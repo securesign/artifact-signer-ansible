@@ -1,1 +1,6 @@
 [sigstore]
+<REMOTE_IP_ADDRESS>
+
+[sigstore:vars]
+ansible_user=<remote_user>
+become=true

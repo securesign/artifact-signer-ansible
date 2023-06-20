@@ -1,12 +1,15 @@
 # sigstore-ansible
 
-Automation to deploy the sigstore ecosystem on Virtual Machines
+Automation to deploy the sigstore ecosystem on RHEL
 
 :warning: **The contents of this repository are a Work in Progress.**
 
 ## Overview
 
-The automation within this repository establishes the components of the [Sigstore project](https://sigstore.dev) within a single Red Hat Enterprise Linux (RHEL) virtual machine using a standalone containerized deployment. Containers are spawned using Kubernetes based manifests using [podman kube play](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).
+The automation within this repository establishes the components of the [Sigstore project](https://sigstore.dev) within a single
+Red Hat Enterprise Linux (RHEL) machine using a standalone containerized deployment.
+Containers are spawned using Kubernetes based manifests using
+[podman kube play](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).
 
 The following Sigstore components are deployed as part of this architecture:
 
@@ -66,7 +69,15 @@ The automation deploys and configures a software load balancer as a central poin
 * https://keycloak.<base_hostname>
 * https://tuf.<base_hostname>
 
-Each of these hostnames must be configured in DNS to resolve to the target Virtual Machine. The `base_hostname` parameter must be provided when executing the provisining.
+Each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided
+when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts` with the following content:
+
+```
+<REMOTE IP ADDRESS> keycloak.<base_hostname>
+<REMOTE_IP_ADDRESS> fulcio.<base_hostname> fulcio
+<REMOTE_IP_ADDRESS> rekor.<base_hostname> rekor
+<REMOTE_IP_ADDRESS> tuf.<base_hostname> tuf
+```
 
 ### Cosign
 
@@ -77,7 +88,8 @@ Each of these hostnames must be configured in DNS to resolve to the target Virtu
 Execute the following commands to execute the automation:
 
 ```shell
-ansible-playbook -i inventory playbooks/install.yml -e base_hostname=<base_hostname>
+# Run the playbook from your local system
+ansible-playbook -vv -i inventory playbooks/install.yml -e base_hostname=sigstore-dev.ez -K
 ```
 
 ### Add the root CA that was created to your local truststore.
