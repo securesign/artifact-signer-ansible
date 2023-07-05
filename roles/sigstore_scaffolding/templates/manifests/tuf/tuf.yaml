@@ -12,7 +12,7 @@ metadata:
   namespace: tuf-system
 spec:
   containers:
-    - image: quay.io/ablock/tuf-server@sha256:c4f534807b331e97b107d908b7e0cf14a896399bc372bca6a2c7e4f6d730807c
+    - image: {{ tuf_image }}
       #image: ghcr.io/sigstore/scaffolding/server@sha256:719ea3fe44c52af5a5fedab2168429872e37e97b9f063977fc164d60a5a14b53
       imagePullPolicy: IfNotPresent
       name: tuf

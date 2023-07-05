@@ -31,7 +31,7 @@ spec:
       #       secretKeyRef:
       #         key: password
       #         name: fulcio-server-secret
-      image: gcr.io/projectsigstore/fulcio@sha256:27c6e4fe64a72a537c133452d9c8e0518944d1d69aeee5e7ef8a9fbe70b8b5d3
+      image: {{ fulcio_server_image }}
       imagePullPolicy: IfNotPresent
       name: fulcio-server
       ports:

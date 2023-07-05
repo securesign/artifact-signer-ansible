@@ -34,7 +34,7 @@ spec:
             secretKeyRef:
               key: mysql-database
               name: trillian-mysql
-      image: gcr.io/trillian-opensource-ci/db_server@sha256:22b7fddcb4bafc5692760d84dca5e86294363a94e8f0ecb8f5c39364d436e6d5
+      image: {{ trillian_db_image }}
       imagePullPolicy: IfNotPresent
       livenessProbe:
         exec:

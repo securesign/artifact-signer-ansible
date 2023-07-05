@@ -40,7 +40,7 @@ spec:
           value: {{ trillian.mysql.host }}
         - name: MYSQL_PORT
           value: "{{ trillian.mysql.port | quote }})"
-      image: gcr.io/projectsigstore/trillian_log_signer@sha256:b56ed0b7b5e9813c91b208ba6041c9342f9a53162d96943374e59b5289090f1f
+      image: {{ trillian_logsigner_image }}
       imagePullPolicy: IfNotPresent
       name: trillian-trillian-logsigner
       ports:

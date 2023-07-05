@@ -16,7 +16,7 @@ spec:
         - 0.0.0.0
         - --appendonly
         - "yes"
-      image: docker.io/redis@sha256:6c42cce2871e8dc5fb3e843ed5c4e7939d312faf5e53ff0ff4ca955a7e0b2b39
+      image: {{ redis_image }}
       imagePullPolicy: IfNotPresent
       name: rekor-redis
       ports:

@@ -38,7 +38,7 @@ spec:
           value: {{ trillian.mysql.host }}
         - name: MYSQL_PORT
           value: "{{ trillian.mysql.port | quote }})"
-      image: gcr.io/projectsigstore/trillian_log_server@sha256:75dbbfc4c0b64334b985c4971fe58c30b9dd73d7aa54b15cee61223ff92aebf3
+      image: {{ trillian_log_server_image }}
       imagePullPolicy: IfNotPresent
       name: trillian-trillian-logserver
       ports:
@@ -56,7 +56,7 @@ spec:
         - sh
         - -c
         - until nc -z -w 10 trillian-mysql 3306; do echo waiting for trillian-mysql; sleep 5; done;
-      image: docker.io/toolbelt/netcat@sha256:7d921b6d368fb1736cb0832c6f57e426c161593c075847af3378eb3185801cea
+      image: {{ netcat_image}}
       imagePullPolicy: IfNotPresent
       name: wait-for-trillian-db
       resources: {}

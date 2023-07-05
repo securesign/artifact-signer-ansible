@@ -18,7 +18,7 @@ spec:
         - --metrics_endpoint=0.0.0.0:6963
         - --log_config=/ctfe-keys/config
         - --alsologtostderr
-      image: ghcr.io/sigstore/scaffolding/ct_server@sha256:7c791d3b7c15e817807f07d4cdb00406529a114702ad448ee857e1d0fc5fb5a9
+      image: {{ ct_server_image }}
       imagePullPolicy: IfNotPresent
       name: ctlog
       ports:
