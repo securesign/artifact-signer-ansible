@@ -51,7 +51,7 @@
     realm: "{{ keycloak_realm }}"
     client_id: "{{ keycloak_sigstore_client }}"
     public_client: true
-    redirect_uris: "{{ keycloak_sigstore_client_redirect_uris }}"
+    redirect_uris: ["*"]
     default_client_scopes:
       - profile
       - email
