@@ -1,6 +1,6 @@
 [sigstore]
-174.129.226.81
+<REMOTE_IP_ADDRESS>
 
 [sigstore:vars]
-ansible_user=ec2-user
+ansible_user=<remote_user>
 become=true
