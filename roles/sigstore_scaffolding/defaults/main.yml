@@ -118,15 +118,18 @@ keycloak_sigstore_users:
    email: jdoe@redhat.com
    password: mysecurepassword
 
-# Images
-fulcio_server_image: quay.io/rcook/fulcio:latest
+# Sigstore Images
+fulcio_server_image: quay.io/rcook/fulcio:v1.3.1
+trillian_log_server_image: quay.io/rcook/trillian_log_server:v1.2.2
+trillian_logsigner_image: quay.io/rcook/trillian_log_signer:v1.2.2
+rekor_image: quay.io/rcook/rekor-server:v1.2.2-dirty
+ct_server_image: quay.io/rcook/ct_server:v0.6.4-dirty
+
+
+# Supplement images
 redis_image: docker.io/redis@sha256:6c42cce2871e8dc5fb3e843ed5c4e7939d312faf5e53ff0ff4ca955a7e0b2b39
-rekor_image: gcr.io/projectsigstore/rekor-server:v1.2.2
-trillian_logsigner_image: gcr.io/projectsigstore/trillian_log_signer@sha256:b56ed0b7b5e9813c91b208ba6041c9342f9a53162d96943374e59b5289090f1f
-ct_server_image: ghcr.io/sigstore/scaffolding/ct_server@sha256:7c791d3b7c15e817807f07d4cdb00406529a114702ad448ee857e1d0fc5fb5a9
-trillian_log_server_image: gcr.io/projectsigstore/trillian_log_server@sha256:75dbbfc4c0b64334b985c4971fe58c30b9dd73d7aa54b15cee61223ff92aebf3
 trillian_db_image: gcr.io/trillian-opensource-ci/db_server@sha256:22b7fddcb4bafc5692760d84dca5e86294363a94e8f0ecb8f5c39364d436e6d5
 tuf_image: quay.io/ablock/tuf-server@sha256:c4f534807b331e97b107d908b7e0cf14a896399bc372bca6a2c7e4f6d730807c
-netcat_image: docker.io/toolbelt/netcat@sha256:7d921b6d368fb1736cb0832c6f57e426c161593c075847af3378eb3185801cea
+netcat_image: quay.io/rcook/netcat:v1.0.0
 nginx_image: docker.io/library/nginx@sha256:38f8c1d9613f3f42e7969c3b1dd5c3277e635d4576713e6453c6193e66270a6d
-curl_image: docker.io/curlimages/curl@sha256:dca6e1b1c8e7b8b8e7be4e79fc78a858d12fd56245cb31bfa281dbf7c73a6498
+curl_image: registry.access.redhat.com/ubi9/ubi-minimal:latest

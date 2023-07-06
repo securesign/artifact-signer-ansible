@@ -1,10 +1,37 @@
-data "aws_route53_zone" "octo" {
-  name        = "octo-emerging.redhataicoe.com"
+variable "vpc_id" {
+  type = string
+}
+
+variable "base_domain" {
+  type = string
+}
+
+data "aws_route53_zone" "domain" {
+  name        = var.base_domain
   private_zone = false
 }
 
-data "aws_eip" "by_allocation_id" {
-  id = "eipalloc-0be7c4b4950490aec"
+data "aws_ami" "rhel8" {
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["RHEL-8*"]
+  }
+  filter {
+    name = "architecture"
+    values = ["x86_64"]
+  }
+}
+
+// Create a new elastic ip address
+resource "aws_eip" "eip_assoc" {
+  vpc = true
+}
+
+// Associate elastic ip address with instance
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.sigstore.id
+  allocation_id = aws_eip.eip_assoc.id
 }
 
 // Generate Private and Public Key and upload to aws
@@ -13,10 +40,31 @@ data "aws_eip" "by_allocation_id" {
    rsa_bits  = 4096
  }
 
-// associate the eip with the instance
-resource "aws_eip_association" "eip_assoc" {
-  instance_id   = aws_instance.sigstore.id
-  allocation_id = data.aws_eip.by_allocation_id.id
+// generate a new security group to allow ssh and https traffic
+resource "aws_security_group" "sigstore-access" {
+  name        = "sigstore-access"
+  description = "Allow ssh and https traffic"
+  vpc_id      = var.vpc_id
+  ingress {
+    description = "SSH from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "HTTPS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
  resource "aws_key_pair" "generated_key" {
@@ -36,11 +84,10 @@ resource "aws_eip_association" "eip_assoc" {
    }
  }
 
-// Launch aws instance using ami-007cf291af489ad4d then connect to it using ssh and install podman
 resource "aws_instance" "sigstore" {
-  ami           = "ami-0ab8a79740bc2cec5"
+  ami           = data.aws_ami.rhel8.id
   instance_type = "m5.large"
-  vpc_security_group_ids = ["sg-052f8b62b8394f363"]
+  vpc_security_group_ids = [aws_security_group.sigstore-access.id]
   key_name      = aws_key_pair.generated_key.key_name
   provisioner "remote-exec" {
     inline = [
@@ -49,10 +96,10 @@ resource "aws_instance" "sigstore" {
     ]
   }  
   provisioner "local-exec" {
-    command = "sed  -i'' -e 's/<REMOTE_IP_ADDRESS>/${data.aws_eip.by_allocation_id.public_ip}/g' inventory"
+    command = "sed  -i.bak 's/<REMOTE_IP_ADDRESS>/${aws_eip.eip_assoc.public_ip}/g' inventory"
   }
   provisioner "local-exec" {
-    command = "sed -i'' -e 's/ansible_user=<remote_user>/ansible_user=ec2-user/g' inventory"
+    command = "sed -i.bak 's/ansible_user=<remote_user>/ansible_user=ec2-user/g' inventory"
   }
   provisioner "local-exec" {
     command = "ansible-galaxy collection install -r requirements.yml"
@@ -68,42 +115,42 @@ resource "aws_instance" "sigstore" {
 resource "null_resource" "configure-sigstore" {
   depends_on = [aws_instance.sigstore]
   provisioner "local-exec" {
-    command = "ansible-playbook -i inventory playbooks/install.yml -e base_hostname=octo-emerging.redhataicoe.com"
+    command = "ansible-playbook -i inventory playbooks/install.yml -e base_hostname=${var.base_domain}"
   }
 }
 
 resource "aws_route53_record" "rekor" {
-  name = "rekor.octo-emerging.redhataicoe.com"
+  name = "rekor.${var.base_domain}"
   type = "A"
-  zone_id = data.aws_route53_zone.octo.zone_id
-  records = [data.aws_eip.by_allocation_id.public_ip]
+  zone_id = data.aws_route53_zone.domain.zone_id
+  records = [aws_eip.eip_assoc.public_ip]
   allow_overwrite = true
   ttl = "300"
 }
 
 resource "aws_route53_record" "fulcio" {
-  name = "fulcio.octo-emerging.redhataicoe.com"
+  name = "fulcio.${var.base_domain}"
   type = "A"
-  zone_id = data.aws_route53_zone.octo.zone_id
-  records = [data.aws_eip.by_allocation_id.public_ip]
+  zone_id = data.aws_route53_zone.domain.zone_id
+  records = [aws_eip.eip_assoc.public_ip]
   allow_overwrite = true
   ttl = "300"
 }
 
 resource "aws_route53_record" "tuf" {
-  name = "tuf.octo-emerging.redhataicoe.com"
+  name = "tuf.${var.base_domain}"
   type = "A"
-  zone_id = data.aws_route53_zone.octo.zone_id
-  records = [data.aws_eip.by_allocation_id.public_ip]
+  zone_id = data.aws_route53_zone.domain.zone_id
+  records = [aws_eip.eip_assoc.public_ip]
   allow_overwrite = true
   ttl = "300"
 }
 
 resource "aws_route53_record" "keycloak" {
-  name = "keycloak.octo-emerging.redhataicoe.com"
+  name = "keycloak.${var.base_domain}"
   type = "A"
-  zone_id = data.aws_route53_zone.octo.zone_id
-  records = [data.aws_eip.by_allocation_id.public_ip]
+  zone_id = data.aws_route53_zone.domain.zone_id
+  records = [aws_eip.eip_assoc.public_ip]
   allow_overwrite = true
   ttl = "300"
 }
