@@ -157,6 +157,7 @@ Terraform code is included within this repository. To test the functionality run
 NOTE: You will be prompted to provide the base domain and vpc at launch time.
 
 ```
+terraform init
 terraform apply --auto-approve
 ```
 
