@@ -152,6 +152,12 @@ If the signature verification did not result in an error, the deployment of Sigs
 
 ## Terraform
 
+If running mac please execute the following before launching the terraform install
+
+```
+sudo killall -HUP mDNSResponder
+```
+
 Terraform code is included within this repository. To test the functionality run the following.
 
 NOTE: You will be prompted to provide the base domain and vpc at launch time.
