@@ -23,6 +23,16 @@ data "aws_ami" "rhel8" {
   }
 }
 
+variable "rh_username" {
+  sensitive = true
+  type = string
+}
+
+variable "rh_password" {
+  sensitive = true
+  type = string
+}
+
 // Create a new elastic ip address
 resource "aws_eip" "eip_assoc" {
   vpc = true
@@ -115,7 +125,7 @@ resource "aws_instance" "sigstore" {
 resource "null_resource" "configure-sigstore" {
   depends_on = [aws_instance.sigstore]
   provisioner "local-exec" {
-    command = "ansible-playbook -i inventory playbooks/install.yml -e base_hostname=${var.base_domain}"
+    command = "ansible-playbook -i inventory playbooks/install.yml -e registry_username='${var.rh_username}' -e registry_password='${var.rh_password}' -e base_hostname=${var.base_domain}"
   }
 }
 
