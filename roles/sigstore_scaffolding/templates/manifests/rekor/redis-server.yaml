@@ -25,10 +25,11 @@ spec:
       readinessProbe:
         exec:
           command:
-            - /bin/sh
-            - -i
-            - -c
-            - test "$(redis-cli -h 127.0.0.1 ping)" = "PONG"
+            - /usr/bin/run-redis
+            - --bind
+            - 0.0.0.0
+            - --appendonly
+            - "yes"
         failureThreshold: 3
         initialDelaySeconds: 5
         periodSeconds: 10
