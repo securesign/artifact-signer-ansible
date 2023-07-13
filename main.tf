@@ -167,5 +167,5 @@ resource "aws_route53_record" "keycloak" {
 
 // Output public ip address
 output "public_ip" {
-  value = aws_instance.sigstore.public_ip
+  value = aws_eip.eip_assoc.public_ip
 }
