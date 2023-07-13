@@ -12,6 +12,7 @@ metadata:
 spec:
   containers:
     - args:
+        - /usr/bin/run-redis
         - --bind
         - 0.0.0.0
         - --appendonly
