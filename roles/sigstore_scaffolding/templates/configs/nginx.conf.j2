@@ -41,7 +41,7 @@ http {
 stream {  
 
   map $ssl_server_name $targetBackend {
-    rekor.{{ base_hostname }}  rekor-server:3000;
+    rekor.{{ base_hostname }}  rekor-server-pod:3000;
     tuf.{{ base_hostname }}  tuf:8080;
     fulcio.{{ base_hostname }}  fulcio-server:5555;
     keycloak.{{ base_hostname }}  keycloak:8080;
