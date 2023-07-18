@@ -55,7 +55,7 @@ spec:
     - command:
         - sh
         - -c
-        - until nc -z -w 10 trillian-mysql 3306; do echo waiting for trillian-mysql; sleep 5; done;
+        - until nc -z -w 10 trillian-mysql-pod 3306; do echo waiting for trillian-mysql; sleep 5; done;
       image: docker.io/toolbelt/netcat@sha256:7d921b6d368fb1736cb0832c6f57e426c161593c075847af3378eb3185801cea
       imagePullPolicy: IfNotPresent
       name: wait-for-trillian-db

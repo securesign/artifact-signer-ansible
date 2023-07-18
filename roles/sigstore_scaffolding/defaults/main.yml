@@ -34,7 +34,7 @@ trillian:
    rootPassword: rootpassword
    password: password
    database: trillian
-   host: trillian-mysql
+   host: trillian-mysql-pod
    port: 3306
 
 config_dir: /etc/sigstore
