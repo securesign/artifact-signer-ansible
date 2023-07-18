@@ -1,4 +1,5 @@
 venv/
+inventory
 env/
 .venv/
 .env/

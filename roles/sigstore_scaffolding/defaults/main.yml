@@ -14,6 +14,7 @@ cockpit:
   cockpit_packages:
     - cockpit-storaged
     - cockpit-podman
+    - cockpit
   cockpit_manage_firewall: yes
 
 skip_os_install: false
@@ -33,7 +34,7 @@ trillian:
    rootPassword: rootpassword
    password: password
    database: trillian
-   host: trillian-mysql
+   host: trillian-mysql-pod
    port: 3306
 
 config_dir: /etc/sigstore
@@ -108,8 +109,7 @@ keycloak_client: sigstore
 keycloak_auth_endpoint: ""
 
 keycloak_sigstore_client: sigstore
-keycloak_sigstore_client_redirect_uris:
-  - "http://localhost/auth/callback"
+keycloak_sigstore_client_redirect_uris: "*"
 
 keycloak_sigstore_users:
  - username: jdoe
@@ -117,3 +117,19 @@ keycloak_sigstore_users:
    last_name: Doe
    email: jdoe@redhat.com
    password: mysecurepassword
+
+# Sigstore Images
+fulcio_server_image: quay.io/rcook/fulcio:v1.3.1
+trillian_log_server_image: quay.io/rcook/trillian_log_server:v1.2.2
+trillian_logsigner_image: quay.io/rcook/trillian_log_signer:v1.2.2
+rekor_image: quay.io/rcook/rekor-server:v1.2.2-dirty
+ct_server_image: quay.io/rcook/ct_server:v0.6.4-dirty
+
+
+# Supplement images
+redis_image: registry.redhat.io/rhel9/redis-6@sha256:031a5a63611e1e6a9fec47492a32347417263b79ad3b63bcee72fc7d02d64c94
+trillian_db_image: gcr.io/trillian-opensource-ci/db_server@sha256:22b7fddcb4bafc5692760d84dca5e86294363a94e8f0ecb8f5c39364d436e6d5
+tuf_image: quay.io/rcook/tuf/server:latest
+netcat_image: quay.io/rcook/netcat:v1.0.0
+nginx_image: docker.io/library/nginx@sha256:38f8c1d9613f3f42e7969c3b1dd5c3277e635d4576713e6453c6193e66270a6d
+curl_image: registry.access.redhat.com/ubi9/ubi-minimal:latest
