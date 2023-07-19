@@ -27,10 +27,10 @@ spec:
             - /etc/nginx/conf/nginx.conf
           ports:
             - name: https
-              containerPort: 443
+              containerPort: 8443
               hostPort: 443
             - name: http
-              containerPort: 80
+              containerPort: 8080
               hostPort: 80
           volumeMounts:
             - mountPath: /certs
