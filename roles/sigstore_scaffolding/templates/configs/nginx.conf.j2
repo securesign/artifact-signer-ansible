@@ -45,21 +45,27 @@ stream {
     rekor.{{ base_hostname }}  rekor-server-pod:3000;
     tuf.{{ base_hostname }}  tuf-pod:8080;
     fulcio.{{ base_hostname }}  fulcio-server-pod:5555;
-    keycloak.{{ base_hostname }}  keycloak:8080;
+{% if keycloak_enabled %}
+    {{ keycloak_url }}  keycloak:8080;
+{% endif %}
   }
 
   map $ssl_server_name $targetCert {
     rekor.{{ base_hostname }} /certs/ingress-rekor.pem;
     tuf.{{ base_hostname }} /certs/ingress-tuf.pem;
     fulcio.{{ base_hostname }} /certs/ingress-fulcio.pem;
-    keycloak.{{ base_hostname }} /certs/ingress-keycloak.pem;
+{% if keycloak_enabled %}
+    {{ keycloak_url }}  /certs/ingress-keycloak.key;
+{% endif %}
   }
 
   map $ssl_server_name $targetCertKey {
     rekor.{{ base_hostname }}  /certs/ingress-rekor.key;
     tuf.{{ base_hostname }}  /certs/ingress-tuf.key;
     fulcio.{{ base_hostname }}  /certs/ingress-fulcio.key;
-    keycloak.{{ base_hostname }}  /certs/ingress-keycloak.key;
+{% if keycloak_enabled %}
+    {{ keycloak_url }}  /certs/ingress-keycloak.key;
+{% endif %}
   }
   
   server {
