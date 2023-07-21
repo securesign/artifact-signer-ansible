@@ -55,7 +55,7 @@ stream {
     tuf.{{ base_hostname }} /certs/ingress-tuf.pem;
     fulcio.{{ base_hostname }} /certs/ingress-fulcio.pem;
 {% if keycloak_enabled %}
-    {{ keycloak_url }}  /certs/ingress-keycloak.key;
+    {{ keycloak_url }}  /certs/ingress-keycloak.pem;
 {% endif %}
   }
 

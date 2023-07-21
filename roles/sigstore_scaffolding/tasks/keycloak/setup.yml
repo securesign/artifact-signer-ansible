@@ -8,11 +8,11 @@
 
 - name: Set Keycloak Hostname
   ansible.builtin.set_fact:
-    keycloak_auth_url: https://{{ keycloak_url }}{{ keycloak_auth_endpoint }}
+    keycloak_auth_url: "https://{{ keycloak_url }}{{ keycloak_auth_endpoint }}"
 
 - name: "Wait until Keycloak becomes active and ready"
   ansible.builtin.uri:
-    url: https://{{ keycloak_url }}/health/ready
+    url: "https://{{ keycloak_url }}/health/ready"
     method: GET
     validate_certs: false
   register: keycloak_status
