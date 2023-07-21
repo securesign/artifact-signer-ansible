@@ -46,9 +46,9 @@ spec:
         - name: KC_HEALTH_ENABLED
           value: "true"
         - name: KC_HOSTNAME_URL
-          value: "https://keycloak.{{ base_hostname }}"
+          value: "https://{{ keycloak_url }}"
         - name: KC_HOSTNAME_ADMIN_URL
-          value: "https://keycloak.{{ base_hostname }}"
+          value: "https://{{ keycloak_url }}"
       args:
         - start
       image: quay.io/keycloak/keycloak@sha256:b8f2a453a17a244a829fdafdb08dd77f719d3622bc3987c76a81771c0913b882

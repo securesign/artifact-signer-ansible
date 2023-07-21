@@ -97,6 +97,8 @@ ct_logprefix: sigstoreansible
 
 scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
 
+keycloak_enabled: true
+keycloak_url: keycloak.{{ base_hostname }}
 keycloak_wait_increment_seconds: 60
 keycloak_postgresql_user: "keycloak"
 keycloak_postgresql_password: "keycloak"
