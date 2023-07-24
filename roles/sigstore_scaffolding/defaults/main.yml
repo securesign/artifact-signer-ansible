@@ -28,6 +28,10 @@ sigstore_trillian_templates:
   - manifests/trillian/trillian-logserver.yaml
   - manifests/trillian/trillian-logsigner.yaml
 
+ctlog_enabled: true
+tuf_enabled: true
+
+trillian_enabled: true
 trillian:
   mysql:
    user: mysql
@@ -74,7 +78,7 @@ remote_ctlog_public_key: "{{ certs_dir }}/{{ ctlog_public_key_filename }}"
 remote_rekor_signer: "{{ certs_dir }}/{{ rekor_signer_filename }}"
 remote_rekor_public_key: "{{ certs_dir }}/{{ rekor_public_key_filename }}"
 
-
+rekor_enabled: true
 rekor_public_key_retries: 5
 rekor_public_key_delay: 10
 fulcio_server_config: "{{ kube_configmap_dir }}/fulcio-config.yaml"
@@ -90,6 +94,7 @@ keycloak_certs_config: "{{ kube_configmap_dir }}/keycloak-certs.yaml"
 setup_host_dns: true
 base_hostname: ""
 
+fulcio_enabled: true
 fulcio_ca_passphrase: sigstore
 ctlog_ca_passphrase: sigstore
 rekor_ca_passphrase: sigstore
