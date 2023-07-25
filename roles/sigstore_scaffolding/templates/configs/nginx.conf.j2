@@ -10,8 +10,10 @@ events {
     worker_connections  1024;
 }
 
-
 http {
+    map_hash_bucket_size 128;
+    map_hash_max_size 128;
+    server_names_hash_bucket_size  128;
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
@@ -41,25 +43,50 @@ http {
 
 stream {  
 
+  map_hash_bucket_size 128;
   map $ssl_server_name $targetBackend {
+{% if rekor_enabled %}
     rekor.{{ base_hostname }}  rekor-server-pod:3000;
+{% endif %}
+{% if tuf_enabled %}
     tuf.{{ base_hostname }}  tuf-pod:8080;
+{% endif %}
+{% if fulcio_enabled %}
     fulcio.{{ base_hostname }}  fulcio-server-pod:5555;
-    keycloak.{{ base_hostname }}  keycloak:8080;
+{% endif %}
+{% if keycloak_enabled %}
+    {{ keycloak_url }}  keycloak:8080;
+{% endif %}
   }
 
   map $ssl_server_name $targetCert {
+{% if rekor_enabled %}
     rekor.{{ base_hostname }} /certs/ingress-rekor.pem;
+{% endif %}
+{% if tuf_enabled %}
     tuf.{{ base_hostname }} /certs/ingress-tuf.pem;
+{% endif %}
+{% if fulcio_enabled %}
     fulcio.{{ base_hostname }} /certs/ingress-fulcio.pem;
-    keycloak.{{ base_hostname }} /certs/ingress-keycloak.pem;
+{% endif %}
+{% if keycloak_enabled %}
+    {{ keycloak_url }}  /certs/ingress-keycloak.pem;
+{% endif %}
   }
 
   map $ssl_server_name $targetCertKey {
+{% if rekor_enabled %}
     rekor.{{ base_hostname }}  /certs/ingress-rekor.key;
+{% endif %}
+{% if tuf_enabled %}
     tuf.{{ base_hostname }}  /certs/ingress-tuf.key;
+{% endif %}
+{% if fulcio_enabled %}
     fulcio.{{ base_hostname }}  /certs/ingress-fulcio.key;
-    keycloak.{{ base_hostname }}  /certs/ingress-keycloak.key;
+{% endif %}
+{% if keycloak_enabled %}
+    {{ keycloak_url }}  /certs/ingress-keycloak.key;
+{% endif %}
   }
   
   server {
