@@ -87,6 +87,8 @@ nginx_config: "{{ kube_configmap_dir }}/nginx-config.yaml"
 nginx_certs_config: "{{ kube_configmap_dir }}/nginx-certs.yaml"
 keycloak_certs_config: "{{ kube_configmap_dir }}/keycloak-certs.yaml"
 
+systemd_directory: /etc/systemd/system
+
 setup_host_dns: true
 base_hostname: ""
 

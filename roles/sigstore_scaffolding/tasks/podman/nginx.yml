@@ -88,7 +88,6 @@
     podman_spec:
       state: "started"
       network: "{{ sigstore_podman_network }}"
+      systemd_file: "nginx"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
-      configmap:
-        - "{{ nginx_certs_config }}"
-        - "{{ nginx_config }}"
+      configmap: "{{ nginx_certs_config }},{{ nginx_config }}"

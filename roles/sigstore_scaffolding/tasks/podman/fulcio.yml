@@ -71,9 +71,7 @@
   vars:
     podman_spec:
       state: "started"
+      systemd_file: "fulcio"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.yaml') | from_yaml }}"
-      configmap:
-        - "{{ fulcio_server_config }}"
-        - "{{ fulcio_server_secret_config }}"
-        - "{{ nginx_certs_config }}"
+      configmap: "{{ fulcio_server_config }}","{{ fulcio_server_secret_config }}","{{ nginx_certs_config }}"

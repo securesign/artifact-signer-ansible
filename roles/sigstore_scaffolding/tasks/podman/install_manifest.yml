@@ -9,9 +9,14 @@
     content: "{{ podman_spec.kube_file_content | to_nice_yaml(indent=2) }}"
     dest: "{{ kube_play_file }}"
 
-- name: Podman Play "{{ kube_play_file | basename }}"
-  containers.podman.podman_play:
-    kube_file: "{{ kube_play_file }}"
-    network: "{{ podman_spec.network | default('podman') }}"
-    configmap: "{{ podman_spec.configmap | default(omit) }}"
-    state: "{{ podman_spec.state | default('started') }}"
+- name: Copy Systemd file to Server
+  ansible.builtin.template:
+    src: "systemd/{{ podman_spec.systemd_file }}.j2"
+    dest: "{{ systemd_directory + '/' + podman_spec.systemd_file }}.service"
+
+- name: Start Podman Service
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    daemon_reload: true
+    name: "{{ podman_spec.systemd_file }}"
