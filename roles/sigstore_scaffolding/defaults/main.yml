@@ -23,11 +23,6 @@ sigstore_rekor_templates:
   - manifests/rekor/redis-server.yaml
   - manifests/rekor/rekor-server.yaml
 
-sigstore_trillian_templates:
-  - manifests/trillian/trillian-mysql.yaml
-  - manifests/trillian/trillian-logserver.yaml
-  - manifests/trillian/trillian-logsigner.yaml
-
 trillian:
   mysql:
    user: mysql
