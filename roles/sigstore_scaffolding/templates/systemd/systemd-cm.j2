@@ -1,5 +1,5 @@
 [Unit]
-Description=Keycloak postgresql systemd container
+Description="{{ podman_spec.systemd_file}}" systemd container
 Documentation=man:podman-kube-play(1)
 Wants=network-online.target
 After=network-online.target
@@ -8,7 +8,7 @@ RequiresMountsFor=%t/containers
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 TimeoutStopSec=70
-ExecStart=/usr/bin/podman kube play --replace --service-container=true "{{ kube_play_file }}"  --network "{{ podman_spec.network | default('podman') }}"
+ExecStart=/usr/bin/podman kube play --replace --service-container=true "{{ kube_play_file }}"  --network "{{ podman_spec.network | default('podman') }}" --configmap "{{ podman_spec.configmap | default(omit) }}"
 ExecStop=/usr/bin/podman kube down "{{ kube_play_file }}"
 Type=notify
 NotifyAccess=all
