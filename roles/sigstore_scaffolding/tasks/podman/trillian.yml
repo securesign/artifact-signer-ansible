@@ -8,7 +8,7 @@
     data: "{{ trillian_mysql_secret | to_json }}"
   vars:
     trillian_mysql_secret:
-      "mysql-root-password": "{{ trillian.mysql.rootPassword }}"
+      "mysql-root-password": "{{ trillian.mysql.rootPassword | b64encode }}"
       "mysql-password": "{{ trillian.mysql.password | b64encode }}"
       "mysql-database": "{{ trillian.mysql.database | b64encode }}"
       "mysql-user": "{{ trillian.mysql.user | b64encode }}"
