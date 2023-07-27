@@ -63,6 +63,7 @@ spec:
               name: rekor-sharding-config
             - mountPath: /var/run/attestations
               name: storage
+      restartPolicy: Always
       volumes:
         - name: rekor-sharding-config
           configMap:

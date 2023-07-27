@@ -40,6 +40,7 @@ spec:
               name: nginx-config
               #subPath: nginx.conf
               #readOnly: true
+      restartPolicy: Always
       volumes:
         - name: nginx-certs
           configMap:

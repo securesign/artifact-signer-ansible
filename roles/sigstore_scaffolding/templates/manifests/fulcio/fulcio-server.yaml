@@ -60,6 +60,7 @@ spec:
             - mountPath: /certs
               name: nginx-certs
               readOnly: true
+      restartPolicy: Always
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       securityContext:
