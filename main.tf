@@ -125,7 +125,7 @@ resource "aws_instance" "sigstore" {
 resource "null_resource" "configure-sigstore" {
   depends_on = [aws_instance.sigstore]
   provisioner "local-exec" {
-    command = "ansible-playbook -i inventory playbooks/install.yml -e registry_username='${var.rh_username}' -e registry_password='${var.rh_password}' -e base_hostname=${var.base_domain}"
+    command = "ansible-playbook --private-key=./aws_keys_pairs.pem -i inventory playbooks/install.yml -e registry_username='${var.rh_username}' -e registry_password='${var.rh_password}' -e base_hostname=${var.base_domain}"
   }
 }
 
