@@ -27,6 +27,7 @@
   delay: "{{ rekor_public_key_delay }}"
   register: rekor_public_key_result
   delegate_to: localhost
+  become: false
 
 
 - name: Create tuf ConfigMap
