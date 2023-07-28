@@ -13,6 +13,7 @@
       - 200
   register: keycloak_user_result
   delegate_to: localhost
+  become: false
 
 - name: Create User {{ keycloak_user.username }}
   ansible.builtin.uri:
@@ -35,6 +36,7 @@
     status_code:
       - 201
   delegate_to: localhost
+  become: false
   when: keycloak_user_result.json | selectattr('username', 'equalto', keycloak_user.username) | list | length == 0
 
 - name: Query Update List of Users for {{ keycloak_user.username }}
@@ -49,6 +51,7 @@
     status_code:
       - 200
   register: keycloak_user_result
+  become: false
   delegate_to: localhost
 
 - name: Set User Password for {{ keycloak_user.username }}
@@ -68,3 +71,4 @@
     status_code:
       - 204
   delegate_to: localhost
+  become: false
