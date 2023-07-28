@@ -24,6 +24,7 @@
   vars:
     podman_spec:
       state: "started"
+      systemd_file: "keycloak-postgresql"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/keycloak/keycloak-postgresql.yaml') | from_yaml }}"
 
@@ -71,9 +72,9 @@
     podman_spec:
       state: "started"
       network: "{{ sigstore_podman_network }}"
+      systemd_file: "keycloak"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/keycloak/keycloak.yaml') | from_yaml }}"
-      configmap:
-        - "{{ keycloak_certs_config }}"
+      configmap: "{{ keycloak_certs_config }}"
 
 - name: Setup Keycloak
   ansible.builtin.include_tasks: keycloak/setup.yml

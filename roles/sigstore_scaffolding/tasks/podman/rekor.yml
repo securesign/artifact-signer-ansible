@@ -22,6 +22,7 @@
   vars:
     podman_spec:
       state: "started"
+      systemd_file: "redis"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/redis-server.yaml') | from_yaml }}"
 
@@ -30,7 +31,7 @@
   vars:
     podman_spec:
       state: "started"
+      systemd_file: "rekor"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/rekor-server.yaml') | from_yaml }}"
-      configmap:
-        - "{{ rekor_sharding_config }}"
+      configmap: "{{ rekor_sharding_config }}"

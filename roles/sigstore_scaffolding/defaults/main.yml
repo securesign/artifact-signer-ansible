@@ -23,15 +23,11 @@ sigstore_rekor_templates:
   - manifests/rekor/redis-server.yaml
   - manifests/rekor/rekor-server.yaml
 
-sigstore_trillian_templates:
-  - manifests/trillian/trillian-mysql.yaml
-  - manifests/trillian/trillian-logserver.yaml
-  - manifests/trillian/trillian-logsigner.yaml
-
 ctlog_enabled: true
 tuf_enabled: true
 
 trillian_enabled: true
+
 trillian:
   mysql:
    user: mysql
@@ -91,6 +87,8 @@ nginx_config: "{{ kube_configmap_dir }}/nginx-config.yaml"
 nginx_certs_config: "{{ kube_configmap_dir }}/nginx-certs.yaml"
 keycloak_certs_config: "{{ kube_configmap_dir }}/keycloak-certs.yaml"
 
+systemd_directory: /etc/systemd/system
+
 setup_host_dns: true
 base_hostname: ""
 
@@ -135,7 +133,7 @@ ct_server_image: quay.io/securesign/ct_server:v0.6.4
 
 # Supplement images
 redis_image: registry.redhat.io/rhel9/redis-6@sha256:031a5a63611e1e6a9fec47492a32347417263b79ad3b63bcee72fc7d02d64c94
-trillian_db_image: gcr.io/trillian-opensource-ci/db_server@sha256:22b7fddcb4bafc5692760d84dca5e86294363a94e8f0ecb8f5c39364d436e6d5
+trillian_db_image: quay.io/securesign/trillian-db:v1.5.2
 tuf_image: quay.io/securesign/tuf/server:latest
 netcat_image: quay.io/securesign/netcat:v1.0.0
 nginx_image: registry.access.redhat.com/ubi8/nginx-120@sha256:0d4543b4cf26eb46b1632006cc5b24a1925336973eb3ec17cdfb9fec372da5b8

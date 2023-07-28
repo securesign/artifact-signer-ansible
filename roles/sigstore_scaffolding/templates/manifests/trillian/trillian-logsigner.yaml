@@ -77,7 +77,7 @@ spec:
         kubernetes.io/arch: arm64
       preemptionPolicy: PreemptLowerPriority
       priority: 0
-      restartPolicy: OnFailure
+      restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       serviceAccountName: trillian-logsigner

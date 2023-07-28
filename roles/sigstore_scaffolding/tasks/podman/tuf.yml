@@ -53,7 +53,7 @@
   vars:
     podman_spec:
       state: "started"
+      systemd_file: "tuf"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.yaml') | from_yaml }}"
-      configmap:
-        - "{{ tuf_secret_config }}"
+      configmap: "{{ tuf_secret_config }}"

@@ -37,7 +37,7 @@
   vars:
     podman_spec:
       state: "started"
+      systemd_file: "ctlog"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog.yaml') | from_yaml }}"
-      configmap:
-        - "{{ ctlog_secret_config }}"
+      configmap: "{{ ctlog_secret_config }}"
