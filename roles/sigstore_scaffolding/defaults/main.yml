@@ -124,17 +124,17 @@ keycloak_sigstore_users:
    password: mysecurepassword
 
 # Sigstore Images
-fulcio_server_image: quay.io/rcook/fulcio:v1.3.1
-trillian_log_server_image: quay.io/rcook/trillian_log_server:v1.2.2
-trillian_logsigner_image: quay.io/rcook/trillian_log_signer:v1.2.2
-rekor_image: quay.io/rcook/rekor-server:v1.2.2-dirty
-ct_server_image: quay.io/rcook/ct_server:v0.6.4-dirty
+fulcio_server_image: quay.io/securesign/fulcio:v1.3.1
+trillian_log_server_image: quay.io/securesign/trillian_log_server:v1.2.2
+trillian_logsigner_image: quay.io/securesign/trillian_log_signer:v1.2.2
+rekor_image: quay.io/securesign/rekor-server:v1.2.2
+ct_server_image: quay.io/securesign/ct_server:v0.6.4
 
 
 # Supplement images
 redis_image: registry.redhat.io/rhel9/redis-6@sha256:031a5a63611e1e6a9fec47492a32347417263b79ad3b63bcee72fc7d02d64c94
-trillian_db_image: quay.io/securesign/trillian-db:v1.5.2
-tuf_image: quay.io/rcook/tuf/server:latest
-netcat_image: quay.io/rcook/netcat:v1.0.0
+trillian_db_image: gcr.io/trillian-opensource-ci/db_server@sha256:22b7fddcb4bafc5692760d84dca5e86294363a94e8f0ecb8f5c39364d436e6d5
+tuf_image: quay.io/securesign/tuf/server:latest
+netcat_image: quay.io/securesign/netcat:v1.0.0
 nginx_image: registry.access.redhat.com/ubi8/nginx-120@sha256:0d4543b4cf26eb46b1632006cc5b24a1925336973eb3ec17cdfb9fec372da5b8
 curl_image: registry.access.redhat.com/ubi9/ubi-minimal:latest
