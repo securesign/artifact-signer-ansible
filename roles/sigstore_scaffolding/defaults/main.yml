@@ -124,11 +124,11 @@ keycloak_sigstore_users:
    password: mysecurepassword
 
 # Sigstore Images
-fulcio_server_image: quay.io/rcook/fulcio:v1.3.1
-trillian_log_server_image: quay.io/rcook/trillian_log_server:v1.2.2
-trillian_logsigner_image: quay.io/rcook/trillian_log_signer:v1.2.2
-rekor_image: quay.io/rcook/rekor-server:v1.2.2-dirty
-ct_server_image: quay.io/rcook/ct_server:v0.6.4-dirty
+fulcio_server_image: quay.io/securesign/fulcio:v1.3.1
+trillian_log_server_image: quay.io/securesign/trillian_log_server:v1.2.2
+trillian_logsigner_image: quay.io/securesign/trillian_log_signer:v1.2.2
+rekor_image: quay.io/securesign/rekor-server:v1.2.2
+ct_server_image: quay.io/securesign/ct_server:v0.6.4
 
 
 # Supplement images
