@@ -22,6 +22,7 @@
   #no_log: true
   register: keycloak_token_result
   delegate_to: localhost
+  become: false
 
 - name: Set SSO Token
   ansible.builtin.set_fact:

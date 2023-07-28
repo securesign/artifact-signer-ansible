@@ -20,6 +20,7 @@
   retries: 25
   delay: 10
   delegate_to: localhost
+  become: false
 
 - name: Create sigstore realm
   community.general.keycloak_realm:
@@ -35,6 +36,7 @@
     validate_certs: no
     wait_increment_seconds: "{{ keycloak_wait_increment_seconds }}"
   delegate_to: localhost
+  become: false
 
 - name: Create sigstore client 
   community.general.keycloak_client:
@@ -53,6 +55,7 @@
     state: present
     validate_certs: no
   delegate_to: localhost
+  become: false
 
 - name: Create Users
   block:
