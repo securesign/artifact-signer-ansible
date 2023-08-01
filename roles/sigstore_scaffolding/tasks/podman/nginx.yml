@@ -31,6 +31,21 @@
     - "{{ certs_dir }}/ingress-keycloak.key"
   register: remote_ingress_certificates
 
+- name: base64 encode the rekor ingress
+  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
+  register: rekor_ingress_base64
+
+- name: base64 encode the tuf ingress
+  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
+  register: tuf_ingress_base64
+
+- name: base 64 encode the fulcio ingress
+  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
+  register: fulcio_ingress_base64
+
+- name: base64 encode the keycloak ingress
+  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
+  register: keycloak_ingress_base64
 
 - name: Create nginx certs ConfigMap
   ansible.builtin.copy:
@@ -38,32 +53,28 @@
     dest: "{{ nginx_certs_config }}"
   vars:
     configmap_content:
-      kind: ConfigMap
+      kind: Secret
       apiVersion: v1
       metadata:
         name: nginx-certs
         namespace: nginx-system
       data:
         ingress-rekor.pem: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode }}
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}
-        ingress-rekor.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.key') | list | first).content | b64decode }}
+          {{ rekor_ingress_base64.stdout }}
         ingress-tuf.pem: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode }}
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}
-        ingress-tuf.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.key') | list | first).content | b64decode }}
+          {{ tuf_ingress_base64.stdout }}
         ingress-fulcio.pem: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode }}
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}
-        ingress-fulcio.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.key') | list | first).content | b64decode }}
+          {{ fulcio_ingress_base64.stdout }}
         ingress-keycloak.pem: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.pem') | list | first).content | b64decode }}
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}
+          {{ keycloak_ingress_base64.stdout }}
+        ingress-rekor.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.key') | list | first).content }}
+        ingress-tuf.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.key') | list | first).content  }}
+        ingress-fulcio.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.key') | list | first).content }}
         ingress-keycloak.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.key') | list | first).content | b64decode }}
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.key') | list | first).content }}
 
 
 - name: Create nginx config ConfigMap
@@ -81,7 +92,6 @@
         nginx.conf: |
           {{ lookup('ansible.builtin.template', 'configs/nginx.conf.j2') }}
 
-
 - name: Deploy nginx Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
@@ -90,4 +100,5 @@
       network: "{{ sigstore_podman_network }}"
       systemd_file: "nginx"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
-      configmap: "{{ nginx_certs_config }},{{ nginx_config }}"
+      configmap: "{{ nginx_config }}"
+      secret: "{{ nginx_certs_config }}"

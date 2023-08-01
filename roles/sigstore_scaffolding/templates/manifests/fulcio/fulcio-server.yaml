@@ -90,7 +90,6 @@ spec:
               - key: cert
                 path: cert.pem
             name: fulcio-server-secret
-        - configMap:
-            defaultMode: 420
-            name: nginx-certs
+        - secret:
+            secretName: nginx-certs
           name: nginx-certs

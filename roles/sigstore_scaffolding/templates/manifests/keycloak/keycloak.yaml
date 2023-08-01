@@ -106,7 +106,6 @@ spec:
       operator: Exists
       tolerationSeconds: 300
   volumes:
-    - configMap:
-        defaultMode: 420
-        name: keycloak-certs
+    - secret:
+        secretName: keycloak-certs
       name: keycloak-certs

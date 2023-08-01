@@ -9,6 +9,12 @@
     content: "{{ podman_spec.kube_file_content | to_nice_yaml(indent=2) }}"
     dest: "{{ kube_play_file }}"
 
+- name: Create Secret
+  containers.podman.podman_play:
+    kube_file: "{{ podman_spec.secret }}"
+    state: "{{ podman_spec.state | default('started') }}"
+  when: podman_spec.secret is defined
+
 - name: Copy Systemd file to Server
   ansible.builtin.template:
     src: "systemd/systemd-cm.j2"
