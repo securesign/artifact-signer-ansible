@@ -47,12 +47,12 @@
   shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
   register: keycloak_ingress_base64
 
-- name: Create nginx certs ConfigMap
+- name: Create nginx certs Secret
   ansible.builtin.copy:
-    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
     dest: "{{ nginx_certs_config }}"
   vars:
-    configmap_content:
+    secret_content:
       kind: Secret
       apiVersion: v1
       metadata:
