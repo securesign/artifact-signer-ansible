@@ -58,12 +58,5 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: tuf-secrets
-          configMap:
-            items:
-              - key: ctlog-public-key
-                path: ctlog-pubkey
-              - key: rekor-public-key
-                path: rekor-pubkey
-              - key: fulcio-root
-                path: fulcio-cert
-            name: tuf-secret
+          secret:
+            secretName: tuf-secret
