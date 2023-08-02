@@ -30,7 +30,7 @@ spec:
           args:
             - --http_endpoint=0.0.0.0:6962
             - --metrics_endpoint=0.0.0.0:6963
-            - --log_config=/ctfe-keys/config
+            - --log_config=/config/config
             - --alsologtostderr
           resources: {}
           terminationMessagePath: /dev/termination-log
@@ -38,6 +38,9 @@ spec:
           volumeMounts:
             - mountPath: /ctfe-keys
               name: keys
+              readOnly: true
+            - mountPath: /config
+              name: config
               readOnly: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
@@ -61,6 +64,8 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: keys
+          secret:
+            secretName: ctlog-secret
+        - name: config
           configMap:
-            defaultMode: 420
-            name: ctlog-secret
+            name: ctlog-config
