@@ -14,8 +14,8 @@
 
 - name: Create ctlog configmap
   ansible.builtin.copy:
-     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-     dest: "{{ ctlog_configmap_config }}"
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ ctlog_configmap_config }}"
   vars:
     configmap_content:
       kind: ConfigMap
