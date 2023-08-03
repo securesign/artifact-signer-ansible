@@ -32,20 +32,20 @@
   register: remote_ingress_certificates
 
 - name: base64 encode the rekor ingress
-  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
-  register: rekor_ingress_base64
+  set_fact: 
+    rekor_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: base64 encode the tuf ingress
-  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
-  register: tuf_ingress_base64
+  set_fact: 
+    tuf_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: base 64 encode the fulcio ingress
-  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
-  register: fulcio_ingress_base64
+  set_fact: 
+    fulcio_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: base64 encode the keycloak ingress
-  shell: echo "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}" | base64
-  register: keycloak_ingress_base64
+  set_fact: 
+    keycloak_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
@@ -60,13 +60,13 @@
         namespace: nginx-system
       data:
         ingress-rekor.pem: |
-          {{ rekor_ingress_base64.stdout }}
+          {{ rekor_ingress_base64 | b64encode}}
         ingress-tuf.pem: |
-          {{ tuf_ingress_base64.stdout }}
+          {{ tuf_ingress_base64 | b64encode}}
         ingress-fulcio.pem: |
-          {{ fulcio_ingress_base64.stdout }}
+          {{ fulcio_ingress_base64 | b64encode}}
         ingress-keycloak.pem: |
-          {{ keycloak_ingress_base64.stdout }}
+          {{ keycloak_ingress_base64 | b64encode}}
         ingress-rekor.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-tuf.key: |
