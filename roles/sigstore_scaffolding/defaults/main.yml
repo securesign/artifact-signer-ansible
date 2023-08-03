@@ -79,7 +79,8 @@ rekor_public_key_retries: 5
 rekor_public_key_delay: 10
 fulcio_server_config: "{{ kube_configmap_dir }}/fulcio-config.yaml"
 fulcio_server_secret_config: "{{ kube_configmap_dir }}/fulcio-server-secret.yaml"
-ctlog_secret_config: "{{ kube_configmap_dir }}/ctlog-secret.yaml"
+ctlog_secret: "{{ kube_configmap_dir }}/ctlog-secret.yaml"
+ctlog_configmap_config: "{{ kube_configmap_dir }}/ctlog-config.yaml"
 tuf_secret_config: "{{ kube_configmap_dir }}/tuf-secret.yaml"
 treeid_config: "{{ kube_configmap_dir }}/treeid-config.yaml"
 rekor_sharding_config: "{{ kube_configmap_dir }}/rekor-sharding-config.yaml"

@@ -29,25 +29,24 @@
   delegate_to: localhost
   become: false
 
-
-- name: Create tuf ConfigMap
+- name: Create tuf Secret
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
     dest: "{{ tuf_secret_config }}"
   vars:
     configmap_content:
-      kind: ConfigMap
+      kind: Secret
       apiVersion: v1
       metadata:
         name: tuf-secret
         namespace: tuf-system
       data:
-        ctlog-public-key: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', remote_ctlog_public_key) | list | first).content | b64decode }}
-        fulcio-root: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', remote_fulcio_root_ca) | list | first).content | b64decode }}
-        rekor-public-key: |
-          {{ rekor_public_key_result.content }}
+        ctlog-pubkey: |
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', remote_ctlog_public_key) | list | first).content }}
+        fulcio-cert: |
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', remote_fulcio_root_ca) | list | first).content }}
+        rekor-pubkey: |
+          {{ rekor_public_key_result.content | b64encode }}
 
 - name: Deploy tuf Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -57,4 +56,4 @@
       systemd_file: "tuf"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.yaml') | from_yaml }}"
-      configmap: "{{ tuf_secret_config }}"
+      secret: "{{ tuf_secret_config }}"
