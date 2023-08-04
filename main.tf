@@ -11,11 +11,11 @@ data "aws_route53_zone" "domain" {
   private_zone = false
 }
 
-data "aws_ami" "rhel8" {
+data "aws_ami" "rhel9" {
   most_recent = true
   filter {
     name = "name"
-    values = ["RHEL-8*"]
+    values = ["RHEL-9*"]
   }
   filter {
     name = "architecture"
@@ -95,7 +95,7 @@ resource "aws_security_group" "sigstore-access" {
  }
 
 resource "aws_instance" "sigstore" {
-  ami           = data.aws_ami.rhel8.id
+  ami           = data.aws_ami.rhel9.id
   instance_type = "m5.large"
   vpc_security_group_ids = [aws_security_group.sigstore-access.id]
   key_name      = aws_key_pair.generated_key.key_name
@@ -103,6 +103,7 @@ resource "aws_instance" "sigstore" {
     inline = [
       "sudo cloud-init status --wait",
       "echo 'Connection Established'",
+      "sudo dnf -y update",
     ]
   }  
   provisioner "local-exec" {

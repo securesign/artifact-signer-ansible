@@ -125,7 +125,7 @@ keycloak_sigstore_users:
    password: mysecurepassword
 
 # Sigstore Images
-fulcio_server_image: quay.io/securesign/fulcio:v1.3.1
+fulcio_server_image: quay.io/securesign/fulcio:v1.4.0
 trillian_log_server_image: quay.io/securesign/trillian_log_server:v1.2.2
 trillian_logsigner_image: quay.io/securesign/trillian_log_signer:v1.2.2
 rekor_image: quay.io/securesign/rekor-server:v1.2.2
