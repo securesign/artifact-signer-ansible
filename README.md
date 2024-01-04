@@ -151,14 +151,7 @@ cosign verify \
 If the signature verification did not result in an error, the deployment of Sigstore was successful!
 
 ## Terraform
-
-If running mac please execute the following before launching the terraform install
-
-```
-sudo killall -HUP mDNSResponder
-```
-
-Terraform code is included within this repository. To test the functionality run the following.
+Terraform code is included within this repository it assumes that you have SSH keys defined at `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub`, the terraform binary is installed, and that you have an AWS account. Credentials for the AWS account are set using the [AWS cli and following these steps](https://docs.aws.amazon.com/cli/latest/reference/configure/index.html) Run time variables exist if this path is not applicable to your sytstem and can be provided through a terraform variable file or providing the variables at the `terraform apply` step. To test the functionality run the following.
 
 NOTE: You will be prompted to provide the base domain and vpc at launch time.
 
@@ -167,24 +160,42 @@ terraform init
 terraform apply --auto-approve
 ```
 
-If you need to remove the assets and run terraform again run the following to ensure you are starting clean.
+If you need to remove the assets run the following to ensure you are starting clean.
 
 ```
-git checkout inventory && rm -f aws_keys_pairs.pem && terraform destroy --auto-approve && terraform apply --auto-approve
+git checkout inventory && rm -f aws_keys_pairs.pem && terraform destroy --auto-approve
 ```
+
+If you are consistently tesing with the terraform code a variable file can be used to save time.
+
+`terraform.tfvars`
+```
+vpc_id = "EXAMPLE"
+base_domain = "EXAMPLE"
+rh_username = "EXAMPLE"
+rh_password = "EXAMPLE"
+ssh_public_key_path = "~/example/.ssh/id_rsa.pub"
+ssh_private_key_path = "~/example/.ssh/id_rsa"
+```
+
+With this file defined the following can be ran 
+```
+terraform apply --auto-approve --var-file='terraform.tfvars'
+```
+
 
 ## Testing
 The following assumes that cosign has been installed on the system
 
 NOTE: Replace `octo-emerging.redhataicoe.com` with your base domain.
 ```
-rm -rf ./*.pem && openssl s_client -showcerts -verify 5 -connect rekor.octo-emerging.redhataicoe.com:443 < /dev/null |    awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}' && for cert in *.pem; do          newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem;         echo "${newname}"; mv "${cert}" "${newname}" ; done && sudo mv octo-emerging_redhataicoe_com.pem /etc/pki/ca-trust/source/anchors/ && sudo update-ca-trust && export KEYCLOAK_REALM=sigstore && export BASE_HOSTNAME=octo-emerging.redhataicoe.com && export FULCIO_URL=https://fulcio.$BASE_HOSTNAME && export KEYCLOAK_URL=https://keycloak.$BASE_HOSTNAME && export REKOR_URL=https://rekor.$BASE_HOSTNAME && export TUF_URL=https://tuf.$BASE_HOSTNAME && export KEYCLOAK_OIDC_ISSUER=$KEYCLOAK_URL/realms/$KEYCLOAK_REALM && /usr/bin/cosign  initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
+export BASE_HOSTNAME=octo-emerging.redhataicoe.com && export ESCAPED_URL=octo-emerging_redhataicoe_com && rm -rf ./*.pem && openssl s_client -showcerts -verify 5 -connect rekor.$BASE_HOSTNAME:443 < /dev/null |    awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}' && for cert in *.pem; do newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem;         echo "${newname}"; mv "${cert}" "${newname}" ; done && sudo mv $ESCAPED_URL.pem /etc/pki/ca-trust/source/anchors/ && sudo update-ca-trust && export KEYCLOAK_REALM=sigstore && export FULCIO_URL=https://fulcio.$BASE_HOSTNAME && export KEYCLOAK_URL=https://keycloak.$BASE_HOSTNAME && export REKOR_URL=https://rekor.$BASE_HOSTNAME && export TUF_URL=https://tuf.$BASE_HOSTNAME && export KEYCLOAK_OIDC_ISSUER=$KEYCLOAK_URL/realms/$KEYCLOAK_REALM && cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
 ```
 
 Next, ensure that an image has been tagged with your quay repository and run the following. For this example, the image `quay.io/rcook/tools:awxy-runner2` is used.
 
 ```
-/usr/bin/cosign sign -y --fulcio-url=$FULCIO_URL --rekor-url=$REKOR_URL --oidc-issuer=$KEYCLOAK_OIDC_ISSUER  quay.io/rcook/tools:awxy-runner2
+cosign sign -y --fulcio-url=$FULCIO_URL --rekor-url=$REKOR_URL --oidc-issuer=$KEYCLOAK_OIDC_ISSUER  quay.io/rcook/tools:awxy-runner2
 ```
 
 ## Feedback
