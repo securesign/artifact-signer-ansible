@@ -2,6 +2,16 @@ variable "vpc_id" {
   type = string
 }
 
+variable "ssh_public_key_path" {
+  type = string
+  default = "~/.ssh/id_rsa.pub"
+}
+
+variable "ssh_private_key_path" {
+  type = string
+  default = "~/.ssh/id_rsa"
+}
+
 variable "base_domain" {
   type = string
 }
@@ -44,12 +54,6 @@ resource "aws_eip_association" "eip_assoc" {
   allocation_id = aws_eip.eip_assoc.id
 }
 
-// Generate Private and Public Key and upload to aws
- resource "tls_private_key" "terrafrom_generated_private_key" {
-   algorithm = "RSA"
-   rsa_bits  = 4096
- }
-
 // generate a new security group to allow ssh and https traffic
 resource "aws_security_group" "sigstore-access" {
   name        = "sigstore-access"
@@ -77,28 +81,16 @@ resource "aws_security_group" "sigstore-access" {
   }
 }
 
- resource "aws_key_pair" "generated_key" {
- 
-   # Name of key: Write the custom name of your key
-   key_name   = "aws_keys_pairs"
- 
-   # Public Key: The public will be generated using the reference of tls_private_key.terrafrom_generated_private_key
-   public_key = tls_private_key.terrafrom_generated_private_key.public_key_openssh
- 
-   # Store private key :  Generate and save private key(aws_keys_pairs.pem) in current directory
-   provisioner "local-exec" {
-     command = <<-EOT
-       echo '${tls_private_key.terrafrom_generated_private_key.private_key_pem}' > aws_keys_pairs.pem
-       chmod 400 aws_keys_pairs.pem
-     EOT
-   }
- }
+resource "aws_key_pair" "sigkey" {
+  key_name   = uuid()
+  public_key = "${file(var.ssh_public_key_path)}"
+}
 
 resource "aws_instance" "sigstore" {
   ami           = data.aws_ami.rhel9.id
   instance_type = "m5.large"
   vpc_security_group_ids = [aws_security_group.sigstore-access.id]
-  key_name      = aws_key_pair.generated_key.key_name
+  key_name      = aws_key_pair.sigkey.key_name
   provisioner "remote-exec" {
     inline = [
       "sudo cloud-init status --wait",
@@ -118,15 +110,15 @@ resource "aws_instance" "sigstore" {
   connection {
    type = "ssh"
    user = "ec2-user"
-   private_key = tls_private_key.terrafrom_generated_private_key.private_key_pem
    host = self.public_ip
+   private_key = file(var.ssh_private_key_path)
  }
 }
 
 resource "null_resource" "configure-sigstore" {
   depends_on = [aws_instance.sigstore]
   provisioner "local-exec" {
-    command = "ansible-playbook --private-key=./aws_keys_pairs.pem -i inventory playbooks/install.yml -e registry_username='${var.rh_username}' -e registry_password='${var.rh_password}' -e base_hostname=${var.base_domain}"
+    command = "ansible-playbook -i inventory playbooks/install.yml -e registry_username='${var.rh_username}' -e registry_password='${var.rh_password}' -e base_hostname=${var.base_domain}"
   }
 }
 
