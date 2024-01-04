@@ -7,8 +7,6 @@ system_packages:
 
 sigstore_podman_network: sigstore
 
-cockpit_enabled: true
-
 cockpit:
   enabled: true
   cockpit_packages:
@@ -23,9 +21,9 @@ sigstore_rekor_templates:
   - manifests/rekor/redis-server.yaml
   - manifests/rekor/rekor-server.yaml
 
+cockpit_enabled: true
 ctlog_enabled: true
 tuf_enabled: true
-
 trillian_enabled: true
 
 trillian:
@@ -113,10 +111,8 @@ keycloak_auth_realm: master
 keycloak_realm: sigstore
 keycloak_client: sigstore
 keycloak_auth_endpoint: ""
-
 keycloak_sigstore_client: sigstore
 keycloak_sigstore_client_redirect_uris: "*"
-
 keycloak_sigstore_users:
  - username: jdoe
    first_name: John
@@ -125,17 +121,17 @@ keycloak_sigstore_users:
    password: mysecurepassword
 
 # Sigstore Images
-fulcio_server_image: quay.io/securesign/fulcio:v1.4.0
-trillian_log_server_image: quay.io/securesign/trillian_log_server:v1.2.2
-trillian_logsigner_image: quay.io/securesign/trillian_log_signer:v1.2.2
-rekor_image: quay.io/securesign/rekor-server:v1.2.2
-ct_server_image: quay.io/securesign/ct_server:v0.6.4
+fulcio_server_image: registry.redhat.io/rhtas-tech-preview/fulcio-rhel9@sha256:0421d44d2da8dd87f05118293787d95686e72c65c0f56dfb9461a61e259b8edc
+trillian_log_server_image: registry.redhat.io/rhtas-tech-preview/trillian-logserver-rhel9@sha256:43bfc6b7b8ed902592f19b830103d9030b59862f959c97c376cededba2ac3a03
+trillian_logsigner_image: registry.redhat.io/rhtas-tech-preview/trillian-logsigner-rhel9@sha256:fa2717c1d54400ca74cc3e9038bdf332fa834c0f5bc3215139c2d0e3579fc292
+rekor_image: registry.redhat.io/rhtas-tech-preview/rekor-server-rhel9@sha256:8ee7d5dd2fa1c955d64ab83d716d482a3feda8e029b861241b5b5dfc6f1b258e
+ct_server_image: registry.redhat.io/rhtas-tech-preview/ct-server-rhel9@sha256:6124a531097c91bf8c872393a6f313c035ca03eca316becd3c350930d978929f
 
 
 # Supplement images
 redis_image: registry.redhat.io/rhel9/redis-6@sha256:031a5a63611e1e6a9fec47492a32347417263b79ad3b63bcee72fc7d02d64c94
-trillian_db_image: quay.io/securesign/trillian-db:v1.5.2
+trillian_db_image: registry.redhat.io/rhtas-tech-preview/trillian-database-rhel9@sha256:fe4758ff57a9a6943a4655b21af63fb579384dc51838af85d0089c04290b4957
 tuf_image: quay.io/securesign/tuf/server:latest
-netcat_image: quay.io/securesign/netcat:v1.0.0
+netcat_image: registry.redhat.io/rhtas-tech-preview/trillian-netcat-rhel9@sha256:b9fa895af8967cceb7a05ed7c9f2b80df047682ed11c87249ca2edba86492f6e
 nginx_image: registry.access.redhat.com/ubi8/nginx-120@sha256:0d4543b4cf26eb46b1632006cc5b24a1925336973eb3ec17cdfb9fec372da5b8
 curl_image: registry.access.redhat.com/ubi9/ubi-minimal:latest
