@@ -18,10 +18,6 @@
 - name: Configure/Deploy nginx
   ansible.builtin.include_tasks: podman/nginx.yml
 
-- name: Configure/Deploy keycloak
-  ansible.builtin.include_tasks: podman/keycloak.yml
-  when: keycloak_enabled | bool
-
 - name: Configure/Deploy Trillian
   ansible.builtin.include_tasks: podman/trillian.yml
   when: trillian_enabled | bool

@@ -27,8 +27,6 @@
     - "{{ certs_dir }}/ingress-tuf.key"
     - "{{ certs_dir }}/ingress-fulcio.pem"
     - "{{ certs_dir }}/ingress-fulcio.key"
-    - "{{ certs_dir }}/ingress-keycloak.pem"
-    - "{{ certs_dir }}/ingress-keycloak.key"
   register: remote_ingress_certificates
 
 - name: base64 encode the rekor ingress
@@ -42,10 +40,6 @@
 - name: base 64 encode the fulcio ingress
   set_fact: 
     fulcio_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
-
-- name: base64 encode the keycloak ingress
-  set_fact: 
-    keycloak_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
@@ -65,17 +59,12 @@
           {{ tuf_ingress_base64 | b64encode}}
         ingress-fulcio.pem: |
           {{ fulcio_ingress_base64 | b64encode}}
-        ingress-keycloak.pem: |
-          {{ keycloak_ingress_base64 | b64encode}}
         ingress-rekor.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-tuf.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.key') | list | first).content  }}
         ingress-fulcio.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.key') | list | first).content }}
-        ingress-keycloak.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-keycloak.key') | list | first).content }}
-
 
 - name: Create nginx config ConfigMap
   ansible.builtin.copy:
