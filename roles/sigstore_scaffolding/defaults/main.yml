@@ -84,8 +84,6 @@ treeid_config: "{{ kube_configmap_dir }}/treeid-config.yaml"
 rekor_sharding_config: "{{ kube_configmap_dir }}/rekor-sharding-config.yaml"
 nginx_config: "{{ kube_configmap_dir }}/nginx-config.yaml"
 nginx_certs_config: "{{ kube_configmap_dir }}/nginx-certs.yaml"
-keycloak_certs_config: "{{ kube_configmap_dir }}/keycloak-certs.yaml"
-
 systemd_directory: /etc/systemd/system
 
 setup_host_dns: true
@@ -99,26 +97,10 @@ ct_logprefix: sigstoreansible
 
 scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
 
-keycloak_enabled: true
-keycloak_url: keycloak.{{ base_hostname }}
-keycloak_wait_increment_seconds: 60
-keycloak_postgresql_user: "keycloak"
-keycloak_postgresql_password: "keycloak"
-keycloak_postgresql_database: "keycloak"
-keycloak_admin_user: "admin"
-keycloak_admin_password: "keycloaksigstore1234@"
-keycloak_auth_realm: master
-keycloak_realm: sigstore
-keycloak_client: sigstore
-keycloak_auth_endpoint: ""
-keycloak_sigstore_client: sigstore
-keycloak_sigstore_client_redirect_uris: "*"
-keycloak_sigstore_users:
- - username: jdoe
-   first_name: John
-   last_name: Doe
-   email: jdoe@redhat.com
-   password: mysecurepassword
+oidc_issuers: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/sigstore
+sigstore_client_id: sigstore
+issuer_url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/sigstore
+oidc_issuers_type: email
 
 # Sigstore Images
 fulcio_server_image: registry.redhat.io/rhtas-tech-preview/fulcio-rhel9@sha256:0421d44d2da8dd87f05118293787d95686e72c65c0f56dfb9461a61e259b8edc

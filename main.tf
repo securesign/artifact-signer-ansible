@@ -149,15 +149,6 @@ resource "aws_route53_record" "tuf" {
   ttl = "300"
 }
 
-resource "aws_route53_record" "keycloak" {
-  name = "keycloak.${var.base_domain}"
-  type = "A"
-  zone_id = data.aws_route53_zone.domain.zone_id
-  records = [aws_eip.eip_assoc.public_ip]
-  allow_overwrite = true
-  ttl = "300"
-}
-
 // Output public ip address
 output "public_ip" {
   value = aws_eip.eip_assoc.public_ip

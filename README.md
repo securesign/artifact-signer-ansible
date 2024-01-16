@@ -17,11 +17,8 @@ The following Sigstore components are deployed as part of this architecture:
     * [Trillian](https://github.com/google/trillian)
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
-* [Keycloak](https://www.keycloak.org)
 
 An [NGINX](https://www.nginx.com) frontend is placed as an entrypoint to the various backend components. Communication is secured via a set of self-signed certificates that are generated at runtime.
-
-[Keycloak](https://www.keycloak.org) is being used as a OIDC issuer for facilitating keyless signing.
 
 Utilize the steps below to understand how to setup and execute the provisioning.
 
@@ -49,16 +46,7 @@ Populate the `sigstore` group within the [inventory](inventory) file with detail
 
 Keycloak is deployed to enable keyless (OIDC) signing. A dedicated realm called `sigstore` is configured by default using a client called `sigstore`
 
-To be able to sign containers, you will need to authenticate to the Keycloak instance. By default, a single user (jdoe) is created. This can be customized by specifying the `keycloak_sigstore_users` variable. The default value is shown below and can be used to authenticate to Keycloak if no modifications are made:
-
-```yaml
-keycloak_sigstore_users:
- - username: jdoe
-   first_name: John
-   last_name: Doe
-   email: jdoe@redhat.com
-   password: mysecurepassword
-```
+Keycloak is not provided by this installation so an OIDC provider such as Keycloak must be defined.
 
 ### Ingress
 
@@ -66,14 +54,12 @@ The automation deploys and configures a software load balancer as a central poin
 
 * https://rekor.<base_hostname>
 * https://fulcio.<base_hostname>
-* https://keycloak.<base_hostname>
 * https://tuf.<base_hostname>
 
 Each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided
 when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts` with the following content:
 
 ```
-<REMOTE IP ADDRESS> keycloak.<base_hostname>
 <REMOTE_IP_ADDRESS> fulcio.<base_hostname> fulcio
 <REMOTE_IP_ADDRESS> rekor.<base_hostname> rekor
 <REMOTE_IP_ADDRESS> tuf.<base_hostname> tuf

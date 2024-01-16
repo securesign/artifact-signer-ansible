@@ -1,9 +1,9 @@
 {
     "OIDCIssuers": {
-    "https://{{ keycloak_url }}{{ keycloak_auth_endpoint }}/realms/{{ keycloak_realm }}": {
-        "ClientID": "{{ keycloak_sigstore_client }}",
-        "IssuerURL": "https://{{ keycloak_url }}{{ keycloak_auth_endpoint }}/realms/{{ keycloak_realm }}",
-        "Type": "email"
+    "{{ oidc_issuers }}": {
+        "ClientID": "{{ sigstore_client_id }}",
+        "IssuerURL": "{{ issuer_url }}",
+        "Type": "{{  oidc_issuers_type }}"
         }
     }
 }
