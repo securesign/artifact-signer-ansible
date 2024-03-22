@@ -21,6 +21,7 @@
       systemd_file: "trillian-mysql"
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-mysql.yaml') | from_yaml }}"
+  when: trillian.database_deploy
 
 - name: Build Trillian Log Signer Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml

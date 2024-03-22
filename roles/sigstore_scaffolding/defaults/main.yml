@@ -27,6 +27,7 @@ tuf_enabled: true
 trillian_enabled: true
 
 trillian:
+  database_deploy: true
   mysql:
    user: mysql
    rootPassword: rootpassword
