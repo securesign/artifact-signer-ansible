@@ -2,7 +2,7 @@
 
 Automation to deploy the sigstore ecosystem on RHEL
 
-:warning: **The contents of this repository are a Work in Progress.**
+:warning: **The contents of this repository are a Work in Progress.** 
 
 ## Overview
 
