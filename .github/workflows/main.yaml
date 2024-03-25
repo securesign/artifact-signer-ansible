@@ -9,16 +9,20 @@ on:
 
 env:
   GO_VERSION: 1.21
-  TF_VARS_AWS_REGION: us-east-1
-  TF_VARS_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  TF_VARS_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  BASE_HOSTNAME: octo-emerging.redhataicoe.com
+  AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  BASE_HOSTNAME: ${{ secrets.BASE_DOMAIN }}
   FULCIO_URL: https://fulcio.${BASE_HOSTNAME}
   TUF_URL: https://tuf.${BASE_HOSTNAME}
   KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
   KEYCLOAK_REALM: sigstore
   KEYCLOAK_OIDC_ISSUER: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
   REKOR_URL: https://rekor.${BASE_HOSTNAME}
+  TF_VARS_base_domain: ${{ secrets.BASE_DOMAIN }}
+  TF_VARS_vpc_id: ${{ secrets.VPC_ID }}
+  TF_VARS_rh_username: ${{ secrets.RH_USERNAME }}
+  TF_VARS_rh_password: ${{ secrets.RH_PASSWORD }}
 
 jobs:
   deploy-and-test:
