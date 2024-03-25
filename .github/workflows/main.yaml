@@ -23,7 +23,7 @@ env:
   TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
   TF_VAR_rh_username: ${{ secrets.RH_USERNAME }}
   TF_VAR_rh_password: ${{ secrets.RH_PASSWORD }}
-  IMAGE: ttl.sh/securesign:10m
+  IMAGE: ttl.sh/sigstore-test:15m
 
 jobs:
   deploy-and-test:
@@ -38,14 +38,23 @@ jobs:
         - name: sshkeygen for ansible
           run: ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
 
+
+        - name: docker login registry.redhat.io
+          run: echo ${{ secrets.RH_PASSWORD }} | docker login -u ${{ secrets.RH_USERNAME }} --password-stdin registry.redhat.io
+
+        - name: build push sign and tag
+          run: |
+            buildah pull alpine:latest
+            buildah tag alpine:latest ${{ env.IMAGE }}
+            buildah push ${{ env.IMAGE }}
+            docker push ${{ env.IMAGE }}
+
         - name: Terraform Init
           run: terraform init
 
         - name: Terraform Apply
           run: terraform apply -auto-approve
 
-        - name: docker login registry.redhat.io
-          run: echo ${{ secrets.RH_PASSWORD }} | docker login -u ${{ secrets.RH_USERNAME }} --password-stdin registry.redhat.io
 
         - name: install cosign
           uses: sigstore/cosign-installer@v3.3.0
@@ -55,16 +64,10 @@ jobs:
         - name: Grab the certificate and trust it
           run: export ESCAPED_URL=octo-emerging_redhataicoe_com && rm -rf ./*.pem && openssl s_client -showcerts -verify 5 -connect rekor.$BASE_HOSTNAME:443 < /dev/null |    awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}' && for cert in *.pem; do newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem; echo "${newname}"; mv "${cert}" "${newname}" ; done && sudo mv $ESCAPED_URL.pem /etc/ssl/certs/ && sudo update-ca-certificates && cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
 
-        - name: pull and tag alpine
+        - name: sign and verify
           run: |
-            docker pull registry.access.redhat.com/ubi9/ubi-minimal:latest
-            docker tag registry.access.redhat.com/ubi9/ubi-minimal:latest ${{ env.IMAGE }}
-
-        - name: push and sign alpine
-          run: |
-            docker push ${{ env.IMAGE }}
             TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=sigstore" https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/sigstore/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
-            cosign sign sign -y --fulcio-url=${{ env.FULCIO_URL}} --rekor-url=${{ env.REKOR_URL}} --oidc-issuer=${{ env.KEYCLOAK_OIDC_ISSUER}} --identity-token=$TOKEN ${{ env.IMAGE }}
+            cosign sign -y --fulcio-url=${{ env.FULCIO_URL}} --rekor-url=${{ env.REKOR_URL}} --oidc-issuer=${{ env.KEYCLOAK_OIDC_ISSUER}} --identity-token=$TOKEN ${{ env.IMAGE }}
             cosign verify --rekor-url=${{ env.REKOR_URL}} --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ${{ env.IMAGE }}
 
         - name: Terraform Destroy
