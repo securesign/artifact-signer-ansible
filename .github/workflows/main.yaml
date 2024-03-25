@@ -60,3 +60,6 @@ jobs:
             TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=sigstore" https://${{ env.KEYCLOAK_URL }}/auth/realms/${{ env.KEYCLOAK_OIDC_ISSUER}}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
             cosign sign sign -y --fulcio-url=$FULCIO_URL --rekor-url=$REKOR_URL --oidc-issuer=$OIDC_ISSUER_URL --identity-token=$TOKEN ttl.sh/alpine:10m
             cosign verify --rekor-url=\$REKOR_URL --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ttl.sh/alpine:10m
+
+        - name: Terraform Destroy
+          run: terraform destroy -auto-approve
