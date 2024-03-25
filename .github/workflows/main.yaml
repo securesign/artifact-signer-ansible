@@ -13,12 +13,12 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   BASE_HOSTNAME: ${{ secrets.BASE_DOMAIN }}
-  FULCIO_URL: https://fulcio.${BASE_HOSTNAME}
-  TUF_URL: https://tuf.${BASE_HOSTNAME}
+  FULCIO_URL: https://fulcio.${{ secrets.BASE_DOMAIN }}
+  TUF_URL: https://tuf.${{ secrets.BASE_DOMAIN }}
   KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
   KEYCLOAK_REALM: sigstore
   KEYCLOAK_OIDC_ISSUER: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
-  REKOR_URL: https://rekor.${BASE_HOSTNAME}
+  REKOR_URL: https://rekor.${{ secrets.BASE_DOMAIN }}
   TF_VAR_base_domain: ${{ secrets.BASE_DOMAIN }}
   TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
   TF_VAR_rh_username: ${{ secrets.RH_USERNAME }}
