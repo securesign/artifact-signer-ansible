@@ -23,7 +23,7 @@ env:
   TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
   TF_VAR_rh_username: ${{ secrets.RH_USERNAME }}
   TF_VAR_rh_password: ${{ secrets.RH_PASSWORD }}
-  IMAGE: ttl.sh/alpine:10m
+  IMAGE: ttl.sh/securesign:10m
 
 jobs:
   deploy-and-test:
@@ -44,6 +44,13 @@ jobs:
         - name: Terraform Apply
           run: terraform apply -auto-approve
 
+        - name: Log in to registry.redhat.io
+          uses: redhat-actions/podman-login@9184318aae1ee5034fbfbacc0388acf12669171f # v1
+          with:
+            username: ${{ secrets.REGISTRY_USER }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+            registry: registry.redhat.io
+
         - name: install cosign
           uses: sigstore/cosign-installer@v3.3.0
           with:
@@ -54,8 +61,8 @@ jobs:
 
         - name: pull and tag alpine
           run: |
-            docker pull alpine:latest
-            docker tag alpine:latest ${{ env.IMAGE }}
+            docker pull registry.access.redhat.com/ubi9/ubi-minimal:latest
+            docker tag registry.access.redhat.com/ubi9/ubi-minimal:latest ${{ env.IMAGE }}
 
         - name: push and sign alpine
           run: |
