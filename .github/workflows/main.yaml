@@ -47,7 +47,6 @@ jobs:
             buildah pull alpine:latest
             buildah tag alpine:latest ${{ env.IMAGE }}
             buildah push ${{ env.IMAGE }}
-            docker push ${{ env.IMAGE }}
 
         - name: Terraform Init
           run: terraform init
