@@ -19,10 +19,10 @@ env:
   KEYCLOAK_REALM: sigstore
   KEYCLOAK_OIDC_ISSUER: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
   REKOR_URL: https://rekor.${BASE_HOSTNAME}
-  TF_VARS_base_domain: ${{ secrets.BASE_DOMAIN }}
-  TF_VARS_vpc_id: ${{ secrets.VPC_ID }}
-  TF_VARS_rh_username: ${{ secrets.RH_USERNAME }}
-  TF_VARS_rh_password: ${{ secrets.RH_PASSWORD }}
+  TF_VAR_base_domain: ${{ secrets.BASE_DOMAIN }}
+  TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
+  TF_VAR_rh_username: ${{ secrets.RH_USERNAME }}
+  TF_VAR_rh_password: ${{ secrets.RH_PASSWORD }}
 
 jobs:
   deploy-and-test:
