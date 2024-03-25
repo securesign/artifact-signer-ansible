@@ -22,6 +22,16 @@ spec:
         - name: ctlog
           image: {{ ct_server_image }}
           imagePullPolicy: IfNotPresent
+          livelinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 6962
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           ports:
             - containerPort: 6962
               protocol: TCP

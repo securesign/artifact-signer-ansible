@@ -21,16 +21,9 @@ data "aws_route53_zone" "domain" {
   private_zone = false
 }
 
-data "aws_ami" "rhel9" {
-  most_recent = true
-  filter {
-    name = "name"
-    values = ["RHEL-9*"]
-  }
-  filter {
-    name = "architecture"
-    values = ["x86_64"]
-  }
+variable "ami_id" {
+  type = string
+  default = "ami-0fe630eb857a6ec83"
 }
 
 variable "rh_username" {
@@ -45,7 +38,7 @@ variable "rh_password" {
 
 // Create a new elastic ip address
 resource "aws_eip" "eip_assoc" {
-  vpc = true
+  domain = "vpc"
 }
 
 // Associate elastic ip address with instance
@@ -87,7 +80,7 @@ resource "aws_key_pair" "sigkey" {
 }
 
 resource "aws_instance" "sigstore" {
-  ami           = data.aws_ami.rhel9.id
+  ami           = var.ami_id
   instance_type = "m5.large"
   vpc_security_group_ids = [aws_security_group.sigstore-access.id]
   key_name      = aws_key_pair.sigkey.key_name
@@ -97,7 +90,7 @@ resource "aws_instance" "sigstore" {
       "echo 'Connection Established'",
       "sudo dnf -y update",
     ]
-  }  
+  }
   provisioner "local-exec" {
     command = "sed  -i.bak 's/<REMOTE_IP_ADDRESS>/${aws_eip.eip_assoc.public_ip}/g' inventory"
   }
