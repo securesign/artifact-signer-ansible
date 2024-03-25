@@ -48,7 +48,7 @@ jobs:
           run: go install github.com/sigstore/cosign/v2/cmd/cosign@v2.2.2
 
         - name: Grab the certificate and trust it
-          run: export ESCAPED_URL=octo-emerging_redhataicoe_com && rm -rf ./*.pem && openssl s_client -showcerts -verify 5 -connect rekor.$BASE_HOSTNAME:443 < /dev/null |    awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}' && for cert in *.pem; do newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem; echo "${newname}"; mv "${cert}" "${newname}" ; done && sudo mv $ESCAPED_URL.pem /etc/ssl/ca-trust/source/anchors/ && sudo update-ca-trust && cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
+          run: export ESCAPED_URL=octo-emerging_redhataicoe_com && rm -rf ./*.pem && openssl s_client -showcerts -verify 5 -connect rekor.$BASE_HOSTNAME:443 < /dev/null |    awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}' && for cert in *.pem; do newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem; echo "${newname}"; mv "${cert}" "${newname}" ; done && sudo mv $ESCAPED_URL.pem /usr/local/share/ca-certificates/ && sudo update-ca-certificates && cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
 
         - name: pull and tag alpine
           run: |
