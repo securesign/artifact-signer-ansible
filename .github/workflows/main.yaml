@@ -17,12 +17,13 @@ env:
   TUF_URL: https://tuf.${{ secrets.BASE_DOMAIN }}
   KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
   KEYCLOAK_REALM: sigstore
-  KEYCLOAK_OIDC_ISSUER: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+  KEYCLOAK_OIDC_ISSUER: ${{ secrets.KEYCLOAK_URL}}/realms/sigstore
   REKOR_URL: https://rekor.${{ secrets.BASE_DOMAIN }}
   TF_VAR_base_domain: ${{ secrets.BASE_DOMAIN }}
   TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
   TF_VAR_rh_username: ${{ secrets.RH_USERNAME }}
   TF_VAR_rh_password: ${{ secrets.RH_PASSWORD }}
+  IMAGE: ttl.sh/alpine:10m
 
 jobs:
   deploy-and-test:
@@ -54,14 +55,14 @@ jobs:
         - name: pull and tag alpine
           run: |
             docker pull alpine:latest
-            docker tag alpine:latest ttl.sh/alpine:10m
+            docker tag alpine:latest ${{ env.IMAGE }}
 
         - name: push and sign alpine
           run: |
-            docker push ttl.sh/alpine:10m
+            docker push ${{ env.IMAGE }}
             TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=sigstore" https://${{ env.KEYCLOAK_URL }}/auth/realms/${{ env.KEYCLOAK_OIDC_ISSUER}}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
-            cosign sign sign -y --fulcio-url=$FULCIO_URL --rekor-url=$REKOR_URL --oidc-issuer=$OIDC_ISSUER_URL --identity-token=$TOKEN ttl.sh/alpine:10m
-            cosign verify --rekor-url=\$REKOR_URL --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ttl.sh/alpine:10m
+            cosign sign sign -y --fulcio-url=${{ env.FULCIO_URL}} --rekor-url=${{ env.REKOR_URL}} --oidc-issuer=${{ env.KEYCLOAK_OIDC_ISSUER}} --identity-token=$TOKEN ${{ env.IMAGE }}
+            cosign verify --rekor-url=${{ env.REKOR_URL}} --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ${{ env.IMAGE }}
 
         - name: Terraform Destroy
           if: always()
