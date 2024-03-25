@@ -44,12 +44,8 @@ jobs:
         - name: Terraform Apply
           run: terraform apply -auto-approve
 
-        - name: Log in to registry.redhat.io
-          uses: redhat-actions/podman-login@9184318aae1ee5034fbfbacc0388acf12669171f # v1
-          with:
-            username: ${{ secrets.RH_USERNAME }}
-            password: ${{ secrets.RH_PASSWORD }}
-            registry: registry.redhat.io
+        - name: docker login registry.redhat.io
+          run: echo ${{ secrets.RH_PASSWORD }} | docker login -u ${{ secrets.RH_USERNAME }} --password-stdin registry.redhat.io
 
         - name: install cosign
           uses: sigstore/cosign-installer@v3.3.0
