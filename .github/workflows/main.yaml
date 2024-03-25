@@ -34,14 +34,15 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v2
 
+        - name: sshkeygen for ansible
+          run: ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+
         - name: Terraform Init
           run: terraform init
 
         - name: Terraform Apply
           run: terraform apply -auto-approve
 
-        - name: sshkeygen for ansible
-          run: ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
 
         - name: Install cosign
           run: go install github.com/sigstore/cosign/v2/cmd/cosign@v2.2.2
@@ -62,4 +63,5 @@ jobs:
             cosign verify --rekor-url=\$REKOR_URL --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ttl.sh/alpine:10m
 
         - name: Terraform Destroy
+          if: always()
           run: terraform destroy -auto-approve
