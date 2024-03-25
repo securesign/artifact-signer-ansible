@@ -47,8 +47,8 @@ jobs:
         - name: Log in to registry.redhat.io
           uses: redhat-actions/podman-login@9184318aae1ee5034fbfbacc0388acf12669171f # v1
           with:
-            username: ${{ secrets.REGISTRY_USER }}
-            password: ${{ secrets.REGISTRY_PASSWORD }}
+            username: ${{ secrets.RH_USERNAME }}
+            password: ${{ secrets.RH_PASSWORD }}
             registry: registry.redhat.io
 
         - name: install cosign
