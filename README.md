@@ -2,7 +2,7 @@
 
 Automation to deploy the sigstore ecosystem on RHEL
 
-:warning: **The contents of this repository are a Work in Progress.** 
+:warning: **The contents of this repository are a Work in Progress.**
 
 ## Overview
 
@@ -32,21 +32,18 @@ Perform the following steps to prepare the control node for execution.
 
 ### Dependencies
 
-Install the required Ansible collections by executing the following 
+Install the required Ansible collections by executing the following
 
 ```shell
-ansible-galaxy collection install -r requirements.yml 
+ansible-galaxy collection install -r requirements.yml
 ```
 
 ### Inventory
 
 Populate the `sigstore` group within the [inventory](inventory) file with details related to the target host.
 
-### Keycloak
-
-Keycloak is deployed to enable keyless (OIDC) signing. A dedicated realm called `sigstore` is configured by default using a client called `sigstore`
-
-Keycloak is not provided by this installation so an OIDC provider such as Keycloak must be defined.
+### OIDC provider
+An installation of Keycloak must be provided to allow for integration with containerized RHTAS.
 
 ### Ingress
 
@@ -73,9 +70,11 @@ when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts`
 
 Execute the following commands to execute the automation:
 
+NOTE: Please provide credentials to authenticate to registry.redhat.io. https://access.redhat.com/RegistryAuthentication
+
 ```shell
 # Run the playbook from your local system
-ansible-playbook -vv -i inventory playbooks/install.yml -e base_hostname=sigstore-dev.ez -K
+ansible-playbook -i inventory playbooks/install.yml -e registry_username='REGISTRY.REDHAT.IO_USERNAME' -e registry_password='REGISTRY.REDHAT.IO_PASSWORD' base_hostname=example.com'
 ```
 
 ### Add the root CA that was created to your local truststore.
@@ -136,53 +135,9 @@ cosign verify \
 
 If the signature verification did not result in an error, the deployment of Sigstore was successful!
 
-## Terraform
-Terraform code is included within this repository it assumes that you have SSH keys defined at `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub`, the terraform binary is installed, and that you have an AWS account. Credentials for the AWS account are set using the [AWS cli and following these steps](https://docs.aws.amazon.com/cli/latest/reference/configure/index.html) Run time variables exist if this path is not applicable to your sytstem and can be provided through a terraform variable file or providing the variables at the `terraform apply` step. To test the functionality run the following.
-
-NOTE: You will be prompted to provide the base domain and vpc at launch time.
-
-```
-terraform init
-terraform apply --auto-approve
-```
-
-If you need to remove the assets run the following to ensure you are starting clean.
-
-```
-git checkout inventory && rm -f aws_keys_pairs.pem && terraform destroy --auto-approve
-```
-
-If you are consistently tesing with the terraform code a variable file can be used to save time.
-
-`terraform.tfvars`
-```
-vpc_id = "EXAMPLE"
-base_domain = "EXAMPLE"
-rh_username = "EXAMPLE"
-rh_password = "EXAMPLE"
-ssh_public_key_path = "~/example/.ssh/id_rsa.pub"
-ssh_private_key_path = "~/example/.ssh/id_rsa"
-```
-
-With this file defined the following can be ran 
-```
-terraform apply --auto-approve --var-file='terraform.tfvars'
-```
-
 
 ## Testing
-The following assumes that cosign has been installed on the system
-
-NOTE: Replace `octo-emerging.redhataicoe.com` with your base domain.
-```
-export BASE_HOSTNAME=octo-emerging.redhataicoe.com && export ESCAPED_URL=octo-emerging_redhataicoe_com && rm -rf ./*.pem && openssl s_client -showcerts -verify 5 -connect rekor.$BASE_HOSTNAME:443 < /dev/null |    awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}' && for cert in *.pem; do newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem;         echo "${newname}"; mv "${cert}" "${newname}" ; done && sudo mv $ESCAPED_URL.pem /etc/pki/ca-trust/source/anchors/ && sudo update-ca-trust && export KEYCLOAK_REALM=sigstore && export FULCIO_URL=https://fulcio.$BASE_HOSTNAME && export KEYCLOAK_URL=https://keycloak.$BASE_HOSTNAME && export REKOR_URL=https://rekor.$BASE_HOSTNAME && export TUF_URL=https://tuf.$BASE_HOSTNAME && export KEYCLOAK_OIDC_ISSUER=$KEYCLOAK_URL/realms/$KEYCLOAK_REALM && cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
-```
-
-Next, ensure that an image has been tagged with your quay repository and run the following. For this example, the image `quay.io/rcook/tools:awxy-runner2` is used.
-
-```
-cosign sign -y --fulcio-url=$FULCIO_URL --rekor-url=$REKOR_URL --oidc-issuer=$KEYCLOAK_OIDC_ISSUER  quay.io/rcook/tools:awxy-runner2
-```
+This repository contains GitHub actions that will test PRs that come in by creating an instance of RHEL 9 and deploying RHTAS then testing to ensure the image can be signed and verified.
 
 ## Feedback
 
