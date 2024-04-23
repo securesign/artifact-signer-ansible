@@ -16,8 +16,8 @@ env:
   FULCIO_URL: https://fulcio.${{ secrets.BASE_DOMAIN }}
   TUF_URL: https://tuf.${{ secrets.BASE_DOMAIN }}
   KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
-  KEYCLOAK_REALM: sigstore
-  KEYCLOAK_OIDC_ISSUER: ${{ secrets.KEYCLOAK_URL}}/realms/sigstore
+  KEYCLOAK_REALM: trusted-artifact-signer
+  KEYCLOAK_OIDC_ISSUER: ${{ secrets.KEYCLOAK_URL}}/realms/trusted-artifact-signer
   REKOR_URL: https://rekor.${{ secrets.BASE_DOMAIN }}
   TF_VAR_base_domain: ${{ secrets.BASE_DOMAIN }}
   TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
@@ -65,8 +65,8 @@ jobs:
 
         - name: sign and verify
           run: |
-            TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=sigstore" https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/sigstore/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
-            cosign sign -y --fulcio-url=${{ env.FULCIO_URL}} --rekor-url=${{ env.REKOR_URL}} --oidc-issuer=${{ env.KEYCLOAK_OIDC_ISSUER}} --identity-token=$TOKEN ${{ env.IMAGE }}
+            TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=sigstore" ${{ env.KEYCLOAK_OIDC_ISSUER }}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
+            cosign sign -y --fulcio-url=${{ env.FULCIO_URL}} --rekor-url=${{ env.REKOR_URL}} --oidc-issuer=${{ env.KEYCLOAK_OIDC_ISSUER}} --identity-token=$TOKEN --oidc-client-id=${{ secrets.KEYCLOAK_REALM }} ${{ env.IMAGE }}
             cosign verify --rekor-url=${{ env.REKOR_URL}} --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ${{ env.IMAGE }}
 
         - name: Terraform Destroy

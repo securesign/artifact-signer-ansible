@@ -98,9 +98,9 @@ ct_logprefix: sigstoreansible
 
 scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
 
-oidc_issuers: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/sigstore
-sigstore_client_id: sigstore
-issuer_url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/sigstore
+oidc_issuers: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
+sigstore_client_id: trusted-artifact-signer
+issuer_url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
 oidc_issuers_type: email
 
 # Sigstore Images
