@@ -65,7 +65,7 @@ jobs:
 
         - name: sign and verify
           run: |
-            TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=sigstore" ${{ env.KEYCLOAK_OIDC_ISSUER }}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
+            TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=jdoe" -d "password=secure" -d "grant_type=password" -d "scope=openid" -d "client_id=trusted-artifact-signer" ${{ env.KEYCLOAK_OIDC_ISSUER }}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
             cosign sign -y --fulcio-url=${{ env.FULCIO_URL}} --rekor-url=${{ env.REKOR_URL}} --oidc-issuer=${{ env.KEYCLOAK_OIDC_ISSUER}} --identity-token=$TOKEN --oidc-client-id=${{ secrets.KEYCLOAK_REALM }} ${{ env.IMAGE }}
             cosign verify --rekor-url=${{ env.REKOR_URL}} --certificate-identity-regexp ".*@redhat" --certificate-oidc-issuer-regexp ".*keycloak.*" ${{ env.IMAGE }}
 
