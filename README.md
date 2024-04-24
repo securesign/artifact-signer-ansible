@@ -23,6 +23,7 @@ An [NGINX](https://www.nginx.com) frontend is placed as an entrypoint to the var
 Utilize the steps below to understand how to setup and execute the provisioning.
 
 ## Prerequisites
+A RHEL 8.8+ or a RHEL 9.2+ server should be used to run the RHTAS components.
 
 Ansible must be installed and configured on a control node that will be used to perform the automation.
 
