@@ -1,20 +1,19 @@
 ---
 namespace: redhat
 name: artifact_signer
-version: 0.0.1
+version: 1.0.0
 
 readme: README.md
 authors:
   - Red Hat
   - TODO
 description: TODO
-license_file: TODO
+license_file: Apache-2.0
 tags: [sigstore, tas, rhtas, security, cosign]
 dependencies: {}
-
-repository: https://github.com/securesign/sigstore-ansible/
+repository: https://github.com/securesign/artifact-signer-ansible/
 documentation: http://TODO.com
 homepage: https://TODO.com
-issues: https://github.com/securesign/sigstore-ansible/issues
+issues: https://github.com/securesign/artifact-signer-ansible/issues
 
-build_ignore: [ansible.cfg, .github, .gitignore, .vscode, inventory, main.tf, playbooks, requirements.yml]
+build_ignore: [.ansible-lint, .github, .gitignore, .vscode, requirements-testing.txt, vm-testing]

@@ -1,120 +1,124 @@
 ---
-# defaults file for sigstore_scaffolding
-system_packages:
-    - podman
-    - podman-plugins
-    - firewalld
+# defaults file for tas_single_node
+tas_single_node_system_packages:
+  - podman
+  - podman-plugins
+  - firewalld
 
-sigstore_podman_network: sigstore
+tas_single_node_podman_network: rhtas
 
-cockpit:
+tas_single_node_cockpit:
   enabled: true
   cockpit_packages:
     - cockpit-storaged
     - cockpit-podman
     - cockpit
-  cockpit_manage_firewall: yes
+  cockpit_manage_firewall: true
 
-skip_os_install: false
+tas_single_node_skip_os_install: false
 
-sigstore_rekor_templates:
+tas_single_node_rekor_templates:
   - manifests/rekor/redis-server.yaml
   - manifests/rekor/rekor-server.yaml
 
-cockpit_enabled: true
-ctlog_enabled: true
-tuf_enabled: true
-trillian_enabled: true
+tas_single_node_cockpit_enabled: true
+tas_single_node_ctlog_enabled: true
+tas_single_node_tuf_enabled: true
+tas_single_node_trillian_enabled: true
 
-trillian:
+tas_single_node_trillian:
   database_deploy: true
   mysql:
-   user: mysql
-   rootPassword: rootpassword
-   password: password
-   database: trillian
-   host: trillian-mysql-pod
-   port: 3306
+    user: mysql
+    rootPassword: rootpassword
+    password: password
+    database: trillian
+    host: trillian-mysql-pod
+    port: 3306
 
-config_dir: /etc/sigstore
-certs_dir: "{{ config_dir }}/certs"
-kube_manifest_dir: "{{ config_dir }}/manifests"
-kube_configmap_dir: "{{ config_dir }}/configs"
+tas_single_node_config_dir: /etc/rhtas
+tas_single_node_certs_dir: "{{ tas_single_node_config_dir }}/certs"
+tas_single_node_kube_manifest_dir: "{{ tas_single_node_config_dir }}/manifests"
+tas_single_node_kube_configmap_dir: "{{ tas_single_node_config_dir }}/configs"
 
+tas_single_node_local_certs_dir: /tmp/rhtas/certs
 
-local_certs_dir: /tmp/sigstore/certs
+tas_single_node_private_key_filename: rhtas.key
+tas_single_node_ca_filename: rhtas.pem
+tas_single_node_fulcio_private_key_filename: fulcio.key
+tas_single_node_fulcio_public_key_filename: fulcio.pub
+tas_single_node_fulcio_root_ca_filename: fulcio.pem
+tas_single_node_ctlog_private_key_filename: ctlog.key
+tas_single_node_ctlog_public_key_filename: ctlog.pub
+tas_single_node_rekor_signer_filename: rekor-signer.key
+tas_single_node_rekor_public_key_filename: rekor-pub-key.pub
 
-sigstore_private_key_filename: sigstore.key
-sigstore_ca_filename: sigstore.pem
-fulcio_private_key_filename: fulcio.key
-fulcio_public_key_filename: fulcio.pub
-fulcio_root_ca_filename: fulcio.pem
-ctlog_private_key_filename: ctlog.key
-ctlog_public_key_filename: ctlog.pub
-rekor_signer_filename: rekor-signer.key
-rekor_public_key_filename: rekor-pub-key.pub
+tas_single_node_local_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_private_key_filename }}"
+tas_single_node_local_ca: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ca_filename }}"
+tas_single_node_local_fulcio_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_fulcio_private_key_filename }}"
+tas_single_node_local_fulcio_public_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_fulcio_public_key_filename }}"
+tas_single_node_local_fulcio_root_ca: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_fulcio_root_ca_filename }}"
+tas_single_node_local_ctlog_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ctlog_private_key_filename }}"
+tas_single_node_local_ctlog_public_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ctlog_public_key_filename }}"
+tas_single_node_local_rekor_signer: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"
+tas_single_node_local_rekor_public_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"
+tas_single_node_remote_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_private_key_filename }}"
+tas_single_node_remote_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ca_filename }}"
+tas_single_node_remote_fulcio_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_private_key_filename }}"
+tas_single_node_remote_fulcio_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_public_key_filename }}"
+tas_single_node_remote_fulcio_root_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_root_ca_filename }}"
+tas_single_node_remote_ctlog_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_private_key_filename }}"
+tas_single_node_remote_ctlog_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_public_key_filename }}"
+tas_single_node_remote_rekor_signer: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"
+tas_single_node_remote_rekor_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"
 
-local_sigstore_private_key: "{{ local_certs_dir }}/{{ sigstore_private_key_filename }}"
-local_sigstore_ca: "{{ local_certs_dir }}/{{ sigstore_ca_filename }}"
-local_fulcio_private_key: "{{ local_certs_dir }}/{{ fulcio_private_key_filename }}"
-local_fulcio_public_key: "{{ local_certs_dir }}/{{ fulcio_public_key_filename }}"
-local_fulcio_root_ca: "{{ local_certs_dir }}/{{ fulcio_root_ca_filename }}"
-local_ctlog_private_key: "{{ local_certs_dir }}/{{ ctlog_private_key_filename }}"
-local_ctlog_public_key: "{{ local_certs_dir }}/{{ ctlog_public_key_filename }}"
-local_rekor_signer: "{{ local_certs_dir }}/{{ rekor_signer_filename }}"
-local_rekor_public_key: "{{ local_certs_dir }}/{{ rekor_public_key_filename }}"
-remote_sigstore_private_key: "{{ certs_dir }}/{{ sigstore_private_key_filename }}"
-remote_sigstore_ca: "{{ certs_dir }}/{{ sigstore_ca_filename }}"
-remote_fulcio_private_key: "{{ certs_dir }}/{{ fulcio_private_key_filename }}"
-remote_fulcio_public_key: "{{ certs_dir }}/{{ fulcio_public_key_filename }}"
-remote_fulcio_root_ca: "{{ certs_dir }}/{{ fulcio_root_ca_filename }}"
-remote_ctlog_private_key: "{{ certs_dir }}/{{ ctlog_private_key_filename }}"
-remote_ctlog_public_key: "{{ certs_dir }}/{{ ctlog_public_key_filename }}"
-remote_rekor_signer: "{{ certs_dir }}/{{ rekor_signer_filename }}"
-remote_rekor_public_key: "{{ certs_dir }}/{{ rekor_public_key_filename }}"
+tas_single_node_rekor_enabled: true
+tas_single_node_rekor_public_key_retries: 5
+tas_single_node_rekor_public_key_delay: 10
+tas_single_node_fulcio_server_config: "{{ tas_single_node_kube_configmap_dir }}/fulcio-config.yaml"
+tas_single_node_fulcio_server_secret_config: "{{ tas_single_node_kube_configmap_dir }}/fulcio-server-secret.yaml"
+tas_single_node_ctlog_secret: "{{ tas_single_node_kube_configmap_dir }}/ctlog-secret.yaml"
+tas_single_node_ctlog_configmap_config: "{{ tas_single_node_kube_configmap_dir }}/ctlog-config.yaml"
+tas_single_node_tuf_secret_config: "{{ tas_single_node_kube_configmap_dir }}/tuf-secret.yaml"
+tas_single_node_treeid_config: "{{ tas_single_node_kube_configmap_dir }}/treeid-config.yaml"
+tas_single_node_rekor_sharding_config: "{{ tas_single_node_kube_configmap_dir }}/rekor-sharding-config.yaml"
+tas_single_node_nginx_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-config.yaml"
+tas_single_node_nginx_certs_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-certs.yaml"
+tas_single_node_systemd_directory: /etc/systemd/system
 
-rekor_enabled: true
-rekor_public_key_retries: 5
-rekor_public_key_delay: 10
-fulcio_server_config: "{{ kube_configmap_dir }}/fulcio-config.yaml"
-fulcio_server_secret_config: "{{ kube_configmap_dir }}/fulcio-server-secret.yaml"
-ctlog_secret: "{{ kube_configmap_dir }}/ctlog-secret.yaml"
-ctlog_configmap_config: "{{ kube_configmap_dir }}/ctlog-config.yaml"
-tuf_secret_config: "{{ kube_configmap_dir }}/tuf-secret.yaml"
-treeid_config: "{{ kube_configmap_dir }}/treeid-config.yaml"
-rekor_sharding_config: "{{ kube_configmap_dir }}/rekor-sharding-config.yaml"
-nginx_config: "{{ kube_configmap_dir }}/nginx-config.yaml"
-nginx_certs_config: "{{ kube_configmap_dir }}/nginx-certs.yaml"
-systemd_directory: /etc/systemd/system
+tas_single_node_setup_host_dns: true
+tas_single_node_base_hostname: ""
 
-setup_host_dns: true
-base_hostname: ""
+tas_single_node_fulcio_enabled: true
+tas_single_node_fulcio_ca_passphrase: rhtas
+tas_single_node_ctlog_ca_passphrase: rhtas
+tas_single_node_rekor_ca_passphrase: rhtas
+tas_single_node_ct_logprefix: rhtasansible
 
-fulcio_enabled: true
-fulcio_ca_passphrase: sigstore
-ctlog_ca_passphrase: sigstore
-rekor_ca_passphrase: sigstore
-ct_logprefix: sigstoreansible
+tas_single_node_scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
 
-scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
+tas_single_node_oidc_issuers: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
+tas_single_node_oidc_client_id: trusted-artifact-signer
+tas_single_node_issuer_url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
+tas_single_node_oidc_issuers_type: email
 
-oidc_issuers: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
-sigstore_client_id: trusted-artifact-signer
-issuer_url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
-oidc_issuers_type: email
-
-# Sigstore Images
-fulcio_server_image: quay.io/redhat-user-workloads/rhtas-tenant/fulcio/fulcio-server@sha256:f333772eb0cd23360516da4a7a50813a59d67c690c2b6baef4bc4b6094d1116b
-trillian_log_server_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/logserver@sha256:cdb2fa8ef85a9727c2b306652e4127ee4b2723cd361a04f364f4a96d60194777
-trillian_logsigner_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/logsigner@sha256:f8199e0b14f391574181a3e38659a2ec5baeb65ba5101ac63b5b9785ae01c214
-rekor_image: quay.io/redhat-user-workloads/rhtas-tenant/rekor/rekor-server@sha256:a2075576589bec3c4544db4368732cb1388e8f5a3cb2a739d943cee601e64b74
-ct_server_image: quay.io/redhat-user-workloads/rhtas-tenant/certificate-transparency-go/certificate-transparency-go@sha256:1419a048cb5095b3f65d08224e6f94c6eb166d8d5a16707942aed2880992ddee
-
+# RHTAS Images
+tas_single_node_fulcio_server_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/fulcio/fulcio-server@sha256:f333772eb0cd23360516da4a7a50813a59d67c690c2b6baef4bc4b6094d1116b
+tas_single_node_trillian_log_server_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/trillian/logserver@sha256:cdb2fa8ef85a9727c2b306652e4127ee4b2723cd361a04f364f4a96d60194777
+tas_single_node_trillian_logsigner_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/trillian/logsigner@sha256:f8199e0b14f391574181a3e38659a2ec5baeb65ba5101ac63b5b9785ae01c214
+tas_single_node_rekor_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/rekor/rekor-server@sha256:a2075576589bec3c4544db4368732cb1388e8f5a3cb2a739d943cee601e64b74
+tas_single_node_ct_server_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/certificate-transparency-go/certificate-transparency-go@sha256:1419a048cb5095b3f65d08224e6f94c6eb166d8d5a16707942aed2880992ddee
 
 # Supplement images
-redis_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/redis@sha256:0804a6634b8836cb2e957ee16d54e8d6ab94d311362a48baf238b1f575d79934
-trillian_db_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/database@sha256:145560da2f030ab6574d62c912b757d5537e75e4ec10e0d26cf56a67b1573969
-tuf_image: quay.io/securesign/tuf/server:latest
-netcat_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7
-nginx_image: registry.redhat.io/rhel8/nginx-122@sha256:088912945049dbb83bc2e8a70732059e4baca7462447c738f4a9ab34ecc705da
-curl_image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+tas_single_node_redis_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/redis@sha256:0804a6634b8836cb2e957ee16d54e8d6ab94d311362a48baf238b1f575d79934
+tas_single_node_trillian_db_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/trillian/database@sha256:145560da2f030ab6574d62c912b757d5537e75e4ec10e0d26cf56a67b1573969
+tas_single_node_tuf_image: quay.io/securesign/tuf/server:latest
+tas_single_node_netcat_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7
+tas_single_node_nginx_image: registry.redhat.io/rhel8/nginx-122@sha256:088912945049dbb83bc2e8a70732059e4baca7462447c738f4a9ab34ecc705da
+tas_single_node_curl_image: registry.access.redhat.com/ubi9/ubi-minimal:latest

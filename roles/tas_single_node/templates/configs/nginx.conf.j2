@@ -45,38 +45,38 @@ stream {
 
   map_hash_bucket_size 128;
   map $ssl_server_name $targetBackend {
-{% if rekor_enabled %}
-    rekor.{{ base_hostname }}  rekor-server-pod:3000;
+{% if tas_single_node_rekor_enabled %}
+    rekor.{{ tas_single_node_base_hostname }}  rekor-server-pod:3000;
 {% endif %}
-{% if tuf_enabled %}
-    tuf.{{ base_hostname }}  tuf-pod:8080;
+{% if tas_single_node_tuf_enabled %}
+    tuf.{{ tas_single_node_base_hostname }}  tuf-pod:8080;
 {% endif %}
-{% if fulcio_enabled %}
-    fulcio.{{ base_hostname }}  fulcio-server-pod:5555;
+{% if tas_single_node_fulcio_enabled %}
+    fulcio.{{ tas_single_node_base_hostname }}  fulcio-server-pod:5555;
 {% endif %}
   }
 
   map $ssl_server_name $targetCert {
-{% if rekor_enabled %}
-    rekor.{{ base_hostname }} /certs/ingress-rekor.pem;
+{% if tas_single_node_rekor_enabled %}
+    rekor.{{ tas_single_node_base_hostname }} /certs/ingress-rekor.pem;
 {% endif %}
-{% if tuf_enabled %}
-    tuf.{{ base_hostname }} /certs/ingress-tuf.pem;
+{% if tas_single_node_tuf_enabled %}
+    tuf.{{ tas_single_node_base_hostname }} /certs/ingress-tuf.pem;
 {% endif %}
-{% if fulcio_enabled %}
-    fulcio.{{ base_hostname }} /certs/ingress-fulcio.pem;
+{% if tas_single_node_fulcio_enabled %}
+    fulcio.{{ tas_single_node_base_hostname }} /certs/ingress-fulcio.pem;
 {% endif %}
   }
 
   map $ssl_server_name $targetCertKey {
-{% if rekor_enabled %}
-    rekor.{{ base_hostname }}  /certs/ingress-rekor.key;
+{% if tas_single_node_rekor_enabled %}
+    rekor.{{ tas_single_node_base_hostname }}  /certs/ingress-rekor.key;
 {% endif %}
-{% if tuf_enabled %}
-    tuf.{{ base_hostname }}  /certs/ingress-tuf.key;
+{% if tas_single_node_tuf_enabled %}
+    tuf.{{ tas_single_node_base_hostname }}  /certs/ingress-tuf.key;
 {% endif %}
-{% if fulcio_enabled %}
-    fulcio.{{ base_hostname }}  /certs/ingress-fulcio.key;
+{% if tas_single_node_fulcio_enabled %}
+    fulcio.{{ tas_single_node_base_hostname }}  /certs/ingress-fulcio.key;
 {% endif %}
   }
   

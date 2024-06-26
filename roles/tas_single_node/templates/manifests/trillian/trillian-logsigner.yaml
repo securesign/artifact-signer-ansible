@@ -26,7 +26,7 @@ spec:
     spec:
       initContainers:
         - name: wait-for-trillian-db
-          image: {{ netcat_image}}
+          image: {{ tas_single_node_netcat_image}}
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "until nc -z -w 10 trillian-mysql-pod 3306; do echo waiting for trillian-mysql-pod; sleep 5; done;"]
           resources: {}
@@ -34,7 +34,7 @@ spec:
           terminationMessagePolicy: File
       containers:
         - name: trillian-trillian-logsigner
-          image: {{ trillian_logsigner_image }}
+          image: {{ tas_single_node_trillian_logsigner_image }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8191
@@ -42,7 +42,7 @@ spec:
           args:
             - --storage_system=mysql
             - --quota_system=mysql
-            - --mysql_uri={{ trillian.mysql.user }}:{{ trillian.mysql.password }}@tcp({{ trillian.mysql.host }}:{{ trillian.mysql.port }})/{{ trillian.mysql.database }}
+            - --mysql_uri={{ tas_single_node_trillian.mysql.user }}:{{ tas_single_node_trillian.mysql.password }}@tcp({{ tas_single_node_trillian.mysql.host }}:{{ tas_single_node_trillian.mysql.port }})/{{ tas_single_node_trillian.mysql.database }}
             - --rpc_endpoint=0.0.0.0:8091
             - --http_endpoint=0.0.0.0:8090
             - --force_master=true
@@ -64,9 +64,9 @@ spec:
                   key: mysql-database
                   name: trillian-mysql
             - name: MYSQL_HOSTNAME
-              value: {{ trillian.mysql.host }}
+              value: {{ tas_single_node_trillian.mysql.host }}
             - name: MYSQL_PORT
-              value: "{{ trillian.mysql.port | quote }})"
+              value: "{{ tas_single_node_trillian.mysql.port | quote }})"
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File

@@ -1,9 +1,9 @@
 {
     "OIDCIssuers": {
-    "{{ oidc_issuers }}": {
-        "ClientID": "{{ sigstore_client_id }}",
-        "IssuerURL": "{{ issuer_url }}",
-        "Type": "{{  oidc_issuers_type }}"
+    "{{ tas_single_node_oidc_issuers }}": {
+        "ClientID": "{{ tas_single_node_oidc_client_id }}",
+        "IssuerURL": "{{ tas_single_node_issuer_url }}",
+        "Type": "{{ tas_single_node_oidc_issuers_type }}"
         }
     }
 }
