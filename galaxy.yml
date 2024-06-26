@@ -1,7 +1,7 @@
 ---
 namespace: redhat
 name: artifact_signer
-version: 0.0.1
+version: 1.0.0
 
 readme: README.md
 authors:

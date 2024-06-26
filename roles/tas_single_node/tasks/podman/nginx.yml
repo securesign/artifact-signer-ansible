@@ -72,8 +72,9 @@
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-tuf.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key') | list | first).content }}
-        ingress-fulcio.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.key') | list | first).content }}
+        ingress-fulcio.key: >
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
+          + '/ingress-fulcio.key') | list | first).content }}
 
 - name: Create nginx config ConfigMap
   ansible.builtin.copy:
