@@ -7,7 +7,7 @@
   ansible.builtin.file:
     state: directory
     dest: "{{ item }}"
-    mode: "0600"
+    mode: "0700"
   loop:
     - "{{ tas_single_node_kube_manifest_dir }}"
     - "{{ tas_single_node_kube_configmap_dir }}"
@@ -16,6 +16,22 @@
   ansible.builtin.command: podman login registry.redhat.io -u '{{ tas_single_node_registry_username }}' --password {{ tas_single_node_registry_password }}
   register: podman_login_result
   changed_when: '"Already logged in" not in podman_login_result'
+
+- name: Pull all images
+  containers.podman.podman_image:
+    name: "{{ item }}"
+  loop:
+    - "{{ tas_single_node_fulcio_server_image }}"
+    - "{{ tas_single_node_trillian_log_server_image }}"
+    - "{{ tas_single_node_trillian_logsigner_image }}"
+    - "{{ tas_single_node_rekor_image }}"
+    - "{{ tas_single_node_ct_server_image }}"
+    - "{{ tas_single_node_redis_image }}"
+    - "{{ tas_single_node_trillian_db_image }}"
+    - "{{ tas_single_node_tuf_image }}"
+    - "{{ tas_single_node_netcat_image }}"
+    - "{{ tas_single_node_nginx_image }}"
+    - "{{ tas_single_node_curl_image }}"
 
 - name: Configure/Deploy nginx
   ansible.builtin.include_tasks: podman/nginx.yml

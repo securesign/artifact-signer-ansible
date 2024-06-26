@@ -53,6 +53,5 @@ dependencies: []
 # if you add dependencies to this list.
 
 collections:
-  - fedora.linux_system_roles
   - containers.podman
   - community.crypto

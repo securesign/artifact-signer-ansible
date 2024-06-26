@@ -1,15 +1,21 @@
 ---
 - name: Set location of Podman Play Manifest
   ansible.builtin.set_fact:
-    kube_play_file: >
-      "{{ tas_single_node_kube_manifest_dir + '/' + podman_spec.kube_file_content.metadata.namespace + '_'
-      + podman_spec.kube_file_content.metadata.name + '.yml' }}"
+    kube_play_file: >-
+      {{ tas_single_node_kube_manifest_dir + '/' + podman_spec.kube_file_content.metadata.namespace + '_'
+      + podman_spec.kube_file_content.metadata.name + '.yml' }}
 
 - name: Copy Manifest to Server
   ansible.builtin.copy:
     content: "{{ podman_spec.kube_file_content | to_nice_yaml(indent=2) }}"
     dest: "{{ kube_play_file }}"
     mode: "0600"
+
+- name: debug
+  debug:
+    msg: "{{ podman_spec.secret }}"
+  when: podman_spec.secret is defined
+
 
 - name: Create Secret
   containers.podman.podman_play:

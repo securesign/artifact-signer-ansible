@@ -30,24 +30,24 @@
 
 - name: Base64 encode the rekor ingress
   ansible.builtin.set_fact:
-    rekor_ingress_base64: >
-      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.pem') | list | first).content
+    rekor_ingress_base64: >-
+      {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
-      | b64decode }}"
+      | b64decode }}
 
 - name: Base64 encode the tuf ingress
   ansible.builtin.set_fact:
-    tuf_ingress_base64: >
-      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.pem') | list | first).content
+    tuf_ingress_base64: >-
+      {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
-      | b64decode }}"
+      | b64decode }}
 
 - name: Base 64 encode the fulcio ingress
   ansible.builtin.set_fact:
-    fulcio_ingress_base64: >
-      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.pem') | list | first).content
+    fulcio_ingress_base64: >-
+      {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
-      | b64decode }}"
+      | b64decode }}
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
@@ -72,7 +72,7 @@
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-tuf.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key') | list | first).content }}
-        ingress-fulcio.key: >
+        ingress-fulcio.key: >-
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
           + '/ingress-fulcio.key') | list | first).content }}
 

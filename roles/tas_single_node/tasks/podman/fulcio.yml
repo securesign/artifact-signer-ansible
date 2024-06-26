@@ -54,7 +54,7 @@
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         public: |
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key) | list | first).content }}
-        password: "{{ tas_single_node_fulcio_ca_passphrase }}"
+        password: "{{ tas_single_node_fulcio_ca_passphrase | b64encode }}"
 
 - name: Deploy Fulcio Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

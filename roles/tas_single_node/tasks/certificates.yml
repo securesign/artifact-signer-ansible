@@ -11,7 +11,7 @@
   ansible.builtin.file:
     state: directory
     dest: "{{ tas_single_node_certs_dir }}"
-    mode: "0600"
+    mode: "0700"
 
 - name: List files in certs directory
   become: true
@@ -24,7 +24,7 @@
   ansible.builtin.file:
     state: directory
     dest: "{{ tas_single_node_local_certs_dir }}"
-    mode: "0600"
+    mode: "0700"
   delegate_to: localhost
 
 - name: Create private key (RSA, 4096 bits)
