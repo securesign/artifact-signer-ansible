@@ -1,5 +1,4 @@
 ---
-
 - name: Set location of Podman Play Manifest
   ansible.builtin.set_fact:
     kube_play_file: "{{ kube_manifest_dir + '/' + podman_spec.kube_file_content.metadata.namespace + '_' + podman_spec.kube_file_content.metadata.name + '.yml' }}"
@@ -17,13 +16,13 @@
 
 - name: Copy Systemd file to Server
   ansible.builtin.template:
-    src: "systemd/systemd-cm.j2"
+    src: systemd/systemd-cm.j2
     dest: "{{ systemd_directory + '/' + podman_spec.systemd_file }}.service"
   when: podman_spec.configmap is defined
 
 - name: Copy Systemd file to Server
   ansible.builtin.template:
-    src: "systemd/systemd-nocm.j2"
+    src: systemd/systemd-nocm.j2
     dest: "{{ systemd_directory + '/' + podman_spec.systemd_file }}.service"
   when: podman_spec.configmap is not defined
 

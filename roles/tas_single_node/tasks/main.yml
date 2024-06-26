@@ -1,5 +1,4 @@
 ---
-
 - name: Install Operating System Components
   ansible.builtin.include_tasks: os.yml
   args:

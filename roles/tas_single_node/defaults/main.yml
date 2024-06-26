@@ -1,9 +1,9 @@
 ---
 # defaults file for sigstore_scaffolding
 system_packages:
-    - podman
-    - podman-plugins
-    - firewalld
+  - podman
+  - podman-plugins
+  - firewalld
 
 sigstore_podman_network: sigstore
 
@@ -13,7 +13,7 @@ cockpit:
     - cockpit-storaged
     - cockpit-podman
     - cockpit
-  cockpit_manage_firewall: yes
+  cockpit_manage_firewall: true
 
 skip_os_install: false
 
@@ -29,18 +29,17 @@ trillian_enabled: true
 trillian:
   database_deploy: true
   mysql:
-   user: mysql
-   rootPassword: rootpassword
-   password: password
-   database: trillian
-   host: trillian-mysql-pod
-   port: 3306
+    user: mysql
+    rootPassword: rootpassword
+    password: password
+    database: trillian
+    host: trillian-mysql-pod
+    port: 3306
 
 config_dir: /etc/sigstore
 certs_dir: "{{ config_dir }}/certs"
 kube_manifest_dir: "{{ config_dir }}/manifests"
 kube_configmap_dir: "{{ config_dir }}/configs"
-
 
 local_certs_dir: /tmp/sigstore/certs
 
@@ -108,8 +107,8 @@ fulcio_server_image: quay.io/redhat-user-workloads/rhtas-tenant/fulcio/fulcio-se
 trillian_log_server_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/logserver@sha256:cdb2fa8ef85a9727c2b306652e4127ee4b2723cd361a04f364f4a96d60194777
 trillian_logsigner_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/logsigner@sha256:f8199e0b14f391574181a3e38659a2ec5baeb65ba5101ac63b5b9785ae01c214
 rekor_image: quay.io/redhat-user-workloads/rhtas-tenant/rekor/rekor-server@sha256:a2075576589bec3c4544db4368732cb1388e8f5a3cb2a739d943cee601e64b74
-ct_server_image: quay.io/redhat-user-workloads/rhtas-tenant/certificate-transparency-go/certificate-transparency-go@sha256:1419a048cb5095b3f65d08224e6f94c6eb166d8d5a16707942aed2880992ddee
-
+ct_server_image:
+  quay.io/redhat-user-workloads/rhtas-tenant/certificate-transparency-go/certificate-transparency-go@sha256:1419a048cb5095b3f65d08224e6f94c6eb166d8d5a16707942aed2880992ddee
 
 # Supplement images
 redis_image: quay.io/redhat-user-workloads/rhtas-tenant/trillian/redis@sha256:0804a6634b8836cb2e957ee16d54e8d6ab94d311362a48baf238b1f575d79934

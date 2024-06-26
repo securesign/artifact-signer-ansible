@@ -1,5 +1,4 @@
 ---
-
 - name: Obtain Trillian Tree ID
   ansible.builtin.include_tasks: podman/createtree.yml
 
@@ -49,8 +48,8 @@
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
     podman_spec:
-      state: "started"
-      systemd_file: "ctlog"
+      state: started
+      systemd_file: ctlog
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog.yaml') | from_yaml }}"
       configmap: "{{ ctlog_configmap_config }}"

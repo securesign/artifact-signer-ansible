@@ -11,10 +11,9 @@ description: TODO
 license_file: TODO
 tags: [sigstore, tas, rhtas, security, cosign]
 dependencies: {}
-
 repository: https://github.com/securesign/sigstore-ansible/
 documentation: http://TODO.com
 homepage: https://TODO.com
 issues: https://github.com/securesign/sigstore-ansible/issues
 
-build_ignore: [ansible.cfg, .github, .gitignore, .vscode, inventory, main.tf, playbooks, requirements.yml]
+build_ignore: [.ansible-lint, .github, .gitignore, .vscode, requirements-testing.txt, vm-testing]

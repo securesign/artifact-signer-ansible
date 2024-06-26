@@ -1,5 +1,4 @@
 ---
-
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
@@ -17,12 +16,12 @@
 
 - name: Retrieve Rekor Public Key
   ansible.builtin.uri:
-    url: "https://rekor.{{ base_hostname }}/api/v1/log/publicKey"
+    url: https://rekor.{{ base_hostname }}/api/v1/log/publicKey
     method: GET
     status_code: 200
     validate_certs: false
     return_content: true
-  until: "rekor_public_key_result.status == 200"
+  until: rekor_public_key_result.status == 200
   retries: "{{ rekor_public_key_retries }}"
   delay: "{{ rekor_public_key_delay }}"
   register: rekor_public_key_result
@@ -52,8 +51,8 @@
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
     podman_spec:
-      state: "started"
-      systemd_file: "tuf"
+      state: started
+      systemd_file: tuf
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.yaml') | from_yaml }}"
       secret: "{{ tuf_secret_config }}"

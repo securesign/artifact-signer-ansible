@@ -1,5 +1,4 @@
 ---
-
 - name: Install System Packages dependencies
   ansible.builtin.package:
     name: "{{ system_packages }}"
@@ -13,10 +12,10 @@
   when: cockpit.enabled | bool
 
 - name: Configure /etc/hosts DNS block
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: /etc/hosts
     content: "{{ lookup('template', 'configs/etc-hosts.j2') }}"
     state: present
-    create: yes
+    create: true
     marker: "# {mark} ANSIBLE MANAGED INGRESS BLOCK"
   when: setup_host_dns | bool

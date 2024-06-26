@@ -1,5 +1,4 @@
 ---
-
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
@@ -44,20 +43,19 @@
         namespace: fulcio-system
       data:
         key.pem: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_private_key) | list | first).content  }}
+          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_private_key) | list | first).content }}
         cert.pem: |
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_root_ca) | list | first).content }}
         public: |
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_public_key) | list | first).content }}
-        password: "{{ fulcio_ca_passphrase  }}"
-
+        password: "{{ fulcio_ca_passphrase }}"
 
 - name: Deploy Fulcio Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
     podman_spec:
-      state: "started"
-      systemd_file: "fulcio"
+      state: started
+      systemd_file: fulcio
       network: "{{ sigstore_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.yaml') | from_yaml }}"
       configmap: "{{ fulcio_server_config }}"

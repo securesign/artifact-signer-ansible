@@ -1,5 +1,4 @@
 ---
-
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
@@ -8,13 +7,13 @@
     msg: "'base_hostname' must be specified"
 
 - name: Create Certificates Directory
-  become: yes
+  become: true
   ansible.builtin.file:
     state: directory
     dest: "{{ certs_dir }}"
 
 - name: List files in certs directory
-  become: yes
+  become: true
   ansible.builtin.find:
     file_type: file
     paths: "{{ certs_dir }}"
@@ -33,32 +32,32 @@
   when: (certs_dir_files.files | selectattr('path', 'equalto', remote_sigstore_private_key) | list | length) == 0
 
 - name: Create Root CA
-  block:
-  - name: Create certificate signing request (CSR) for CA certificate
-    community.crypto.openssl_csr_pipe:
-      privatekey_path: "{{ local_sigstore_private_key }}"
-      common_name: "{{ base_hostname }}"
-      use_common_name_for_san: false
-      basic_constraints:
-        - 'CA:TRUE'
-      basic_constraints_critical: true
-      key_usage:
-        - keyCertSign
-      key_usage_critical: true
-    register: ca_csr
-
-  - name: Create self-signed CA certificate from CSR
-    community.crypto.x509_certificate:
-      path: "{{ local_sigstore_ca }}"
-      csr_content: "{{ ca_csr.csr }}"
-      privatekey_path: "{{ local_sigstore_private_key }}"
-      provider: selfsigned
-      selfsigned_not_after: +365d  # valid for one year
   delegate_to: localhost
   when: (certs_dir_files.files | selectattr('path', 'equalto', remote_sigstore_ca) | list | length) == 0
+  block:
+    - name: Create certificate signing request (CSR) for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ local_sigstore_private_key }}"
+        common_name: "{{ base_hostname }}"
+        use_common_name_for_san: false
+        basic_constraints:
+          - CA:TRUE
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        key_usage_critical: true
+      register: ca_csr
+
+    - name: Create self-signed CA certificate from CSR
+      community.crypto.x509_certificate:
+        path: "{{ local_sigstore_ca }}"
+        csr_content: "{{ ca_csr.csr }}"
+        privatekey_path: "{{ local_sigstore_private_key }}"
+        provider: selfsigned
+        selfsigned_not_after: +365d # valid for one year
 
 - name: Create Ingress Certificates
-  include_tasks: create_ingress_cert.yml
+  ansible.builtin.include_tasks: create_ingress_cert.yml
   loop:
     - fulcio
     - rekor
@@ -67,13 +66,17 @@
     loop_var: cert_name
   vars:
     existing_files: "{{ certs_dir_files }}"
-    local_ca_key_path: "{{ local_sigstore_private_key  }}"
+    local_ca_key_path: "{{ local_sigstore_private_key }}"
     local_ca_cert_path: "{{ local_sigstore_ca }}"
-    remote_ca_key_path: "{{ remote_sigstore_private_key  }}"
+    remote_ca_key_path: "{{ remote_sigstore_private_key }}"
     remote_ca_cert_path: "{{ remote_sigstore_ca }}"
     dns_name: "{{ cert_name }}.{{ base_hostname }}"
 
 - name: Create fulcio root
+  delegate_to: localhost
+  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_private_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto',
+    remote_fulcio_public_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_root_ca) | list | length) == 0
+
   block:
     - name: Create Fulcio Private Key
       community.crypto.openssl_privatekey:
@@ -82,10 +85,11 @@
         type: ECC
         passphrase: "{{ fulcio_ca_passphrase }}"
         cipher: auto
+
     - name: Create Fulcio Public Key
       community.crypto.openssl_publickey:
         path: "{{ local_fulcio_public_key }}"
-        privatekey_path : "{{ local_fulcio_private_key }}"
+        privatekey_path: "{{ local_fulcio_private_key }}"
         privatekey_passphrase: "{{ fulcio_ca_passphrase }}"
 
     - name: Create certificate signing request (CSR) for Fulcio Root certificate
@@ -93,7 +97,7 @@
         privatekey_path: "{{ local_fulcio_private_key }}"
         privatekey_passphrase: "{{ fulcio_ca_passphrase }}"
         basic_constraints:
-          - 'CA:TRUE'
+          - CA:TRUE
         basic_constraints_critical: true
         key_usage:
           - keyCertSign
@@ -107,10 +111,12 @@
         privatekey_path: "{{ local_fulcio_private_key }}"
         privatekey_passphrase: "{{ fulcio_ca_passphrase }}"
         provider: selfsigned
-  delegate_to: localhost
-  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_private_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_public_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_root_ca) | list | length) == 0
 
 - name: Create ctlog root
+  delegate_to: localhost
+  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_private_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto',
+    remote_ctlog_public_key) | list | length) == 0
+
   block:
     - name: Create ctlog Private Key
       community.crypto.openssl_privatekey:
@@ -122,15 +128,11 @@
     - name: Create ctlog Public Key
       community.crypto.openssl_publickey:
         path: "{{ local_ctlog_public_key }}"
-        privatekey_path : "{{ local_ctlog_private_key }}"
+        privatekey_path: "{{ local_ctlog_private_key }}"
         privatekey_passphrase: "{{ ctlog_ca_passphrase }}"
 
-  delegate_to: localhost
-  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_private_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_public_key) | list | length) == 0
-
-
 - name: Copy Certificates to Server
-  become: yes
+  become: true
   ansible.builtin.copy:
     src: "{{ local_certs_dir }}/"
     dest: "{{ certs_dir }}"

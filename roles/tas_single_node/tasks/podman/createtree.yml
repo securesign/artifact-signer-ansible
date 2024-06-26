@@ -1,12 +1,11 @@
 ---
-
 - name: Check if Trillian treeid Config exists
   ansible.builtin.stat:
     path: "{{ treeid_config }}"
   register: treeid_config_stat
 
-
 - name: Obtain existing ctlog ID
+  when: tree_id is not defined and treeid_config_stat.stat.exists
   block:
     - name: Obtain existing Trillian Treeid config
       ansible.builtin.slurp:
@@ -17,13 +16,12 @@
       ansible.builtin.set_fact:
         trillian_tree_id: "{{ (existing_treeid_config.content | b64decode | from_yaml)['data']['tree_id'] }}"
       when: '"tree_id" in (existing_treeid_config.content | b64decode | from_yaml)["data"]'
-  when: tree_id is not defined and treeid_config_stat.stat.exists
-
 
 # Create Tree ID
 - name: Create Tree ID
+  when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists
   block:
-    - name: createtree container
+    - name: Createtree container
       containers.podman.podman_container:
         name: createtree
         image: "{{ scaffolding_utils_image }}"
@@ -59,7 +57,3 @@
             namespace: rekor-system
           data:
             tree_id: "{{ trillian_tree_id }}"
-
-  when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists
-
-

@@ -1,5 +1,4 @@
 ---
-
 - name: Create sigstore network
   containers.podman.podman_network:
     name: "{{ sigstore_podman_network }}"
@@ -12,7 +11,7 @@
     - "{{ kube_manifest_dir }}"
     - "{{ kube_configmap_dir }}"
 
-- name: podman login to registry.redhat.io
+- name: Podman login to registry.redhat.io
   ansible.builtin.command: podman login registry.redhat.io -u '{{ registry_username }}' --password {{ registry_password }}
 
 - name: Configure/Deploy nginx

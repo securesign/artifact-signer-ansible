@@ -1,5 +1,4 @@
 ---
-
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
@@ -29,17 +28,20 @@
     - "{{ certs_dir }}/ingress-fulcio.key"
   register: remote_ingress_certificates
 
-- name: base64 encode the rekor ingress
-  set_fact: 
-    rekor_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+- name: Base64 encode the rekor ingress
+  ansible.builtin.set_fact:
+    rekor_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode
+      + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
-- name: base64 encode the tuf ingress
-  set_fact: 
-    tuf_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+- name: Base64 encode the tuf ingress
+  ansible.builtin.set_fact:
+    tuf_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode
+      + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
-- name: base 64 encode the fulcio ingress
-  set_fact: 
-    fulcio_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+- name: Base 64 encode the fulcio ingress
+  ansible.builtin.set_fact:
+    fulcio_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content |
+      b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
@@ -54,15 +56,15 @@
         namespace: nginx-system
       data:
         ingress-rekor.pem: |
-          {{ rekor_ingress_base64 | b64encode}}
+          {{ rekor_ingress_base64 | b64encode }}
         ingress-tuf.pem: |
-          {{ tuf_ingress_base64 | b64encode}}
+          {{ tuf_ingress_base64 | b64encode }}
         ingress-fulcio.pem: |
-          {{ fulcio_ingress_base64 | b64encode}}
+          {{ fulcio_ingress_base64 | b64encode }}
         ingress-rekor.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-tuf.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.key') | list | first).content  }}
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.key') | list | first).content }}
         ingress-fulcio.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.key') | list | first).content }}
 
@@ -85,9 +87,9 @@
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
     podman_spec:
-      state: "started"
+      state: started
       network: "{{ sigstore_podman_network }}"
-      systemd_file: "nginx"
+      systemd_file: nginx
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
       configmap: "{{ nginx_config }}"
       secret: "{{ nginx_certs_config }}"
