@@ -76,6 +76,10 @@
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
           + '/ingress-fulcio.key') | list | first).content }}
 
+- name: Load nginx config content
+  ansible.builtin.set_fact:
+    nginx_config_content: "{{ lookup('ansible.builtin.template', 'configs/nginx.conf.j2') }}"
+
 - name: Create nginx config ConfigMap
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
@@ -89,8 +93,7 @@
         name: nginx-config
         namespace: nginx-system
       data:
-        nginx.conf: |
-          {{ lookup('ansible.builtin.template', 'configs/nginx.conf.j2') }}
+        nginx.conf: "{{ nginx_config_content }}"
 
 - name: Deploy nginx Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

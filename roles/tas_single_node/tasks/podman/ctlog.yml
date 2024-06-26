@@ -11,6 +11,10 @@
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
   register: remote_ctlog_certificates
 
+- name: Load ctlog config content
+  ansible.builtin.set_fact:
+    ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config.j2') }}"
+
 - name: Create ctlog configmap
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
@@ -24,7 +28,7 @@
         name: ctlog-config
         namespace: ctlog-system
       data:
-        config: "{{ lookup('template', 'configs/ctlog-config.j2') }}"
+        config: "{{ ctlog_config_content }}"
 
 - name: Create ctlog Secret
   ansible.builtin.copy:

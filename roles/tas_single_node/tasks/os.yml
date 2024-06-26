@@ -14,7 +14,7 @@
 - name: Configure /etc/hosts DNS block
   ansible.builtin.blockinfile:
     dest: /etc/hosts
-    content: "{{ lookup('template', 'configs/etc-hosts.j2') }}"
+    content: "{{ lookup('ansible.builtin.template', 'configs/etc-hosts.j2') }}"
     state: present
     create: true
     mode: "0644"
