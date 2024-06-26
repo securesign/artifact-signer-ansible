@@ -19,6 +19,7 @@
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
     dest: "{{ fulcio_server_config }}"
+    mode: "0600"
   vars:
     configmap_content:
       kind: ConfigMap
@@ -34,6 +35,7 @@
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
     dest: "{{ fulcio_server_secret_config }}"
+    mode: "0600"
   vars:
     secret_content:
       kind: Secret

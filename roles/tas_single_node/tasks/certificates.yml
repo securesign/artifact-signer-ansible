@@ -11,6 +11,7 @@
   ansible.builtin.file:
     state: directory
     dest: "{{ certs_dir }}"
+    mode: "0600"
 
 - name: List files in certs directory
   become: true
@@ -23,6 +24,7 @@
   ansible.builtin.file:
     state: directory
     dest: "{{ local_certs_dir }}"
+    mode: "0600"
   delegate_to: localhost
 
 - name: Create private key (RSA, 4096 bits)
@@ -74,8 +76,10 @@
 
 - name: Create fulcio root
   delegate_to: localhost
-  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_private_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto',
-    remote_fulcio_public_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_root_ca) | list | length) == 0
+  when: >
+    (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_private_key) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_public_key) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_root_ca) | list | length) == 0
 
   block:
     - name: Create Fulcio Private Key
@@ -114,8 +118,9 @@
 
 - name: Create ctlog root
   delegate_to: localhost
-  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_private_key) | list | length) == 0 or (certs_dir_files.files | selectattr('path', 'equalto',
-    remote_ctlog_public_key) | list | length) == 0
+  when: >
+    (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_private_key) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_public_key) | list | length) == 0
 
   block:
     - name: Create ctlog Private Key
@@ -137,6 +142,7 @@
     src: "{{ local_certs_dir }}/"
     dest: "{{ certs_dir }}"
     force: true
+    mode: "0600"
 
 - name: Remove Local Certificate Directory
   ansible.builtin.file:

@@ -9,11 +9,13 @@
 
 - name: Create Certificate and Private Key
   delegate_to: localhost
-  when: (existing_files.files | selectattr('path', 'equalto', remote_key_path) | list | length) == 0 or (existing_files.files | selectattr('path', 'equalto', remote_cert_path)
-    | list | length) == 0
-  #   when: ((existing_files.files | selectattr('path', 'equalto', key_path) | list | length) == 0) and (existing_files.files | selectattr('path', 'equalto', cert_path) | list | length) == 0))
+  when: >
+    (existing_files.files | selectattr('path', 'equalto', remote_key_path) | list | length) == 0
+    or (existing_files.files | selectattr('path', 'equalto', remote_cert_path) | list | length) == 0
+  #   when: ((existing_files.files | selectattr('path', 'equalto', key_path) | list | length) == 0)
+  #         and (existing_files.files | selectattr('path', 'equalto', cert_path) | list | length) == 0))
   block:
-    - name: Create {{ cert_name }} Private Key
+    - name: Create Private Key {{ cert_name }}
       community.crypto.openssl_privatekey:
         path: "{{ local_key_path }}"
 
@@ -50,4 +52,5 @@
       ansible.builtin.copy:
         dest: "{{ local_cert_path }}"
         content: "{{ certificate.certificate }}"
+        mode: "0600"
       when: certificate is changed

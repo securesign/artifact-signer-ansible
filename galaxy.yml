@@ -8,7 +8,7 @@ authors:
   - Red Hat
   - TODO
 description: TODO
-license_file: TODO
+license_file: Apache-2.0
 tags: [sigstore, tas, rhtas, security, cosign]
 dependencies: {}
 repository: https://github.com/securesign/sigstore-ansible/

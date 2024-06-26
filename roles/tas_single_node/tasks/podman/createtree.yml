@@ -34,6 +34,7 @@
       ansible.builtin.command:
         cmd: podman logs {{ createtree_container.container.Id }}
       register: createtree_container_logs
+      changed_when: false
 
     - name: Set Trillian tree id
       ansible.builtin.set_fact:
@@ -48,6 +49,7 @@
       ansible.builtin.copy:
         content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
         dest: "{{ treeid_config }}"
+        mode: "0600"
       vars:
         configmap_content:
           kind: ConfigMap

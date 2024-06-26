@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Install TAS locally
+  hosts: localhost
   remote_user: root
   roles:
-    - sigstore_scaffolding
+    - tas_single_node

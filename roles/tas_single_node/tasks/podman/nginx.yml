@@ -30,23 +30,27 @@
 
 - name: Base64 encode the rekor ingress
   ansible.builtin.set_fact:
-    rekor_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode
+    rekor_ingress_base64: >
+      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode
       + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: Base64 encode the tuf ingress
   ansible.builtin.set_fact:
-    tuf_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode
+    tuf_ingress_base64: >
+      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode
       + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: Base 64 encode the fulcio ingress
   ansible.builtin.set_fact:
-    fulcio_ingress_base64: "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content |
-      b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+    fulcio_ingress_base64: >
+      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode
+      + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
     dest: "{{ nginx_certs_config }}"
+    mode: "0600"
   vars:
     secret_content:
       kind: Secret
@@ -72,6 +76,7 @@
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
     dest: "{{ nginx_config }}"
+    mode: "0600"
   vars:
     configmap_content:
       kind: ConfigMap
