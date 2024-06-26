@@ -7,10 +7,10 @@
     data: "{{ trillian_mysql_secret | to_json }}"
   vars:
     trillian_mysql_secret:
-      mysql-root-password: "{{ trillian.mysql.rootPassword | b64encode }}"
-      mysql-password: "{{ trillian.mysql.password | b64encode }}"
-      mysql-database: "{{ trillian.mysql.database | b64encode }}"
-      mysql-user: "{{ trillian.mysql.user | b64encode }}"
+      mysql-root-password: "{{ tas_single_node_trillian.mysql.rootPassword | b64encode }}"
+      mysql-password: "{{ tas_single_node_trillian.mysql.password | b64encode }}"
+      mysql-database: "{{ tas_single_node_trillian.mysql.database | b64encode }}"
+      mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
 
 - name: Build Trillian Database Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -18,9 +18,9 @@
     podman_spec:
       state: started
       systemd_file: trillian-mysql
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-mysql.yaml') | from_yaml }}"
-  when: trillian.database_deploy
+  when: tas_single_node_trillian.database_deploy
 
 - name: Build Trillian Log Signer Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -28,7 +28,7 @@
     podman_spec:
       state: started
       systemd_file: trillian-signer
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logsigner.yaml') | from_yaml }}"
 
 - name: Build Trillian Log Server Manifest specs
@@ -37,5 +37,5 @@
     podman_spec:
       state: started
       systemd_file: trillian-server
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logserver.yaml') | from_yaml }}"

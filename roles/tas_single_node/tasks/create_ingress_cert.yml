@@ -1,10 +1,10 @@
 ---
 - name: Set Certificate Facts
   ansible.builtin.set_fact:
-    local_key_path: "{{ local_certs_dir }}/ingress-{{ cert_name }}.key"
-    local_cert_path: "{{ local_certs_dir }}/ingress-{{ cert_name }}.pem"
-    remote_key_path: "{{ certs_dir }}/ingress-{{ cert_name }}.key"
-    remote_cert_path: "{{ certs_dir }}/ingress-{{ cert_name }}.pem"
+    local_key_path: "{{ tas_single_node_local_certs_dir }}/ingress-{{ cert_name }}.key"
+    local_cert_path: "{{ tas_single_node_local_certs_dir }}/ingress-{{ cert_name }}.pem"
+    remote_key_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.key"
+    remote_cert_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.pem"
   delegate_to: localhost
 
 - name: Create Certificate and Private Key

@@ -1,7 +1,7 @@
 ---
 - name: Check if Trillian treeid Config exists
   ansible.builtin.stat:
-    path: "{{ treeid_config }}"
+    path: "{{ tas_single_node_treeid_config }}"
   register: treeid_config_stat
 
 - name: Obtain existing ctlog ID
@@ -9,7 +9,7 @@
   block:
     - name: Obtain existing Trillian Treeid config
       ansible.builtin.slurp:
-        src: "{{ treeid_config }}"
+        src: "{{ tas_single_node_treeid_config }}"
       register: existing_treeid_config
 
     - name: Set Trillian Tree ID fact
@@ -24,9 +24,9 @@
     - name: Createtree container
       containers.podman.podman_container:
         name: createtree
-        image: "{{ scaffolding_utils_image }}"
+        image: "{{ tas_single_node_scaffolding_utils_image }}"
         command: createtree --admin_server trillian-logserver-pod:8091
-        network: "{{ sigstore_podman_network }}"
+        network: "{{ tas_single_node_podman_network }}"
         detach: false
       register: createtree_container
 
@@ -48,7 +48,7 @@
     - name: Create Trillian treeid ConfigMap
       ansible.builtin.copy:
         content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-        dest: "{{ treeid_config }}"
+        dest: "{{ tas_single_node_treeid_config }}"
         mode: "0600"
       vars:
         configmap_content:

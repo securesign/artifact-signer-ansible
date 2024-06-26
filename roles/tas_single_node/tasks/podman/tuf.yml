@@ -2,28 +2,28 @@
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
-      - base_hostname is defined
-      - base_hostname | trim | length > 0
-    msg: "'base_hostname' must be specified"
+      - tas_single_node_base_hostname is defined
+      - tas_single_node_base_hostname | trim | length > 0
+    msg: "'tas_single_node_base_hostname' must be specified"
 
 - name: Slurp tuf Certificates
   ansible.builtin.slurp:
     src: "{{ item }}"
   loop:
-    - "{{ remote_ctlog_public_key }}"
-    - "{{ remote_fulcio_root_ca }}"
+    - "{{ tas_single_node_remote_ctlog_public_key }}"
+    - "{{ tas_single_node_remote_fulcio_root_ca }}"
   register: remote_tuf_certificates
 
 - name: Retrieve Rekor Public Key
   ansible.builtin.uri:
-    url: https://rekor.{{ base_hostname }}/api/v1/log/publicKey
+    url: https://rekor.{{ tas_single_node_base_hostname }}/api/v1/log/publicKey
     method: GET
     status_code: 200
     validate_certs: false
     return_content: true
   until: rekor_public_key_result.status == 200
-  retries: "{{ rekor_public_key_retries }}"
-  delay: "{{ rekor_public_key_delay }}"
+  retries: "{{ tas_single_node_rekor_public_key_retries }}"
+  delay: "{{ tas_single_node_rekor_public_key_delay }}"
   register: rekor_public_key_result
   delegate_to: localhost
   become: false
@@ -31,7 +31,7 @@
 - name: Create tuf Secret
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ tuf_secret_config }}"
+    dest: "{{ tas_single_node_tuf_secret_config }}"
     mode: "0600"
   vars:
     configmap_content:
@@ -42,9 +42,9 @@
         namespace: tuf-system
       data:
         ctlog-pubkey: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', remote_ctlog_public_key) | list | first).content }}
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
         fulcio-cert: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', remote_fulcio_root_ca) | list | first).content }}
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
           {{ rekor_public_key_result.content | b64encode }}
 
@@ -54,6 +54,6 @@
     podman_spec:
       state: started
       systemd_file: tuf
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.yaml') | from_yaml }}"
-      secret: "{{ tuf_secret_config }}"
+      secret: "{{ tas_single_node_tuf_secret_config }}"

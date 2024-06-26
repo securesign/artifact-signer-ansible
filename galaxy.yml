@@ -11,9 +11,9 @@ description: TODO
 license_file: Apache-2.0
 tags: [sigstore, tas, rhtas, security, cosign]
 dependencies: {}
-repository: https://github.com/securesign/sigstore-ansible/
+repository: https://github.com/securesign/artifact-signer-ansible/
 documentation: http://TODO.com
 homepage: https://TODO.com
-issues: https://github.com/securesign/sigstore-ansible/issues
+issues: https://github.com/securesign/artifact-signer-ansible/issues
 
 build_ignore: [.ansible-lint, .github, .gitignore, .vscode, requirements-testing.txt, vm-testing]

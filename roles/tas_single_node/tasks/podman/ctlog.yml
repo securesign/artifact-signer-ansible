@@ -6,15 +6,15 @@
   ansible.builtin.slurp:
     src: "{{ item }}"
   loop:
-    - "{{ remote_ctlog_private_key }}"
-    - "{{ remote_ctlog_public_key }}"
-    - "{{ remote_fulcio_root_ca }}"
+    - "{{ tas_single_node_remote_ctlog_private_key }}"
+    - "{{ tas_single_node_remote_ctlog_public_key }}"
+    - "{{ tas_single_node_remote_fulcio_root_ca }}"
   register: remote_ctlog_certificates
 
 - name: Create ctlog configmap
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ ctlog_configmap_config }}"
+    dest: "{{ tas_single_node_ctlog_configmap_config }}"
     mode: "0600"
   vars:
     configmap_content:
@@ -29,7 +29,7 @@
 - name: Create ctlog Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ ctlog_secret }}"
+    dest: "{{ tas_single_node_ctlog_secret }}"
     mode: "0600"
   vars:
     secret_content:
@@ -40,11 +40,11 @@
         namespace: ctlog-system
       data:
         private: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', remote_ctlog_private_key) | list | first).content }}
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_private_key) | list | first).content }}
         public: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', remote_ctlog_public_key) | list | first).content }}
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
         fulcio-0: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', remote_fulcio_root_ca) | list | first).content }}
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
 
 - name: Deploy ctlog Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -52,7 +52,7 @@
     podman_spec:
       state: started
       systemd_file: ctlog
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog.yaml') | from_yaml }}"
-      configmap: "{{ ctlog_configmap_config }}"
-      secret: "{{ ctlog_secret }}"
+      configmap: "{{ tas_single_node_ctlog_configmap_config }}"
+      secret: "{{ tas_single_node_ctlog_secret }}"

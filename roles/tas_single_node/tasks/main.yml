@@ -4,7 +4,7 @@
   args:
     apply:
       become: true
-  when: not skip_os_install
+  when: not tas_single_node_skip_os_install
 
 - name: Create Certificates
   ansible.builtin.include_tasks: certificates.yml

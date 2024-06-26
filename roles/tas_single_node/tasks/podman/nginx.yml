@@ -2,54 +2,57 @@
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
-      - base_hostname is defined
-      - base_hostname | trim | length > 0
-    msg: "'base_hostname' must be specified"
+      - tas_single_node_base_hostname is defined
+      - tas_single_node_base_hostname | trim | length > 0
+    msg: "'tas_single_node_base_hostname' must be specified"
 
-- name: Get sigstore network details
+- name: Get RHTAS network details
   containers.podman.podman_network:
-    name: "{{ sigstore_podman_network }}"
-  register: sigstore_podman_network_results
+    name: "{{ tas_single_node_podman_network }}"
+  register: tas_podman_network_results
 
 - name: Set DNS Resolver
   ansible.builtin.set_fact:
-    dns_resolver: "{{ sigstore_podman_network_results.network.subnets[0].gateway }}"
+    dns_resolver: "{{ tas_podman_network_results.network.subnets[0].gateway }}"
 
 - name: Slurp ingress Certificates
   ansible.builtin.slurp:
     src: "{{ item }}"
   loop:
-    - "{{ remote_sigstore_ca }}"
-    - "{{ certs_dir }}/ingress-rekor.pem"
-    - "{{ certs_dir }}/ingress-rekor.key"
-    - "{{ certs_dir }}/ingress-tuf.pem"
-    - "{{ certs_dir }}/ingress-tuf.key"
-    - "{{ certs_dir }}/ingress-fulcio.pem"
-    - "{{ certs_dir }}/ingress-fulcio.key"
+    - "{{ tas_single_node_remote_ca }}"
+    - "{{ tas_single_node_certs_dir }}/ingress-rekor.pem"
+    - "{{ tas_single_node_certs_dir }}/ingress-rekor.key"
+    - "{{ tas_single_node_certs_dir }}/ingress-tuf.pem"
+    - "{{ tas_single_node_certs_dir }}/ingress-tuf.key"
+    - "{{ tas_single_node_certs_dir }}/ingress-fulcio.pem"
+    - "{{ tas_single_node_certs_dir }}/ingress-fulcio.key"
   register: remote_ingress_certificates
 
 - name: Base64 encode the rekor ingress
   ansible.builtin.set_fact:
     rekor_ingress_base64: >
-      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.pem') | list | first).content | b64decode
-      + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.pem') | list | first).content
+      | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
+      | b64decode }}"
 
 - name: Base64 encode the tuf ingress
   ansible.builtin.set_fact:
     tuf_ingress_base64: >
-      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.pem') | list | first).content | b64decode
-      + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.pem') | list | first).content
+      | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
+      | b64decode }}"
 
 - name: Base 64 encode the fulcio ingress
   ansible.builtin.set_fact:
     fulcio_ingress_base64: >
-      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.pem') | list | first).content | b64decode
-      + (remote_ingress_certificates.results | selectattr('source', 'equalto', remote_sigstore_ca) | list | first).content | b64decode }}"
+      "{{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.pem') | list | first).content
+      | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
+      | b64decode }}"
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ nginx_certs_config }}"
+    dest: "{{ tas_single_node_nginx_certs_config }}"
     mode: "0600"
   vars:
     secret_content:
@@ -66,16 +69,16 @@
         ingress-fulcio.pem: |
           {{ fulcio_ingress_base64 | b64encode }}
         ingress-rekor.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-rekor.key') | list | first).content }}
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-tuf.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-tuf.key') | list | first).content }}
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key') | list | first).content }}
         ingress-fulcio.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', certs_dir + '/ingress-fulcio.key') | list | first).content }}
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.key') | list | first).content }}
 
 - name: Create nginx config ConfigMap
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ nginx_config }}"
+    dest: "{{ tas_single_node_nginx_config }}"
     mode: "0600"
   vars:
     configmap_content:
@@ -93,8 +96,8 @@
   vars:
     podman_spec:
       state: started
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       systemd_file: nginx
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
-      configmap: "{{ nginx_config }}"
-      secret: "{{ nginx_certs_config }}"
+      configmap: "{{ tas_single_node_nginx_config }}"
+      secret: "{{ tas_single_node_nginx_certs_config }}"

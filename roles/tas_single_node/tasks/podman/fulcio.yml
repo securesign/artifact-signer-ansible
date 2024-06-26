@@ -2,23 +2,23 @@
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
-      - base_hostname is defined
-      - base_hostname | trim | length > 0
-    msg: "'base_hostname' must be specified"
+      - tas_single_node_base_hostname is defined
+      - tas_single_node_base_hostname | trim | length > 0
+    msg: "'tas_single_node_base_hostname' must be specified"
 
 - name: Slurp Fulcio Certificates
   ansible.builtin.slurp:
     src: "{{ item }}"
   loop:
-    - "{{ remote_fulcio_private_key }}"
-    - "{{ remote_fulcio_public_key }}"
-    - "{{ remote_fulcio_root_ca }}"
+    - "{{ tas_single_node_remote_fulcio_private_key }}"
+    - "{{ tas_single_node_remote_fulcio_public_key }}"
+    - "{{ tas_single_node_remote_fulcio_root_ca }}"
   register: remote_fulcio_certificates
 
 - name: Create Fulcio Config ConfigMap
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ fulcio_server_config }}"
+    dest: "{{ tas_single_node_fulcio_server_config }}"
     mode: "0600"
   vars:
     configmap_content:
@@ -34,7 +34,7 @@
 - name: Create Fulcio Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ fulcio_server_secret_config }}"
+    dest: "{{ tas_single_node_fulcio_server_secret_config }}"
     mode: "0600"
   vars:
     secret_content:
@@ -45,12 +45,12 @@
         namespace: fulcio-system
       data:
         key.pem: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_private_key) | list | first).content }}
+          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_private_key) | list | first).content }}
         cert.pem: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_root_ca) | list | first).content }}
+          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         public: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', remote_fulcio_public_key) | list | first).content }}
-        password: "{{ fulcio_ca_passphrase }}"
+          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key) | list | first).content }}
+        password: "{{ tas_single_node_fulcio_ca_passphrase }}"
 
 - name: Deploy Fulcio Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -58,7 +58,7 @@
     podman_spec:
       state: started
       systemd_file: fulcio
-      network: "{{ sigstore_podman_network }}"
+      network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.yaml') | from_yaml }}"
-      configmap: "{{ fulcio_server_config }}"
-      secret: "{{ fulcio_server_secret_config }}"
+      configmap: "{{ tas_single_node_fulcio_server_config }}"
+      secret: "{{ tas_single_node_fulcio_server_secret_config }}"

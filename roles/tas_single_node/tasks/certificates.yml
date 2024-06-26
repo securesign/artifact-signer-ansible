@@ -2,45 +2,45 @@
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
-      - base_hostname is defined
-      - base_hostname | trim | length > 0
-    msg: "'base_hostname' must be specified"
+      - tas_single_node_base_hostname is defined
+      - tas_single_node_base_hostname | trim | length > 0
+    msg: "'tas_single_node_base_hostname' must be specified"
 
 - name: Create Certificates Directory
   become: true
   ansible.builtin.file:
     state: directory
-    dest: "{{ certs_dir }}"
+    dest: "{{ tas_single_node_certs_dir }}"
     mode: "0600"
 
 - name: List files in certs directory
   become: true
   ansible.builtin.find:
     file_type: file
-    paths: "{{ certs_dir }}"
+    paths: "{{ tas_single_node_certs_dir }}"
   register: certs_dir_files
 
 - name: Create Local Certificates Directory
   ansible.builtin.file:
     state: directory
-    dest: "{{ local_certs_dir }}"
+    dest: "{{ tas_single_node_local_certs_dir }}"
     mode: "0600"
   delegate_to: localhost
 
 - name: Create private key (RSA, 4096 bits)
   community.crypto.openssl_privatekey:
-    path: "{{ local_sigstore_private_key }}"
+    path: "{{ tas_single_node_local_private_key }}"
   delegate_to: localhost
-  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_sigstore_private_key) | list | length) == 0
+  when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) == 0
 
 - name: Create Root CA
   delegate_to: localhost
-  when: (certs_dir_files.files | selectattr('path', 'equalto', remote_sigstore_ca) | list | length) == 0
+  when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
   block:
     - name: Create certificate signing request (CSR) for CA certificate
       community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ local_sigstore_private_key }}"
-        common_name: "{{ base_hostname }}"
+        privatekey_path: "{{ tas_single_node_local_private_key }}"
+        common_name: "{{ tas_single_node_base_hostname }}"
         use_common_name_for_san: false
         basic_constraints:
           - CA:TRUE
@@ -52,9 +52,9 @@
 
     - name: Create self-signed CA certificate from CSR
       community.crypto.x509_certificate:
-        path: "{{ local_sigstore_ca }}"
+        path: "{{ tas_single_node_local_ca }}"
         csr_content: "{{ ca_csr.csr }}"
-        privatekey_path: "{{ local_sigstore_private_key }}"
+        privatekey_path: "{{ tas_single_node_local_private_key }}"
         provider: selfsigned
         selfsigned_not_after: +365d # valid for one year
 
@@ -68,38 +68,38 @@
     loop_var: cert_name
   vars:
     existing_files: "{{ certs_dir_files }}"
-    local_ca_key_path: "{{ local_sigstore_private_key }}"
-    local_ca_cert_path: "{{ local_sigstore_ca }}"
-    remote_ca_key_path: "{{ remote_sigstore_private_key }}"
-    remote_ca_cert_path: "{{ remote_sigstore_ca }}"
-    dns_name: "{{ cert_name }}.{{ base_hostname }}"
+    local_ca_key_path: "{{ tas_single_node_local_private_key }}"
+    local_ca_cert_path: "{{ tas_single_node_local_ca }}"
+    remote_ca_key_path: "{{ tas_single_node_remote_private_key }}"
+    remote_ca_cert_path: "{{ tas_single_node_remote_ca }}"
+    dns_name: "{{ cert_name }}.{{ tas_single_node_base_hostname }}"
 
 - name: Create fulcio root
   delegate_to: localhost
   when: >
-    (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_private_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_public_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', remote_fulcio_root_ca) | list | length) == 0
+    (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
 
   block:
     - name: Create Fulcio Private Key
       community.crypto.openssl_privatekey:
-        path: "{{ local_fulcio_private_key }}"
+        path: "{{ tas_single_node_local_fulcio_private_key }}"
         curve: secp256r1
         type: ECC
-        passphrase: "{{ fulcio_ca_passphrase }}"
+        passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
         cipher: auto
 
     - name: Create Fulcio Public Key
       community.crypto.openssl_publickey:
-        path: "{{ local_fulcio_public_key }}"
-        privatekey_path: "{{ local_fulcio_private_key }}"
-        privatekey_passphrase: "{{ fulcio_ca_passphrase }}"
+        path: "{{ tas_single_node_local_fulcio_public_key }}"
+        privatekey_path: "{{ tas_single_node_local_fulcio_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
 
     - name: Create certificate signing request (CSR) for Fulcio Root certificate
       community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ local_fulcio_private_key }}"
-        privatekey_passphrase: "{{ fulcio_ca_passphrase }}"
+        privatekey_path: "{{ tas_single_node_local_fulcio_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
         basic_constraints:
           - CA:TRUE
         basic_constraints_critical: true
@@ -110,42 +110,42 @@
 
     - name: Create self-signed Fulcio root from CSR
       community.crypto.x509_certificate:
-        path: "{{ local_fulcio_root_ca }}"
+        path: "{{ tas_single_node_local_fulcio_root_ca }}"
         csr_content: "{{ fulcio_root_csr.csr }}"
-        privatekey_path: "{{ local_fulcio_private_key }}"
-        privatekey_passphrase: "{{ fulcio_ca_passphrase }}"
+        privatekey_path: "{{ tas_single_node_local_fulcio_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
         provider: selfsigned
 
 - name: Create ctlog root
   delegate_to: localhost
   when: >
-    (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_private_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', remote_ctlog_public_key) | list | length) == 0
+    (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0
 
   block:
     - name: Create ctlog Private Key
       community.crypto.openssl_privatekey:
-        path: "{{ local_ctlog_private_key }}"
+        path: "{{ tas_single_node_local_ctlog_private_key }}"
         curve: secp256r1
         type: ECC
-        passphrase: "{{ ctlog_ca_passphrase }}"
+        passphrase: "{{ tas_single_node_ctlog_ca_passphrase }}"
         cipher: auto
     - name: Create ctlog Public Key
       community.crypto.openssl_publickey:
-        path: "{{ local_ctlog_public_key }}"
-        privatekey_path: "{{ local_ctlog_private_key }}"
-        privatekey_passphrase: "{{ ctlog_ca_passphrase }}"
+        path: "{{ tas_single_node_local_ctlog_public_key }}"
+        privatekey_path: "{{ tas_single_node_local_ctlog_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_ctlog_ca_passphrase }}"
 
 - name: Copy Certificates to Server
   become: true
   ansible.builtin.copy:
-    src: "{{ local_certs_dir }}/"
-    dest: "{{ certs_dir }}"
+    src: "{{ tas_single_node_local_certs_dir }}/"
+    dest: "{{ tas_single_node_certs_dir }}"
     force: true
     mode: "0600"
 
 - name: Remove Local Certificate Directory
   ansible.builtin.file:
     state: absent
-    dest: "{{ local_certs_dir }}"
+    dest: "{{ tas_single_node_local_certs_dir }}"
   delegate_to: localhost

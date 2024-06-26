@@ -1,12 +1,12 @@
-# sigstore-ansible
+# artifact-signer-ansible
 
-Automation to deploy the sigstore ecosystem on RHEL
+Automation to deploy the RHTAS ecosystem on RHEL
 
 :warning: **The contents of this repository are a Work in Progress.**
 
 ## Overview
 
-The automation within this repository establishes the components of the [Sigstore project](https://sigstore.dev) within a single
+The automation within this repository establishes the components of RHTAS, the downstream redistribution of  [Sigstore project](https://sigstore.dev) within a single
 Red Hat Enterprise Linux (RHEL) machine using a standalone containerized deployment.
 Containers are spawned using Kubernetes based manifests using
 [podman kube play](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).
@@ -54,7 +54,7 @@ The automation deploys and configures a software load balancer as a central poin
 * https://fulcio.<base_hostname>
 * https://tuf.<base_hostname>
 
-Each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided
+each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided
 when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts` with the following content:
 
 ```
@@ -85,8 +85,8 @@ Download the _root_ certiicate that issued the rekor certificate.
 In Red Hat based systems, the following commands will add a CA to the system truststore.
 
 ```shell
-$ sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out sigstore-ca.pem --outform PEM
-$ sudo mv sigstore-ca.pem /etc/pki/ca-trust/source/anchors/
+$ sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+$ sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
 $ sudo update-ca-trust
 ```
 
@@ -97,7 +97,7 @@ Utilize the following steps to sign a container that has been published to an OC
 1. Export the following environment variables substituting `base_hostname` with the value used as part of the provisioning
 
 ```shell
-export KEYCLOAK_REALM=sigstore
+export KEYCLOAK_REALM=trusted-artifact-signer
 export BASE_HOSTNAME=<base_hostname>
 export FULCIO_URL=https://fulcio.$BASE_HOSTNAME
 export KEYCLOAK_URL=https://keycloak.$BASE_HOSTNAME
@@ -142,4 +142,4 @@ This repository contains GitHub actions that will test PRs that come in by creat
 
 ## Feedback
 
-Any and all feedback is welcomed. Submit an [Issue](https://github.com/securesign/sigstore-ansible/issues) or [Pull Request](https://github.com/securesign/sigstore-ansible/pulls) as desired.
+Any and all feedback is welcomed. Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) or [Pull Request](https://github.com/securesign/artifact-signer-ansible/pulls) as desired.
