@@ -11,12 +11,6 @@
     dest: "{{ kube_play_file }}"
     mode: "0600"
 
-- name: debug
-  debug:
-    msg: "{{ podman_spec.secret }}"
-  when: podman_spec.secret is defined
-
-
 - name: Create Secret
   containers.podman.podman_play:
     kube_file: "{{ podman_spec.secret }}"
