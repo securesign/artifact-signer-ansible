@@ -1,0 +1,18 @@
+- hosts: rhtas
+  vars:
+    tas_single_node_base_hostname: myrhtas
+    # tas_single_node_registry_username: "15421500|bkabrda-ansible"
+    tas_single_node_skip_os_install: true  # TODO: temporary until we get a VM properly registered to insights
+  vars_files:
+    # vars.yml should contain:
+    # * tas_single_node_registry_username
+    #   * get at https://access.redhat.com/terms-based-registry
+    # * tas_single_node_registry_password
+    #   * get at https://access.redhat.com/terms-based-registry
+    # * tas_single_node_oidc_issuers
+    # * tas_single_node_issuer_url
+    - vars.yml
+  tasks:
+    - name: Include TAS single node
+      ansible.builtin.include_role:
+        name: tas_single_node

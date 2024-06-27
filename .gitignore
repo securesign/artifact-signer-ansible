@@ -1,5 +1,9 @@
 venv/
-inventory
+vm-testing/inventory
+vm-testing/vars.yml
+vm-testing/**/.terraform*
+vm-testing/**/terraform.tfvars
+vm-testing/**/terraform.tfstate*
 env/
 .venv/
 .env/
