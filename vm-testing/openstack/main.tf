@@ -9,7 +9,8 @@ variable "openstack_ssh_key_pair" {}
 variable "openstack_network" {}
 
 variable "openstack_vm_image" {
-  default = "rhel-9.2-x86_64-rhtas-ansible-testing"
+  # temporary until we find a better image
+  default = "fuseqe-20230525-RHEL-9.2.0-x86_64-ga-latest"
 }
 variable "openstack_flavor" {
   default = "ci.standard.medium"
