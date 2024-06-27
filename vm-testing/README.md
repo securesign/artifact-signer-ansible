@@ -48,11 +48,11 @@ tas_single_node_issuer_url: "TODO-issuer-url"
 
 When testing, you can:
 
-* Provision a new machine by running `./provision openstack`. This will:
+* Provision a new machine by running `./provision.sh openstack`. This will:
   * Provision a new OpenStack VM.
   * Print a command to modify `/etc/hosts` on your localhost to add URLs to services you're about to deploy - inspect the command and run it.
   * Create a properly configured `inventory` file.
 * Run `ansible-playbook play.yml` to deploy RHTAS to your VM. You can modify in play.yml/vars.yml to e.g. change configuration.
-* Destroy the VM by running `./destroy openstack`. This will:
+* Destroy the VM by running `./destroy.sh openstack`. This will:
   * Destroy the VM.
   * Print a command to remove the entries from `/etc/hosts` - inspect the command and run it.
