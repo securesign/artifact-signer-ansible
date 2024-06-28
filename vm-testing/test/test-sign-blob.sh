@@ -35,4 +35,4 @@ cosign initialize
 echo "testing" > to-sign
 
 cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token=${TOKEN}
-cosign verify-blob --certificate-identity=bkabrda@redhat.com --bundle signed.bundle to-sign
+cosign verify-blob --certificate-identity=${USERNAME}@redhat.com --bundle signed.bundle to-sign
