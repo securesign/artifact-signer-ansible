@@ -57,3 +57,7 @@ When testing, you can:
 * Destroy the VM by running `./destroy.sh openstack`. This will:
   * Destroy the VM.
   * Print a command to remove the entries from `/etc/hosts` - inspect the command and run it.
+
+## Testing
+
+You can run a simple test that signs a blob in a container by running `./test.sh`. Note that this must be run in the Python virtualenv environment created in the start to work properly.
