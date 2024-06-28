@@ -1,0 +1,6 @@
+[rhtas]
+REMOTE_IP_ADDRESS
+
+[rhtas:vars]
+ansible_user=ANSIBLE_USER
+become=true
