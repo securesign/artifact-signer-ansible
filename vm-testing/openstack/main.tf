@@ -13,7 +13,7 @@ variable "openstack_vm_image" {
   default = "fuseqe-20230525-RHEL-9.2.0-x86_64-ga-latest"
 }
 variable "openstack_flavor" {
-  default = "ci.standard.medium"
+  default = "ci.standard.large"
 }
 variable "openstack_az" {
   default = "nova"
