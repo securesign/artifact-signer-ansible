@@ -27,7 +27,7 @@ export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
 export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
 export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 
-export TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=${USERNAME}" -d "password=${PASSWORD}" -d "grant_type=password" -d "scope=openid" -d "client_id=trusted-artifact-signer" ${OIDC_ISSUER_URL}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
+export TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=${USERNAME}" -d "password=${PASSWORD}" -d "grant_type=password" -d "scope=openid" -d "client_id=${KEYCLOAK_REALM}" ${OIDC_ISSUER_URL}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
 
 env
 cosign initialize
