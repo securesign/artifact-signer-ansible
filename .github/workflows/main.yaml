@@ -37,7 +37,7 @@ jobs:
           run: ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
 
         - name: Login to Container Registry
-          run: podman login -u ${{ secrets.secrets.RH_USERNAME }} -p ${{ secrets.RH_PASSWORD }} ${{ env.REGISTRY }}
+          run: podman login -u ${{ secrets.RH_USERNAME }} -p ${{ secrets.RH_PASSWORD }} ${{ env.REGISTRY }}
 
         - name: build push sign and tag
           run: |
