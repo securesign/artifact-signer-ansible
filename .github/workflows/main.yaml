@@ -1,6 +1,9 @@
 name: Validate SecureSign Ansible
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 env:
   GO_VERSION: 1.21
@@ -33,9 +36,8 @@ jobs:
         - name: sshkeygen for ansible
           run: ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
 
-
-        - name: docker login registry.redhat.io
-          run: echo ${{ secrets.RH_PASSWORD }} | docker login -u ${{ secrets.RH_USERNAME }} --password-stdin registry.redhat.io
+        - name: Login to Container Registry
+          run: podman login -u ${{ secrets.secrets.RH_USERNAME }} -p ${{ secrets.RH_PASSWORD }} ${{ env.REGISTRY }}
 
         - name: build push sign and tag
           run: |
