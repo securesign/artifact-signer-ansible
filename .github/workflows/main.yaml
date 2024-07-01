@@ -1,9 +1,6 @@
 name: Validate SecureSign Ansible
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 env:
   GO_VERSION: 1.21
@@ -22,6 +19,7 @@ env:
   TF_VAR_rh_username: ${{ secrets.RH_USERNAME }}
   TF_VAR_rh_password: ${{ secrets.RH_PASSWORD }}
   IMAGE: ttl.sh/sigstore-test:15m
+  REGISTRY: registry.redhat.io
 
 jobs:
   deploy-and-test:
