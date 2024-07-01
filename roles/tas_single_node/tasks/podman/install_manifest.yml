@@ -1,4 +1,7 @@
 ---
+# NOTE: determining when the service will restart with `when: ...` is not ideal, however
+# we would need a dynamic handler otherwise and these are a bit fragile.
+
 - name: Set location of Podman Play Manifest
   ansible.builtin.set_fact:
     kube_play_file: >-
@@ -10,12 +13,19 @@
     content: "{{ podman_spec.kube_file_content | to_nice_yaml(indent=2) }}"
     dest: "{{ kube_play_file }}"
     mode: "0600"
+  register: copy_manifest
 
 - name: Create Secret
+  # We can't use podman_secret because we support Podman 4.4.1 and the podman_secret module only
+  # supports idempotency with >= 4.7.0: https://github.com/containers/ansible-podman-collections/issues/692
+  # Unfortunately podman_play doesn't properly understand idempotency with secrets either
+  # The next best thing is to identify whether the secret file changed - this is determined from the secret_changed
+  # variable passed by the caller to this file
   containers.podman.podman_play:
     kube_file: "{{ podman_spec.secret }}"
     state: "{{ podman_spec.state | default('started') }}"
   when: podman_spec.secret is defined
+  changed_when: podman_spec.secret is defined and podman_spec.secret_changed
 
 - name: Copy Systemd file to Server
   ansible.builtin.template:
@@ -23,6 +33,7 @@
     dest: "{{ tas_single_node_systemd_directory + '/' + podman_spec.systemd_file }}.service"
     mode: "0600"
   when: podman_spec.configmap is defined
+  register: copy_systemd_file
 
 - name: Copy Systemd file to Server
   ansible.builtin.template:
@@ -30,10 +41,12 @@
     dest: "{{ tas_single_node_systemd_directory + '/' + podman_spec.systemd_file }}.service"
     mode: "0600"
   when: podman_spec.configmap is not defined
+  register: copy_systemd_file
 
-- name: Start Podman Service
+- name: Restart Podman Service
   ansible.builtin.systemd:
-    state: started
+    state: restarted
     enabled: true
     daemon_reload: true
     name: "{{ podman_spec.systemd_file }}"
+  when: copy_manifest.changed or copy_systemd_file.changed or (podman_spec.secret is defined and podman_spec.secret_changed)

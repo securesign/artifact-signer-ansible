@@ -55,6 +55,7 @@
         public: |
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key) | list | first).content }}
         password: "{{ tas_single_node_fulcio_ca_passphrase | b64encode }}"
+  register: secret_result
 
 - name: Deploy Fulcio Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -66,3 +67,4 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.yaml') | from_yaml }}"
       configmap: "{{ tas_single_node_fulcio_server_config }}"
       secret: "{{ tas_single_node_fulcio_server_secret_config }}"
+      secret_changed: "{{ secret_result.changed }}"

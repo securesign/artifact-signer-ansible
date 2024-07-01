@@ -75,6 +75,7 @@
         ingress-fulcio.key: >-
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
           + '/ingress-fulcio.key') | list | first).content }}
+  register: secret_result
 
 - name: Load nginx config content
   ansible.builtin.set_fact:
@@ -105,3 +106,4 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
       configmap: "{{ tas_single_node_nginx_config }}"
       secret: "{{ tas_single_node_nginx_certs_config }}"
+      secret_changed: "{{ secret_result.changed }}"

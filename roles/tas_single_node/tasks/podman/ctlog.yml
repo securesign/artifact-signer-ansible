@@ -49,6 +49,7 @@
           {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
         fulcio-0: |
           {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
+  register: secret_result
 
 - name: Deploy ctlog Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -60,3 +61,4 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog.yaml') | from_yaml }}"
       configmap: "{{ tas_single_node_ctlog_configmap_config }}"
       secret: "{{ tas_single_node_ctlog_secret }}"
+      secret_changed: "{{ secret_result.changed }}"

@@ -84,6 +84,7 @@ tas_single_node_treeid_config: "{{ tas_single_node_kube_configmap_dir }}/treeid-
 tas_single_node_rekor_sharding_config: "{{ tas_single_node_kube_configmap_dir }}/rekor-sharding-config.yaml"
 tas_single_node_nginx_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-config.yaml"
 tas_single_node_nginx_certs_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-certs.yaml"
+tas_single_node_trillian_secret: "{{ tas_single_node_kube_configmap_dir }}/trillian-secret.yaml"
 tas_single_node_systemd_directory: /etc/systemd/system
 
 tas_single_node_setup_host_dns: true
