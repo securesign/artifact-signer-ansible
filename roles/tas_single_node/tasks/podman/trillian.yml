@@ -1,16 +1,22 @@
 ---
 - name: Create Trillian Secret
-  containers.podman.podman_secret:
-    name: trillian-mysql
-    state: present
-    force: true
-    data: "{{ trillian_mysql_secret | to_json }}"
+  ansible.builtin.copy:
+    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_trillian_secret }}"
+    mode: "0600"
   vars:
-    trillian_mysql_secret:
-      mysql-root-password: "{{ tas_single_node_trillian.mysql.rootPassword | b64encode }}"
-      mysql-password: "{{ tas_single_node_trillian.mysql.password | b64encode }}"
-      mysql-database: "{{ tas_single_node_trillian.mysql.database | b64encode }}"
-      mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
+    secret_content:
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: trillian-mysql
+        namespace: trillian-system
+      data:
+        mysql-root-password: "{{ tas_single_node_trillian.mysql.rootPassword | b64encode }}"
+        mysql-password: "{{ tas_single_node_trillian.mysql.password | b64encode }}"
+        mysql-database: "{{ tas_single_node_trillian.mysql.database | b64encode }}"
+        mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
+  register: secret_result
 
 - name: Build Trillian Database Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -20,6 +26,8 @@
       systemd_file: trillian-mysql
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-mysql.yaml') | from_yaml }}"
+      secret: "{{ tas_single_node_trillian_secret }}"
+      secret_changed: "{{ secret_result.changed }}"
   when: tas_single_node_trillian.database_deploy
 
 - name: Build Trillian Log Signer Manifest specs
@@ -30,6 +38,8 @@
       systemd_file: trillian-signer
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logsigner.yaml') | from_yaml }}"
+      secret: "{{ tas_single_node_trillian_secret }}"
+      secret_changed: "{{ secret_result.changed }}"
 
 - name: Build Trillian Log Server Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -39,3 +49,5 @@
       systemd_file: trillian-server
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logserver.yaml') | from_yaml }}"
+      secret: "{{ tas_single_node_trillian_secret }}"
+      secret_changed: "{{ secret_result.changed }}"

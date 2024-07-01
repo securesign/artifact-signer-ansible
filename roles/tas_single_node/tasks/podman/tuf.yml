@@ -47,6 +47,7 @@
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
           {{ rekor_public_key_result.content | b64encode }}
+  register: secret_result
 
 - name: Deploy tuf Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -57,3 +58,4 @@
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.yaml') | from_yaml }}"
       secret: "{{ tas_single_node_tuf_secret_config }}"
+      secret_changed: "{{ secret_result.changed }}"
