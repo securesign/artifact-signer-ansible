@@ -17,9 +17,25 @@
   register: podman_login_result
   changed_when: '"Already logged in" not in podman_login_result'
 
+
+
 - name: Pull all images
   containers.podman.podman_image:
     name: "{{ item }}"
+  vars:
+    enabledVals: [
+              "{{ tas_single_node_fulcio_enabled }}",
+              "{{ tas_single_node_trillian_enabled }}",
+              "{{ tas_single_node_trillian_enabled }}",
+              "{{ tas_single_node_rekor_enabled }}",
+              "{{ tas_single_node_ctlog_enabled }}",
+              "{{ tas_single_node_rekor_enabled }}",
+              "{{ tas_single_node_trillian_enabled }}",
+              "{{ tas_single_node_tuf_enabled }}",
+              "{{ tas_single_node_trillian_enabled }}",
+              "true",
+              "true"
+                  ]
   loop:
     - "{{ tas_single_node_fulcio_server_image }}"
     - "{{ tas_single_node_trillian_log_server_image }}"
@@ -32,6 +48,9 @@
     - "{{ tas_single_node_netcat_image }}"
     - "{{ tas_single_node_nginx_image }}"
     - "{{ tas_single_node_curl_image }}"
+  loop_control:
+    index_var: my_idx
+  when: enabledVals[my_idx] | bool
 
 - name: Configure/Deploy nginx
   ansible.builtin.include_tasks: podman/nginx.yml
