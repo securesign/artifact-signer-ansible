@@ -32,7 +32,6 @@
       "{{ tas_single_node_tuf_enabled }}",
       "{{ tas_single_node_trillian_enabled }}",
       "true",
-      "true"
     ]
   loop:
     - "{{ tas_single_node_fulcio_server_image }}"
@@ -45,7 +44,6 @@
     - "{{ tas_single_node_tuf_image }}"
     - "{{ tas_single_node_netcat_image }}"
     - "{{ tas_single_node_nginx_image }}"
-    - "{{ tas_single_node_curl_image }}"
   loop_control:
     index_var: idx
   when: enabled_vals[idx] | bool
