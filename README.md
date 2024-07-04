@@ -6,9 +6,7 @@ Automation to deploy the RHTAS ecosystem on RHEL
 
 ## Overview
 
-The automation within this repository establishes the components of RHTAS, the downstream redistribution of  [Sigstore project](https://sigstore.dev) within a single
-Red Hat Enterprise Linux (RHEL) machine using a standalone containerized deployment.
-Containers are spawned using Kubernetes based manifests using
+The automation within this repository establishes the components of RHTAS, the downstream redistribution of [Sigstore project](https://sigstore.dev) within a single Red Hat Enterprise Linux (RHEL) machine using a standalone containerized deployment. Containers are spawned using Kubernetes based manifests using
 [podman kube play](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).
 
 The following Sigstore components are deployed as part of this architecture:
@@ -23,11 +21,10 @@ An [NGINX](https://www.nginx.com) frontend is placed as an entrypoint to the var
 Utilize the steps below to understand how to setup and execute the provisioning.
 
 ## Prerequisites
-A RHEL 8.8+ or a RHEL 9.2+ server should be used to run the RHTAS components.
+
+A RHEL 9.2+ server should be used to run the RHTAS components.
 
 Ansible must be installed and configured on a control node that will be used to perform the automation.
-
-NOTE: Future improvements will make use of an Execution environment
 
 Perform the following steps to prepare the control node for execution.
 
@@ -39,11 +36,8 @@ Install the required Ansible collections by executing the following
 ansible-galaxy collection install -r requirements.yml
 ```
 
-### Inventory
-
-Populate the `sigstore` group within the [inventory](inventory) file with details related to the target host.
-
 ### OIDC provider
+
 An installation of Keycloak must be provided to allow for integration with containerized RHTAS.
 
 ### Ingress
@@ -69,14 +63,29 @@ when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts`
 
 ## Provision
 
-Execute the following commands to execute the automation:
+In order to deploy RHTAS on a RHEL 9.2+ VM:
 
-NOTE: Please provide credentials to authenticate to registry.redhat.io. https://access.redhat.com/RegistryAuthentication
-
-```shell
-# Run the playbook from your local system
-ansible-playbook -i inventory playbooks/install.yml -e registry_username='REGISTRY.REDHAT.IO_USERNAME' -e registry_password='REGISTRY.REDHAT.IO_PASSWORD' base_hostname=example.com'
-```
+1. Create an `inventory` file with a single VM in the `rhtas` group:
+  ```
+  [rhtas]
+  123.123.123.123 become=true
+  ```
+2. Create a simple Ansible playbook `play.yml`:
+  ```
+  - hosts: rhtas
+    vars:
+      base_hostname: TODO # e.g. example.com
+      tas_single_node_oidc_issuers: TODO # your OIDC provider (e.g. keycloak) URL
+      tas_single_node_issuer_url: TODO # your OIDC provider (e.g. keycloak) URL
+    tasks:
+      - name: Include TAS single node role
+        ansible.builtin.include_role:
+          name: tas_single_node
+  ```
+3. Execute the following command (NOTE: you will have to provide credentials to authenticate to registry.redhat.io: https://access.redhat.com/RegistryAuthentication):
+  ```shell
+  ANSIBLE_ROLES_PATH="roles/" ansible-playbook -i inventory play.yml -e registry_username='REGISTRY.REDHAT.IO_USERNAME' -e registry_password='REGISTRY.REDHAT.IO_PASSWORD'
+  ```
 
 ### Add the root CA that was created to your local truststore.
 
@@ -94,22 +103,33 @@ $ sudo update-ca-trust
 
 Utilize the following steps to sign a container that has been published to an OCI registry
 
-1. Export the following environment variables substituting `base_hostname` with the value used as part of the provisioning
+1. Export the following environment variables substituting `BASE_HOSTNAME`, `KEYCLOAK_URL` and if necessary also `KEYCLOAK_REALM` with the values used as part of the provisioning:
 
 ```shell
+export BASE_HOSTNAME="TODO-provide-base-hostname"
+export KEYCLOAK_URL="TODO-your-keycloak-url"
 export KEYCLOAK_REALM=trusted-artifact-signer
-export BASE_HOSTNAME=<base_hostname>
-export FULCIO_URL=https://fulcio.$BASE_HOSTNAME
-export KEYCLOAK_URL=https://keycloak.$BASE_HOSTNAME
-export REKOR_URL=https://rekor.$BASE_HOSTNAME
+
 export TUF_URL=https://tuf.$BASE_HOSTNAME
-export KEYCLOAK_OIDC_ISSUER=$KEYCLOAK_URL/realms/$KEYCLOAK_REALM
+export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
+export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
+export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
+export COSIGN_MIRROR=$TUF_URL
+export COSIGN_ROOT=$TUF_URL/root.json
+export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
+export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
+export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
+export COSIGN_YES="true"
+export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
+export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
+export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
+export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 ```
 
 2. Initialize the TUF roots
 
 ```shell
-cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json
+cosign initialize
 ```
 
 Note: If you have used `cosign` previously, you may need to delete the `~/.sigstore` directory
@@ -117,7 +137,7 @@ Note: If you have used `cosign` previously, you may need to delete the `~/.sigst
 3. Sign the desired container
 
 ```shell
-cosign sign -y --fulcio-url=$FULCIO_URL --rekor-url=$REKOR_URL --oidc-issuer=$KEYCLOAK_OIDC_ISSUER  <image>
+cosign sign -y <image>
 ```
 
 Authenticate with the Keycloak instance using the desired credentials.
@@ -128,18 +148,30 @@ Refer to this example that verifies an image signed with email identity `sigstor
 
 ```shell
 cosign verify \
---rekor-url=$REKOR_URL \
 --certificate-identity-regexp sigstore-user \
 --certificate-oidc-issuer-regexp keycloak  \
 <image>
 ```
 
-If the signature verification did not result in an error, the deployment of Sigstore was successful!
+If the signature verification did not result in an error, the deployment of RHTAS was successful!
 
+## Contributing
 
-## Testing
-This repository contains GitHub actions that will test PRs that come in by creating an instance of RHEL 9 and deploying RHTAS then testing to ensure the image can be signed and verified.
+### Linting
+
+This repository contains GitHub actions that will test PRs that come in with `ansible-lint`. To run `ansible-lint` locally:
+
+```shell
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-testing.txt
+ansible-lint
+```
+
+### Testing Deployment on a VM
+
+The [vm-testing/README.md](vm-testing/README.md) file contains instructions on testing the deployment on a VM. Right now, only OpenStack is supported as testing VM provisioner.
 
 ## Feedback
 
-Any and all feedback is welcomed. Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) or [Pull Request](https://github.com/securesign/artifact-signer-ansible/pulls) as desired.
+Any and all feedback is welcome. Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) or [Pull Request](https://github.com/securesign/artifact-signer-ansible/pulls) as desired.
