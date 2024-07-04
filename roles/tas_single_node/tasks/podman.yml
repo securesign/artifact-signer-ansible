@@ -47,8 +47,8 @@
     - "{{ tas_single_node_nginx_image }}"
     - "{{ tas_single_node_curl_image }}"
   loop_control:
-    index_var: my_idx
-  when: enabled_vals[my_idx] | bool
+    index_var: idx
+  when: enabled_vals[idx] | bool
 
 - name: Configure/Deploy nginx
   ansible.builtin.include_tasks: podman/nginx.yml
