@@ -16,6 +16,18 @@ pip install ansible       # Install Ansible
 
 Before starting, you will need to:
 * Get an API token for your OpenStack instance according to the [docs](https://docs.openstack.org/api-quick-start/api-quick-start.html). *Note that the token has an expiration date and needs to be refreshed when it expires.*
+  * Example:
+    ```
+    export OS_PROJECT_NAME=rhtas-qe-lab
+    export OS_PROJECT_DOMAIN_NAME=redhat.com
+    export OS_USERNAME=<username>
+    export OS_PASSWORD=<password>
+    export OS_USER_DOMAIN_NAME=redhat.com
+    export OS_AUTH_URL=https://api.rhos-01.prod.psi.rdu2.redhat.com:13000/v3
+
+    # Request a token:
+    curl -v -s -X POST $OS_AUTH_URL/auth/tokens?nocatalog   -H "Content-Type: application/json"   -d '{ "auth": { "identity": { "methods": ["password"],"password": {"user": {"domain": {"name": "'"$OS_USER_DOMAIN_NAME"'"},"name": "'"$OS_USERNAME"'", "password": "'"$OS_PASSWORD"'"} } }, "scope": { "project": { "domain": { "name": "'"$OS_PROJECT_DOMAIN_NAME"'" }, "name":  "'"$OS_PROJECT_NAME"'" } } }}' | python -m json.tool
+    ```
 * Create an SSH keypair at `/dashboard/project/key_pairs` page of you OpenStack instance.
 
 When you have the above, create an `openstack/terraform.tfvars` file with following contents:
