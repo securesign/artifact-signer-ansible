@@ -27,7 +27,6 @@ spec:
       containers:
         - name: tuf
           image: {{ tas_single_node_tuf_image }}
-          # image: ghcr.io/sigstore/scaffolding/server@sha256:719ea3fe44c52af5a5fedab2168429872e37e97b9f063977fc164d60a5a14b53
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8082
