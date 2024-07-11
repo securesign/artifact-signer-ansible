@@ -24,3 +24,12 @@
         content: "{{ {} | to_yaml }}"
         dest: "{{ molecule_instance_config }}"
         mode: "0600"
+
+- name: Remove dynamic molecule inventory
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Remove dynamic inventory file
+      ansible.builtin.file:
+        path: "{{ molecule_ephemeral_directory }}/inventory/molecule_inventory.yml"
+        state: absent

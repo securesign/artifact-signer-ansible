@@ -18,4 +18,4 @@ documentation: http://TODO.com
 homepage: https://TODO.com
 issues: https://github.com/securesign/artifact-signer-ansible/issues
 
-build_ignore: [.ansible-lint, .github, .gitignore, .vscode, requirements-testing.txt, vm-testing]
+build_ignore: [.ansible-lint, .github, .gitignore, .vscode, molecule, requirements-testing.txt, vm-testing]
