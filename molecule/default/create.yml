@@ -1,0 +1,94 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Inform user we're about to create the VM
+      ansible.builtin.debug:
+        msg: Creating Testing Farm VM instance
+
+    - name: Define private key path
+      ansible.builtin.set_fact:
+        private_key_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/id_rsa"
+
+    - name: "Generate local key pair {{ private_key_path }}"
+      community.crypto.openssh_keypair:
+        path: "{{ private_key_path }}"
+        type: rsa
+        size: 4096
+        regenerate: never
+        backend: cryptography
+        private_key_format: pkcs1
+      register: local_keypair
+
+    # TODO: check if the VM already exists - idempotency
+    # TODO: error handling
+    # TODO: proper when?
+    - name: Create the VM using testing-farm
+      ansible.builtin.command:
+        cmd: >-
+          testing-farm reserve
+            --compose {{ item.compose }}
+            --arch {{ item.arch | default("x86_64", true) }}
+            --duration {{ item.duration | default(30, true) }}
+            --ssh-public-key {{ private_key_path }}.pub
+            --no-autoconnect
+      register: tf_results
+      with_items: "{{ molecule_yml.platforms }}"
+      changed_when: true
+      async: 300
+      poll: 5
+      when: false # temporarily disabled, let's use the command below to mock the output
+
+    - name: Testing output
+      ansible.builtin.command:
+        cmd: "echo '0acccef6-7ce6-4bb6-a0b4-3428762aa3ae root@1.2.3.4'"
+      register: tf_results
+      with_items: "{{ molecule_yml.platforms }}"
+
+    - name: Debug testing-farm results
+      ansible.builtin.debug:
+        msg: "{{ tf_results }}"
+
+    - name: Initialize variable for parsed testing-farm results
+      ansible.builtin.set_fact:
+        tf_parsed_results: []
+
+    - name: Parse testing-farm result
+      ansible.builtin.include_tasks: "_parse_tf_results.yml"
+      with_items: "{{ tf_results.results }}"
+
+    - name: Debug extracted testing-farm results
+      ansible.builtin.debug:
+        msg: "{{ tf_parsed_results }}"
+
+    # TODO: idempotency
+    - name: Populate instance config dict  # noqa jinja
+      ansible.builtin.set_fact:
+        instance_conf_dict: {
+          'instance': "{{ item.uuid }}",
+          'address': "{{ item.ip }}",
+          'user': "{{ item.username }}",
+          'port': "22", # TODO: get it dynamically
+          'identity_file': "{{ private_key_path  }}",
+        }
+      with_items: "{{ tf_parsed_results }}"
+      register: instance_config_dict
+
+    - name: Convert instance config dict to a list
+      ansible.builtin.set_fact:
+        instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+
+    - name: Debug instance_conf_dict
+      ansible.builtin.debug:
+        msg: "{{ instance_conf_dict }}"
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: |
+          # Molecule managed
+
+          {{ instance_conf | to_json | from_json | to_yaml }}
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"

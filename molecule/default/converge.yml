@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Get IP
+      ansible.builtin.command:
+        cmd: "ip a"
+      register: ipa
+
+    - name: Replace this task with one that validates your content
+      ansible.builtin.debug:
+        msg: "{{ ipa }}"

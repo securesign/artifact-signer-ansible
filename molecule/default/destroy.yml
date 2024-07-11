@@ -1,0 +1,26 @@
+---
+# TODO: fix idempotency throughout this file
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Load instance config
+      ansible.builtin.set_fact:
+        instance_configs: "{{ (lookup('file', molecule_instance_config, errors='ignore') or '{}') | from_yaml }}"
+
+    - name: Debug instance config
+      ansible.builtin.debug:
+        msg: "{{ instance_configs }}"
+
+    - name: Cancel testing-farm instances
+      ansible.builtin.command:
+        cmd: "testing-farm cancel {{ item['instance'] }}"
+      with_items: "{{ instance_configs }}"
+      changed_when: true
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: "{{ {} | to_yaml }}"
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
