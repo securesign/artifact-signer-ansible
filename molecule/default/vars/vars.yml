@@ -1,0 +1,8 @@
+tas_single_node_oidc_issuers: "https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer"
+tas_single_node_issuer_url: "https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer"
+tas_single_node_base_hostname: myrhtas
+tas_single_node_cockpit:
+  enabled: false
+# TODO: from env variables
+tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
+tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
