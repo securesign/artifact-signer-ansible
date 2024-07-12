@@ -23,6 +23,8 @@ jobs:
             eval $(ssh-agent -s) # testing-farm CLI right now mandates that ssh-agent is running
             molecule converge --scenario-name default
         - name: Destroy molecule infrastructure
+          env:
+            TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
           if: always()
           run:
             molecule destroy
