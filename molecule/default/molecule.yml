@@ -1,6 +1,8 @@
 ---
 dependency:
   name: galaxy
+  options:
+    requirements-file: molecule/requirements.yml
 driver:
   name: default
 platforms:
