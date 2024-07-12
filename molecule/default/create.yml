@@ -29,9 +29,8 @@
         private_key_format: pkcs1
       register: local_keypair
 
-    # TODO: check if the VM already exists - idempotency
+    # TODO: check if the VM already exists
     # TODO: error handling
-    # TODO: proper when?
     - name: Create the VM using testing-farm
       ansible.builtin.command:
         cmd: >-
