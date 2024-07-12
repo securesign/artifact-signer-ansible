@@ -1,4 +1,6 @@
 ---
+# TODO: improve idempotency and error handling throughout this file,
+# specifically for the testing-farm call
 - name: Create
   hosts: localhost
   connection: local
@@ -29,8 +31,6 @@
         private_key_format: pkcs1
       register: local_keypair
 
-    # TODO: check if the VM already exists
-    # TODO: error handling
     - name: Create the VM using testing-farm
       ansible.builtin.command:
         cmd: >-
