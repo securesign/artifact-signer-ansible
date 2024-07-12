@@ -1,4 +1,4 @@
-name: Run ansible-lint
+name: Lint and test the collection
 on:
   push:
   pull_request:
@@ -30,6 +30,7 @@ jobs:
             TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
             TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
           run: |
+            eval $(ssh-agent -s) # testing-farm CLI right now mandates that ssh-agent is running
             molecule converge --scenario-name default
         - name: Destroy molecule infrastructure
           if: always()
