@@ -83,6 +83,8 @@
       data:
         ingress-rekor.pem: |
           {{ rekor_ingress_base64 | b64encode }}
+        ingress-rekor-search.pem: |
+          {{ rekor_search_ingress_base64 | b64encode }}
         ingress-tuf.pem: |
           {{ tuf_ingress_base64 | b64encode }}
         ingress-fulcio.pem: |
@@ -92,7 +94,8 @@
         ingress-rekor.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-rekor-search.key: |
-          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor-search.key') | list | first).content }}
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
+          + '/ingress-rekor-search.key') | list | first).content }}
         ingress-tuf.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key') | list | first).content }}
         ingress-fulcio.key: >-
