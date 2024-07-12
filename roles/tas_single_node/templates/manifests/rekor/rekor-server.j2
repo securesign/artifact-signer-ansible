@@ -54,9 +54,9 @@ spec:
           image: "{{ tas_single_node_rekor_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
+            - containerPort: 3001
               protocol: TCP
-              hostPort: 3000
+              hostPort: 3001
             - containerPort: 2112
               protocol: TCP
               hostPort: 2112

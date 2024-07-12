@@ -1,0 +1,10 @@
+---
+
+- name: Deploy Rekor Search Pod
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: rekor-search
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor-search-ui/rekor-search-ui.yml') | from_yaml }}"

@@ -16,7 +16,7 @@
 
 - name: Retrieve Rekor Public Key
   ansible.builtin.uri:
-    url: http://localhost:3000/api/v1/log/publicKey
+    url: http://localhost:3001/api/v1/log/publicKey
     method: GET
     status_code: 200
     validate_certs: false

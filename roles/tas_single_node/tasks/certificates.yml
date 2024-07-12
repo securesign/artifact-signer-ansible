@@ -65,6 +65,7 @@
     - rekor
     - tuf
     - tsa
+    - rekor-search
   loop_control:
     loop_var: cert_name
   vars:

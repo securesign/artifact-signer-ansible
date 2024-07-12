@@ -22,6 +22,8 @@
     - "{{ tas_single_node_remote_ca }}"
     - "{{ tas_single_node_certs_dir }}/ingress-rekor.pem"
     - "{{ tas_single_node_certs_dir }}/ingress-rekor.key"
+    - "{{ tas_single_node_certs_dir }}/ingress-rekor-search.pem"
+    - "{{ tas_single_node_certs_dir }}/ingress-rekor-search.key"
     - "{{ tas_single_node_certs_dir }}/ingress-tuf.pem"
     - "{{ tas_single_node_certs_dir }}/ingress-tuf.key"
     - "{{ tas_single_node_certs_dir }}/ingress-fulcio.pem"
@@ -36,6 +38,14 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
+
+- name: Base64 encode the rekor ingress
+  ansible.builtin.set_fact:
+    rekor_search_ingress_base64: >-
+      {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor-search.pem') | list | first).content
+      | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
+      | b64decode }}
+
 
 - name: Base64 encode the tuf ingress
   ansible.builtin.set_fact:
@@ -81,6 +91,8 @@
           {{ tsa_ingress_base64 | b64encode }}
         ingress-rekor.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
+        ingress-rekor-search.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor-search.key') | list | first).content }}
         ingress-tuf.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key') | list | first).content }}
         ingress-fulcio.key: >-
