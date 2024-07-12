@@ -16,7 +16,7 @@
 
 - name: Retrieve Rekor Public Key
   ansible.builtin.uri:
-    url: https://rekor.{{ tas_single_node_base_hostname }}/api/v1/log/publicKey
+    url: http://localhost:3000/api/v1/log/publicKey
     method: GET
     status_code: 200
     validate_certs: false
@@ -25,8 +25,6 @@
   retries: "{{ tas_single_node_rekor_public_key_retries }}"
   delay: "{{ tas_single_node_rekor_public_key_delay }}"
   register: rekor_public_key_result
-  delegate_to: localhost
-  become: false
 
 - name: Create tuf Secret
   ansible.builtin.copy:
