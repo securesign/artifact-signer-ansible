@@ -1,4 +1,3 @@
-
 # NOTE: it seems that it's not possible to include the collection-level requirements.yml
 # the dependencies listed here are purely for the molecule setup, not for the collection itself
 ---
