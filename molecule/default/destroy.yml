@@ -1,5 +1,6 @@
 ---
-# TODO: fix idempotency throughout this file
+# TODO: improve idempotency and error handling throughout this file,
+# specifically for the testing-farm call
 - name: Destroy
   hosts: localhost
   connection: local
