@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
 podman build test/ -f test/Containerfile -t fedora-cosign:latest
 
@@ -19,19 +20,19 @@ password=${password}
 
 EOF
 
-if  [ -z "${base_hostname}" -o -z "${ip_address}" -o -z "${oidc_url}" -o -z "${username}" -o -z "${password}" ]; then
+if  [ -z "${base_hostname}" ] || [ -z "${ip_address}" ] || [ -z "${oidc_url}" ] || [ -z "${username}" ] || [ -z "${password}" ]; then
   echo "Couldn't extract some testing parameters, see above and fix."
   exit 1
 fi
 
 podman run \
-  -v $(pwd)/test:/mnt:z \
+  -v "$(pwd)"/test:/mnt:z \
   -ti --rm \
-  --add-host fulcio.${base_hostname}:${ip_address} \
-  --add-host rekor.${base_hostname}:${ip_address} \
-  --add-host tuf.${base_hostname}:${ip_address} \
-  -e BASE_HOSTNAME=${base_hostname} \
-  -e USERNAME=${username} \
-  -e PASSWORD=${password} \
-  -e KEYCLOAK_URL=${oidc_url} \
+  --add-host fulcio."${base_hostname}":"${ip_address}" \
+  --add-host rekor."${base_hostname}":"${ip_address}" \
+  --add-host tuf."${base_hostname}":"${ip_address}" \
+  -e BASE_HOSTNAME="${base_hostname}" \
+  -e USERNAME="${username}" \
+  -e PASSWORD="${password}" \
+  -e KEYCLOAK_URL="${oidc_url}" \
   fedora-cosign:latest /bin/bash /mnt/test-sign-blob.sh

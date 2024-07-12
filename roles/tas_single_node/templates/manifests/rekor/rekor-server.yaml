@@ -48,7 +48,7 @@ spec:
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
             - --enable_attestation_storage
             - --attestation_storage_bucket=file:///var/run/attestations
-          image: {{ tas_single_node_rekor_image }}
+          image: "{{ tas_single_node_rekor_image }}"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -72,4 +72,3 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: rekor-server
-

@@ -157,9 +157,11 @@ If the signature verification did not result in an error, the deployment of RHTA
 
 ## Contributing
 
-### Linting
+### Testing locally
 
-This repository contains GitHub actions that will test PRs that come in with `ansible-lint`. To run `ansible-lint` locally:
+This repository contains GitHub actions that will test PRs that come in with `ansible-lint` and `sanity-test` to enforce good code quality and practices. 
+
+To run `ansible-lint` locally:
 
 ```shell
 python3 -m venv venv
@@ -167,6 +169,23 @@ source venv/bin/activate
 pip install -r requirements-testing.txt
 ansible-lint
 ```
+
+To run `sanity-test` locally:
+
+The `ansible-test` command relies on a specific directory structure for collections to function correctly. This structure follows the format:
+
+`{...}/ansible_collections/{namespace}/{collection}/`
+
+To enable testing, make sure your local machine adheres to this format, which you can achieve by copying, symlinking, moving or cloning a repo into this structure.
+`namespace` and `collection` names are not critical, as long as the overall format is kept, and no illegal characters are used such as `-`.
+The `collection` refers to the current repository `artifact-signer-ansible`, while the namespace can be anything you want.
+
+A valid path for our collection would be:
+`{...}/ansible_collections/redhat/artifact_signer_ansible/`
+
+When this is achieved, you can run sanity checks by executing
+
+`ansible-test sanity`
 
 ### Testing Deployment on a VM
 

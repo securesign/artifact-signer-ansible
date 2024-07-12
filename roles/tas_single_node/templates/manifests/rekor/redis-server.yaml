@@ -32,7 +32,7 @@ spec:
             - 0.0.0.0
             - --appendonly
             - "yes"
-          image: {{ tas_single_node_redis_image }}
+          image: "{{ tas_single_node_redis_image }}"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6379

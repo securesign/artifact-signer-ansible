@@ -33,12 +33,12 @@ spec:
             - --fileca-cert
             - /var/run/fulcio-secrets/cert.pem
             - --fileca-key-passwd
-            - {{ tas_single_node_fulcio_ca_passphrase  }}
-            - --ct-log-url=http://ctlog-pod:6962/{{ tas_single_node_ct_logprefix }}
+            - "{{ tas_single_node_fulcio_ca_passphrase }}"
+            - --ct-log-url="http://ctlog-pod:6962/{{ tas_single_node_ct_logprefix }}"
           env:
             - name: SSL_CERT_DIR
               value: /certs
-          image: {{ tas_single_node_fulcio_server_image }}
+          image: "{{ tas_single_node_fulcio_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5555
