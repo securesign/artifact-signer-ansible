@@ -31,6 +31,7 @@ podman run \
   --add-host fulcio."${base_hostname}":"${ip_address}" \
   --add-host rekor."${base_hostname}":"${ip_address}" \
   --add-host tuf."${base_hostname}":"${ip_address}" \
+  --add-host tsa."${base_hostname}":"${ip_address}" \
   -e BASE_HOSTNAME="${base_hostname}" \
   -e USERNAME="${username}" \
   -e PASSWORD="${password}" \

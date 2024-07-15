@@ -52,6 +52,10 @@ tas_single_node_ctlog_private_key_filename: ctlog.key
 tas_single_node_ctlog_public_key_filename: ctlog.pub
 tas_single_node_rekor_signer_filename: rekor-signer.key
 tas_single_node_rekor_public_key_filename: rekor-pub-key.pub
+tas_single_node_tsa_private_key_filename: tsa.key
+tas_single_node_tsa_certificate_chain_filename: certificate-chain.pem
+tas_single_node_tsa_intermediate_certificate_filename: intermediate-certificate.pem
+tas_single_node_tsa_signer_private_key_filename: signer-private-key.pem
 
 tas_single_node_local_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_private_key_filename }}"
 tas_single_node_local_ca: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ca_filename }}"
@@ -94,7 +98,26 @@ tas_single_node_fulcio_enabled: true
 tas_single_node_fulcio_ca_passphrase: rhtas
 tas_single_node_ctlog_ca_passphrase: rhtas
 tas_single_node_rekor_ca_passphrase: rhtas
+tas_single_node_tsa_ca_passphrase: rhtas
+tas_single_node_tsa_signer_passphrase: rhtas
 tas_single_node_ct_logprefix: rhtasansible
+
+tas_single_node_tsa_enabled: true
+tas_single_node_signer_type: file
+tas_single_node_local_tsa_certificate_chain: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
+tas_single_node_local_tsa_intermediate_certificate: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_intermediate_certificate_filename }}"
+tas_single_node_local_tsa_signer_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
+tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
+tas_single_node_remote_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
+tas_single_node_local_tsa_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
+tas_single_node_remote_tsa_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
+
+tas_single_node_tsa_secret: "{{ tas_single_node_kube_configmap_dir }}/tsa-secret.yaml"
+
+tas_single_node_kms_key_resource: ""
+tas_single_node_tink_key_resource: ""
+tas_single_node_tsa_tink_keyset: ""
+tas_single_node_tink_hcvault_token: ""
 
 tas_single_node_scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
 
@@ -124,3 +147,5 @@ tas_single_node_netcat_image:
   "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe"
+tas_single_node_tsa_image:
+  "quay.io/redhat-user-workloads/rhtas-tenant/timestamp-authority/timestamp-authority@sha256:a13834438c2b7f9441535783880daa01e1cdb1f26255311352b38ebbb154abac"
