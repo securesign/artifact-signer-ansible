@@ -1,12 +1,17 @@
 - name: Verify
   hosts: molecule
+  gather_facts: true
   become: true
   vars:
-    node_ip: "{{ hostvars[inventory_hostname].ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
     test_dir_path: "{{ lookup('env', 'PWD') }}/../../vm-testing/test"
   vars_files:
     - vars/vars.yml
   tasks:
+    - name: Get IP of the current node
+      # The tasks below run locally, so their ansible_ssh_host is 127.0.0.1
+      ansible.builtin.set_fact:
+        node_ip: "{{ ansible_ssh_host }}"
+
     - name: Build the test Podman image
       containers.podman.podman_image:
         name: fedora-cosign
@@ -22,15 +27,15 @@
 
     - name: Run tests in a Podman container
       containers.podman.podman_container:
-        name: rhtas-test-container
+        name: "rhtas-test-container-{{ ansible_date_time.epoch }}"
         image: fedora-cosign:latest
         rm: true
         recreate: true
         env:
-          BASE_HOSTNAME: "{{ tas_single_node_base_hostname }}"
+          BASE_HOSTNAME: "{{ tas_single_node_base_hostname}}"
           USERNAME: "jdoe"
           PASSWORD: "secure"
-          KEYCLOAK_URL: "{{ tas_single_node_issuer_url }}"
+          KEYCLOAK_URL: "https://{{ tas_single_node_issuer_url | urlsplit('hostname') }}"
         # NOTE: we can't add hosts with the etc_hosts parameter, because we would need to template
         # the dictionary keys for it and Ansible doesn't do that
         cmd_args:
@@ -49,3 +54,8 @@
           - stderr
       delegate_to: localhost
       become: false
+      register: blob_verify_output
+
+    - name: Ensure the blob was verified successfully
+      ansible.builtin.assert:
+        that: blob_verify_output.stderr is contains("Verified OK")
