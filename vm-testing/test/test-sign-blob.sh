@@ -1,13 +1,15 @@
-#!/bin/bash -ex
+#!/usr/bin/env bash
+set -ex
+
 # NOTE: this script requires BASE_HOSTNAME and KEYCLOAK_URL to be set
 
 # extract the root certificate and make it trusted
-openssl s_client -showcerts -connect rekor.${BASE_HOSTNAME}:443 < /dev/null | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}'
+openssl s_client -showcerts -connect rekor."${BASE_HOSTNAME}":443 < /dev/null | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}'
 for cert in *.pem; do
-  newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem
+  newname="$(openssl x509 -noout -subject -in "$cert" | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]')".pem
   echo "${newname}"; mv "${cert}" "${newname}" 
 done
-cp ${BASE_HOSTNAME}.pem /etc/pki/ca-trust/source/anchors/
+cp "${BASE_HOSTNAME}".pem /etc/pki/ca-trust/source/anchors/
 update-ca-trust
 
 # set up cosign env
@@ -27,12 +29,13 @@ export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
 export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
 export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 
-export TOKEN=$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=${USERNAME}" -d "password=${PASSWORD}" -d "grant_type=password" -d "scope=openid" -d "client_id=${KEYCLOAK_REALM}" ${OIDC_ISSUER_URL}/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')
+TOKEN="$(curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "username=${USERNAME}" -d "password=${PASSWORD}" -d "grant_type=password" -d "scope=openid" -d "client_id=${KEYCLOAK_REALM}" "${OIDC_ISSUER_URL}"/protocol/openid-connect/token |  sed -E 's/.*"access_token":"([^"]*).*/\1/')"
+export TOKEN
 
 env
 cosign initialize
 
 echo "testing" > to-sign
 
-cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token=${TOKEN}
-cosign verify-blob --certificate-identity=${USERNAME}@redhat.com --bundle signed.bundle to-sign
+cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token="${TOKEN}"
+cosign verify-blob --certificate-identity="${USERNAME}"@redhat.com --bundle signed.bundle to-sign
