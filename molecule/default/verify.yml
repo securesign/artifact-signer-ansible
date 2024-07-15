@@ -32,7 +32,7 @@
         rm: true
         recreate: true
         env:
-          BASE_HOSTNAME: "{{ tas_single_node_base_hostname}}"
+          BASE_HOSTNAME: "{{ tas_single_node_base_hostname }}"
           USERNAME: "jdoe"
           PASSWORD: "secure"
           KEYCLOAK_URL: "https://{{ tas_single_node_issuer_url | urlsplit('hostname') }}"
