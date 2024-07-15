@@ -13,4 +13,7 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             pip install -r requirements-testing.txt
+            ansible-galaxy install -r requirements.yml
+            # we also lint the molecule setup
+            ansible-galaxy install -r molecule/requirements.yml
             ansible-lint -v
