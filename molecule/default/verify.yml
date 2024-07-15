@@ -1,0 +1,51 @@
+- name: Verify
+  hosts: molecule
+  become: true
+  vars:
+    node_ip: "{{ hostvars[inventory_hostname].ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
+    test_dir_path: "{{ lookup('env', 'PWD') }}/../../vm-testing/test"
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: Build the test Podman image
+      containers.podman.podman_image:
+        name: fedora-cosign
+        tag: latest
+        pull: false
+        force: true
+        path: "{{ test_dir_path }}"
+        build:
+          cache: true
+          file: "Containerfile"
+      become: false
+      delegate_to: localhost
+
+    - name: Run tests in a Podman container
+      containers.podman.podman_container:
+        name: rhtas-test-container
+        image: fedora-cosign:latest
+        rm: true
+        recreate: true
+        env:
+          BASE_HOSTNAME: "{{ tas_single_node_base_hostname }}"
+          USERNAME: "jdoe"
+          PASSWORD: "secure"
+          KEYCLOAK_URL: "{{ tas_single_node_issuer_url }}"
+        # NOTE: we can't add hosts with the etc_hosts parameter, because we would need to template
+        # the dictionary keys for it and Ansible doesn't do that
+        cmd_args:
+          - --add-host
+          - "fulcio.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+          - --add-host
+          - "rekor.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+          - --add-host
+          - "tuf.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+        volume:
+          - "{{ test_dir_path }}:/mnt:z"
+        entrypoint: /bin/bash
+        command: /mnt/test-sign-blob.sh
+        attach:
+          - stdout
+          - stderr
+      delegate_to: localhost
+      become: false
