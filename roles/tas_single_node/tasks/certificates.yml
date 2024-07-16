@@ -64,6 +64,7 @@
     - fulcio
     - rekor
     - tuf
+    - tsa
   loop_control:
     loop_var: cert_name
   vars:
@@ -135,6 +136,101 @@
         path: "{{ tas_single_node_local_ctlog_public_key }}"
         privatekey_path: "{{ tas_single_node_local_ctlog_private_key }}"
         privatekey_passphrase: "{{ tas_single_node_ctlog_ca_passphrase }}"
+
+- name: Handle TSA certificate chain
+  delegate_to: localhost
+  block:
+    - name: Create TSA root Private Key
+      community.crypto.openssl_privatekey:
+        path: "{{ tas_single_node_local_tsa_private_key }}"
+        curve: secp256r1
+        type: ECC
+        passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
+        cipher: auto
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) == 0
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
+
+    - name: Create certificate signing request (CSR) for TSA Root certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ tas_single_node_local_tsa_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
+        common_name: "Root CA"
+        basic_constraints:
+          - CA:TRUE
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+      register: tsa_root_csr
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
+
+    - name: Create self-signed TSA root CA from CSR
+      community.crypto.x509_certificate:
+        path: "{{ tas_single_node_local_tsa_certificate_chain }}"
+        csr_content: "{{ tsa_root_csr.csr }}"
+        privatekey_path: "{{ tas_single_node_local_tsa_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
+        provider: selfsigned
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
+
+    # Intermediate certificate
+    - name: Create TSA intermediate CA Private Key
+      community.crypto.openssl_privatekey:
+        path: "{{ tas_single_node_local_tsa_signer_private_key }}"
+        curve: secp256r1
+        type: ECC
+        passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
+        cipher: auto
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_signer_private_key) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
+
+    - name: Create TSA intermediate CA CSR
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ tas_single_node_local_tsa_signer_private_key }}"
+        privatekey_passphrase: "{{ tas_single_node_tsa_signer_passphrase }}"
+        common_name: "Intermediate CA"
+        basic_constraints:
+          - CA:TRUE
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        extended_key_usage:
+          - "1.3.6.1.5.5.7.3.8"
+        extended_key_usage_critical: true
+      register: tsa_intermediate_csr
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
+
+    - name: Sign Intermediate CA with Root CA
+      community.crypto.x509_certificate:
+        path: "{{ tas_single_node_local_tsa_intermediate_certificate }}"
+        csr_content: "{{ tsa_intermediate_csr.csr }}"
+        ownca_path: "{{ tas_single_node_local_tsa_certificate_chain }}"
+        ownca_privatekey_path: "{{ tas_single_node_local_tsa_private_key }}"
+        ownca_privatekey_passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
+        provider: ownca
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
+
+    - name: Combine Intermediate and Root CA certificates into a chain
+      ansible.builtin.command: >
+        /bin/bash -c '
+        cat {{ tas_single_node_local_tsa_intermediate_certificate }} {{ tas_single_node_local_tsa_certificate_chain }} > /tmp/certificate-chain.tmp &&
+        mv /tmp/certificate-chain.tmp {{ tas_single_node_local_tsa_certificate_chain }};'
+      register: result
+      changed_when: "'changed' in result.stdout"
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
+        and tas_single_node_signer_type == 'file'
 
 - name: Copy Certificates to Server
   become: true

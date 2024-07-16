@@ -31,6 +31,7 @@
       "{{ tas_single_node_trillian_enabled }}",
       "{{ tas_single_node_tuf_enabled }}",
       "{{ tas_single_node_trillian_enabled }}",
+      "{{ tas_single_node_tsa_enabled }}",
       "true",
     ]
   loop:
@@ -44,6 +45,7 @@
     - "{{ tas_single_node_tuf_image }}"
     - "{{ tas_single_node_netcat_image }}"
     - "{{ tas_single_node_nginx_image }}"
+    - "{{ tas_single_node_tsa_image }}"
   loop_control:
     index_var: idx
   when: enabled_vals[idx] | bool
@@ -74,3 +76,7 @@
 - name: Configure/Deploy tuf
   ansible.builtin.include_tasks: podman/tuf.yml
   when: tas_single_node_tuf_enabled | bool
+
+- name: Configure/Deploy TSA
+  ansible.builtin.include_tasks: podman/tsa.yml
+  when: tas_single_node_tsa_enabled | bool

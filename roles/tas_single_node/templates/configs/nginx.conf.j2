@@ -54,6 +54,9 @@ stream {
 {% if tas_single_node_fulcio_enabled %}
     fulcio.{{ tas_single_node_base_hostname }}  fulcio-server-pod:5555;
 {% endif %}
+{% if tas_single_node_tsa_enabled %}
+    tsa.{{ tas_single_node_base_hostname }}  tsa-server-pod:3002;
+{% endif %}
   }
 
   map $ssl_server_name $targetCert {
@@ -66,6 +69,9 @@ stream {
 {% if tas_single_node_fulcio_enabled %}
     fulcio.{{ tas_single_node_base_hostname }} /certs/ingress-fulcio.pem;
 {% endif %}
+{% if tas_single_node_tsa_enabled %}
+    tsa.{{ tas_single_node_base_hostname }} /certs/ingress-tsa.pem;
+{% endif %}
   }
 
   map $ssl_server_name $targetCertKey {
@@ -77,6 +83,9 @@ stream {
 {% endif %}
 {% if tas_single_node_fulcio_enabled %}
     fulcio.{{ tas_single_node_base_hostname }}  /certs/ingress-fulcio.key;
+{% endif %}
+{% if tas_single_node_tsa_enabled %}
+    tsa.{{ tas_single_node_base_hostname }}  /certs/ingress-tsa.key;
 {% endif %}
   }
   

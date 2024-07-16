@@ -18,6 +18,7 @@ export TUF_URL=https://tuf.$BASE_HOSTNAME
 export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
 export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
 export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
+export COSIGN_TSA_URL=https://tsa.$BASE_HOSTNAME/api/v1/timestamp
 export COSIGN_MIRROR=$TUF_URL
 export COSIGN_ROOT=$TUF_URL/root.json
 export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
@@ -37,5 +38,7 @@ cosign initialize
 
 echo "testing" > to-sign
 
-cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token="${TOKEN}"
-cosign verify-blob --certificate-identity="${USERNAME}"@redhat.com --bundle signed.bundle to-sign
+cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp=timestamp.txt
+
+curl "${COSIGN_TSA_URL}"/certchain > tsa_chain.pem
+cosign verify-blob --certificate-identity="${USERNAME}"@redhat.com --bundle signed.bundle to-sign --timestamp-certificate-chain=tsa_chain.pem --rfc3161-timestamp=timestamp.txt
