@@ -39,12 +39,14 @@
         # NOTE: we can't add hosts with the etc_hosts parameter, because we would need to template
         # the dictionary keys for it and Ansible doesn't do that
         cmd_args:
-          - --add-host
+          - "--add-host"
           - "fulcio.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
-          - --add-host
+          - "--add-host"
           - "rekor.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
-          - --add-host
+          - "--add-host"
           - "tuf.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+          - "--add-host"
+          - "tsa.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
         volume:
           - "{{ test_dir_path }}:/mnt:z"
         entrypoint: /bin/bash

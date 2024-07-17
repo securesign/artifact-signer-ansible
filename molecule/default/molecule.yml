@@ -9,7 +9,7 @@ platforms:
   - name: instance
     compose: CentOS-Stream-9
     arch: x86_64
-    duration: 45
+    duration: 60
 provisioner:
   name: ansible
   env:
