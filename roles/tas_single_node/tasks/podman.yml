@@ -78,18 +78,18 @@
   ansible.builtin.include_tasks: podman/rekor.yml
   when: tas_single_node_rekor_enabled | bool
 
-# - name: Configure/Deploy Fulcio
-#   ansible.builtin.include_tasks: podman/fulcio.yml
-#   when: tas_single_node_fulcio_enabled | bool
+- name: Configure/Deploy Fulcio
+  ansible.builtin.include_tasks: podman/fulcio.yml
+  when: tas_single_node_fulcio_enabled | bool
 
-# - name: Configure/Deploy ctlog
-#   ansible.builtin.include_tasks: podman/ctlog.yml
-#   when: tas_single_node_ctlog_enabled | bool
+- name: Configure/Deploy ctlog
+  ansible.builtin.include_tasks: podman/ctlog.yml
+  when: tas_single_node_ctlog_enabled | bool
 
-# - name: Configure/Deploy tuf
-#   ansible.builtin.include_tasks: podman/tuf.yml
-#   when: tas_single_node_tuf_enabled | bool
+- name: Configure/Deploy tuf
+  ansible.builtin.include_tasks: podman/tuf.yml
+  when: tas_single_node_tuf_enabled | bool
 
-# - name: Configure/Deploy TSA
-#   ansible.builtin.include_tasks: podman/tsa.yml
-#   when: tas_single_node_tsa_enabled | bool
+- name: Configure/Deploy TSA
+  ansible.builtin.include_tasks: podman/tsa.yml
+  when: tas_single_node_tsa_enabled | bool
