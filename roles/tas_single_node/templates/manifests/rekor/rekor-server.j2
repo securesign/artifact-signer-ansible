@@ -43,7 +43,7 @@ spec:
             - --redis_server.address={{ tas_single_node_rekor_redis.redis.address }}
             - --redis_server.port={{ tas_single_node_rekor_redis.redis.port }}
 {% if tas_single_node_rekor_redis.redis.password != "" %}
-            - "--redis_server.password={{ tas_single_node_rekor_redis.redis.password }}
+            - --redis_server.password={{ tas_single_node_rekor_redis.redis.password }}
 {% endif %}
             - --rekor_server.address=0.0.0.0
             - --rekor_server.signer=memory

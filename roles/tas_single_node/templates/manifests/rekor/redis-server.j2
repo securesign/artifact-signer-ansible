@@ -33,6 +33,11 @@ spec:
             - --appendonly
             - "yes"
           image: "{{ tas_single_node_redis_image }}"
+{% if tas_single_node_rekor_redis.redis.password != "" %}
+          env:
+            - name: REDIS_PASSWORD
+              value: "{{ tas_single_node_rekor_redis.redis.password }}"
+{% endif %}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6379
