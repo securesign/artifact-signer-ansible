@@ -40,8 +40,11 @@ spec:
             - --trillian_log_server.address=trillian-logserver-pod
             - --trillian_log_server.port=8091
             - --trillian_log_server.sharding_config=/sharding/sharding-config.yaml
-            - --redis_server.address=rekor-redis
-            - --redis_server.port=6379
+            - --redis_server.address={{ tas_single_node_rekor_redis.redis.address }}
+            - --redis_server.port={{ tas_single_node_rekor_redis.redis.port }}
+{% if tas_single_node_rekor_redis.redis.password != "" %}
+            - "--redis_server.password={{ tas_single_node_rekor_redis.redis.password }}
+{% endif %}
             - --rekor_server.address=0.0.0.0
             - --rekor_server.signer=memory
             - --enable_retrieve_api=true

@@ -19,7 +19,14 @@ tas_single_node_skip_os_install: false
 
 tas_single_node_rekor_templates:
   - manifests/rekor/redis-server.yaml
-  - manifests/rekor/rekor-server.yaml
+  - manifests/rekor/rekor-server.j2
+
+tas_single_node_rekor_redis:
+  database_deploy: true
+  redis:
+    address: "rekor-redis"
+    port: 6379
+    password: ""
 
 tas_single_node_cockpit_enabled: true
 tas_single_node_ctlog_enabled: true

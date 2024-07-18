@@ -25,6 +25,7 @@
       systemd_file: redis
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/redis-server.yaml') | from_yaml }}"
+  when: tas_single_node_rekor_redis.database_deploy
 
 - name: Deploy Rekor Server Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -33,5 +34,5 @@
       state: started
       systemd_file: rekor
       network: "{{ tas_single_node_podman_network }}"
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/rekor-server.yaml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/rekor-server.j2') | from_yaml }}"
       configmap: "{{ tas_single_node_rekor_sharding_config }}"
