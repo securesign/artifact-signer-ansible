@@ -28,7 +28,7 @@
       "{{ tas_single_node_rekor_enabled }}",
       "{{ tas_single_node_ctlog_enabled }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy }}",
-      "{{ tas_single_node_trillian_enabled and tas_single_node_trillian.database_deploy}}",
+      "{{ tas_single_node_trillian_enabled and tas_single_node_trillian.database_deploy }}",
       "{{ tas_single_node_tuf_enabled }}",
       "{{ tas_single_node_trillian_enabled }}",
       "true",
