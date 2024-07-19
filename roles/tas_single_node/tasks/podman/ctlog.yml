@@ -29,6 +29,7 @@
         namespace: ctlog-system
       data:
         config: "{{ ctlog_config_content }}"
+  register: configmap_result
 
 - name: Create ctlog Secret
   ansible.builtin.copy:
@@ -60,5 +61,6 @@
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog.yaml') | from_yaml }}"
       configmap: "{{ tas_single_node_ctlog_configmap_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
       secret: "{{ tas_single_node_ctlog_secret }}"
       secret_changed: "{{ secret_result.changed }}"

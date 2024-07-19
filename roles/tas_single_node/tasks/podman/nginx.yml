@@ -108,6 +108,7 @@
         namespace: nginx-system
       data:
         nginx.conf: "{{ nginx_config_content }}"
+  register: configmap_result
 
 - name: Deploy nginx Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -118,5 +119,6 @@
       systemd_file: nginx
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
       configmap: "{{ tas_single_node_nginx_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
       secret: "{{ tas_single_node_nginx_certs_config }}"
       secret_changed: "{{ secret_result.changed }}"

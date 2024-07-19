@@ -49,4 +49,4 @@
     enabled: true
     daemon_reload: true
     name: "{{ podman_spec.systemd_file }}"
-  when: copy_manifest.changed or copy_systemd_file.changed or (podman_spec.secret is defined and podman_spec.secret_changed)
+  when: copy_manifest.changed or copy_systemd_file.changed or (podman_spec.secret is defined and podman_spec.secret_changed) or (podman_spec.configmap is defined and podman_spec.configmap_changed)
