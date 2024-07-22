@@ -34,6 +34,7 @@
       data:
         config.json: |
           {{ fulcio_config_content | to_json }}
+  register: configmap_result
 
 - name: Create Fulcio Secret
   ansible.builtin.copy:
@@ -66,5 +67,6 @@
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.yaml') | from_yaml }}"
       configmap: "{{ tas_single_node_fulcio_server_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
       secret: "{{ tas_single_node_fulcio_server_secret_config }}"
       secret_changed: "{{ secret_result.changed }}"
