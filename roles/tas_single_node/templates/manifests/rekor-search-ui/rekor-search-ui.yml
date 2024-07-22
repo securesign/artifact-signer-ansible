@@ -33,7 +33,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: NEXT_PUBLIC_REKOR_DEFAULT_DOMAIN
-              value: "rekor-server-pod"
+              value: https://rekor.myrhtas:3001
           ports:
             - containerPort: 3000
               protocol: TCP
