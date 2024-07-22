@@ -32,7 +32,7 @@
       "{{ tas_single_node_tuf_enabled }}",
       "{{ tas_single_node_trillian_enabled }}",
       "true",
-      "{{ tas_single_node_tsa_enabled }}", 
+      "{{ tas_single_node_tsa_enabled }}",
       "{{ tas_single_node_rekor_search_enabled }}"
     ]
   loop:
