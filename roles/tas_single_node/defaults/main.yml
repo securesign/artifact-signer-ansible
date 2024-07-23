@@ -158,4 +158,4 @@ tas_single_node_nginx_image:
 tas_single_node_tsa_image:
   "quay.io/redhat-user-workloads/rhtas-tenant/timestamp-authority/timestamp-authority@sha256:a13834438c2b7f9441535783880daa01e1cdb1f26255311352b38ebbb154abac"
 tas_single_node_rekor_search_image:
-  quay.io/securesign/rekor-search-ui@sha256:2978242ab09841ff6f61c47a336f3222080dc39c7907cb1f02bf74d75560aeff
+  "quay.io/securesign/rekor-search-ui@sha256:2978242ab09841ff6f61c47a336f3222080dc39c7907cb1f02bf74d75560aeff"
