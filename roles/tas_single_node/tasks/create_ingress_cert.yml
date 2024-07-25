@@ -1,14 +1,11 @@
 ---
 - name: Set Certificate Facts
   ansible.builtin.set_fact:
-    local_key_path: "{{ tas_single_node_local_certs_dir }}/ingress-{{ cert_name }}.key"
-    local_cert_path: "{{ tas_single_node_local_certs_dir }}/ingress-{{ cert_name }}.pem"
     remote_key_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.key"
     remote_cert_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.pem"
   delegate_to: localhost
 
-- name: Create Certificate and Private Key
-  delegate_to: localhost
+- name: Create certificate and private key
   when: >
     (existing_files.files | selectattr('path', 'equalto', remote_key_path) | list | length) == 0
     or (existing_files.files | selectattr('path', 'equalto', remote_cert_path) | list | length) == 0
@@ -16,41 +13,32 @@
   #         and (existing_files.files | selectattr('path', 'equalto', cert_path) | list | length) == 0))
   block:
     - name: Create Private Key {{ cert_name }}
-      community.crypto.openssl_privatekey:
-        path: "{{ local_key_path }}"
+      ansible.builtin.command:
+        cmd: "openssl genrsa -out '{{ remote_key_path }}' 4096"
+        creates: "{{ remote_key_path }}"
 
     # TODO: Allow more parameters to be provided
     - name: Create certificate signing request (CSR) for new certificate
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ local_key_path }}"
-        subject:
-          commonName: "{{ dns_name }}"
-        basic_constraints:
-          - CA:FALSE
-        extended_key_usage:
-          - serverAuth
-        key_usage:
-          - digitalSignature
-          - nonRepudiation
-          - keyEncipherment
-          - dataEncipherment
-        subject_alt_name:
-          - DNS:{{ dns_name }}
+      ansible.builtin.command:
+        cmd: >-
+          openssl req -new
+          -key '{{ remote_key_path }}'
+          -subj '/CN={{ dns_name }}'
+          -addext 'subjectAltName = DNS:{{ dns_name }}'
+          -addext 'basicConstraints=CA:FALSE'
+          -addext 'keyUsage = digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment'
+          -addext 'extendedKeyUsage = serverAuth'
       register: csr
+      changed_when: false
 
     - name: Sign certificate with our CA
-      community.crypto.x509_certificate_pipe:
-        csr_content: "{{ csr.csr }}"
-        provider: ownca
-        ownca_path: "{{ local_ca_cert_path }}"
-        ownca_privatekey_path: "{{ local_ca_key_path }}"
-        # ownca_privatekey_passphrase: "{{ secret_ca_passphrase }}"
-        ownca_not_after: +365d # valid for one year
-      register: certificate
-
-    - name: Create certificate
-      ansible.builtin.copy:
-        dest: "{{ local_cert_path }}"
-        content: "{{ certificate.certificate }}"
-        mode: "0600"
-      when: certificate is changed  # noqa no-handler
+      ansible.builtin.shell:
+        # valid for two years
+        cmd: >-
+          set -o pipefail &&
+          echo "{{ csr.stdout }}" |
+          openssl x509 -req -days 730
+          -CA '{{ remote_ca_cert_path }}'
+          -CAkey '{{ remote_ca_key_path }}'
+          -out '{{ remote_cert_path }}'
+        creates: "{{ remote_cert_path }}"
