@@ -29,7 +29,6 @@
     name: openssl
     state: present
 
-# TODO: file permissions of the created files?
 - name: Create private key (RSA, 4096 bits)
   ansible.builtin.command:
     cmd: "openssl genrsa -out '{{ tas_single_node_remote_private_key }}' 4096"
