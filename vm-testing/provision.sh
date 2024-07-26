@@ -17,7 +17,7 @@ else
   exit 1
 fi
 
-(sed -e "s/REMOTE_IP_ADDRESS/$ip_address/" -e "s/ANSIBLE_USER/$vm_username/" inventory-sample > inventory)
+(sed -e "s/REMOTE_IP_ADDRESS/$ip_address/" -e "s/ANSIBLE_USER/$vm_username/" ../inventory-sample > ../inventory)
 
 cat << EOF
 Please add the following lines to your /etc/hosts:

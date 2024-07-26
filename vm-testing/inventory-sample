@@ -3,4 +3,5 @@ REMOTE_IP_ADDRESS
 
 [rhtas:vars]
 ansible_user=ANSIBLE_USER
-become=true
+ansible_become=true
+ansible_become_user=root
