@@ -1,3 +1,5 @@
 ---
 # NOTE: when updating, also update dependencies in galaxy.yml
-collections: []
+collections:
+  - name: containers.podman
+    version: ">=1.15.0"
