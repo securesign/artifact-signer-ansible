@@ -1,4 +1,8 @@
 ---
+# General notes that apply throughout the file
+# * openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
+# * openssl's ec curve "prime256v1" is equivalent to what everyone else calls "secp256r1"
+
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
@@ -81,11 +85,11 @@
 
   block:
     - name: Create Fulcio private key
-      # openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
+      # NOTE: As of cosign 2.3.0, only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported
       ansible.builtin.shell:
         cmd: >-
           set -o pipefail &&
-          openssl ecparam -genkey -name secp384r1 |
+          openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_remote_fulcio_private_key }}'
           -passout 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
@@ -131,11 +135,10 @@
 
   block:
     - name: Create CTLog private key
-      # openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
       ansible.builtin.shell:
         cmd: >-
           set -o pipefail &&
-          openssl ecparam -genkey -name secp384r1 |
+          openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_remote_ctlog_private_key }}'
           -passout 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
@@ -152,11 +155,10 @@
 - name: Handle TSA certificate chain
   block:
     - name: Create TSA root private key
-      # openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
       ansible.builtin.shell:
         cmd: >-
           set -o pipefail &&
-          openssl ecparam -genkey -name secp384r1 |
+          openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_remote_tsa_private_key }}'
           -passout 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
@@ -199,11 +201,10 @@
 
     # Intermediate certificate
     - name: Create TSA intermediate CA private key
-      # openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
       ansible.builtin.shell:
         cmd: >-
           set -o pipefail &&
-          openssl ecparam -genkey -name secp384r1 |
+          openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_remote_tsa_signer_private_key }}'
           -passout 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
