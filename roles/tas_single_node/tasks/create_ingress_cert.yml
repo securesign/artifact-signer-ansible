@@ -3,7 +3,6 @@
   ansible.builtin.set_fact:
     remote_key_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.key"
     remote_cert_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.pem"
-  delegate_to: localhost
 
 - name: Create certificate and private key for {{ cert_name }}
   when: >
