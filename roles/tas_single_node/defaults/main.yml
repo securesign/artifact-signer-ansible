@@ -48,8 +48,6 @@ tas_single_node_certs_dir: "{{ tas_single_node_config_dir }}/certs"
 tas_single_node_kube_manifest_dir: "{{ tas_single_node_config_dir }}/manifests"
 tas_single_node_kube_configmap_dir: "{{ tas_single_node_config_dir }}/configs"
 
-tas_single_node_local_certs_dir: /tmp/rhtas/certs
-
 tas_single_node_private_key_filename: rhtas.key
 tas_single_node_ca_filename: rhtas.pem
 tas_single_node_fulcio_private_key_filename: fulcio.key
@@ -64,15 +62,6 @@ tas_single_node_tsa_certificate_chain_filename: certificate-chain.pem
 tas_single_node_tsa_intermediate_certificate_filename: intermediate-certificate.pem
 tas_single_node_tsa_signer_private_key_filename: signer-private-key.pem
 
-tas_single_node_local_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_private_key_filename }}"
-tas_single_node_local_ca: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ca_filename }}"
-tas_single_node_local_fulcio_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_fulcio_private_key_filename }}"
-tas_single_node_local_fulcio_public_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_fulcio_public_key_filename }}"
-tas_single_node_local_fulcio_root_ca: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_fulcio_root_ca_filename }}"
-tas_single_node_local_ctlog_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ctlog_private_key_filename }}"
-tas_single_node_local_ctlog_public_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_ctlog_public_key_filename }}"
-tas_single_node_local_rekor_signer: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"
-tas_single_node_local_rekor_public_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"
 tas_single_node_remote_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_private_key_filename }}"
 tas_single_node_remote_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ca_filename }}"
 tas_single_node_remote_fulcio_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_private_key_filename }}"
@@ -111,12 +100,9 @@ tas_single_node_ct_logprefix: rhtasansible
 
 tas_single_node_tsa_enabled: true
 tas_single_node_signer_type: file
-tas_single_node_local_tsa_certificate_chain: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
-tas_single_node_local_tsa_intermediate_certificate: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_intermediate_certificate_filename }}"
-tas_single_node_local_tsa_signer_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
 tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
+tas_single_node_remote_tsa_intermediate_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_intermediate_certificate_filename }}"
 tas_single_node_remote_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
-tas_single_node_local_tsa_private_key: "{{ tas_single_node_local_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
 tas_single_node_remote_tsa_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
 
 tas_single_node_tsa_secret: "{{ tas_single_node_kube_configmap_dir }}/tsa-secret.yaml"

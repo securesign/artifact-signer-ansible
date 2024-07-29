@@ -1,4 +1,8 @@
 ---
+# General notes that apply throughout the file
+# * openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
+# * openssl's ec curve "prime256v1" is equivalent to what everyone else calls "secp256r1"
+
 - name: Confirmed required parameters provided
   ansible.builtin.assert:
     that:
@@ -6,7 +10,7 @@
       - tas_single_node_base_hostname | trim | length > 0
     msg: "'tas_single_node_base_hostname' must be specified"
 
-- name: Create Certificates Directory
+- name: Create certificates directory
   become: true
   ansible.builtin.file:
     state: directory
@@ -20,45 +24,44 @@
     paths: "{{ tas_single_node_certs_dir }}"
   register: certs_dir_files
 
-- name: Create Local Certificates Directory
-  ansible.builtin.file:
-    state: directory
-    dest: "{{ tas_single_node_local_certs_dir }}"
-    mode: "0700"
-  delegate_to: localhost
+- name: Install openssl for generating RHTAS secrets
+  ansible.builtin.package:
+    name: openssl
+    state: present
 
 - name: Create private key (RSA, 4096 bits)
-  community.crypto.openssl_privatekey:
-    path: "{{ tas_single_node_local_private_key }}"
-  delegate_to: localhost
+  ansible.builtin.command:
+    cmd: "openssl genrsa -out '{{ tas_single_node_remote_private_key }}' 4096"
+    creates: "{{ tas_single_node_remote_private_key }}"
   when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) == 0
 
-- name: Create Root CA
-  delegate_to: localhost
+- name: Create root CA
   when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
   block:
     - name: Create certificate signing request (CSR) for CA certificate
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ tas_single_node_local_private_key }}"
-        common_name: "{{ tas_single_node_base_hostname }}"
-        use_common_name_for_san: false
-        basic_constraints:
-          - CA:TRUE
-        basic_constraints_critical: true
-        key_usage:
-          - keyCertSign
-        key_usage_critical: true
+      ansible.builtin.command:
+        cmd: >-
+          openssl req -new -batch
+          -key '{{ tas_single_node_remote_private_key }}'
+          -subj '/CN={{ tas_single_node_base_hostname }}'
+          -addext 'basicConstraints=critical,CA:TRUE'
+          -addext 'keyUsage = critical,keyCertSign'
       register: ca_csr
+      changed_when: false
 
     - name: Create self-signed CA certificate from CSR
-      community.crypto.x509_certificate:
-        path: "{{ tas_single_node_local_ca }}"
-        csr_content: "{{ ca_csr.csr }}"
-        privatekey_path: "{{ tas_single_node_local_private_key }}"
-        provider: selfsigned
-        selfsigned_not_after: +365d # valid for one year
+      ansible.builtin.shell:
+        # valid for two years
+        cmd: >-
+          set -o pipefail &&
+          echo "{{ ca_csr.stdout }}" |
+          openssl x509 -req -days 730
+          -copy_extensions copyall
+          -signkey '{{ tas_single_node_remote_private_key }}'
+          -out '{{ tas_single_node_remote_ca }}'
+        creates: "{{ tas_single_node_remote_ca }}"
 
-- name: Create Ingress Certificates
+- name: Create ingress certificates
   ansible.builtin.include_tasks: create_ingress_cert.yml
   loop:
     - fulcio
@@ -69,179 +72,187 @@
     loop_var: cert_name
   vars:
     existing_files: "{{ certs_dir_files }}"
-    local_ca_key_path: "{{ tas_single_node_local_private_key }}"
-    local_ca_cert_path: "{{ tas_single_node_local_ca }}"
     remote_ca_key_path: "{{ tas_single_node_remote_private_key }}"
     remote_ca_cert_path: "{{ tas_single_node_remote_ca }}"
     dns_name: "{{ cert_name }}.{{ tas_single_node_base_hostname }}"
 
-- name: Create fulcio root
-  delegate_to: localhost
+- name: Create Fulcio root
   when: >
     (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) == 0
     or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
     or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
 
   block:
-    - name: Create Fulcio Private Key
-      community.crypto.openssl_privatekey:
-        path: "{{ tas_single_node_local_fulcio_private_key }}"
-        curve: secp256r1
-        type: ECC
-        passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
-        cipher: auto
+    - name: Create Fulcio private key
+      # NOTE: As of cosign 2.3.0, only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl ecparam -genkey -name prime256v1 |
+          openssl ec -des3
+          -out '{{ tas_single_node_remote_fulcio_private_key }}'
+          -passout 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
+        creates: "{{ tas_single_node_remote_fulcio_private_key }}"
 
-    - name: Create Fulcio Public Key
-      community.crypto.openssl_publickey:
-        path: "{{ tas_single_node_local_fulcio_public_key }}"
-        privatekey_path: "{{ tas_single_node_local_fulcio_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
+    - name: Create Fulcio public key
+      ansible.builtin.command:
+        cmd: >-
+          openssl ec -pubout
+          -in '{{ tas_single_node_remote_fulcio_private_key }}'
+          -out '{{ tas_single_node_remote_fulcio_public_key }}'
+          -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
+        creates: "{{ tas_single_node_remote_fulcio_public_key }}"
 
-    - name: Create certificate signing request (CSR) for Fulcio Root certificate
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ tas_single_node_local_fulcio_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
-        basic_constraints:
-          - CA:TRUE
-        basic_constraints_critical: true
-        key_usage:
-          - keyCertSign
-        key_usage_critical: true
+    - name: Create certificate signing request (CSR) for Fulcio root certificate
+      ansible.builtin.command:
+        cmd: >-
+          openssl req -new -batch
+          -key '{{ tas_single_node_remote_fulcio_private_key }}'
+          -addext 'basicConstraints=critical,CA:TRUE'
+          -addext 'keyUsage = critical,keyCertSign'
+          -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
       register: fulcio_root_csr
+      changed_when: false
 
     - name: Create self-signed Fulcio root from CSR
-      community.crypto.x509_certificate:
-        path: "{{ tas_single_node_local_fulcio_root_ca }}"
-        csr_content: "{{ fulcio_root_csr.csr }}"
-        privatekey_path: "{{ tas_single_node_local_fulcio_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_fulcio_ca_passphrase }}"
-        provider: selfsigned
+      ansible.builtin.shell:
+        # valid for two years
+        cmd: >-
+          set -o pipefail &&
+          echo "{{ fulcio_root_csr.stdout }}" |
+          openssl x509 -req -days 730
+          -copy_extensions copyall
+          -signkey '{{ tas_single_node_remote_fulcio_private_key }}'
+          -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
+          -out '{{ tas_single_node_remote_fulcio_root_ca }}'
+        creates: "{{ tas_single_node_remote_fulcio_root_ca }}"
 
-- name: Create ctlog root
-  delegate_to: localhost
+- name: Create CTLog root
   when: >
     (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
     or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0
 
   block:
-    - name: Create ctlog Private Key
-      community.crypto.openssl_privatekey:
-        path: "{{ tas_single_node_local_ctlog_private_key }}"
-        curve: secp256r1
-        type: ECC
-        passphrase: "{{ tas_single_node_ctlog_ca_passphrase }}"
-        cipher: auto
-    - name: Create ctlog Public Key
-      community.crypto.openssl_publickey:
-        path: "{{ tas_single_node_local_ctlog_public_key }}"
-        privatekey_path: "{{ tas_single_node_local_ctlog_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_ctlog_ca_passphrase }}"
+    - name: Create CTLog private key
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl ecparam -genkey -name prime256v1 |
+          openssl ec -des3
+          -out '{{ tas_single_node_remote_ctlog_private_key }}'
+          -passout 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
+        creates: "{{ tas_single_node_remote_ctlog_private_key }}"
+    - name: Create CTLog public key
+      ansible.builtin.command:
+        cmd: >-
+          openssl ec -pubout
+          -in '{{ tas_single_node_remote_ctlog_private_key }}'
+          -out '{{ tas_single_node_remote_ctlog_public_key }}'
+          -passin 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
+        creates: "{{ tas_single_node_remote_ctlog_public_key }}"
 
 - name: Handle TSA certificate chain
-  delegate_to: localhost
   block:
-    - name: Create TSA root Private Key
-      community.crypto.openssl_privatekey:
-        path: "{{ tas_single_node_local_tsa_private_key }}"
-        curve: secp256r1
-        type: ECC
-        passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
-        cipher: auto
+    - name: Create TSA root private key
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl ecparam -genkey -name prime256v1 |
+          openssl ec -des3
+          -out '{{ tas_single_node_remote_tsa_private_key }}'
+          -passout 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
+        creates: "{{ tas_single_node_remote_tsa_private_key }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) == 0
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
-    - name: Create certificate signing request (CSR) for TSA Root certificate
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ tas_single_node_local_tsa_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
-        common_name: "Root CA"
-        basic_constraints:
-          - CA:TRUE
-        basic_constraints_critical: true
-        key_usage:
-          - keyCertSign
+    - name: Create certificate signing request (CSR) for TSA root certificate
+      ansible.builtin.command:
+        cmd: >-
+          openssl req -new -batch
+          -key '{{ tas_single_node_remote_tsa_private_key }}'
+          -subj '/CN=Root CA'
+          -addext 'basicConstraints=critical,CA:TRUE'
+          -addext 'keyUsage = keyCertSign'
+          -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
       register: tsa_root_csr
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
+      changed_when: false
 
     - name: Create self-signed TSA root CA from CSR
-      community.crypto.x509_certificate:
-        path: "{{ tas_single_node_local_tsa_certificate_chain }}"
-        csr_content: "{{ tsa_root_csr.csr }}"
-        privatekey_path: "{{ tas_single_node_local_tsa_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
-        provider: selfsigned
+      ansible.builtin.shell:
+        # valid for two years
+        cmd: >-
+          set -o pipefail &&
+          echo "{{ tsa_root_csr.stdout }}" |
+          openssl x509 -req -days 730
+          -copy_extensions copyall
+          -signkey '{{ tas_single_node_remote_tsa_private_key }}'
+          -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
+          -out '{{ tas_single_node_remote_tsa_certificate_chain }}'
+        creates: "{{ tas_single_node_remote_tsa_certificate_chain }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
     # Intermediate certificate
-    - name: Create TSA intermediate CA Private Key
-      community.crypto.openssl_privatekey:
-        path: "{{ tas_single_node_local_tsa_signer_private_key }}"
-        curve: secp256r1
-        type: ECC
-        passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
-        cipher: auto
+    - name: Create TSA intermediate CA private key
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl ecparam -genkey -name prime256v1 |
+          openssl ec -des3
+          -out '{{ tas_single_node_remote_tsa_signer_private_key }}'
+          -passout 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
+        creates: "{{ tas_single_node_remote_tsa_signer_private_key }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_signer_private_key) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
     - name: Create TSA intermediate CA CSR
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ tas_single_node_local_tsa_signer_private_key }}"
-        privatekey_passphrase: "{{ tas_single_node_tsa_signer_passphrase }}"
-        common_name: "Intermediate CA"
-        basic_constraints:
-          - CA:TRUE
-        basic_constraints_critical: true
-        key_usage:
-          - keyCertSign
-        extended_key_usage:
-          - "1.3.6.1.5.5.7.3.8"
-        extended_key_usage_critical: true
+      ansible.builtin.command:
+        cmd: >-
+          openssl req -new -batch
+          -key '{{ tas_single_node_remote_tsa_signer_private_key }}'
+          -subj '/CN=Intermediate CA'
+          -addext 'basicConstraints=critical,CA:TRUE'
+          -addext 'keyUsage = keyCertSign'
+          -addext 'extendedKeyUsage = critical,1.3.6.1.5.5.7.3.8'
+          -passin 'pass:{{ tas_single_node_tsa_signer_passphrase }}'
       register: tsa_intermediate_csr
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
+      changed_when: false
 
-    - name: Sign Intermediate CA with Root CA
-      community.crypto.x509_certificate:
-        path: "{{ tas_single_node_local_tsa_intermediate_certificate }}"
-        csr_content: "{{ tsa_intermediate_csr.csr }}"
-        ownca_path: "{{ tas_single_node_local_tsa_certificate_chain }}"
-        ownca_privatekey_path: "{{ tas_single_node_local_tsa_private_key }}"
-        ownca_privatekey_passphrase: "{{ tas_single_node_tsa_ca_passphrase }}"
-        provider: ownca
+    - name: Sign intermediate CA with Root CA
+      ansible.builtin.shell:
+        # valid for two years
+        cmd: >-
+          set -o pipefail &&
+          echo "{{ tsa_intermediate_csr.stdout }}" |
+          openssl x509 -req -days 730
+          -copy_extensions copyall
+          -CA '{{ tas_single_node_remote_tsa_certificate_chain }}'
+          -CAkey '{{ tas_single_node_remote_tsa_private_key }}'
+          -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
+          -out '{{ tas_single_node_remote_tsa_intermediate_certificate }}'
+        creates: "{{ tas_single_node_remote_tsa_intermediate_certificate }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
-    - name: Combine Intermediate and Root CA certificates into a chain
+    - name: Combine intermediate and root CA certificates into a chain
       ansible.builtin.command: >
         /bin/bash -c '
-        cat {{ tas_single_node_local_tsa_intermediate_certificate }} {{ tas_single_node_local_tsa_certificate_chain }} > /tmp/certificate-chain.tmp &&
-        mv /tmp/certificate-chain.tmp {{ tas_single_node_local_tsa_certificate_chain }};'
+        cat {{ tas_single_node_remote_tsa_intermediate_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > /tmp/certificate-chain.tmp &&
+        mv /tmp/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
       register: result
       changed_when: "'changed' in result.stdout"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
-
-- name: Copy Certificates to Server
-  become: true
-  ansible.builtin.copy:
-    src: "{{ tas_single_node_local_certs_dir }}/"
-    dest: "{{ tas_single_node_certs_dir }}"
-    force: true
-    mode: "0600"
-
-- name: Remove Local Certificate Directory
-  ansible.builtin.file:
-    state: absent
-    dest: "{{ tas_single_node_local_certs_dir }}"
-  delegate_to: localhost

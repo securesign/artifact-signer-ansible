@@ -54,4 +54,3 @@ dependencies: []
 
 collections:
   - containers.podman
-  - community.crypto
