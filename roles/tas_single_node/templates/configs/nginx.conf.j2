@@ -49,7 +49,7 @@ stream {
     rekor.{{ tas_single_node_base_hostname }}  rekor-server-pod:3001;
 {% endif %}
 {% if tas_single_node_rekor_search_enabled %}
-    rekor-search.{{ tas_single_node_base_hostname }}  rekor-search-pod:3000;
+    rekor-search.{{ tas_single_node_base_hostname }}  rekor-search-ui-pod:3000;
 {% endif %}
 {% if tas_single_node_tuf_enabled %}
     tuf.{{ tas_single_node_base_hostname }}  tuf-pod:8080;
