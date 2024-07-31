@@ -24,7 +24,9 @@ jobs:
           run: |
             eval $(ssh-agent -s) # testing-farm CLI right now mandates that ssh-agent is running
             source venv/bin/activate
-            molecule -vv test --scenario-name default
+            # NOTE: for now we don't run "molecule test", because we don't have proper idempotence yet
+            molecule -v converge --scenario-name default
+            molecule -v verify --scenario-name default
         - name: Destroy molecule infrastructure
           env:
             TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
