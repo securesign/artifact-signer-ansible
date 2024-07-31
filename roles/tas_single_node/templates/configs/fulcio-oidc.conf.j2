@@ -1,9 +1,11 @@
 {
-    "OIDCIssuers": {
-    "{{ tas_single_node_oidc_issuers }}": {
-        "ClientID": "{{ tas_single_node_oidc_client_id }}",
-        "IssuerURL": "{{ tas_single_node_issuer_url }}",
-        "Type": "{{ tas_single_node_oidc_issuers_type }}"
-        }
-    }
+  "OIDCIssuers": {
+    {% for issuer in tas_single_node_oidc_issuers %}
+    "{{ issuer.issuer }}": {
+      "IssuerURL": "{{ issuer.url }}",
+      "ClientID": "{{ issuer.client_id }}",
+      "Type": "{{ issuer.type }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  }
 }

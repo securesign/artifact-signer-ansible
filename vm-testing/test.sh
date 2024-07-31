@@ -5,7 +5,7 @@ podman build test/ -f test/Containerfile -t fedora-cosign:latest
 
 base_hostname=$(grep tas_single_node_base_hostname: play.yml | awk '{print $2}')
 ip_address=$(ansible-inventory --list rhtas | jq '.rhtas | .hosts | .[]' | tr -d '"')
-oidc_url=$(grep tas_single_node_oidc_issuers: vars.yml | awk '{print $2}' | tr -d '"' | awk -F'/' '{print $1FS$2FS$3}')
+oidc_url=$(grep -A 0 'issuer:' vars.yml | awk '{print $3}' | tr -d '"' | awk -F'/' '{print $1FS$2FS$3}')
 username=jdoe
 password=secure
 
