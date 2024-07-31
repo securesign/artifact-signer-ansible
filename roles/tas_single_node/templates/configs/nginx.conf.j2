@@ -46,7 +46,10 @@ stream {
   map_hash_bucket_size 128;
   map $ssl_server_name $targetBackend {
 {% if tas_single_node_rekor_enabled %}
-    rekor.{{ tas_single_node_base_hostname }}  rekor-server-pod:3000;
+    rekor.{{ tas_single_node_base_hostname }}  rekor-server-pod:3001;
+{% endif %}
+{% if tas_single_node_rekor_search_enabled %}
+    rekor-search.{{ tas_single_node_base_hostname }}  rekor-search-ui-pod:3000;
 {% endif %}
 {% if tas_single_node_tuf_enabled %}
     tuf.{{ tas_single_node_base_hostname }}  tuf-pod:8080;
@@ -63,6 +66,9 @@ stream {
 {% if tas_single_node_rekor_enabled %}
     rekor.{{ tas_single_node_base_hostname }} /certs/ingress-rekor.pem;
 {% endif %}
+{% if tas_single_node_rekor_search_enabled %}
+    rekor-search.{{ tas_single_node_base_hostname }} /certs/ingress-rekor-search.pem;
+{% endif %}
 {% if tas_single_node_tuf_enabled %}
     tuf.{{ tas_single_node_base_hostname }} /certs/ingress-tuf.pem;
 {% endif %}
@@ -77,6 +83,9 @@ stream {
   map $ssl_server_name $targetCertKey {
 {% if tas_single_node_rekor_enabled %}
     rekor.{{ tas_single_node_base_hostname }}  /certs/ingress-rekor.key;
+{% endif %}
+{% if tas_single_node_rekor_search_enabled %}
+    rekor-search.{{ tas_single_node_base_hostname }}  /certs/ingress-rekor-search.key;
 {% endif %}
 {% if tas_single_node_tuf_enabled %}
     tuf.{{ tas_single_node_base_hostname }}  /certs/ingress-tuf.key;

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rekor-search-ui
+  namespace: rekor-search-ui
+  labels:
+    app.kubernetes.io/component: search
+    app.kubernetes.io/instance: scaffold
+    app.kubernetes.io/name: rekor-search-ui
+    helm.sh/chart: rekor-search-1.0.3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: search
+      app.kubernetes.io/instance: scaffold
+      app.kubernetes.io/name: rekor-search-ui
+      helm.sh/chart: rekor-search-1.0.3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: search
+        app.kubernetes.io/instance: scaffold
+        app.kubernetes.io/name: rekor-search-ui
+        helm.sh/chart: rekor-search-1.0.3
+    spec:
+      containers:
+        - name: rekor-ui
+          image: "{{ tas_single_node_rekor_search_image }}"
+          imagePullPolicy: Always
+          env:
+            - name: NEXT_PUBLIC_REKOR_DEFAULT_DOMAIN
+              value: https://rekor.myrhtas
+          ports:
+            - containerPort: 3000
+              protocol: TCP

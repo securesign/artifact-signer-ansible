@@ -26,5 +26,6 @@ sudo bash -c "cat << EOT >> /etc/hosts
 $ip_address fulcio.myrhtas
 $ip_address tuf.myrhtas
 $ip_address rekor.myrhtas
+$ip_address rekor-search.myrhtas
 EOT"
 EOF

@@ -33,6 +33,7 @@
       "{{ tas_single_node_trillian_enabled }}",
       "true",
       "{{ tas_single_node_tsa_enabled }}",
+      "{{ tas_single_node_rekor_search_enabled }}"
     ]
   loop:
     - "{{ tas_single_node_fulcio_server_image }}"
@@ -46,6 +47,7 @@
     - "{{ tas_single_node_netcat_image }}"
     - "{{ tas_single_node_nginx_image }}"
     - "{{ tas_single_node_tsa_image }}"
+    - "{{ tas_single_node_rekor_search_image }}"
   loop_control:
     index_var: idx
   when: enabled_vals[idx] | bool
@@ -80,3 +82,7 @@
 - name: Configure/Deploy TSA
   ansible.builtin.include_tasks: podman/tsa.yml
   when: tas_single_node_tsa_enabled | bool
+
+- name: Configure/Deploy RekorSearch
+  ansible.builtin.include_tasks: podman/rekor_search.yml
+  when: tas_single_node_rekor_search_enabled | bool
