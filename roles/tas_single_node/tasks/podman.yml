@@ -82,7 +82,7 @@
 - name: Configure/Deploy TSA
   ansible.builtin.include_tasks: podman/tsa.yml
   when: tas_single_node_tsa_enabled | bool
-  
+
 - name: Configure/Deploy RekorSearch
   ansible.builtin.include_tasks: podman/rekor_search.yml
   when: tas_single_node_rekor_search_enabled | bool
