@@ -6,7 +6,6 @@ metadata:
   labels:
     app.kubernetes.io/component: search
     app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rekor-search-ui
     helm.sh/chart: rekor-search-1.0.3
 spec:
@@ -15,7 +14,6 @@ spec:
     matchLabels:
       app.kubernetes.io/component: search
       app.kubernetes.io/instance: scaffold
-      app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: rekor-search-ui
       helm.sh/chart: rekor-search-1.0.3
   template:
@@ -23,7 +21,6 @@ spec:
       labels:
         app.kubernetes.io/component: search
         app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: rekor-search-ui
         helm.sh/chart: rekor-search-1.0.3
     spec:

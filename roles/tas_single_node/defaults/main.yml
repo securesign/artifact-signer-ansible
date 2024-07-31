@@ -99,7 +99,7 @@ tas_single_node_trillian_secret: "{{ tas_single_node_kube_configmap_dir }}/trill
 tas_single_node_systemd_directory: /etc/systemd/system
 
 tas_single_node_setup_host_dns: true
-tas_single_node_base_hostname: "myrhtas"
+tas_single_node_base_hostname: ""
 
 tas_single_node_fulcio_enabled: true
 tas_single_node_fulcio_ca_passphrase: rhtas
