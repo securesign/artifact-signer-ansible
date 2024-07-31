@@ -1,6 +1,8 @@
 name: Test the collection using Ansible Molecule
 on:
   push:
+    branches:
+      - 'main'
   pull_request:
 
 jobs:
@@ -16,6 +18,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements-testing.txt
             ansible-galaxy install -r requirements.yml
+            ansible-galaxy install -r molecule/requirements.yml
         - name: Run molecule
           env:
             TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
