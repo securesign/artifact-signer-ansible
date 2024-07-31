@@ -11,6 +11,8 @@ jobs:
           uses: actions/checkout@v4
         - name: Install dependencies
           run: |
+            python -m venv venv
+            source venv/bin/activate
             python -m pip install --upgrade pip
             pip install -r requirements-testing.txt
             ansible-galaxy install -r requirements.yml
@@ -21,10 +23,12 @@ jobs:
             TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
           run: |
             eval $(ssh-agent -s) # testing-farm CLI right now mandates that ssh-agent is running
+            source venv/bin/activate
             molecule converge --scenario-name default
         - name: Destroy molecule infrastructure
           env:
             TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
           if: always()
           run:
+            source venv/bin/activate
             molecule destroy
