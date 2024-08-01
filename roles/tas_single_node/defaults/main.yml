@@ -58,9 +58,9 @@ tas_single_node_ctlog_public_key_filename: ctlog.pub
 tas_single_node_rekor_signer_filename: rekor-signer.key
 tas_single_node_rekor_public_key_filename: rekor-pub-key.pub
 tas_single_node_tsa_private_key_filename: tsa.key
-tas_single_node_tsa_certificate_chain_filename: certificate-chain.pem
-tas_single_node_tsa_intermediate_certificate_filename: intermediate-certificate.pem
-tas_single_node_tsa_signer_private_key_filename: signer-private-key.pem
+tas_single_node_tsa_certificate_chain_filename: tsa-certificate-chain.pem
+tas_single_node_tsa_leaf_certificate_filename: tsa-leaf-certificate.pem
+tas_single_node_tsa_signer_private_key_filename: tsa-signer-private-key.pem
 
 tas_single_node_remote_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_private_key_filename }}"
 tas_single_node_remote_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ca_filename }}"
@@ -102,7 +102,7 @@ tas_single_node_rekor_search_enabled: true
 tas_single_node_tsa_enabled: true
 tas_single_node_signer_type: file
 tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
-tas_single_node_remote_tsa_intermediate_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_intermediate_certificate_filename }}"
+tas_single_node_remote_tsa_leaf_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_leaf_certificate_filename }}"
 tas_single_node_remote_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
 tas_single_node_remote_tsa_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
 
