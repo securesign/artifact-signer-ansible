@@ -1,5 +1,8 @@
-tas_single_node_oidc_issuers: "https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer"
-tas_single_node_issuer_url: "https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer"
+tas_single_node_oidc_issuers:
+  - issuer: "https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer"
+    url: "https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer"
+    client_id: trusted-artifact-signer
+    type: email
 tas_single_node_base_hostname: myrhtas
 tas_single_node_cockpit:
   enabled: false
