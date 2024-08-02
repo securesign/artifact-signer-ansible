@@ -75,8 +75,11 @@ In order to deploy RHTAS on a RHEL 9.2+ VM:
   - hosts: rhtas
     vars:
       base_hostname: TODO # e.g. example.com
-      tas_single_node_oidc_issuers: TODO # your OIDC provider (e.g. keycloak) URL
-      tas_single_node_issuer_url: TODO # your OIDC provider (e.g. keycloak) URL
+      tas_single_node_oidc_issuers:
+        - issuer: TODO # your OIDC provider (e.g. keycloak) URL
+          client_id: trusted-artifact-signer
+          url: TODO # your OIDC provider (e.g. keycloak) URL
+          type: email
     tasks:
       - name: Include TAS single node role
         ansible.builtin.include_role:

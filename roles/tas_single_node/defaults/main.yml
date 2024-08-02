@@ -115,10 +115,11 @@ tas_single_node_tink_hcvault_token: ""
 
 tas_single_node_scaffolding_utils_image: quay.io/ablock/sigstore-scaffolding-helper:latest
 
-tas_single_node_oidc_issuers: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
-tas_single_node_oidc_client_id: trusted-artifact-signer
-tas_single_node_issuer_url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
-tas_single_node_oidc_issuers_type: email
+tas_single_node_oidc_issuers:
+  - issuer: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
+    client_id: trusted-artifact-signer
+    url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
+    type: email
 
 # RHTAS Images
 tas_single_node_fulcio_server_image:
