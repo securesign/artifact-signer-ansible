@@ -173,7 +173,7 @@
         cmd: >-
           openssl req -new -batch
           -key '{{ tas_single_node_remote_tsa_private_key }}'
-          -subj '/CN=Root CA'
+          -subj '/CN=TSA Root CA'
           -addext 'basicConstraints=critical,CA:TRUE'
           -addext 'keyUsage = keyCertSign'
           -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
@@ -199,8 +199,8 @@
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
-    # Intermediate certificate
-    - name: Create TSA intermediate CA private key
+    # Leaf certificate
+    - name: Create TSA leaf CA private key
       ansible.builtin.shell:
         cmd: >-
           set -o pipefail &&
@@ -214,43 +214,43 @@
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_signer_private_key) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
-    - name: Create TSA intermediate CA CSR
+    - name: Create TSA leaf CSR
       ansible.builtin.command:
         cmd: >-
           openssl req -new -batch
           -key '{{ tas_single_node_remote_tsa_signer_private_key }}'
-          -subj '/CN=Intermediate CA'
-          -addext 'basicConstraints=critical,CA:TRUE'
-          -addext 'keyUsage = keyCertSign'
-          -addext 'extendedKeyUsage = critical,1.3.6.1.5.5.7.3.8'
+          -subj '/CN=TSA Leaf certificate'
+          -addext 'basicConstraints=critical,CA:FALSE'
+          -addext 'keyUsage = critical,digitalSignature'
+          -addext 'extendedKeyUsage = critical,timeStamping'
           -passin 'pass:{{ tas_single_node_tsa_signer_passphrase }}'
-      register: tsa_intermediate_csr
+      register: tsa_leaf_csr
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
       changed_when: false
 
-    - name: Sign intermediate CA with Root CA
+    - name: Sign leaf certificate with Root CA
       ansible.builtin.shell:
         # valid for two years
         cmd: >-
           set -o pipefail &&
-          echo "{{ tsa_intermediate_csr.stdout }}" |
+          echo "{{ tsa_leaf_csr.stdout }}" |
           openssl x509 -req -days 730
           -copy_extensions copyall
           -CA '{{ tas_single_node_remote_tsa_certificate_chain }}'
           -CAkey '{{ tas_single_node_remote_tsa_private_key }}'
           -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
-          -out '{{ tas_single_node_remote_tsa_intermediate_certificate }}'
-        creates: "{{ tas_single_node_remote_tsa_intermediate_certificate }}"
+          -out '{{ tas_single_node_remote_tsa_leaf_certificate }}'
+        creates: "{{ tas_single_node_remote_tsa_leaf_certificate }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
-    - name: Combine intermediate and root CA certificates into a chain
+    - name: Combine leaf and root CA certificates into a chain
       ansible.builtin.command: >
         /bin/bash -c '
-        cat {{ tas_single_node_remote_tsa_intermediate_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > /tmp/certificate-chain.tmp &&
+        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > /tmp/certificate-chain.tmp &&
         mv /tmp/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
       register: result
       changed_when: "'changed' in result.stdout"
