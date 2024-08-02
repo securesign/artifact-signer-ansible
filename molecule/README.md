@@ -34,8 +34,8 @@ Molecule has [multiple commands](https://ansible.readthedocs.io/projects/molecul
 * `molecule create` - creates the VM and stops
 * `molecule destroy` - destroys the VM and stops
 * `molecule reset` - wipe out locally cached data about created VMs without destroying them
-* `molecule verify` - run verification steps on a provisioned VM
 * `molecule converge` - runs `create` (skips if VM is already created) and then converges (applies `molecule/<scenario>/converge.yml` which applies the role)
+* `molecule verify` - run verification steps on a provisioned VM (expects that you already converged it)
 * `molecule idempotence` - converges twice; fails if there are `changed` tasks on the second run
 * `molecule test` - runs `converge`, `idempotence`, `verify` and `destroy`
 
