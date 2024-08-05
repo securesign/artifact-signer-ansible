@@ -11,14 +11,12 @@
     msg: "'tas_single_node_base_hostname' must be specified"
 
 - name: Create certificates directory
-  become: true
   ansible.builtin.file:
     state: directory
     dest: "{{ tas_single_node_certs_dir }}"
     mode: "0700"
 
 - name: List files in certs directory
-  become: true
   ansible.builtin.find:
     file_type: file
     paths: "{{ tas_single_node_certs_dir }}"
