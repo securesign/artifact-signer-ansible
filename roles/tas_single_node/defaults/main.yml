@@ -121,6 +121,23 @@ tas_single_node_oidc_issuers:
     url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
     type: email
 
+tas_single_node_meta_issuers:
+  - issuer_pattern: "https://*.oic.prod-aks.azure.com/*"
+    client_id: "sigstore"
+    type: "kubernetes"
+  - issuer_pattern: "https://container.googleapis.com/v1/projects/*/locations/*/clusters/*"
+    client_id: "sigstore"
+    type: "kubernetes"
+  - issuer_pattern: "https://oidc.eks.*.amazonaws.com/id/*"
+    client_id: "sigstore"
+    type: "kubernetes"
+  - issuer_pattern: "https://oidc.prod-aks.azure.com/*"
+    client_id: "sigstore"
+    type: "kubernetes"
+  - issuer_pattern: "https://token.actions.githubusercontent.com/*"
+    client_id: "sigstore"
+    type: "github-workflow"
+
 # RHTAS Images
 tas_single_node_fulcio_server_image:
   "registry.redhat.io/rhtas/fulcio-rhel9@sha256:e16accb01b2ca6bf4ebd60c6ce7faab73b784828578ee74305a3a97ff9db1e26"
