@@ -1,9 +1,6 @@
 ---
 - name: Install Operating System Components
   ansible.builtin.include_tasks: os.yml
-  args:
-    apply:
-      become: true
   when: not tas_single_node_skip_os_install
 
 - name: Create Certificates
@@ -11,6 +8,3 @@
 
 - name: Execute Podman Actions
   ansible.builtin.include_tasks: podman.yml
-  args:
-    apply:
-      become: true
