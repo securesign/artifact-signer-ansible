@@ -4,12 +4,12 @@
   gather_facts: true
   tasks:
     - name: Fail if the OS is not RHEL
-      fail:
+      ansible.builtin.fail:
         msg: "Unsupported OS. This playbook supports only RHEL."
       when: ansible_facts['os_family'] != 'RedHat'
 
     - name: Fail if the OS version is lower than 9.2
-      fail:
+      ansible.builtin.fail:
         msg: "Unsupported OS version. This playbook supports only RHEL 9.2 or higher."
       when: (ansible_facts['distribution'] == 'RedHat' and
              (ansible_facts['distribution_major_version'] | int < 9 or
@@ -17,10 +17,10 @@
                ansible_facts['distribution_minor_version'] | int < 2)))
 
     - name: Fail if the architecture is not x86_64
-      fail:
+      ansible.builtin.fail:
         msg: "Unsupported architecture. This playbook supports only x86_64."
       when: ansible_facts['architecture'] != 'x86_64'
-      
+
 - name: Install System Packages dependencies
   ansible.builtin.package:
     name: "{{ tas_single_node_system_packages }}"
