@@ -121,10 +121,7 @@ tas_single_node_oidc_issuers:
     url: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer
     type: email
 
-tas_single_node_meta_issuers:
-  - issuer: ""
-    client_id: ""
-    type: ""
+tas_single_node_meta_issuers: []
 
 # RHTAS Images
 tas_single_node_fulcio_server_image:
