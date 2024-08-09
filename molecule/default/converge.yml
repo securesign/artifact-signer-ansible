@@ -1,0 +1,20 @@
+---
+- name: Converge
+  hosts: molecule
+  gather_facts: true
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: Error out if registry username is not set
+      ansible.builtin.fail:
+        msg: "Username for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_USERNAME env variable"
+      when: tas_single_node_registry_username == ""
+
+    - name: Error out if registry password is not set
+      ansible.builtin.fail:
+        msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
+      when: tas_single_node_registry_password == ""
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
