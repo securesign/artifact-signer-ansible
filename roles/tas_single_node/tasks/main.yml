@@ -1,4 +1,7 @@
 ---
+- name: Check OS System Support
+  ansible.builtin.include_tasks: os_support.yml
+
 - name: Install Operating System Components
   ansible.builtin.include_tasks: os.yml
   when: not tas_single_node_skip_os_install
@@ -8,6 +11,3 @@
 
 - name: Execute Podman Actions
   ansible.builtin.include_tasks: podman.yml
-
-- name: Check OS System Support
-  ansible.builtin.include_tasks: os_support.yml
