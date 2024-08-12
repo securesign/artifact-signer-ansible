@@ -1,0 +1,17 @@
+- name: Fail if the OS is not RHEL
+  ansible.builtin.fail:
+    msg: "Unsupported OS. This role supports only RHEL and CentOS."
+  when: ansible_facts['os_family'] != 'RedHat'
+
+- name: Fail if the OS version is lower than 9.2
+  ansible.builtin.fail:
+    msg: "Unsupported OS version. This role supports only RHEL 9.2 or higher or CentOS."
+  when: (ansible_facts['distribution'] in ['RedHat', 'CentOS'] and
+    (ansible_facts['distribution_major_version'] | int < 9 or
+    (ansible_facts['distribution_major_version'] | int == 9 and
+    ansible_facts['distribution_minor_version'] | int < 2)))
+
+- name: Fail if the architecture is not x86_64
+  ansible.builtin.fail:
+    msg: "Unsupported architecture. This role supports only x86_64."
+  when: ansible_facts['architecture'] != 'x86_64'

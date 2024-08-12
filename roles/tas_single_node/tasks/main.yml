@@ -8,3 +8,6 @@
 
 - name: Execute Podman Actions
   ansible.builtin.include_tasks: podman.yml
+
+- name: Check OS System Support
+  ansible.builtin.include_tasks: os_support.yml
