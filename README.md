@@ -1,4 +1,4 @@
-# artifact-signer-ansible
+# RHTAS Ansible Collection
 
 Automation to deploy the RHTAS ecosystem on RHEL
 
@@ -13,8 +13,11 @@ The following Sigstore components are deployed as part of this architecture:
 
 * [Rekor](https://docs.sigstore.dev/rekor/overview)
     * [Trillian](https://github.com/google/trillian)
+    * Optionally a MariaDB instance and a Redis instance, although it is possible to use instances managed outside of Ansible
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
+* [Timestamp Authority](https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities)
+* [TUF](https://theupdateframework.io/) server
 
 An [NGINX](https://www.nginx.com) frontend is placed as an entrypoint to the various backend components. Communication is secured via a set of self-signed certificates that are generated at runtime.
 
@@ -22,7 +25,7 @@ Utilize the steps below to understand how to setup and execute the provisioning.
 
 ## Prerequisites
 
-A RHEL 9.2+ server should be used to run the RHTAS components.
+RHEL 9.2+ x86\_64 is supported to run the RHTAS components.
 
 Ansible must be installed and configured on a control node that will be used to perform the automation.
 
@@ -30,7 +33,7 @@ Perform the following steps to prepare the control node for execution.
 
 ### Dependencies
 
-Install the required Ansible collections by executing the following
+Install the required Ansible collections by executing the following (this can be skipped if installing from Ansible Automation Hub, as `ansible-galaxy install` will install dependencies automatically).
 
 ```shell
 ansible-galaxy collection install -r requirements.yml
@@ -38,7 +41,7 @@ ansible-galaxy collection install -r requirements.yml
 
 ### OIDC provider
 
-An installation of Keycloak must be provided to allow for integration with containerized RHTAS.
+An installation of an OIDC provider, such as [Keycloak](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/sso/), must be provided to allow for integration with containerized RHTAS.
 
 ### Ingress
 
@@ -46,14 +49,15 @@ The automation deploys and configures a software load balancer as a central poin
 
 * https://rekor.<base_hostname>
 * https://fulcio.<base_hostname>
+* https://tsa.<base_hostname>
 * https://tuf.<base_hostname>
 
-each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided
-when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts` with the following content:
+Each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts` with the following content:
 
 ```
 <REMOTE_IP_ADDRESS> fulcio.<base_hostname> fulcio
 <REMOTE_IP_ADDRESS> rekor.<base_hostname> rekor
+<REMOTE_IP_ADDRESS> tsa.<base_hostname> tsa
 <REMOTE_IP_ADDRESS> tuf.<base_hostname> tuf
 ```
 
@@ -68,13 +72,16 @@ In order to deploy RHTAS on a RHEL 9.2+ VM:
 1. Create an `inventory` file with a single VM in the `rhtas` group:
   ```
   [rhtas]
-  123.123.123.123 become=true
+  123.123.123.123
   ```
 2. Create a simple Ansible playbook `play.yml`:
   ```
   - hosts: rhtas
     vars:
       base_hostname: TODO # e.g. example.com
+      # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
+      tas_single_node_registry_username: TODO
+      tas_single_node_registry_password: TODO
       tas_single_node_oidc_issuers:
         - issuer: TODO # your OIDC provider (e.g. keycloak) URL
           client_id: trusted-artifact-signer
@@ -84,16 +91,22 @@ In order to deploy RHTAS on a RHEL 9.2+ VM:
       - name: Include TAS single node role
         ansible.builtin.include_role:
           name: tas_single_node
+        vars:
+          ansible_become: true
   ```
-3. Execute the following command (NOTE: you will have to provide credentials to authenticate to registry.redhat.io: https://access.redhat.com/RegistryAuthentication):
+3. Execute the following command if the collection is installed from Ansible Automation Hub:
   ```shell
-  ANSIBLE_ROLES_PATH="roles/" ansible-playbook -i inventory play.yml -e registry_username='REGISTRY.REDHAT.IO_USERNAME' -e registry_password='REGISTRY.REDHAT.IO_PASSWORD'
+  ansible-playbook -i inventory play.yml
+  ```
+4. Execute the following command if you're running from the collection repository checked out locally:
+  ```shell
+  ANSIBLE_ROLES_PATH="roles/" ansible-playbook -i inventory play.yml
   ```
 
 ### Add the root CA that was created to your local truststore.
 
 The certificate can be downloaded from the browser Certificate Viewer by navigating to `https://rekor.<base_domain>`.
-Download the _root_ certiicate that issued the rekor certificate.
+Download the _root_ certificate that issued the Rekor certificate.
 In Red Hat based systems, the following commands will add a CA to the system truststore.
 
 ```shell

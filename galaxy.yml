@@ -5,9 +5,13 @@ version: 1.0.0
 
 readme: README.md
 authors:
-  - Red Hat
-  - TODO
-description: TODO
+  - Andrew Block <ablock@redhat.com>
+  - Firas Ghanmi <fghanmi@redhat.com>
+  - Nina Olear <nolear@redhat.com>
+  - Ryan Cook <rcook@redhat.com>
+  - Slavek Kabrda <bkabrda@redhat.com>
+  - Tommy Dalton <tdalton@redhat.com>
+description: Install and configure RHTAS, a downstream redistribution of the Sigstore project.
 license_file: Apache-2.0
 tags: [sigstore, tas, rhtas, security, cosign]
 # NOTE: when updating, also update dependencies in requirements.yml
@@ -15,7 +19,15 @@ dependencies:
   containers.podman: ">=1.15.0"
 repository: https://github.com/securesign/artifact-signer-ansible/
 documentation: http://TODO.com
-homepage: https://TODO.com
+homepage: https://github.com/securesign/artifact-signer-ansible#rhtas-ansible-collection
 issues: https://github.com/securesign/artifact-signer-ansible/issues
 
-build_ignore: [.ansible-lint, .github, .gitignore, .vscode, requirements-testing.txt, vm-testing]
+build_ignore:
+  - .ansible-lint
+  - .github
+  - .gitignore
+  - .vscode
+  - ansible-navigator.log
+  - molecule
+  - requirements-testing.txt
+  - vm-testing

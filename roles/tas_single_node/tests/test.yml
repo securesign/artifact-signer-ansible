@@ -1,6 +1,0 @@
----
-- name: Install TAS locally
-  hosts: localhost
-  remote_user: root
-  roles:
-    - tas_single_node
