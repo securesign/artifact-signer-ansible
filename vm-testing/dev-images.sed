@@ -11,3 +11,4 @@ s#registry.redhat.io/rhtas/certificate-transparency-rhel9#quay.io/securesign/cer
 s#registry.redhat.io/rhtas/client-server-cg-rhel9#quay.io/securesign/cli-client-server-cg#
 s#registry.redhat.io/rhtas/client-server-re-rhel9#quay.io/securesign/client-server-re#
 s#registry.redhat.io/rhtas/segment-reporting-rhel9#quay.io/securesign/segment-backup-job#
+s#registry.redhat.io/rhtas/timestamp-authority-rhel9#quay.io/securesign/timestamp-authority#

@@ -145,6 +145,6 @@ tas_single_node_netcat_image:
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe"
 tas_single_node_tsa_image:
-  "quay.io/redhat-user-workloads/rhtas-tenant/timestamp-authority/timestamp-authority@sha256:a13834438c2b7f9441535783880daa01e1cdb1f26255311352b38ebbb154abac"
+  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:9983bb5f29be5af3cb3ec045a609eca66c7e91c34eb00f17e4d50dc5d441c0b4"
 tas_single_node_rekor_search_image:
   "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8486888c1af02c4d6bade9d00e2c84589b206e2e195f266c03ed1937babcdaa7"
