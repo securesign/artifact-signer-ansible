@@ -17,7 +17,8 @@ pip install ansible       # Install Ansible
 Before starting, you will need to:
 * Get an API token for your OpenStack instance according to the [docs](https://docs.openstack.org/api-quick-start/api-quick-start.html). *Note that the token has an expiration date and needs to be refreshed when it expires.*
 * Create an SSH keypair at `/dashboard/project/key_pairs` page of you OpenStack instance.
-* Switch images from `registry.redhat.io` images to the dev images by running `sed -f vm-testing/dev-images.sed  -i roles/tas_single_node/defaults/main.yml`
+* Switch images from `registry.redhat.io` images to the dev images by running 
+`sed -f vm-testing/dev-images.sed  -i roles/tas_single_node/defaults/main.yml`
 
 When you have the above, create an `openstack/terraform.tfvars` file with following contents:
 
