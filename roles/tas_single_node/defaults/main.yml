@@ -125,17 +125,17 @@ tas_single_node_meta_issuers: []
 
 # RHTAS Images
 tas_single_node_fulcio_server_image:
-  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:1ebf0160eadd707bd087d46e08272cab5ec2935446c3ddb6b9a2da24ad5c84bf"
+  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513"
 tas_single_node_trillian_log_server_image:
   "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208"
 tas_single_node_trillian_logsigner_image:
   "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0"
 tas_single_node_rekor_image:
-  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:73767ee1df9c9e63d5d20f5eee83dcb828fea4c5400ee771114577c02f335f66"
+  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae"
 tas_single_node_ct_server_image:
-  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:1588b8e97456806b4f76f8e1e63f3c089f2bc3b898f18f43c22d03dbc03b4c15"
+  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:a0c7d71fc8f4cb7530169a6b54dc3a67215c4058a45f84b87bb04fc62e6e8141"
 tas_single_node_redis_image:
-  "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:5ee318e1f13b3e4bbabc4c4250c12d986cacfce28978203e502f4d91d023592c"
+  "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:01736bdd96acbc646334a1109409862210e5273394c35fb244f21a143af9f83e"
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:909f584804245f8a9e05ecc4d6874c26d56c0d742ba793c1a4357a14f5e67eb0"
 tas_single_node_tuf_image:
@@ -147,4 +147,4 @@ tas_single_node_nginx_image:
 tas_single_node_tsa_image:
   "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:9983bb5f29be5af3cb3ec045a609eca66c7e91c34eb00f17e4d50dc5d441c0b4"
 tas_single_node_rekor_search_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8486888c1af02c4d6bade9d00e2c84589b206e2e195f266c03ed1937babcdaa7"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b"
