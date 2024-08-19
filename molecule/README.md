@@ -21,7 +21,8 @@ Next, export following values in your shell environment:
 ```
 export TAS_SINGLE_NODE_REGISTRY_USERNAME=<your-username-for-registry.redhat.io>
 export TAS_SINGLE_NODE_REGISTRY_PASSWORD=<your-password-for-registry.redhat.io>
-# get this from the Testing Farm team
+# get a token at https://testing-farm.io/tokens/
+# you can sign in with a Fedora account, but it must be "CLA+1" (signed CLA and a member of at least 1 other group)
 export TESTING_FARM_API_TOKEN=<your-testing-farm-token>
 ```
 
