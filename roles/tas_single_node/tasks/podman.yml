@@ -15,8 +15,8 @@
 - name: Podman check login
   ansible.builtin.command: podman login --get-login registry.redhat.io
   register: loginCheck
-  changed_when: False
-  ignore_errors: true
+  failed_when: loginCheck.stdout == "Nil val"
+  changed_when: loginCheck.stdout | string != tas_single_node_registry_username | string
 
 - name: Podman login to registry.redhat.io
   ansible.builtin.command: podman login registry.redhat.io -u '{{ tas_single_node_registry_username }}' --password {{ tas_single_node_registry_password }}
