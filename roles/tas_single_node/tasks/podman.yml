@@ -14,14 +14,14 @@
 
 - name: Podman check login
   ansible.builtin.command: podman login --get-login registry.redhat.io
-  register: loginCheck
-  failed_when: loginCheck.stdout == "Nil val"
-  changed_when: loginCheck.stdout | string != tas_single_node_registry_username | string
+  register: logincheck
+  failed_when: logincheck.stdout == "Nil val"
+  changed_when: logincheck.stdout | string != tas_single_node_registry_username | string
 
 - name: Podman login to registry.redhat.io
   ansible.builtin.command: podman login registry.redhat.io -u '{{ tas_single_node_registry_username }}' --password {{ tas_single_node_registry_password }}
   register: podman_login_result
-  when: loginCheck.stdout | string != tas_single_node_registry_username | string
+  when: logincheck.stdout | string != tas_single_node_registry_username | string
 
 - name: Pull all images
   containers.podman.podman_image:
