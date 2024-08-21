@@ -11,6 +11,7 @@ authors:
   - Ryan Cook <rcook@redhat.com>
   - Slavek Kabrda <bkabrda@redhat.com>
   - Tommy Dalton <tdalton@redhat.com>
+  - Aleksy Siek <asiek@redhat.com>
 description: Install and configure RHTAS, a downstream redistribution of the Sigstore project.
 license_file: Apache-2.0
 tags: [sigstore, tas, rhtas, security, cosign]
