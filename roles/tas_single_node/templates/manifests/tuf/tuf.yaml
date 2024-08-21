@@ -35,6 +35,7 @@ spec:
           env:
             - name: NAMESPACE
               value: tuf-system
+          args: ["-no-k8s"]
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
