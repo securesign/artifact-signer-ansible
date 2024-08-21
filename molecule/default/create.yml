@@ -1,0 +1,137 @@
+---
+# TODO: improve idempotency and error handling throughout this file,
+# specifically for the testing-farm call
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    debug_outputs: true
+    molecule_inventory:
+      all:
+        children:
+          molecule:
+            hosts: {}
+  tasks:
+    - name: Inform user we're about to create the VM
+      ansible.builtin.debug:
+        msg: Creating Testing Farm VM instance
+
+    - name: Define private key path
+      ansible.builtin.set_fact:
+        private_key_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/id_rsa"
+
+    - name: "Generate local key pair {{ private_key_path }}"
+      community.crypto.openssh_keypair:
+        path: "{{ private_key_path }}"
+        type: rsa
+        size: 4096
+        regenerate: never
+        backend: cryptography
+        private_key_format: pkcs1
+      register: local_keypair
+
+    - name: Create the VM using testing-farm
+      ansible.builtin.command:
+        cmd: >-
+          testing-farm reserve
+            --compose {{ item.compose }}
+            --arch {{ item.arch | default("x86_64", true) }}
+            --duration {{ item.duration | default(30, true) }}
+            --ssh-public-key {{ private_key_path }}.pub
+            --no-autoconnect
+      register: tf_results
+      with_items: "{{ molecule_yml.platforms }}"
+      changed_when: true
+      async: 360
+      poll: 5
+
+    # - name: Testing output
+    #   ansible.builtin.command:
+    #     cmd: "echo '0acccef6-7ce6-4bb6-a0b4-3428762aa3ae root@1.2.3.4'"
+    #   register: tf_results
+    #   with_items: "{{ molecule_yml.platforms }}"
+    #   changed_when: true
+
+    - name: Debug testing-farm results
+      ansible.builtin.debug:
+        msg: "{{ tf_results }}"
+      when: debug_outputs
+
+    - name: Initialize variable for parsed testing-farm results
+      ansible.builtin.set_fact:
+        tf_parsed_results: []
+
+    - name: Parse testing-farm result
+      ansible.builtin.include_tasks:
+        file: "tasks/_parse_tf_results.yml"
+      with_items: "{{ tf_results.results }}"
+
+    - name: Debug parsed testing-farm results
+      ansible.builtin.debug:
+        msg: "{{ tf_parsed_results }}"
+      when: debug_outputs
+
+    # TODO: idempotency
+    - name: Populate instance config dict  # noqa jinja
+      ansible.builtin.set_fact:
+        instance_conf_dict: {
+          'instance': "{{ item.uuid }}",
+          'address': "{{ item.ip }}",
+          # TODO: testing-farm is giving us root by default, ideally we would get non-root to get conditions closer to prod environments
+          'user': "{{ item.username }}",
+          'port': "22", # TODO: get it dynamically
+          'identity_file': "{{ private_key_path  }}",
+        }
+      with_items: "{{ tf_parsed_results }}"
+      register: instance_config_dict
+
+    - name: Convert instance config dict to a list
+      ansible.builtin.set_fact:
+        instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+
+    - name: Debug instance_conf
+      ansible.builtin.debug:
+        msg: "{{ instance_conf }}"
+      when: debug_outputs
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: |
+          # Molecule managed
+
+          {{ instance_conf | to_json | from_json | to_yaml }}
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
+
+    - name: Add VM to molecule_inventory
+      vars:
+        inventory_partial_yaml: |
+          all:
+            children:
+              molecule:
+                hosts:
+                  "{{ item.address }}":
+                    ansible_user: {{ item.user }}
+                    ansible_ssh_private_key_file: {{ private_key_path }}
+      ansible.builtin.set_fact:
+        molecule_inventory: >
+          {{ molecule_inventory | combine(inventory_partial_yaml | from_yaml, recursive=true) }}
+      loop: "{{ instance_conf }}"
+
+    - name: Dump molecule_inventory
+      ansible.builtin.copy:
+        content: |
+          {{ molecule_inventory | to_yaml }}
+        dest: "{{ molecule_ephemeral_directory }}/inventory/molecule_inventory.yml"
+        mode: "0600"
+
+    - name: Force inventory refresh
+      ansible.builtin.meta: refresh_inventory
+
+    - name: Fail if molecule group is missing
+      ansible.builtin.assert:
+        that: "'molecule' in groups"
+        fail_msg: |
+          molecule group was not found inside inventory groups: {{ groups }}
+      run_once: true # noqa: run-once[task]

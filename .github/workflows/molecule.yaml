@@ -1,0 +1,41 @@
+name: Test the collection using Ansible Molecule
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  molecule:
+    runs-on: testing-farm
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+        - name: Install dependencies
+          run: |
+            python -m venv venv
+            source venv/bin/activate
+            python -m pip install --upgrade pip
+            pip install -r requirements-testing.txt
+            ansible-galaxy install -r requirements.yml
+            ansible-galaxy install -r molecule/requirements.yml
+        - name: Run molecule
+          env:
+            TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
+            TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
+            TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
+          run: |
+            eval $(ssh-agent -s) # testing-farm CLI right now mandates that ssh-agent is running
+            source venv/bin/activate
+            # ensure we wipe out any data potentially still on the runner from previous run
+            molecule reset
+            # NOTE: for now we don't run "molecule test", because we don't have proper idempotence yet
+            molecule -v converge --scenario-name default
+            molecule -v verify --scenario-name default
+        - name: Destroy molecule infrastructure
+          env:
+            TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
+          if: always()
+          run:
+            source venv/bin/activate
+            molecule destroy

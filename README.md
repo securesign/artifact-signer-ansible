@@ -205,7 +205,7 @@ When this is achieved, you can run sanity checks by executing
 
 ### Testing Deployment on a VM
 
-The [vm-testing/README.md](vm-testing/README.md) file contains instructions on testing the deployment on a VM. Right now, only OpenStack is supported as testing VM provisioner.
+The [molecule/README.md](molecule/README.md) file contains instructions on testing the deployment on a VM. By default, [testing-farm](https://docs.testing-farm.io/) is used as the VM provider.
 
 ## Feedback
 
