@@ -19,6 +19,18 @@
         cmd: "testing-farm cancel {{ item['instance'] }}"
       with_items: "{{ instance_configs }}"
       changed_when: true
+      failed_when: false
+      register: cancel_results
+
+    - name: Find out if some cancel requests failed
+      ansible.builtin.set_fact:
+        cancel_failed:
+          "{{ cancel_results.results | selectattr('rc', 'ne', 0) | rejectattr('stdout_lines', 'match', '.* already finished.*') }}"
+
+    - name: Fail if some cancel requests failed
+      ansible.builtin.fail:
+        msg: "Failed to cancel some requests: {{ cancel_failed }}"
+      when: cancel_failed | length > 0
 
     - name: Dump instance config
       ansible.builtin.copy:
