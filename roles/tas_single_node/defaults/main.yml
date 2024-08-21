@@ -139,7 +139,7 @@ tas_single_node_redis_image:
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:58140d6b7fee762b148336b342a6745b1910ab758a701b2e8077b1fca2af1180"
 tas_single_node_tuf_image:
-  "quay.io/securesign/tuf/server:latest"
+  "quay.io/securesign/scaffold-tuf-server@sha256:34f5cdc53a908ae2819d85ab18e35b69dc4efc135d747dd1d2e216a99a2dcd1b"
 tas_single_node_netcat_image:
   "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
 tas_single_node_nginx_image:
