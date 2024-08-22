@@ -13,7 +13,8 @@ python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements-testing.txt
 ansible-galaxy install -r requirements.yml
-ansible-galaxy install -r molecule/requirements.yml
+ansible-galaxy install -r molecule/requirements.yml  
+sed -f vm-testing/dev-images.sed  -i roles/tas_single_node/defaults/main.yml
 ```
 
 Next, export following values in your shell environment:
