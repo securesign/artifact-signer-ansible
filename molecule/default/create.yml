@@ -43,7 +43,7 @@
       register: tf_results
       with_items: "{{ molecule_yml.platforms }}"
       changed_when: true
-      async: 360
+      async: 500
       poll: 5
 
     # - name: Testing output
