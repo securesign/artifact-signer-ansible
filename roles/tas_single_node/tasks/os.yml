@@ -2,6 +2,7 @@
 - name: Install System Packages dependencies
   ansible.builtin.package:
     name: "{{ tas_single_node_system_packages }}"
+    state: latest
 
 - name: Install Cockpit
   ansible.builtin.include_role:
