@@ -12,17 +12,16 @@
     - "{{ tas_single_node_kube_manifest_dir }}"
     - "{{ tas_single_node_kube_configmap_dir }}"
 
-- name: Podman check login
+- name: Check if Podman is already logged in to registry.redhat.io
   ansible.builtin.command: podman login --get-login registry.redhat.io
   register: logincheck
-  failed_when: logincheck.stdout == "Nil val"
+  failed_when: logincheck.stdout == 'Error":" not logged into registry.redhat.io'
   changed_when: logincheck.stdout | string != tas_single_node_registry_username | string
 
 - name: Podman login to registry.redhat.io
   ansible.builtin.command: podman login registry.redhat.io -u '{{ tas_single_node_registry_username }}' --password {{ tas_single_node_registry_password }}
   register: podman_login_result
   when: logincheck.stdout | string != tas_single_node_registry_username | string
-  changed_when: '"Login Succeeded!" in podman_login_result.stdout'
 
 - name: Pull all images
   containers.podman.podman_image:
