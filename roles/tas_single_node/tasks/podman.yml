@@ -22,6 +22,7 @@
   ansible.builtin.command: podman login registry.redhat.io -u '{{ tas_single_node_registry_username }}' --password {{ tas_single_node_registry_password }}
   register: podman_login_result
   when: logincheck.stdout | string != tas_single_node_registry_username | string
+  changed_when: true
 
 - name: Pull all images
   containers.podman.podman_image:
