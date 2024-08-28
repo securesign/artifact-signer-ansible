@@ -1,6 +1,17 @@
 ---
 # vars file for sigstore_scaffolding
+tas_single_node_system_packages:
+  - podman
+  - podman-plugins
+  - firewalld
 
+tas_single_node_cockpit:
+  enabled: false
+  cockpit_packages:
+    - cockpit-storaged
+    - cockpit-podman
+    - cockpit
+  cockpit_manage_firewall: true
 
 tas_single_node_rekor_templates:
   - manifests/rekor/redis-server.j2

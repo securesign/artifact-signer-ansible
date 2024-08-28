@@ -1,19 +1,6 @@
 ---
 # defaults file for tas_single_node
-tas_single_node_system_packages:
-  - podman
-  - podman-plugins
-  - firewalld
-
 tas_single_node_podman_network: rhtas
-
-tas_single_node_cockpit:
-  enabled: true
-  cockpit_packages:
-    - cockpit-storaged
-    - cockpit-podman
-    - cockpit
-  cockpit_manage_firewall: true
 
 tas_single_node_rekor_redis:
   database_deploy: true
