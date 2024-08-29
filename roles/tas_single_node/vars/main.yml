@@ -17,6 +17,15 @@ tas_single_node_rekor_templates:
   - manifests/rekor/redis-server.j2
   - manifests/rekor/rekor-server.j2
 
+# Individual service enablement
+tas_single_node_trillian_enabled: true
+tas_single_node_rekor_enabled: true
+tas_single_node_ctlog_enabled: true
+tas_single_node_tuf_enabled: true
+tas_single_node_tsa_enabled: true
+tas_single_node_fulcio_enabled: true
+tas_single_node_rekor_search_enabled: true
+
 # Directory Structure
 tas_single_node_config_dir: /etc/rhtas
 tas_single_node_certs_dir: "{{ tas_single_node_config_dir }}/certs"

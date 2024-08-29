@@ -12,7 +12,7 @@
         name: trillian-mysql
         namespace: trillian-system
       data:
-        mysql-root-password: "{{ tas_single_node_trillian.mysql.rootPassword | b64encode }}"
+        mysql-root-password: "{{ tas_single_node_trillian.mysql.root_password | b64encode }}"
         mysql-password: "{{ tas_single_node_trillian.mysql.password | b64encode }}"
         mysql-database: "{{ tas_single_node_trillian.mysql.database | b64encode }}"
         mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"

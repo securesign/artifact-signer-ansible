@@ -1,0 +1,63 @@
+<!--- to update this file, update files in the role's meta/ directory (and/or its README.j2 template) and run "make role-readme" -->
+# Ansible Role: {{ role }}
+
+{%- if "version" in galaxy_collection %}
+Version: {{ galaxy_collection.version }}
+{% endif %}
+{{ argument_specs["main"].description }} Requires RHEL >= 9.2.
+
+## Role Arguments
+{% set path, options=entrypoint_options["main"][0] -%}
+
+### Required
+|Option|Description|Type|Default|
+|---|---|---|---|
+{%- for name, details in options.items() %}{% if details.required | default(false) %}
+| {{ name }} | {{ details.display_description }} | {{ details.display_type }} | {% if details.display_default %} `{{ details.display_default }}` {% endif %} |
+{%- endif %}{%- endfor %}
+
+### Optional
+|Option|Description|Type|Default|
+|---|---|---|---|
+{%- for name, details in options.items() %}{% if not details.required | default(false) %}
+| {{ name }} | {{ details.display_description }} | {{ details.display_type }} | {% if details.display_default %} `{{ details.display_default }}` {% endif %} |
+{%- endif %}{%- endfor %}
+
+{% if entrypoint_options["main"] | length > 1 -%}
+{% for path, options in entrypoint_options["main"][1:] -%}
+#### Options for {{ path | join(" > ") }}
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+{%- for name, details in options.items() %}
+| {{ name }} | {{ details.display_description }} | {{ details.display_type }} | {{ details.display_required }} | {% if details.display_default %} `{{ details.display_default }}` {% endif %} |
+{%- endfor %}
+
+{% endfor -%}
+{% endif -%}
+
+## Example Playbook
+
+```
+- hosts: rhtas
+  vars:
+    {% for name, variable in argument_specs.main.options | items -%}
+    {%- if variable.required | default(false) -%}
+    {{ name }}: # TODO: required, type: {{ variable.type }}
+    {% endif -%}
+    {% endfor %}
+  tasks:
+    - name: Include TAS single node role
+      ansible.builtin.include_role:
+        name: {{ role }}
+      vars:
+        ansible_become: true
+```
+
+## License
+
+{{ metadata.galaxy_info.license }}
+
+## Author and Project Information
+
+{{ metadata.galaxy_info.company }}

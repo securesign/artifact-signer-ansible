@@ -90,7 +90,7 @@ In order to deploy RHTAS on a RHEL 9.2+ VM:
     tasks:
       - name: Include TAS single node role
         ansible.builtin.include_role:
-          name: tas_single_node
+          name: redhat.artifact_signer.tas_single_node
         vars:
           ansible_become: true
   ```
