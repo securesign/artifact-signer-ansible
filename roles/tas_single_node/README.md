@@ -2,8 +2,6 @@
 # Ansible Role: redhat.artifact_signer.tas_single_node
 Version: 1.0.0
 
-test
-
 The `tas_single_node` role can be used to deploy a [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) instance on a single managed node.
  Requires RHEL >= 9.2.
 
