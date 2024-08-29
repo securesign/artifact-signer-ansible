@@ -1,4 +1,3 @@
-aar_doc==1.0.4
 ansible-lint==24.6.1
 antsibull-docs==2.13.1
 molecule==24.7.0
