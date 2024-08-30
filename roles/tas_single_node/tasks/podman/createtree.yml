@@ -25,7 +25,7 @@
       containers.podman.podman_container:
         name: createtree
         image: "{{ tas_single_node_scaffolding_utils_image }}"
-        command: createtree -admin_server trillian-logserver-pod:8091
+        command: createtree --admin_server trillian-logserver-pod:8091
         network: "{{ tas_single_node_podman_network }}"
         detach: false
       register: createtree_container
