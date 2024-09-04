@@ -245,11 +245,18 @@
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
         and tas_single_node_signer_type == 'file'
 
+
+    - name: Create temporary tmp directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: tmp
+      register: tmp_dir
+
     - name: Combine leaf and root CA certificates into a chain
       ansible.builtin.command: >
         /bin/bash -c '
-        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > /tmp/certificate-chain.tmp &&
-        mv /tmp/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
+        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > /{{ tmp_dir }}/certificate-chain.tmp &&
+        mv /{{ tmp_dir }}/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
       register: result
       changed_when: "'changed' in result.stdout"
       when: >
