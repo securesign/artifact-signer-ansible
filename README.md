@@ -1,212 +1,217 @@
-# RHTAS Ansible Collection
+# Red Hat Trusted Artifact Signer Ansible collection
 
-Automation to deploy the RHTAS ecosystem on RHEL
+The purpose of this Ansible collection is to automate the deployment of the Red Hat Trusted Artifact Signer (RHTAS) service on Red Hat Enterprise Linux (RHEL).
 
-:warning: **The contents of this repository are a Work in Progress.**
+> [!WARNING]
+Currently, the contents of this repository are a work in progress and can change often.
 
 ## Overview
 
-The automation within this repository establishes the components of RHTAS, the downstream redistribution of [Sigstore project](https://sigstore.dev) within a single Red Hat Enterprise Linux (RHEL) machine using a standalone containerized deployment. Containers are spawned using Kubernetes based manifests using
-[podman kube play](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).
+The RHTAS service is the downstream redistribution of the [Sigstore](https://sigstore.dev) project.
+The automation contained within this Git repository installs and configures the components of RHTAS to run on a single RHEL server, which uses a standalone containerized deployment.
+A Kubernetes-based manifest creates containers that uses [`podman kube play`](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).
 
-The following Sigstore components are deployed as part of this architecture:
+The RHTAS Ansible collection deploys the following RHTAS components:
 
 * [Rekor](https://docs.sigstore.dev/rekor/overview)
-    * [Trillian](https://github.com/google/trillian)
-    * Optionally a MariaDB instance and a Redis instance, although it is possible to use instances managed outside of Ansible
+  * [Trillian](https://github.com/google/trillian)
+  * Optional.
+    A self-managed MariaDB instance, and a Redis instance.
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
 * [Timestamp Authority](https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities)
-* [TUF](https://theupdateframework.io/) server
+* [TUF](https://theupdateframework.io/)
 
-An [NGINX](https://www.nginx.com) frontend is placed as an entrypoint to the various backend components. Communication is secured via a set of self-signed certificates that are generated at runtime.
+An [NGINX](https://www.nginx.com) front end places an entrypoint to the various backend components.
+A set of self-signed certificates get generated at runtime to establishing secure communications.
 
-Utilize the steps below to understand how to setup and execute the provisioning.
+This automation also deploys and configures a software load balancer as a central point of ingress.
+The ingress host names are as follows, where `<base_hostname>` is your organization's base hostname:
+
+* https://rekor.`<base_hostname>`
+* https://fulcio.`<base_hostname>`
+* https://tsa.`<base_hostname>`
+* https://tuf.`<base_hostname>`
 
 ## Prerequisites
 
-RHEL 9.2+ x86\_64 is supported to run the RHTAS components.
+* RHEL x86\_64 9.2 or greater.
+* Command-line access to the Ansible control node with a user that has `sudo` privileges.
+* Installation and configuration of Ansible on a control node to perform the automation.
+* Installation of the Ansible collections on the control node, unless installing from the Ansible Automation Hub.
+  > [!NOTE]
+  To install the required dependencies automatically, you can run the `ansible-galaxy install` command.
+* An OpenID Connect (OIDC) provider, such as [Keycloak](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/sso/).
+* The ability to resolve the ingress host names, by using the Domain Name System (DNS) or the `/etc/hosts` file.
+* Optional.
+  Installation of the `podman` and [`cosign`](https://github.com/sigstore/cosign) binaries to verify that the RHTAS service is working as expected.
 
-Ansible must be installed and configured on a control node that will be used to perform the automation.
+## Deploying
 
-Perform the following steps to prepare the control node for execution.
+1. Create an `inventory` file with a single node under the `rhtas` group:
+   
+   ```
+   [rhtas]
+   123.123.123.123
+   ```
 
-### Dependencies
+2. Create a simple Ansible Playbook named `play.yml`, and replace `TODO` with your relevant information:
+   
+   ```yaml
+   - hosts: rhtas
+     vars:
+       base_hostname: TODO # e.g. example.com
+       # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
+       tas_single_node_registry_username: TODO
+       tas_single_node_registry_password: TODO
+       tas_single_node_oidc_issuers:
+         - issuer: TODO # your OIDC provider (e.g. keycloak) URL
+           client_id: trusted-artifact-signer
+           url: TODO # your OIDC provider (e.g. keycloak) URL
+           type: email
+     tasks:
+       - name: Include TAS single node role
+         ansible.builtin.include_role:
+           name: redhat.artifact_signer.tas_single_node
+         vars:
+           ansible_become: true
+   ```
 
-Install the required Ansible collections by executing the following (this can be skipped if installing from Ansible Automation Hub, as `ansible-galaxy install` will install dependencies automatically).
+3. Install the RHTAS Ansible collection.
+   
+   - If installing from Ansible Automation Hub, then run the following command:
+   
+     ```shell
+     $ ansible-playbook -i inventory play.yml
+     ```
 
-```shell
-ansible-galaxy collection install -r requirements.yml
-```
+   - If running from a locally-cloned Git repository, then run the following command:
+   
+     ```shell
+     $ export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
+     ```
 
-### OIDC provider
+4. Add the root certificate authority (CA) to your local truststore:
+  
+   ```shell
+   $ sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+   $ sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
+   $ sudo update-ca-trust
+   ```
+   > [!TIP]
+   The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_domain>` in a web browser.
+   Download the _root_ certificate that issued the Rekor certificate.
 
-An installation of an OIDC provider, such as [Keycloak](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/sso/), must be provided to allow for integration with containerized RHTAS.
+## Verifying the deployment by signing a test container
 
-### Ingress
+1. Export the following environment variables, replacing `TODO` with your relevant information:
 
-The automation deploys and configures a software load balancer as a central point of ingress. Multiple hostnames underneath a _base hostname_ are configured and include the following hostnames:
+   ```shell
+   $ export BASE_HOSTNAME="TODO"
+   $ export KEYCLOAK_URL="TODO"
+   $ export KEYCLOAK_REALM=TODO
+  
+   $ export TUF_URL=https://tuf.$BASE_HOSTNAME
+   $ export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
+   $ export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
+   $ export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
+   $ export COSIGN_MIRROR=$TUF_URL
+   $ export COSIGN_ROOT=$TUF_URL/root.json
+   $ export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
+   $ export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
+   $ export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
+   $ export COSIGN_YES="true"
+   $ export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
+   $ export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
+   $ export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
+   $ export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
+   ```
 
-* https://rekor.<base_hostname>
-* https://fulcio.<base_hostname>
-* https://tsa.<base_hostname>
-* https://tuf.<base_hostname>
+2. Initialize The Update Framework (TUF) system:
 
-Each of these hostnames must be configured in DNS to resolve to the target machine. The `base_hostname` parameter must be provided when executing the provisining. To configure hostnames in DNS, edit `/etc/hosts` with the following content:
+   ```shell
+   $ cosign initialize
+   ```
 
-```
-<REMOTE_IP_ADDRESS> fulcio.<base_hostname> fulcio
-<REMOTE_IP_ADDRESS> rekor.<base_hostname> rekor
-<REMOTE_IP_ADDRESS> tsa.<base_hostname> tsa
-<REMOTE_IP_ADDRESS> tuf.<base_hostname> tuf
-```
+   > [!NOTE]
+   If you have used `cosign` before, you might need to delete the `~/.sigstore` directory first.
 
-### Cosign
+3. Sign a test container image.
+   
+   a. Create an empty container image:
+      
+      ```shell
+      $ echo "FROM scratch" > ./tmp.Dockerfile
+      $ podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
+      ```
 
-[cosign](https://github.com/sigstore/cosign) is used as part of testing and validating the setup and configuration. It is an optional install if there is not a desire to perform the validation as described below.
+   b. Push the empty container image to the `ttl.sh` ephemeral registry:
+      
+      ```shell
+      $ podman push ttl.sh/rhtas/test-image:1h
+      ```
 
-## Provision
+   c. Sign the container image:
+      
+      ```shell
+      $ cosign sign -y ttl.sh/rhtas/test-image:1h
+      ```
 
-In order to deploy RHTAS on a RHEL 9.2+ VM:
+      A web browser opens allowing you to sign the container image with an email address.
 
-1. Create an `inventory` file with a single VM in the `rhtas` group:
-  ```
-  [rhtas]
-  123.123.123.123
-  ```
-2. Create a simple Ansible playbook `play.yml`:
-  ```
-  - hosts: rhtas
-    vars:
-      base_hostname: TODO # e.g. example.com
-      # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
-      tas_single_node_registry_username: TODO
-      tas_single_node_registry_password: TODO
-      tas_single_node_oidc_issuers:
-        - issuer: TODO # your OIDC provider (e.g. keycloak) URL
-          client_id: trusted-artifact-signer
-          url: TODO # your OIDC provider (e.g. keycloak) URL
-          type: email
-    tasks:
-      - name: Include TAS single node role
-        ansible.builtin.include_role:
-          name: redhat.artifact_signer.tas_single_node
-        vars:
-          ansible_become: true
-  ```
-3. Execute the following command if the collection is installed from Ansible Automation Hub:
-  ```shell
-  ansible-playbook -i inventory play.yml
-  ```
-4. Execute the following command if you're running from the collection repository checked out locally:
-  ```shell
-  ANSIBLE_ROLES_PATH="roles/" ansible-playbook -i inventory play.yml
-  ```
+   d. Remove the temporary Docker file:
+      
+      ```shell
+      $ rm ./tmp.Dockerfile
+      ```
 
-### Add the root CA that was created to your local truststore.
+4. Verify the signed image by replacing `TODO` with the signer's email address:
 
-The certificate can be downloaded from the browser Certificate Viewer by navigating to `https://rekor.<base_domain>`.
-Download the _root_ certificate that issued the Rekor certificate.
-In Red Hat based systems, the following commands will add a CA to the system truststore.
+   ```shell
+   $ cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
+   ```
+   
+   If the signature verification does not result in an error, then the deployment of RHTAS was successful!
 
-```shell
-$ sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
-$ sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
-$ sudo update-ca-trust
-```
-
-## Signing a Container
-
-Utilize the following steps to sign a container that has been published to an OCI registry
-
-1. Export the following environment variables substituting `BASE_HOSTNAME`, `KEYCLOAK_URL` and if necessary also `KEYCLOAK_REALM` with the values used as part of the provisioning:
-
-```shell
-export BASE_HOSTNAME="TODO-provide-base-hostname"
-export KEYCLOAK_URL="TODO-your-keycloak-url"
-export KEYCLOAK_REALM=trusted-artifact-signer
-
-export TUF_URL=https://tuf.$BASE_HOSTNAME
-export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
-export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
-export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
-export COSIGN_MIRROR=$TUF_URL
-export COSIGN_ROOT=$TUF_URL/root.json
-export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
-export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
-export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
-export COSIGN_YES="true"
-export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
-export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
-export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
-export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
-```
-
-2. Initialize the TUF roots
-
-```shell
-cosign initialize
-```
-
-Note: If you have used `cosign` previously, you may need to delete the `~/.sigstore` directory
-
-3. Sign the desired container
-
-```shell
-cosign sign -y <image>
-```
-
-Authenticate with the Keycloak instance using the desired credentials.
-
-4. Verify the signed image
-
-Refer to this example that verifies an image signed with email identity `sigstore-user@email.com` and issuer `https://github.com/login/oauth`.
-
-```shell
-cosign verify \
---certificate-identity-regexp sigstore-user \
---certificate-oidc-issuer-regexp keycloak  \
-<image>
-```
-
-If the signature verification did not result in an error, the deployment of RHTAS was successful!
 
 ## Contributing
 
 ### Testing locally
 
-This repository contains GitHub actions that will test PRs that come in with `ansible-lint` and `sanity-test` to enforce good code quality and practices. 
+This Git repository has GitHub actions that tests incoming PRs with `ansible-lint` and `sanity-test` to enforce good code quality and practices. 
 
 To run `ansible-lint` locally:
 
 ```shell
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements-testing.txt
-ansible-lint
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements-testing.txt
+$ ansible-lint
 ```
 
 To run `sanity-test` locally:
 
-The `ansible-test` command relies on a specific directory structure for collections to function correctly. This structure follows the format:
+The `ansible-test` command relies on a specific directory structure for collections to function correctly.
+This structure follows the format, `{...}/ansible_collections/{namespace}/{collection}/`.
 
-`{...}/ansible_collections/{namespace}/{collection}/`
+To enable testing, make sure your local machine adheres to this format, which you can achieve by copying, symlinking, moving or cloning a Git repository into this structure.
+By keeping the overall format, and not using invalid characters, such as `-`, the `namespace` and `collection` names are not critical.
+The `collection` refers to the current repository `artifact-signer-ansible`, while the `namespace` can be anything you want.
 
-To enable testing, make sure your local machine adheres to this format, which you can achieve by copying, symlinking, moving or cloning a repo into this structure.
-`namespace` and `collection` names are not critical, as long as the overall format is kept, and no illegal characters are used such as `-`.
-The `collection` refers to the current repository `artifact-signer-ansible`, while the namespace can be anything you want.
+A valid path for our collection would be, `{...}/ansible_collections/redhat/artifact_signer_ansible/`.
 
-A valid path for our collection would be:
-`{...}/ansible_collections/redhat/artifact_signer_ansible/`
+To achieve this, you can run sanity checks by running the following:
 
-When this is achieved, you can run sanity checks by executing
+```shell
+$ ansible-test sanity
+```
 
-`ansible-test sanity`
+### Testing Deployment on a virtual machine
 
-### Testing Deployment on a VM
-
-The [molecule/README.md](molecule/README.md) file contains instructions on testing the deployment on a VM. By default, [testing-farm](https://docs.testing-farm.io/) is used as the VM provider.
+The [molecule/README.md](molecule/README.md) file has instructions on testing the deployment on a virtual machine (VM).
+By default, the VM provider is [testing-farm.io](https://docs.testing-farm.io/).
 
 ## Feedback
 
-Any and all feedback is welcome. Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) or [Pull Request](https://github.com/securesign/artifact-signer-ansible/pulls) as desired.
+Any and all feedback is welcome.
+Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) or [Pull Request](https://github.com/securesign/artifact-signer-ansible/pulls) as needed.
