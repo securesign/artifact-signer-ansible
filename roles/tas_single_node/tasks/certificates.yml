@@ -250,12 +250,13 @@
       ansible.builtin.tempfile:
         state: directory
         suffix: tmp_dir
+      register: tmp_dir1
 
     - name: Combine leaf and root CA certificates into a chain
       ansible.builtin.command: >
         /bin/bash -c '
-        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > /tmp_dir/certificate-chain.tmp &&
-        mv /tmp_dir/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
+        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > {{ tmp_dir1.path }}/certificate-chain.tmp &&
+        mv {{ tmp_dir1.path }}/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
       register: result
       changed_when: "'changed' in result.stdout"
       when: >
