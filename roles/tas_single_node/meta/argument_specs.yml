@@ -1,32 +1,30 @@
 argument_specs:
   main:
-    short_description: "Configure RHTAS on a single managed node"
+    short_description: "Configure Red Hat Trusted Artifact Signer (RHTAS) on a single managed node."
     description: >
-      The `tas_single_node` role can be used to deploy a
-      [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) instance
-      on a single managed node.
+      Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service on a single managed node by using the `tas_single_node` role.
     version_added: "1.0.0"
     options:
       tas_single_node_registry_username:
-        description: "Login for registry where the images will be pulled from"
+        description: "The user name logging in to the registry to pull images."
         type: "str"
         required: true
         version_added: "1.0.0"
         # we provide no default value here intentionally
       tas_single_node_registry_password:
-        description: "Password for registry where the images will be pulled from"
+        description: "The user's password to log in to the registry."
         type: "str"
         required: true
         version_added: "1.0.0"
         # we provide no default value here intentionally
       tas_single_node_podman_network:
-        description: "Name of the podman network for the containers to use"
+        description: "Name of the Podman network for containers to use."
         type: "str"
         required: false
         version_added: "1.0.0"
         default: "rhtas"
       tas_single_node_rekor_redis:
-        description: "Details of Redis connection for Rekor (set this to provide custom Redis instance)"
+        description: "Details on the Redis connection for Rekor. You can set this to a custom Redis instance."
         type: "dict"
         required: false
         version_added: "1.0.0"
@@ -38,33 +36,33 @@ argument_specs:
             password: password
         options:
           database_deploy:
-            description: "Whether or not to deploy Redis"
+            description: "Whether or not to deploy Redis."
             type: "bool"
             required: false
             version_added: "1.0.0"
           redis:
-            description: "Details of Redis connection"
+            description: "Details on the Redis connection."
             type: "dict"
             required: false
             version_added: "1.0.0"
             options:
               host:
-                description: "Redis host"
+                description: "The Redis host."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
               port:
-                description: "Redis host port"
+                description: "The Redis host port number."
                 type: "int"
                 required: false
                 version_added: "1.0.0"
               password:
-                description: "Redis password"
+                description: "The Redis password."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
       tas_single_node_trillian:
-        description: "Details of database connection for Trillian (set this to provide custom MySQL/MariaDB instance)"
+        description: "Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance."
         type: "dict"
         required: false
         version_added: "1.0.0"
@@ -79,110 +77,110 @@ argument_specs:
             port: 3306
         options:
           database_deploy:
-            description: "Whether or not to deploy the database"
+            description: "Whether or not to deploy the database."
             type: "bool"
             required: false
             version_added: "1.0.0"
           mysql:
-            description: "Details of database connection"
+            description: "Details on the database connection."
             type: "dict"
             required: false
             version_added: "1.0.0"
             options:
               host:
-                description: "Database host"
+                description: "The database host."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
               port:
-                description: "Database host port"
+                description: "The database host port number."
                 type: "int"
                 required: false
                 version_added: "1.0.0"
               password:
-                description: "Database password"
+                description: "The database password."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
               user:
-                description: "Database user"
+                description: "The database user."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
               root_password:
-                description: "Root password for the database"
+                description: "The root password for the database."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
               database:
-                description: "Database to connect to"
+                description: "The database name to connect to."
                 type: "str"
                 required: false
                 version_added: "1.0.0"
       tas_single_node_rekor_public_key_retries:
-        description: "Number of retries when retrieving Rekor public key when constructing trust root"
+        description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
         type: "int"
         required: false
         version_added: "1.0.0"
         default: 5
       tas_single_node_rekor_public_key_delay:
-        description: "Number of seconds to wait before retrying retrieval of Rekor public key when constructing trust root"
+        description: "The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root."
         type: "int"
         required: false
         version_added: "1.0.0"
         default: 10
       tas_single_node_setup_host_dns:
-        description: "Set up managed host DNS to resolve URLs of the configured RHTAS services"
+        description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"
         required: false
         version_added: "1.0.0"
         default: true
       tas_single_node_base_hostname:
         description: >
-          Base hostname of the managed node. This will be used to generate proper self-signed certificates
-          for the individual HTTPS endpoints.
+          The base host name of the managed node.
+          This generates self-signed certificates for the individual HTTPS endpoints.
         type: "str"
         required: true
         version_added: "1.0.0"
         # we provide no default value here intentionally
       tas_single_node_kms_key_resource:
         description: >
-          KMS key for signing timestamp responses. Valid options include:
-          [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource]
+          The Key Management Services (KMS) key for signing timestamp responses.
+          Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource].
         type: "str"
         required: false
         version_added: "1.0.0"
         default: ""
       tas_single_node_tink_key_resource:
         description: >
-          KMS key for signing timestamp responses for Tink keysets. Valid options include:
-          [gcp-kms://resource, aws-kms://resource, hcvault://]
+          The KMS key for signing timestamp responses for Tink keysets.
+          Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].
         type: "str"
         required: false
         version_added: "1.0.0"
         default: ""
       tas_single_node_tsa_tink_keyset:
-        description: "KMS-encrypted keyset for Tink, decrypted by tas_single_node_tink_key_resource"
+        description: "The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tink_key_resource string."
         type: "str"
         required: false
         version_added: "1.0.0"
         default: ""
       tas_single_node_tink_hcvault_token:
-        description: "Authentication token for Hashicorp Vault API calls"
+        description: "The authentication token for Hashicorp Vault API calls."
         type: "str"
         required: false
         version_added: "1.0.0"
         default: ""
       tas_single_node_skip_os_install:
         description: >
-          Skip installation of required OS packages. Only use this when all packages are already installed at
-          versions released for RHEL >= 9.2
+          Whether or not to skip the installation of the required operating system packages.
+          Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later.
         type: "bool"
         required: false
         version_added: "1.0.0"
         default: false
       tas_single_node_oidc_issuers:
-        description: "List of OIDC issuers to allow to authenticate Fulcio certificate requests"
+        description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
         type: "list"
         elements: "dict"
         required: true
@@ -190,27 +188,27 @@ argument_specs:
         # we provide no default here intentionally
         options:
           issuer:
-            description: "Unique name of the OIDC issuer"
+            description: "A unique name of the OIDC issuer."
             type: "str"
             required: true
             version_added: "1.0.0"
           url:
-            description: "OIDC issuer service URL"
+            description: "The OIDC issuer service URL."
             type: "str"
             required: true
             version_added: "1.0.0"
           client_id:
-            description: "OIDC client ID to use by this RHTAS instance"
+            description: "The OIDC client identifier used by the RHTAS service."
             type: "str"
             required: true
             version_added: "1.0.0"
           type:
-            description: "Type of the OIDC token issuer, e.g. 'email'"
+            description: "The type of the OIDC token issuer, for example, 'email'."
             type: "str"
             required: true
             version_added: "1.0.0"
       tas_single_node_meta_issuers:
-        description: "List of OIDC meta issuers to allow to authenticate Fulcio certificate requests"
+        description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
         type: "list"
         elements: "dict"
         required: false
@@ -218,17 +216,17 @@ argument_specs:
         default: []
         options:
           issuer_pattern:
-            description: "Templated URL to match multiple OIDC issuers, e.g. `'https://oidc.eks.*.amazonaws.com/id/*'`"
+            description: "A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`."
             type: "str"
             required: true
             version_added: "1.0.0"
           client_id:
-            description: "OIDC client ID to use by this RHTAS instance"
+            description: "The OIDC client identifier used by the RHTAS service."
             type: "str"
             required: true
             version_added: "1.0.0"
           type:
-            description: "Type of the OIDC token issuer, e.g. `'email'`"
+            description: "The type of the OIDC token issuer, for example, 'email'."
             type: "str"
             required: true
             version_added: "1.0.0"
