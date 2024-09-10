@@ -2,8 +2,11 @@
 
 The purpose of this Ansible collection is to automate the deployment of the Red Hat Trusted Artifact Signer (RHTAS) service on Red Hat Enterprise Linux (RHEL).
 
-> [!WARNING]
-Currently, the contents of this repository are a work in progress and can change often.
+> [!IMPORTANT]
+Deploying RHTAS by using Ansible is a Technology Preview feature only.
+Technology Preview features are not supported with Red Hat production service level agreements (SLAs), might not be functionally complete, and Red Hat does not recommend to use them for production.
+These features provide early access to upcoming product features, enabling customers to test functionality and provide feedback during the development process.
+See the support scope for [Red Hat Technology Preview](https://access.redhat.com/support/offerings/techpreview/) features for more details.
 
 ## Overview
 
@@ -15,18 +18,17 @@ The RHTAS Ansible collection deploys the following RHTAS components:
 
 * [Rekor](https://docs.sigstore.dev/rekor/overview)
   * [Trillian](https://github.com/google/trillian)
-  * Optional.
-    A self-managed MariaDB instance, and a Redis instance.
+  * Optional: A self-managed MariaDB instance, and a Redis instance.
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
 * [Timestamp Authority](https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities)
-* [TUF](https://theupdateframework.io/)
+* [The Update Framework (TUF) server](https://theupdateframework.io/)
 
 An [NGINX](https://www.nginx.com) front end places an entrypoint to the various backend components.
 A set of self-signed certificates get generated at runtime to establishing secure communications.
 
 This automation also deploys and configures a software load balancer as a central point of ingress.
-The ingress host names are as follows, where `<base_hostname>` is your organization's base hostname:
+The ingress host names are as follows, where `<base_hostname>` is your deployment's base hostname:
 
 * https://rekor.`<base_hostname>`
 * https://fulcio.`<base_hostname>`
@@ -38,9 +40,9 @@ The ingress host names are as follows, where `<base_hostname>` is your organizat
 * RHEL x86\_64 9.2 or greater.
 * Command-line access to the Ansible control node with a user that has `sudo` privileges.
 * Installation and configuration of Ansible on a control node to perform the automation.
-* Installation of the Ansible collections on the control node, unless installing from the Ansible Automation Hub.
-  > [!NOTE]
-  To install the required dependencies automatically, you can run the `ansible-galaxy install` command.
+* Installation of the Ansible collections on the control node.
+  * If installing from the Ansible Automation Hub, then run `ansible-galaxy install redhat.artifact_signer`.
+  * If installing from this Git repository, then clone it locally, and run `ansible-galaxy collection install -r requirements.yml`.
 * An OpenID Connect (OIDC) provider, such as [Keycloak](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/sso/).
 * The ability to resolve the ingress host names, by using the Domain Name System (DNS) or the `/etc/hosts` file.
 * Optional.
