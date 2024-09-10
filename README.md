@@ -84,21 +84,21 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
    - If installing from Ansible Automation Hub, then run the following command:
    
      ```shell
-     $ ansible-playbook -i inventory play.yml
+     ansible-playbook -i inventory play.yml
      ```
 
    - If running from a locally-cloned Git repository, then run the following command:
    
      ```shell
-     $ export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
+     export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
      ```
 
 4. Add the root certificate authority (CA) to your local truststore:
   
    ```shell
-   $ sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
-   $ sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
-   $ sudo update-ca-trust
+   sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+   sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
+   sudo update-ca-trust
    ```
    > [!TIP]
    The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_domain>` in a web browser.
@@ -109,30 +109,30 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 1. Export the following environment variables, replacing `TODO` with your relevant information:
 
    ```shell
-   $ export BASE_HOSTNAME="TODO"
-   $ export KEYCLOAK_URL="TODO"
-   $ export KEYCLOAK_REALM=TODO
+   export BASE_HOSTNAME="TODO"
+   export KEYCLOAK_URL="TODO"
+   export KEYCLOAK_REALM=TODO
   
-   $ export TUF_URL=https://tuf.$BASE_HOSTNAME
-   $ export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
-   $ export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
-   $ export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
-   $ export COSIGN_MIRROR=$TUF_URL
-   $ export COSIGN_ROOT=$TUF_URL/root.json
-   $ export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
-   $ export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
-   $ export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
-   $ export COSIGN_YES="true"
-   $ export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
-   $ export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
-   $ export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
-   $ export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
+   export TUF_URL=https://tuf.$BASE_HOSTNAME
+   export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
+   export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
+   export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
+   export COSIGN_MIRROR=$TUF_URL
+   export COSIGN_ROOT=$TUF_URL/root.json
+   export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
+   export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
+   export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
+   export COSIGN_YES="true"
+   export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
+   export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
+   export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
+   export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
    ```
 
 2. Initialize The Update Framework (TUF) system:
 
    ```shell
-   $ cosign initialize
+   cosign initialize
    ```
 
    > [!NOTE]
@@ -143,20 +143,20 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
    a. Create an empty container image:
       
       ```shell
-      $ echo "FROM scratch" > ./tmp.Dockerfile
-      $ podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
+      echo "FROM scratch" > ./tmp.Dockerfile
+      podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
       ```
 
    b. Push the empty container image to the `ttl.sh` ephemeral registry:
       
       ```shell
-      $ podman push ttl.sh/rhtas/test-image:1h
+      podman push ttl.sh/rhtas/test-image:1h
       ```
 
    c. Sign the container image:
       
       ```shell
-      $ cosign sign -y ttl.sh/rhtas/test-image:1h
+      cosign sign -y ttl.sh/rhtas/test-image:1h
       ```
 
       A web browser opens allowing you to sign the container image with an email address.
@@ -164,13 +164,13 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
    d. Remove the temporary Docker file:
       
       ```shell
-      $ rm ./tmp.Dockerfile
+      rm ./tmp.Dockerfile
       ```
 
 4. Verify the signed image by replacing `TODO` with the signer's email address:
 
    ```shell
-   $ cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
+   cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
    ```
    
    If the signature verification does not result in an error, then the deployment of RHTAS was successful!
@@ -185,10 +185,10 @@ This Git repository has GitHub actions that tests incoming PRs with `ansible-lin
 To run `ansible-lint` locally:
 
 ```shell
-$ python3 -m venv venv
-$ source venv/bin/activate
-$ pip install -r requirements-testing.txt
-$ ansible-lint
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-testing.txt
+ansible-lint
 ```
 
 To run `sanity-test` locally:
@@ -205,7 +205,7 @@ A valid path for our collection would be, `{...}/ansible_collections/redhat/arti
 To achieve this, you can run sanity checks by running the following:
 
 ```shell
-$ ansible-test sanity
+ansible-test sanity
 ```
 
 ### Testing Deployment on a virtual machine
