@@ -3,7 +3,7 @@
 Version: 1.0.0
 
 Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service on a single managed node by using the `tas_single_node` role.
- Requires RHEL >= 9.2.
+ Requires RHEL 9.2 or later.
 
 ## Role Arguments
 ### Required
