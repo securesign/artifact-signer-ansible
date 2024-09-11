@@ -2,7 +2,8 @@ argument_specs:
   main:
     short_description: "Configure Red Hat Trusted Artifact Signer (RHTAS) on a single managed node."
     description: >
-      Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service on a single managed node by using the `tas_single_node` role.
+      Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service
+      on a single managed node by using the `tas_single_node` role.
     version_added: "1.0.0"
     options:
       tas_single_node_registry_username:
