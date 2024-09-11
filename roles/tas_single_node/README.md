@@ -2,33 +2,33 @@
 # Ansible Role: redhat.artifact_signer.tas_single_node
 Version: 1.0.0
 
-The `tas_single_node` role can be used to deploy a [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) instance on a single managed node.
+Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service on a single managed node by using the `tas_single_node` role.
  Requires RHEL >= 9.2.
 
 ## Role Arguments
 ### Required
 |Option|Description|Type|Default|
 |---|---|---|---|
-| tas_single_node_registry_username | Login for registry where the images will be pulled from | str |  |
-| tas_single_node_registry_password | Password for registry where the images will be pulled from | str |  |
-| tas_single_node_base_hostname | Base hostname of the managed node. This will be used to generate proper self-signed certificates for the individual HTTPS endpoints. | str |  |
-| tas_single_node_oidc_issuers | List of OIDC issuers to allow to authenticate Fulcio certificate requests | list of dicts of 'tas_single_node_oidc_issuers' options |  |
+| tas_single_node_registry_username | The user name logging in to the registry to pull images. | str |  |
+| tas_single_node_registry_password | The user's password to log in to the registry. | str |  |
+| tas_single_node_base_hostname | The base host name of the managed node. This generates self-signed certificates for the individual HTTPS endpoints. | str |  |
+| tas_single_node_oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_oidc_issuers' options |  |
 
 ### Optional
 |Option|Description|Type|Default|
 |---|---|---|---|
-| tas_single_node_podman_network | Name of the podman network for the containers to use | str |  `rhtas`  |
-| tas_single_node_rekor_redis | Details of Redis connection for Rekor (set this to provide custom Redis instance) | dict of 'tas_single_node_rekor_redis' options |  `{"database_deploy": true, "redis": {"host": "rekor-redis-pod", "port": 6379, "password": "password"}}`  |
-| tas_single_node_trillian | Details of database connection for Trillian (set this to provide custom MySQL/MariaDB instance) | dict of 'tas_single_node_trillian' options |  `{"database_deploy": true, "mysql": {"user": "mysql", "root_password": "rootpassword", "password": "password", "database": "trillian", "host": "trillian-mysql-pod", "port": 3306}}`  |
-| tas_single_node_rekor_public_key_retries | Number of retries when retrieving Rekor public key when constructing trust root | int |  `5`  |
-| tas_single_node_rekor_public_key_delay | Number of seconds to wait before retrying retrieval of Rekor public key when constructing trust root | int |  `10`  |
-| tas_single_node_setup_host_dns | Set up managed host DNS to resolve URLs of the configured RHTAS services | bool |  `true`  |
-| tas_single_node_kms_key_resource | KMS key for signing timestamp responses. Valid options include: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource] | str |  |
-| tas_single_node_tink_key_resource | KMS key for signing timestamp responses for Tink keysets. Valid options include: [gcp-kms://resource, aws-kms://resource, hcvault://] | str |  |
-| tas_single_node_tsa_tink_keyset | KMS-encrypted keyset for Tink, decrypted by tas_single_node_tink_key_resource | str |  |
-| tas_single_node_tink_hcvault_token | Authentication token for Hashicorp Vault API calls | str |  |
-| tas_single_node_skip_os_install | Skip installation of required OS packages. Only use this when all packages are already installed at versions released for RHEL >= 9.2 | bool |  `false`  |
-| tas_single_node_meta_issuers | List of OIDC meta issuers to allow to authenticate Fulcio certificate requests | list of dicts of 'tas_single_node_meta_issuers' options |  |
+| tas_single_node_podman_network | Name of the Podman network for containers to use. | str |  `rhtas`  |
+| tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{"database_deploy": true, "redis": {"host": "rekor-redis-pod", "port": 6379, "password": "password"}}`  |
+| tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{"database_deploy": true, "mysql": {"user": "mysql", "root_password": "rootpassword", "password": "password", "database": "trillian", "host": "trillian-mysql-pod", "port": 3306}}`  |
+| tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
+| tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
+| tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `true`  |
+| tas_single_node_kms_key_resource | The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource]. | str |  |
+| tas_single_node_tink_key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str |  |
+| tas_single_node_tsa_tink_keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tink_key_resource string. | str |  |
+| tas_single_node_tink_hcvault_token | The authentication token for Hashicorp Vault API calls. | str |  |
+| tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later. | bool |  `false`  |
+| tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208`  |
 | tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0`  |
@@ -46,51 +46,51 @@ The `tas_single_node` role can be used to deploy a [RHTAS](https://docs.redhat.c
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| database_deploy | Whether or not to deploy Redis | bool | no |  `false`  |
-| redis | Details of Redis connection | dict of 'redis' options | no |  |
+| database_deploy | Whether or not to deploy Redis. | bool | no |  `false`  |
+| redis | Details on the Redis connection. | dict of 'redis' options | no |  |
 
 #### Options for main > tas_single_node_rekor_redis > redis
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| host | Redis host | str | no |  |
-| port | Redis host port | int | no |  |
-| password | Redis password | str | no |  |
+| host | The Redis host. | str | no |  |
+| port | The Redis host port number. | int | no |  |
+| password | The Redis password. | str | no |  |
 
 #### Options for main > tas_single_node_trillian
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| database_deploy | Whether or not to deploy the database | bool | no |  `false`  |
-| mysql | Details of database connection | dict of 'mysql' options | no |  |
+| database_deploy | Whether or not to deploy the database. | bool | no |  `false`  |
+| mysql | Details on the database connection. | dict of 'mysql' options | no |  |
 
 #### Options for main > tas_single_node_trillian > mysql
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| host | Database host | str | no |  |
-| port | Database host port | int | no |  |
-| password | Database password | str | no |  |
-| user | Database user | str | no |  |
-| root_password | Root password for the database | str | no |  |
-| database | Database to connect to | str | no |  |
+| host | The database host. | str | no |  |
+| port | The database host port number. | int | no |  |
+| password | The database password. | str | no |  |
+| user | The database user. | str | no |  |
+| root_password | The root password for the database. | str | no |  |
+| database | The database name to connect to. | str | no |  |
 
 #### Options for main > tas_single_node_oidc_issuers
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| issuer | Unique name of the OIDC issuer | str | yes |  |
-| url | OIDC issuer service URL | str | yes |  |
-| client_id | OIDC client ID to use by this RHTAS instance | str | yes |  |
-| type | Type of the OIDC token issuer, e.g. 'email' | str | yes |  |
+| issuer | A unique name of the OIDC issuer. | str | yes |  |
+| url | The OIDC issuer service URL. | str | yes |  |
+| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
+| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
 
 #### Options for main > tas_single_node_meta_issuers
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| issuer_pattern | Templated URL to match multiple OIDC issuers, e.g. `'https://oidc.eks.*.amazonaws.com/id/*'` | str | yes |  |
-| client_id | OIDC client ID to use by this RHTAS instance | str | yes |  |
-| type | Type of the OIDC token issuer, e.g. `'email'` | str | yes |  |
+| issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
+| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
+| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
 
 ## Example Playbook
 
