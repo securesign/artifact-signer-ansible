@@ -16,4 +16,10 @@ jobs:
             ansible-galaxy install -r requirements.yml
             # we also lint the molecule setup
             ansible-galaxy install -r molecule/requirements.yml
-            ansible-lint -v
+            make lint
+            # ensure that the role README was regenerated
+            make role-readme
+            if ! git diff --exit-code roles/tas_single_node/README.md; then
+              echo "roles/tas_single_node/README.md not regenerated, please run 'make role-readme'"
+              exit 1
+            fi

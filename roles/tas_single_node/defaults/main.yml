@@ -1,11 +1,14 @@
 ---
 # defaults file for tas_single_node
+tas_single_node_registry_username: ""
+tas_single_node_registry_password: ""
+
 tas_single_node_podman_network: rhtas
 
 tas_single_node_rekor_redis:
   database_deploy: true
   redis:
-    address: rekor-redis-pod
+    host: rekor-redis-pod
     port: 6379
     password: password
 
@@ -13,7 +16,7 @@ tas_single_node_trillian:
   database_deploy: true
   mysql:
     user: mysql
-    rootPassword: rootpassword
+    root_password: rootpassword
     password: password
     database: trillian
     host: trillian-mysql-pod
@@ -31,14 +34,6 @@ tas_single_node_tsa_tink_keyset: ""
 tas_single_node_tink_hcvault_token: ""
 
 tas_single_node_skip_os_install: false
-tas_single_node_cockpit_enabled: true
-tas_single_node_trillian_enabled: true
-tas_single_node_rekor_enabled: true
-tas_single_node_ctlog_enabled: true
-tas_single_node_tuf_enabled: true
-tas_single_node_tsa_enabled: true
-tas_single_node_fulcio_enabled: true
-tas_single_node_rekor_search_enabled: true
 
 tas_single_node_oidc_issuers:
   - issuer: https://keycloak-keycloak-system.apps.platform-sts.pcbk.p1.openshiftapps.com/auth/realms/trusted-artifact-signer

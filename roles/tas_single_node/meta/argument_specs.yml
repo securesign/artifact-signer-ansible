@@ -1,0 +1,305 @@
+argument_specs:
+  main:
+    short_description: "Configure Red Hat Trusted Artifact Signer (RHTAS) on a single managed node."
+    description: >
+      Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service
+      on a single managed node by using the `tas_single_node` role.
+    version_added: "1.0.0"
+    options:
+      tas_single_node_registry_username:
+        description: "The user name logging in to the registry to pull images."
+        type: "str"
+        required: true
+        version_added: "1.0.0"
+        # we provide no default value here intentionally
+      tas_single_node_registry_password:
+        description: "The user's password to log in to the registry."
+        type: "str"
+        required: true
+        version_added: "1.0.0"
+        # we provide no default value here intentionally
+      tas_single_node_podman_network:
+        description: "Name of the Podman network for containers to use."
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "rhtas"
+      tas_single_node_rekor_redis:
+        description: "Details on the Redis connection for Rekor. You can set this to a custom Redis instance."
+        type: "dict"
+        required: false
+        version_added: "1.0.0"
+        default:
+          database_deploy: true
+          redis:
+            host: rekor-redis-pod
+            port: 6379
+            password: password
+        options:
+          database_deploy:
+            description: "Whether or not to deploy Redis."
+            type: "bool"
+            required: false
+            version_added: "1.0.0"
+          redis:
+            description: "Details on the Redis connection."
+            type: "dict"
+            required: false
+            version_added: "1.0.0"
+            options:
+              host:
+                description: "The Redis host."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+              port:
+                description: "The Redis host port number."
+                type: "int"
+                required: false
+                version_added: "1.0.0"
+              password:
+                description: "The Redis password."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+      tas_single_node_trillian:
+        description: "Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance."
+        type: "dict"
+        required: false
+        version_added: "1.0.0"
+        default:
+          database_deploy: true
+          mysql:
+            user: mysql
+            root_password: rootpassword
+            password: password
+            database: trillian
+            host: trillian-mysql-pod
+            port: 3306
+        options:
+          database_deploy:
+            description: "Whether or not to deploy the database."
+            type: "bool"
+            required: false
+            version_added: "1.0.0"
+          mysql:
+            description: "Details on the database connection."
+            type: "dict"
+            required: false
+            version_added: "1.0.0"
+            options:
+              host:
+                description: "The database host."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+              port:
+                description: "The database host port number."
+                type: "int"
+                required: false
+                version_added: "1.0.0"
+              password:
+                description: "The database password."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+              user:
+                description: "The database user."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+              root_password:
+                description: "The root password for the database."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+              database:
+                description: "The database name to connect to."
+                type: "str"
+                required: false
+                version_added: "1.0.0"
+      tas_single_node_rekor_public_key_retries:
+        description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
+        type: "int"
+        required: false
+        version_added: "1.0.0"
+        default: 5
+      tas_single_node_rekor_public_key_delay:
+        description: "The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root."
+        type: "int"
+        required: false
+        version_added: "1.0.0"
+        default: 10
+      tas_single_node_setup_host_dns:
+        description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
+        type: "bool"
+        required: false
+        version_added: "1.0.0"
+        default: true
+      tas_single_node_base_hostname:
+        description: >
+          The base host name of the managed node.
+          This generates self-signed certificates for the individual HTTPS endpoints.
+        type: "str"
+        required: true
+        version_added: "1.0.0"
+        # we provide no default value here intentionally
+      tas_single_node_kms_key_resource:
+        description: >
+          The Key Management Services (KMS) key for signing timestamp responses.
+          Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource].
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: ""
+      tas_single_node_tink_key_resource:
+        description: >
+          The KMS key for signing timestamp responses for Tink keysets.
+          Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: ""
+      tas_single_node_tsa_tink_keyset:
+        description: "The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tink_key_resource string."
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: ""
+      tas_single_node_tink_hcvault_token:
+        description: "The authentication token for Hashicorp Vault API calls."
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: ""
+      tas_single_node_skip_os_install:
+        description: >
+          Whether or not to skip the installation of the required operating system packages.
+          Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later.
+        type: "bool"
+        required: false
+        version_added: "1.0.0"
+        default: false
+      tas_single_node_oidc_issuers:
+        description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
+        type: "list"
+        elements: "dict"
+        required: true
+        version_added: "1.0.0"
+        # we provide no default here intentionally
+        options:
+          issuer:
+            description: "A unique name of the OIDC issuer."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+          url:
+            description: "The OIDC issuer service URL."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+          client_id:
+            description: "The OIDC client identifier used by the RHTAS service."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+          type:
+            description: "The type of the OIDC token issuer, for example, 'email'."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+      tas_single_node_meta_issuers:
+        description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
+        type: "list"
+        elements: "dict"
+        required: false
+        version_added: "1.0.0"
+        default: []
+        options:
+          issuer_pattern:
+            description: "A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+          client_id:
+            description: "The OIDC client identifier used by the RHTAS service."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+          type:
+            description: "The type of the OIDC token issuer, for example, 'email'."
+            type: "str"
+            required: true
+            version_added: "1.0.0"
+      tas_single_node_fulcio_server_image:
+        description: "Fulcio image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513"
+      tas_single_node_trillian_log_server_image:
+        description: "Trillian log server image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208"
+      tas_single_node_logsigner_image:
+        description: "Trillian logsigner image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0"
+      tas_single_node_rekor_image:
+        description: "Rekor image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae"
+      tas_single_node_ct_server_image:
+        description: "CTLog image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:a0c7d71fc8f4cb7530169a6b54dc3a67215c4058a45f84b87bb04fc62e6e8141"
+      tas_single_node_redis_image:
+        description: "Redis image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:01736bdd96acbc646334a1109409862210e5273394c35fb244f21a143af9f83e"
+      tas_single_node_trillian_db_image:
+        description: "Trillian database image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:909f584804245f8a9e05ecc4d6874c26d56c0d742ba793c1a4357a14f5e67eb0"
+      tas_single_node_tuf_image:
+        description: "TUF server image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/tuf-server-rhel9@sha256:34f5cdc53a908ae2819d85ab18e35b69dc4efc135d747dd1d2e216a99a2dcd1b"
+      tas_single_node_netcat_image:
+        description: "Netcat image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
+      tas_single_node_nginx_image:
+        description: "Nginx image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe"
+      tas_single_node_tsa_image:
+        description: "Timestamp Authority Image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:3fba2f8cd09548d2bd2dfff938529952999cb28ff5b7ea42c1c5e722b8eb827f"
+      tas_single_node_rekor_search_image:
+        description: "Rekor search UI image"
+        type: "str"
+        required: false
+        version_added: "1.0.0"
+        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b"
