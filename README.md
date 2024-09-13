@@ -38,8 +38,9 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 ## Prerequisites
 
 * RHEL x86\_64 9.2 or greater.
-* Command-line access to the Ansible control node with a user that has `sudo` privileges.
-* Update DNS records or `/etc/hosts` entries with the ingress host names and IP addresses.
+* All client nodes using `cosign`, `gitsign`, and `ec` need the following:
+  * Command-line access to the node with a user that has `sudo` privileges.
+  * Updated DNS records or `/etc/hosts` entries with the ingress host names and IP addresses.
 * Installation and configuration of Ansible on a control node to perform the automation.
 * Installation of the Ansible collections on the control node.
   * If installing from the Ansible Automation Hub, then run `ansible-galaxy install redhat.artifact_signer`.
