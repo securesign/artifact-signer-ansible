@@ -251,6 +251,7 @@
         state: directory
         suffix: tmp_dir
       register: tmpdir
+      changed_when: false
 
     - name: Combine leaf and root CA certificates into a chain
       ansible.builtin.command: >
