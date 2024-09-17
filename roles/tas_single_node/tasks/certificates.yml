@@ -267,4 +267,5 @@
     - name: Delete content & directory
       ansible.builtin.file:
         state: absent
-        path: tmpdir.path
+        path: '{{ tmpdir.path }}'
+      changed_when: false
