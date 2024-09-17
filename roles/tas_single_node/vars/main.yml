@@ -80,9 +80,6 @@ tas_single_node_trillian_secret: "{{ tas_single_node_kube_configmap_dir }}/trill
 tas_single_node_tsa_secret: "{{ tas_single_node_kube_configmap_dir }}/tsa-secret.yaml"
 tas_single_node_systemd_directory: /etc/systemd/system
 
-# Scaffolding Helper
-tas_single_node_scaffolding_utils_image: quay.io/securesign/trillian-createtree@sha256:a5b294a71b5adae6f0f6882fa4ac48b22a8fffd63d61515893577033a65f99cf
-
 # Timestamp Authority Config
 tas_single_node_signer_type: file
 tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
