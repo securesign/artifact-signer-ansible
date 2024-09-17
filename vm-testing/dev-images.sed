@@ -12,3 +12,4 @@ s#registry.redhat.io/rhtas/client-server-cg-rhel9#quay.io/securesign/cli-client-
 s#registry.redhat.io/rhtas/client-server-re-rhel9#quay.io/securesign/client-server-re#
 s#registry.redhat.io/rhtas/segment-reporting-rhel9#quay.io/securesign/segment-backup-job#
 s#registry.redhat.io/rhtas/timestamp-authority-rhel9#quay.io/securesign/timestamp-authority#
+s#registry.redhat.io/rhtas/trillian-createtree-rhel9#quay.io/securesign/trillian-createtree#
