@@ -40,7 +40,8 @@
       "{{ tas_single_node_trillian_enabled }}",
       "true",
       "{{ tas_single_node_tsa_enabled }}",
-      "{{ tas_single_node_rekor_search_enabled }}"
+      "{{ tas_single_node_rekor_search_enabled }}",
+      "{{ tas_single_node_client_server_enabled }}"
     ]
   loop:
     - "{{ tas_single_node_fulcio_server_image }}"
@@ -55,12 +56,17 @@
     - "{{ tas_single_node_nginx_image }}"
     - "{{ tas_single_node_timestamp_authority_image }}"
     - "{{ tas_single_node_rekor_search_ui_image }}"
+    - "{{ tas_single_node_cli_server_image }}"
   loop_control:
     index_var: idx
   when: enabled_vals[idx] | bool
 
 - name: Configure/Deploy nginx
   ansible.builtin.include_tasks: podman/nginx.yml
+
+- name: Configure/Deploy CLI Server
+  ansible.builtin.include_tasks: podman/cli_server.yml
+  when: tas_single_node_client_server_enabled | bool
 
 - name: Configure/Deploy Trillian
   ansible.builtin.include_tasks: podman/trillian.yml

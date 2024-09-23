@@ -1,0 +1,31 @@
+---
+- name: Load Apache config content
+  ansible.builtin.set_fact:
+    index_html_content: "{{ lookup('ansible.builtin.template', 'configs/index.html.j2') }}"
+
+- name: Create Apache config ConfigMap
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_apache_config }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: apache-config
+        namespace: cli-server
+      data:
+        index.html: "{{ index_html_content }}"
+  register: apache_configmap_result
+
+- name: Deploy CLI server pod
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: cli-server
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/cli-server/cli-server.yml') | from_yaml }}"
+      configmap: "{{ tas_single_node_apache_config }}"
+      configmap_changed: "{{ apache_configmap_result.changed }}"

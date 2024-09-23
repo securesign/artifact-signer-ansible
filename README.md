@@ -111,6 +111,9 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
    > [!NOTE]
    Add this certificate to all RHTAS client nodes that use the `cosign` and `gitsign` binaries for signing and verifying artifacts.
 
+## Downloading CLI tools
+   To Download tools to interact with Red Hat Trusted Artifact Signer, you can visit `https://cli-server.`<base_hostname>``
+
 ## Verifying the deployment by signing a test container
 
 1. Export the following environment variables, replacing `TODO` with your relevant information:
