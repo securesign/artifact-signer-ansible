@@ -39,6 +39,9 @@ tas_single_node_oidc_issuers: []
 
 tas_single_node_meta_issuers: []
 
+# When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
+# To avoid breaking our structural tests
+
 tas_single_node_fulcio_server_image:
   "registry.redhat.io/rhtas/fulcio-rhel9@sha256:02dc2af135b4eaa16deec597187fc9c4eb1d7e395631d0566df80eb3e0aaa84e"
 tas_single_node_trillian_log_server_image:
