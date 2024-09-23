@@ -43,25 +43,25 @@ tas_single_node_fulcio_server_image:
   "registry.redhat.io/rhtas/fulcio-rhel9@sha256:02dc2af135b4eaa16deec597187fc9c4eb1d7e395631d0566df80eb3e0aaa84e"
 tas_single_node_trillian_log_server_image:
   "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208"
-tas_single_node_trillian_logsigner_image:
+tas_single_node_trillian_log_signer_image:
   "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0"
-tas_single_node_rekor_image:
+tas_single_node_rekor_server_image:
   "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae"
-tas_single_node_ct_server_image:
+tas_single_node_ct_log_image:
   "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:a0c7d71fc8f4cb7530169a6b54dc3a67215c4058a45f84b87bb04fc62e6e8141"
-tas_single_node_redis_image:
+tas_single_node_rekor_redis_image:
   "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:01736bdd96acbc646334a1109409862210e5273394c35fb244f21a143af9f83e"
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:909f584804245f8a9e05ecc4d6874c26d56c0d742ba793c1a4357a14f5e67eb0"
 tas_single_node_tuf_image:
   "registry.redhat.io/rhtas/tuf-server-rhel9@sha256:34f5cdc53a908ae2819d85ab18e35b69dc4efc135d747dd1d2e216a99a2dcd1b"
-tas_single_node_netcat_image:
+tas_single_node_trillian_netcat_image:
   "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe"
-tas_single_node_tsa_image:
+tas_single_node_timestamp_authority_image:
   "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:3fba2f8cd09548d2bd2dfff938529952999cb28ff5b7ea42c1c5e722b8eb827f"
-tas_single_node_rekor_search_image:
+tas_single_node_rekor_search_ui_image:
   "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b"
 # Create Tree
 tas_single_node_create_tree_image: "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:a5b294a71b5adae6f0f6882fa4ac48b22a8fffd63d61515893577033a65f99cf"

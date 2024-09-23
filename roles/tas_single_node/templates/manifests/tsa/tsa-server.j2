@@ -23,7 +23,7 @@ spec:
       automountServiceAccountToken: true
       containers:
         - name: tsa-server
-          image: {{ tas_single_node_tsa_image }}
+          image: {{ tas_single_node_timestamp_authority_image }}
           imagePullPolicy: IfNotPresent
           command:
             - "timestamp-server"
