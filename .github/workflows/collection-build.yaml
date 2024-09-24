@@ -13,7 +13,7 @@ jobs:
         - name: Build collection
           run: |
             python -m pip install --upgrade pip
-            pip install -r requirements-testing.txt
+            pip install -r testing-requirements.txt
             ansible-galaxy collection build -vvv --force
             sha256sum redhat-artifact_signer-*.tar.gz
         - name: Upload collection tarball
