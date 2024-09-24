@@ -1,0 +1,27 @@
+name: Build collection
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  ansible-lint:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+        - name: Build collection
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements-testing.txt
+            ansible-galaxy collection build -vvv --force
+            sha256sum redhat-artifact_signer-*.tar.gz
+        - name: Upload collection tarball
+          uses: actions/upload-artifact@v4
+          id: artifact-upload-step
+          with:
+            path: redhat-artifact_signer-*.tar.gz
+            retention-days: 60
+            if-no-files-found: error
+        - name: Output artifact ID
+          run: echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
