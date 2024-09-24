@@ -62,7 +62,7 @@ spec:
           terminationMessagePolicy: File
       initContainers:
         - name: wait-for-trillian-db
-          image: "{{ tas_single_node_netcat_image }}"
+          image: "{{ tas_single_node_trillian_netcat_image }}"
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "until nc -z -w 10 trillian-mysql-pod 3306; do echo waiting for trillian-mysql; sleep 5; done;"]
           resources: {}

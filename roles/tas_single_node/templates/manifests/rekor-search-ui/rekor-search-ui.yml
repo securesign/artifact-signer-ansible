@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: rekor-ui
-          image: "{{ tas_single_node_rekor_search_image }}"
+          image: "{{ tas_single_node_rekor_search_ui_image }}"
           imagePullPolicy: Always
           env:
             - name: NEXT_PUBLIC_REKOR_DEFAULT_DOMAIN
