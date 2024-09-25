@@ -1,10 +1,10 @@
-name: Run ansible-lint
+name: Run linters (ansible-lint, antsibull-docs, galaxy-importer)
 on:
   push:
   pull_request:
 
 jobs:
-  ansible-lint:
+  run-linters:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout code
@@ -17,6 +17,7 @@ jobs:
             # we also lint the molecule setup
             ansible-galaxy install -r molecule/requirements.yml
             make lint
+            make galaxy-importer-test
             # ensure that the role README was regenerated
             make role-readme
             if ! git diff --exit-code roles/tas_single_node/README.md; then
