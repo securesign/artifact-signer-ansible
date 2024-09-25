@@ -21,7 +21,7 @@
         path: "{{ test_dir_path }}"
         build:
           cache: true
-          file: "Containerfile"
+          file: "{{ test_dir_path }}/Containerfile"
       become: false
       delegate_to: localhost
 
