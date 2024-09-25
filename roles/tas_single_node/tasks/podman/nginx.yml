@@ -7,13 +7,14 @@
     msg: "'tas_single_node_base_hostname' must be specified"
 
 - name: Get RHTAS network details
-  containers.podman.podman_network:
-    name: "{{ tas_single_node_podman_network }}"
+  ansible.builtin.command:
+    cmd: "podman network inspect {{ tas_single_node_podman_network }}"
   register: tas_podman_network_results
+  changed_when: false
 
 - name: Set DNS Resolver
   ansible.builtin.set_fact:
-    dns_resolver: "{{ tas_podman_network_results.network.subnets[0].gateway }}"
+    dns_resolver: "{{ (tas_podman_network_results.stdout | from_json)[0].subnets[0].gateway }}"
 
 - name: Slurp ingress Certificates
   ansible.builtin.slurp:

@@ -21,18 +21,22 @@
 - name: Create Tree ID
   when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists
   block:
+    - name: Generate unique container name for the createtree container
+      ansible.builtin.set_fact:
+        createtree_container_name: "{{ lookup('password', '/dev/null length=20 chars=ascii_letters') }}"
+
     - name: Createtree container
-      containers.podman.podman_container:
-        name: createtree
-        image: "{{ tas_single_node_create_tree_image }}"
-        command: --admin_server trillian-logserver-pod:8091
-        network: "{{ tas_single_node_podman_network }}"
-        detach: false
+      ansible.builtin.command:
+        cmd: >-
+          podman run --network {{ tas_single_node_podman_network }} --replace
+          --name {{ createtree_container_name }} {{ tas_single_node_create_tree_image }}
+          --admin_server trillian-logserver-pod:8091
       register: createtree_container
+      changed_when: true
 
     - name: Obtain Createtree logs
       ansible.builtin.command:
-        cmd: podman logs {{ createtree_container.container.Id }}
+        cmd: "podman logs {{ createtree_container_name }}"
       register: createtree_container_logs
       changed_when: false
 
@@ -41,9 +45,9 @@
         trillian_tree_id: "{{ createtree_container_logs.stdout_lines[0] }}"
 
     - name: Remove createtree container
-      containers.podman.podman_container:
-        name: createtree
-        state: absent
+      ansible.builtin.command:
+        cmd: "podman rm {{ createtree_container_name }}"
+      changed_when: true
 
     - name: Create Trillian treeid ConfigMap
       ansible.builtin.copy:

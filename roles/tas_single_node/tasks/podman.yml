@@ -1,7 +1,16 @@
 ---
+- name: Check if RHTAS network exists
+  ansible.builtin.command:
+    cmd: "podman network inspect {{ tas_single_node_podman_network }}"
+  register: network_inspect_result
+  failed_when: false
+  changed_when: false
+
 - name: Create RHTAS network
-  containers.podman.podman_network:
-    name: "{{ tas_single_node_podman_network }}"
+  ansible.builtin.command:
+    cmd: "podman network create {{ tas_single_node_podman_network }}"
+  when: network_inspect_result.rc != 0
+  changed_when: true
 
 - name: Create Manifests/Configs Directory
   ansible.builtin.file:
@@ -25,8 +34,8 @@
   changed_when: true
 
 - name: Pull all images
-  containers.podman.podman_image:
-    name: "{{ item }}"
+  ansible.builtin.command:
+    cmd: "podman pull {{ item }}"
   vars:
     enabled_vals: [
       "{{ tas_single_node_fulcio_enabled }}",
@@ -60,6 +69,14 @@
   loop_control:
     index_var: idx
   when: enabled_vals[idx] | bool
+  changed_when: false
+  # NOTE: there's no way to tell if "podman pull" actually changed something;
+  # we also can't be 100 % certain if the required image is pulled before pulling,
+  # because the user might use a tag instead of of digest and hence we need to try
+  # pulling again anyway. Podman output doesn't tell us if the image already existed
+  # or not: https://github.com/containers/podman/issues/13582
+  # Hence, we just set changed_when: false, which is fine because we're not using
+  # the result of this task anywhere.
 
 - name: Configure/Deploy nginx
   ansible.builtin.include_tasks: podman/nginx.yml
