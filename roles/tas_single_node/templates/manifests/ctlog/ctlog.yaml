@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: ctlog
-          image: "{{ tas_single_node_ct_log_image }}"
+          image: "{{ tas_single_node_ctlog_image }}"
           imagePullPolicy: IfNotPresent
           livelinessProbe:
             failureThreshold: 3
