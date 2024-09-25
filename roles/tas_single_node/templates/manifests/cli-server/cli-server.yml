@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cli-server
+  namespace: cli-server
+  labels:
+    app.kubernetes.io/instance: scaffold
+    app.kubernetes.io/name: cli-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: cli-server
+      app.kubernetes.io/instance: scaffold
+      app.kubernetes.io/name: cli-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: cli-server
+        app.kubernetes.io/instance: scaffold
+        app.kubernetes.io/name: cli-server
+    spec:
+      containers:
+        - name: cli-server
+          image: "{{ tas_single_node_cli_server_image }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: apache-config
+              mountPath: /var/www/html/index.html
+              subPath: index.html
+      restartPolicy: Always
+      volumes:
+        - name: apache-config
+          configMap:
+            name: apache-config
+            defaultMode: 0644

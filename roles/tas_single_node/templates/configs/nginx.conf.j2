@@ -36,7 +36,7 @@ http {
       listen 8080 default_server;
       server_name _;
       return 301 https://$host$request_uri;
-    } 
+    }
 
 }
 
@@ -60,6 +60,9 @@ stream {
 {% if tas_single_node_tsa_enabled %}
     tsa.{{ tas_single_node_base_hostname }}  tsa-server-pod:3002;
 {% endif %}
+{% if tas_single_node_client_server_enabled %}
+    cli-server.{{ tas_single_node_base_hostname }}  cli-server-pod:8080;
+{% endif %}
   }
 
   map $ssl_server_name $targetCert {
@@ -78,6 +81,9 @@ stream {
 {% if tas_single_node_tsa_enabled %}
     tsa.{{ tas_single_node_base_hostname }} /certs/ingress-tsa.pem;
 {% endif %}
+{% if tas_single_node_client_server_enabled %}
+    cli-server.{{ tas_single_node_base_hostname }} /certs/ingress-cli-server.pem;
+{% endif %}
   }
 
   map $ssl_server_name $targetCertKey {
@@ -95,6 +101,9 @@ stream {
 {% endif %}
 {% if tas_single_node_tsa_enabled %}
     tsa.{{ tas_single_node_base_hostname }}  /certs/ingress-tsa.key;
+{% endif %}
+{% if tas_single_node_client_server_enabled %}
+    cli-server.{{ tas_single_node_base_hostname }}  /certs/ingress-cli-server.key;
 {% endif %}
   }
   

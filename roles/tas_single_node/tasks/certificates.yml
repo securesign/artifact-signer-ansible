@@ -67,6 +67,7 @@
     - tuf
     - tsa
     - rekor-search
+    - cli-server
   loop_control:
     loop_var: cert_name
   vars:

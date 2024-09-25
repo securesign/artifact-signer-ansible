@@ -30,6 +30,8 @@
     - "{{ tas_single_node_certs_dir }}/ingress-fulcio.key"
     - "{{ tas_single_node_certs_dir }}/ingress-tsa.pem"
     - "{{ tas_single_node_certs_dir }}/ingress-tsa.key"
+    - "{{ tas_single_node_certs_dir }}/ingress-cli-server.pem"
+    - "{{ tas_single_node_certs_dir }}/ingress-cli-server.key"
   register: remote_ingress_certificates
 
 - name: Base64 encode the rekor ingress
@@ -68,6 +70,13 @@
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
 
+- name: Base 64 encode the cli server ingress
+  ansible.builtin.set_fact:
+    cli_server_ingress_base64: >-
+      {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-cli-server.pem') | list | first).content
+      | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
+      | b64decode }}
+
 - name: Create nginx certs Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
@@ -91,6 +100,8 @@
           {{ fulcio_ingress_base64 | b64encode }}
         ingress-tsa.pem: |
           {{ tsa_ingress_base64 | b64encode }}
+        ingress-cli-server.pem: |
+          {{ cli_server_ingress_base64 | b64encode }}
         ingress-rekor.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
         ingress-rekor-search.key: |
@@ -103,6 +114,9 @@
           + '/ingress-fulcio.key') | list | first).content }}
         ingress-tsa.key: |
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tsa.key') | list | first).content }}
+        ingress-cli-server.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
+          + '/ingress-cli-server.key') | list | first).content }}
   register: secret_result
 
 - name: Load nginx config content

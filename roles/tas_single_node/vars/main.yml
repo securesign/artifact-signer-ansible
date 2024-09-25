@@ -25,6 +25,7 @@ tas_single_node_tuf_enabled: true
 tas_single_node_tsa_enabled: true
 tas_single_node_fulcio_enabled: true
 tas_single_node_rekor_search_enabled: true
+tas_single_node_client_server_enabled: true
 
 # Directory Structure
 tas_single_node_config_dir: /etc/rhtas
@@ -75,6 +76,7 @@ tas_single_node_tuf_secret_config: "{{ tas_single_node_kube_configmap_dir }}/tuf
 tas_single_node_treeid_config: "{{ tas_single_node_kube_configmap_dir }}/treeid-config.yaml"
 tas_single_node_rekor_sharding_config: "{{ tas_single_node_kube_configmap_dir }}/rekor-sharding-config.yaml"
 tas_single_node_nginx_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-config.yaml"
+tas_single_node_apache_config: "{{ tas_single_node_kube_configmap_dir }}/apache-config.yaml"
 tas_single_node_nginx_certs_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-certs.yaml"
 tas_single_node_trillian_secret: "{{ tas_single_node_kube_configmap_dir }}/trillian-secret.yaml"
 tas_single_node_tsa_secret: "{{ tas_single_node_kube_configmap_dir }}/tsa-secret.yaml"
