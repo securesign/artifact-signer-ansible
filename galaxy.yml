@@ -31,6 +31,6 @@ build_ignore:
   - ansible-navigator.log
   - Makefile
   - molecule
-  - requirements-testing.txt
+  - testing-requirements.txt
   - roles/tas_single_node/README.j2
   - vm-testing
