@@ -12,6 +12,10 @@
       ansible.builtin.set_fact:
         node_ip: "{{ ansible_ssh_host }}"
 
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "Test dir path is {{ test_dir_path }}"
+
     - name: Build the test Podman image
       containers.podman.podman_image:
         name: fedora-cosign
@@ -21,7 +25,7 @@
         path: "{{ test_dir_path }}"
         build:
           cache: true
-          file: "Containerfile"
+          file: "{{ test_dir_path }}/Containerfile"
       become: false
       delegate_to: localhost
 
