@@ -1,7 +1,6 @@
-ansible-lint==24.6.1
-antsibull-docs==2.13.1
-galaxy-importer==0.4.25
+ansible-lint==24.9.0
+antsibull-docs==2.14.0
 molecule==24.7.0
 # testing farm should depend on setuptools, but it doesn't; list them here explicitly
-setuptools==72.1.0
+setuptools==75.1.0
 tft-cli==0.0.17
