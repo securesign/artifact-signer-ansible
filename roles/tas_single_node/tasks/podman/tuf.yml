@@ -16,16 +16,13 @@
   register: remote_tuf_certificates
 
 - name: Retrieve Rekor Public Key
-  ansible.builtin.uri:
-    url: http://localhost:3001/api/v1/log/publicKey
-    method: GET
-    status_code: 200
-    validate_certs: false
-    return_content: true
-  until: rekor_public_key_result.status == 200
-  retries: "{{ tas_single_node_rekor_public_key_retries }}"
-  delay: "{{ tas_single_node_rekor_public_key_delay }}"
+  containers.podman.podman_container_exec:
+    name: rekor-server-pod-rekor-server
+    command: >-
+      curl -k --fail --retry {{ tas_single_node_rekor_public_key_retries }}
+      --retry-delay {{ tas_single_node_rekor_public_key_delay }} http://localhost:3001/api/v1/log/publicKey
   register: rekor_public_key_result
+  changed_when: false
 
 - name: Create tuf Secret
   ansible.builtin.copy:
@@ -45,7 +42,7 @@
         fulcio-cert: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
-          {{ rekor_public_key_result.content | b64encode }}
+          {{ rekor_public_key_result.stdout | b64encode }}
         tsa-cert: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | first).content }}
   register: secret_result
