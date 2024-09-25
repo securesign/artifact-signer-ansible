@@ -4,3 +4,4 @@
 
 collections:
   - community.crypto
+  - containers.podman

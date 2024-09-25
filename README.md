@@ -43,7 +43,8 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
   * Updated DNS records or `/etc/hosts` entries with the ingress host names and IP addresses.
 * Installation and configuration of Ansible on a control node to perform the automation.
 * Installation of the Ansible collections on the control node.
-  * If installing from the Ansible Automation Hub, then run `ansible-galaxy install redhat.artifact_signer`.
+  * Install the `containers.podman` collection from [Ansible Galaxy](https://galaxy.ansible.com/ui/repo/published/containers/podman/) by running `ansible-galaxy collection install "containers.podman>=1.15.0"`.
+  * If installing from the Ansible Automation Hub, then run `ansible-galaxy collection install redhat.artifact_signer`.
   * If installing from this Git repository, then clone it locally, and run `ansible-galaxy collection install -r requirements.yml`.
 * An OpenID Connect (OIDC) provider, such as [Keycloak](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/sso/).
 * The ability to resolve the ingress host names, by using the Domain Name System (DNS) or the `/etc/hosts` file.

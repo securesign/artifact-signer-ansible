@@ -16,8 +16,7 @@ description: Install and configure RHTAS, a downstream redistribution of the Sig
 license_file: Apache-2.0
 tags: [sigstore, tas, rhtas, security, cosign]
 # NOTE: when updating, also update dependencies in requirements.yml
-dependencies:
-  containers.podman: ">=1.15.0"
+dependencies: {}
 repository: https://github.com/securesign/artifact-signer-ansible/
 documentation: http://TODO.com
 homepage: https://github.com/securesign/artifact-signer-ansible#rhtas-ansible-collection

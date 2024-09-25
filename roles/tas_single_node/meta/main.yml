@@ -14,5 +14,4 @@ galaxy_info:
 
   galaxy_tags: [sigstore, tas, rhtas, security, cosign]
 
-collections:
-  - containers.podman
+collections: []
