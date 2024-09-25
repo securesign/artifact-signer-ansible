@@ -1,8 +1,6 @@
 ---
-- name: Check OIDC issuers
-  ansible.builtin.fail:
-    msg: "Either tas_single_node_oidc_issuers or tas_single_node_meta_issuers must be specified"
-  when: not tas_single_node_oidc_issuers and not tas_single_node_meta_issuers
+- name: Check configuration correctness
+  ansible.builtin.include_tasks: configuration_check.yml
 
 - name: Check OS Support
   ansible.builtin.include_tasks: os_support.yml

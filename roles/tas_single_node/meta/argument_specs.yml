@@ -143,8 +143,14 @@ argument_specs:
         type: "str"
         required: true
         version_added: "1.1.0"
-        # we provide no default value here intentionally
-      tas_single_node_kms_key_resource:
+        # we provide no default value here intentionall
+      tas_single_node_tsa_signer_type:
+        description: >
+          Signer type to use for TSA. Valid options are: [file, kms, tink].
+        type: str
+        required: false
+        version_added: "1.1.0"
+      tas_single_node_tsa_kms_key_resource:
         description: >
           The Key Management Services (KMS) key for signing timestamp responses.
           Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource].
@@ -152,7 +158,7 @@ argument_specs:
         required: false
         version_added: "1.1.0"
         default: ""
-      tas_single_node_tink_key_resource:
+      tas_single_node_tsa_tink_key_resource:
         description: >
           The KMS key for signing timestamp responses for Tink keysets.
           Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].
@@ -161,12 +167,12 @@ argument_specs:
         version_added: "1.1.0"
         default: ""
       tas_single_node_tsa_tink_keyset:
-        description: "The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tink_key_resource string."
+        description: "The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string."
         type: "str"
         required: false
         version_added: "1.1.0"
         default: ""
-      tas_single_node_tink_hcvault_token:
+      tas_single_node_tsa_tink_hcvault_token:
         description: "The authentication token for Hashicorp Vault API calls."
         type: "str"
         required: false
