@@ -28,10 +28,11 @@ tas_single_node_rekor_public_key_delay: 10
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
 
-tas_single_node_kms_key_resource: ""
-tas_single_node_tink_key_resource: ""
+tas_single_node_tsa_signer_type: file
+tas_single_node_tsa_kms_key_resource: ""
+tas_single_node_tsa_tink_key_resource: ""
 tas_single_node_tsa_tink_keyset: ""
-tas_single_node_tink_hcvault_token: ""
+tas_single_node_tsa_tink_hcvault_token: ""
 
 tas_single_node_skip_os_install: false
 

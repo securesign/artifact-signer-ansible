@@ -27,7 +27,7 @@
 - name: Append Tink secret data
   ansible.builtin.set_fact:
     secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa_tink_keyset | b64encode}) }}"
-  when: tas_single_node_signer_type == 'tink'
+  when: tas_single_node_tsa_signer_type == 'tink'
 
 - name: Create TSA Secret
   ansible.builtin.copy:

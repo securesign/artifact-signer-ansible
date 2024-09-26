@@ -39,14 +39,17 @@ spec:
             - serve
             - --trillian_log_server.address=trillian-logserver-pod
             - --trillian_log_server.port=8091
-            - --trillian_log_server.sharding_config=/sharding/sharding-config.yaml
+            - --trillian_log_server.sharding_config=/config/sharding-config.yaml
             - --redis_server.address={{ tas_single_node_rekor_redis.redis.host }}
             - --redis_server.port={{ tas_single_node_rekor_redis.redis.port }}
 {% if tas_single_node_rekor_redis.redis.password != "" %}
             - --redis_server.password={{ tas_single_node_rekor_redis.redis.password }}
 {% endif %}
             - --rekor_server.address=0.0.0.0
-            - --rekor_server.signer=memory
+{% if tas_single_node_rekor_signer_type == "file" %}
+            - --rekor_server.signer=/rekor-keys/private
+            - --rekor_server.signer-passwd={{ tas_single_node_rekor_ca_passphrase }}
+{% endif %}
             - --enable_retrieve_api=true
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
             - --enable_attestation_storage
@@ -61,16 +64,21 @@ spec:
               protocol: TCP
           resources: {}
           volumeMounts:
-            - mountPath: /sharding
-              name: rekor-sharding-config
+            - mountPath: /rekor-keys
+              name: keys
+            - mountPath: /config
+              name: rekor-server-config
             - mountPath: /var/run/attestations
               name: storage
       restartPolicy: Always
       volumes:
-        - name: rekor-sharding-config
+        - name: keys
+          secret:
+            secretName: rekor-secret
+        - name: rekor-server-config
           configMap:
             defaultMode: 420
-            name: rekor-sharding-config
+            name: rekor-server-config
         - name: storage
           persistentVolumeClaim:
             claimName: rekor-server

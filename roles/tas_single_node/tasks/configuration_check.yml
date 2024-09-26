@@ -1,0 +1,15 @@
+---
+- name: Check OIDC issuers
+  ansible.builtin.fail:
+    msg: "Either tas_single_node_oidc_issuers or tas_single_node_meta_issuers must be specified"
+  when: not tas_single_node_oidc_issuers and not tas_single_node_meta_issuers
+
+- name: Prevent usage of memory signer for TSA
+  ansible.builtin.fail:
+    msg: "'memory' signer can't be used for TSA"
+  when: tas_single_node_tsa_signer_type == "memory"
+
+- name: Prevent usage of memory signer for Rekor
+  ansible.builtin.fail:
+    msg: "'memory' signer can't be used for Rekor"
+  when: tas_single_node_rekor_signer_type == "memory"

@@ -23,10 +23,11 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `true`  |
-| tas_single_node_kms_key_resource | The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource]. | str |  |
-| tas_single_node_tink_key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str |  |
-| tas_single_node_tsa_tink_keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tink_key_resource string. | str |  |
-| tas_single_node_tink_hcvault_token | The authentication token for Hashicorp Vault API calls. | str |  |
+| tas_single_node_tsa_signer_type | Signer type to use for TSA. Valid options are: [file, kms, tink]. | str |  |
+| tas_single_node_tsa_kms_key_resource | The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource]. | str |  |
+| tas_single_node_tsa_tink_key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str |  |
+| tas_single_node_tsa_tink_keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str |  |
+| tas_single_node_tsa_tink_hcvault_token | The authentication token for Hashicorp Vault API calls. | str |  |
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later. | bool |  `false`  |
 | tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
