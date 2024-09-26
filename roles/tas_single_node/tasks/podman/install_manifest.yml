@@ -16,14 +16,14 @@
   register: copy_manifest
 
 - name: Create Secret
+  # Note for when we'll use containers.podman.podman_play:
   # We can't use podman_secret because we support Podman 4.4.1 and the podman_secret module only
   # supports idempotency with >= 4.7.0: https://github.com/containers/ansible-podman-collections/issues/692
   # Unfortunately podman_play doesn't properly understand idempotency with secrets either
   # The next best thing is to identify whether the secret file changed - this is determined from the secret_changed
   # variable passed by the caller to this file
-  containers.podman.podman_play:
-    kube_file: "{{ podman_spec.secret }}"
-    state: "{{ podman_spec.state | default('started') }}"
+  ansible.builtin.command:
+    cmd: "podman kube play {{ podman_spec.secret }}"
   when: podman_spec.secret is defined
   changed_when: podman_spec.secret is defined and podman_spec.secret_changed
 
