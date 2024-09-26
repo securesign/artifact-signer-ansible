@@ -19,7 +19,7 @@
 
 # Create Tree ID
 - name: Create Tree ID
-  when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists and tas_single_node_create_tree_enabled | bool
+  when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists and tas_single_node_createtree_enabled | bool
   block:
     - name: Generate unique container name for the createtree container
       ansible.builtin.set_fact:
@@ -29,7 +29,7 @@
       ansible.builtin.command:
         cmd: >-
           podman run --network {{ tas_single_node_podman_network }} --replace
-          --name {{ createtree_container_name }} {{ tas_single_node_create_tree_image }}
+          --name {{ createtree_container_name }} {{ tas_single_node_createtree_image }}
           --admin_server trillian-logserver-pod:8091
       register: createtree_container
       changed_when: true

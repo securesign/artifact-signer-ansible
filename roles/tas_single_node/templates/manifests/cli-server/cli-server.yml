@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: cli-server
-          image: "{{ tas_single_node_cli_server_image }}"
+          image: "{{ tas_single_node_client_server_image }}"
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
