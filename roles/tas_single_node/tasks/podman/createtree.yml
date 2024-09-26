@@ -19,7 +19,7 @@
 
 # Create Tree ID
 - name: Create Tree ID
-  when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists
+  when: trillian_tree_id is not defined or not treeid_config_stat.stat.exists and tas_single_node_create_tree_enabled | bool
   block:
     - name: Generate unique container name for the createtree container
       ansible.builtin.set_fact:
