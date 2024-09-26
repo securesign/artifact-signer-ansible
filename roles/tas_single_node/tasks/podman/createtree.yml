@@ -33,6 +33,7 @@
           --admin_server trillian-logserver-pod:8091
       register: createtree_container
       changed_when: true
+      when: tas_single_node_create_tree_enabled | bool
 
     - name: Obtain Createtree logs
       ansible.builtin.command:

@@ -27,6 +27,7 @@ tas_single_node_tsa_enabled: true
 tas_single_node_fulcio_enabled: true
 tas_single_node_rekor_search_enabled: true
 tas_single_node_client_server_enabled: true
+tas_single_node_create_tree_enabled: true
 
 # Directory Structure
 tas_single_node_config_dir: /etc/rhtas
