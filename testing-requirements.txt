@@ -1,4 +1,4 @@
-ansible-lint==24.9.0
+ansible-lint==24.9.2
 antsibull-docs==2.14.0
 galaxy-importer==0.4.25
 molecule==24.7.0
