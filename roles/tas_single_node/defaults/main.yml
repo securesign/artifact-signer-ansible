@@ -68,6 +68,6 @@ tas_single_node_timestamp_authority_image:
 tas_single_node_rekor_search_ui_image:
   "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e01cfb64b011a14a243701a992b7fc3dbc9d7a181bea5cebcfc28593613f7950"
 # Create Tree
-tas_single_node_create_tree_image: "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:c089ee74ce7781f6ac356ff6959bf4e4f520abc0e08820fe891c65b50c8b1e5b"
+tas_single_node_createtree_image: "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:c089ee74ce7781f6ac356ff6959bf4e4f520abc0e08820fe891c65b50c8b1e5b"
 # CLI Server
-tas_single_node_cli_server_image: "registry.redhat.io/rhtas/client-server-rhel9@sha256:eea8539812775b24be97fa2d62606be0ab3403581c1a4b9ae115e25c2dc4a4c5"
+tas_single_node_client_server_image: "registry.redhat.io/rhtas/client-server-rhel9@sha256:eea8539812775b24be97fa2d62606be0ab3403581c1a4b9ae115e25c2dc4a4c5"
