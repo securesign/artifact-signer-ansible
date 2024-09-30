@@ -8,7 +8,7 @@ Technology Preview features are not supported with Red Hat production service le
 These features provide early access to upcoming product features, enabling customers to test functionality and provide feedback during the development process.
 See the support scope for [Red Hat Technology Preview](https://access.redhat.com/support/offerings/techpreview/) features for more details.
 
-## Overview
+## Description
 
 The RHTAS service is the downstream redistribution of the [Sigstore](https://sigstore.dev) project.
 The automation contained within this Git repository installs and configures the components of RHTAS to run on a single RHEL server, which uses a standalone containerized deployment.
@@ -35,8 +35,10 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 * https://tsa.`<base_hostname>`
 * https://tuf.`<base_hostname>`
 
-## Prerequisites
+## Requirements
 
+* Ansible 2.16.0 or greater
+* Python 3.9.0 or greater
 * RHEL x86\_64 9.2 or greater.
 * All client nodes using `cosign`, `gitsign`, and `ec` need the following:
   * Command-line access to the node with a user that has `sudo` privileges.
@@ -50,69 +52,39 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 * Optional:
   Installation of the `podman` and [`cosign`](https://github.com/sigstore/cosign) binaries to verify that the RHTAS service is working as expected.
 
-## Deploying
+## Installation
 
-1. Create an `inventory` file with a single node under the `rhtas` group:
-   
-   ```
-   [rhtas]
-   123.123.123.123
-   ```
 
-2. Create an Ansible Playbook named `play.yml`, and replace `TODO` with your relevant information:
-   
-   ```yaml
-   - hosts: rhtas
-     vars:
-       base_hostname: TODO # e.g. example.com
-       # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
-       tas_single_node_registry_username: TODO
-       tas_single_node_registry_password: TODO
-       tas_single_node_oidc_issuers:
-         - issuer: TODO # your OIDC provider (e.g. keycloak) URL
-           client_id: trusted-artifact-signer
-           url: TODO # your OIDC provider (e.g. keycloak) URL
-           type: email
-     tasks:
-       - name: Include TAS single node role
-         ansible.builtin.include_role:
-           name: redhat.artifact_signer.tas_single_node # Use if deploying from Ansible Automation Hub.
-         vars:
-           ansible_become: true
-   ```
-   > [!NOTE]
-   If running this Playbook from a locally-cloned Git repository, then replace the `redhat.artifact_signer.tas_single_node` value with `tas_single_node`.
+Before using this collection, you need to install it with the Ansible Galaxy command-line tool:
 
-3. Install the RHTAS Ansible collection.
-   
-   - If installing from Ansible Automation Hub, then run the following command:
-   
-     ```shell
-     ansible-playbook -i inventory play.yml
-     ```
+```
+ansible-galaxy collection install redhat.artifact_signer
+```
 
-   - If running from a locally-cloned Git repository, then run the following command:
-   
-     ```shell
-     export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
-     ```
+You can also include it in a requirements.yml file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
 
-4. Add the root certificate authority (CA) to your local truststore:
-  
-   ```shell
-   sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
-   sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
-   sudo update-ca-trust
-   ```
-   > [!TIP]
-   The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_hostname>` in a web browser.
-   Download the _root_ certificate that issued the Rekor certificate.
-   
-   > [!NOTE]
-   Add this certificate to all RHTAS client nodes that use the `cosign` and `gitsign` binaries for signing and verifying artifacts.
+
+```yaml
+collections:
+  - name: redhat.artifact_signer
+```
+
+Note that if you install any collections from Ansible Galaxy, they will not be upgraded automatically when you upgrade the Ansible package.
+To upgrade the collection to the latest available version, run the following command:
+
+```
+ansible-galaxy collection install redhat.artifact_signer --upgrade
+```
+
+You can also install a specific version of the collection, for example, if you need to downgrade when something is broken in the latest version (please report an issue in this repository). Use the following syntax to install version 1.1.0:
+
+```
+ansible-galaxy collection install redhat.artifact_signer:==1.1.0
+```
+
 
 ## Downloading CLI tools
-   To Download tools to interact with Red Hat Trusted Artifact Signer, you can visit `https://cli-server.`<base_hostname>``
+   To Download tools to interact with Red Hat Trusted Artifact Signer, you can visit `https://cli-server.<base_hostname>`
 
 ## Verifying the deployment by signing a test container
 
@@ -185,8 +157,72 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
    
    If the signature verification does not result in an error, then the deployment of RHTAS was successful!
 
+## Use Cases
 
-## Contributing
+See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
+
+
+
+1. Create an `inventory` file with a single node under the `rhtas` group:
+   
+   ```
+   [rhtas]
+   123.123.123.123
+   ```
+
+2. Create an Ansible Playbook named `play.yml`, and replace `TODO` with your relevant information:
+   
+   ```yaml
+   - hosts: rhtas
+     vars:
+       base_hostname: TODO # e.g. example.com
+       # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
+       tas_single_node_registry_username: TODO
+       tas_single_node_registry_password: TODO
+       tas_single_node_oidc_issuers:
+         - issuer: TODO # your OIDC provider (e.g. keycloak) URL
+           client_id: trusted-artifact-signer
+           url: TODO # your OIDC provider (e.g. keycloak) URL
+           type: email
+     tasks:
+       - name: Include TAS single node role
+         ansible.builtin.include_role:
+           name: redhat.artifact_signer.tas_single_node # Use if deploying from Ansible Automation Hub.
+         vars:
+           ansible_become: true
+   ```
+   > [!NOTE]
+   If running this Playbook from a locally-cloned Git repository, then replace the `redhat.artifact_signer.tas_single_node` value with `tas_single_node`.
+
+3. Install the RHTAS Ansible collection.
+   
+   - If installing from Ansible Automation Hub, then run the following command:
+   
+     ```shell
+     ansible-playbook -i inventory play.yml
+     ```
+
+   - If running from a locally-cloned Git repository, then run the following command:
+   
+     ```shell
+     export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
+     ```
+
+4. Add the root certificate authority (CA) to your local truststore:
+  
+   ```shell
+   sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+   sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
+   sudo update-ca-trust
+   ```
+   > [!TIP]
+   The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_hostname>` in a web browser.
+   Download the _root_ certificate that issued the Rekor certificate.
+   
+   > [!NOTE]
+   Add this certificate to all RHTAS client nodes that use the `cosign` and `gitsign` binaries for signing and verifying artifacts.
+
+## Testing
 
 ### Testing locally
 
@@ -223,7 +259,27 @@ ansible-test sanity
 The [molecule/README.md](molecule/README.md) file has instructions on testing the deployment on a virtual machine (VM).
 By default, the VM provider is [testing-farm.io](https://docs.testing-farm.io/).
 
+## Contributing
+
+## Support
+
+Support tickets for RedHat Trusted Artifact Signer can be opened at https://access.redhat.com/support/cases/#/case/new?product=Red%20Hat%20Trusted%20Artifact%20Signer.
+
+## Release notes and Roadmap
+
+Release notes can be found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/release_notes/index).
+
+## Related Information
+
+More information around Red Hat Trusted Artifact Signer can be found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1).
+
+Information on Sigstore can be found [here](https://www.sigstore.dev/).
+
 ## Feedback
 
 Any and all feedback is welcome.
 Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) or [Pull Request](https://github.com/securesign/artifact-signer-ansible/pulls) as needed.
+
+## License Information
+
+License Information cna be found within the [LICENSE](LICENSE) file.
