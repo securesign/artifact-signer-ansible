@@ -61,7 +61,7 @@ Before using this collection, you need to install it with the Ansible Galaxy com
 ansible-galaxy collection install redhat.artifact_signer
 ```
 
-You can also include it in a requirements.yml file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
+You can also include it in a `requirements.yml` file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
 
 
 ```yaml
@@ -267,7 +267,7 @@ Support tickets for RedHat Trusted Artifact Signer can be opened at https://acce
 
 ## Release notes and Roadmap
 
-Release notes can be found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/release_notes/index).
+Release notes can be found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1.1/html/release_notes/index).
 
 ## Related Information
 
