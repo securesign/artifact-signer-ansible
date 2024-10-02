@@ -40,5 +40,4 @@ echo "testing" > to-sign
 
 cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp=timestamp.txt
 
-curl "${COSIGN_TSA_URL}"/certchain > tsa_chain.pem
-cosign --verbose verify-blob --certificate-identity="${USERNAME}"@redhat.com --bundle signed.bundle to-sign --timestamp-certificate-chain=tsa_chain.pem --rfc3161-timestamp=timestamp.txt
+cosign --verbose verify-blob --certificate-identity="${USERNAME}"@redhat.com --bundle signed.bundle to-sign --rfc3161-timestamp=timestamp.txt --use-signed-timestamps
