@@ -30,8 +30,10 @@ A set of self-signed certificates get generated at runtime to establishing secur
 This automation also deploys and configures a software load balancer as a central point of ingress.
 The ingress host names are as follows, where `<base_hostname>` is your deployment's base hostname:
 
-* https://rekor.`<base_hostname>`
+* https://cli-server.`<base_hostname>`
 * https://fulcio.`<base_hostname>`
+* https://rekor.`<base_hostname>`
+* https://rekor-search.`<base_hostname>`
 * https://tsa.`<base_hostname>`
 * https://tuf.`<base_hostname>`
 
