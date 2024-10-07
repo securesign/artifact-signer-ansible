@@ -64,9 +64,9 @@ tas_single_node_trillian_netcat_image:
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe"
 tas_single_node_timestamp_authority_image:
-  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:d957041e1f10faf087333b9f1d39b2bb4b26edd37a812192e67771c423950def"
+  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:413b27ba32209d9432e1894ac0a7c095332ddc52683c6e444fc4329644751fed"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e01cfb64b011a14a243701a992b7fc3dbc9d7a181bea5cebcfc28593613f7950"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e9233bc0f5d1d441385253771ea4896e16446f08a594553c3d3b182c6e9bb96d"
 # Create Tree
 tas_single_node_createtree_image: "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:c089ee74ce7781f6ac356ff6959bf4e4f520abc0e08820fe891c65b50c8b1e5b"
 # CLI Server
