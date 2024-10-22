@@ -1,0 +1,42 @@
+---
+- name: Prepare
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Install Redis
+      ansible.builtin.dnf:
+        name: redis
+        state: latest
+
+    - name: Enable and start Redis
+      ansible.builtin.service:
+        name: redis
+        enabled: yes
+        state: started
+
+    - name: Install mariadb
+      ansible.builtin.dnf:
+        name:
+          - mariadb
+          - mariadb-server
+        state: latest
+
+    - name: Enable and start MariaDB
+      ansible.builtin.service:
+        name: mariadb
+        enabled: yes
+        state: started
+
+    - name: Create Trillian Database
+      shell: echo "CREATE DATABASE IF NOT EXISTS trillian;" | mysql
+
+    - name: Import schema
+      shell: curl https://raw.githubusercontent.com/securesign/trillian/refs/heads/main/storage/mysql/schema/storage.sql | mysql -u root -p trillian
+ 
+    - name: Prepare MariaDB installation
+      shell: |
+        echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'rootpassword'; GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY 'rootpassword' WITH GRANT OPTION; \
+              DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1'); \
+              CREATE user mysql; GRANT ALL ON trillian.* to 'mysql'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION; FLUSH PRIVILIGES;" | mysql -u root
