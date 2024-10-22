@@ -18,18 +18,18 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Default|
 |---|---|---|---|
 | tas_single_node_podman_network | Name of the Podman network for containers to use. | str |  `rhtas`  |
-| tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{"database_deploy": true, "redis": {"host": "rekor-redis-pod", "port": 6379, "password": "password"}}`  |
-| tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{"database_deploy": true, "mysql": {"user": "mysql", "root_password": "rootpassword", "password": "password", "database": "trillian", "host": "trillian-mysql-pod", "port": 3306}}`  |
+| tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
+| tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}}`  |
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
-| tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `true`  |
+| tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_tsa_signer_type | Signer type to use for TSA. Valid options are: [file, kms, tink]. | str |  |
 | tas_single_node_tsa_kms_key_resource | The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource]. | str |  |
 | tas_single_node_tsa_tink_key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str |  |
 | tas_single_node_tsa_tink_keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str |  |
 | tas_single_node_tsa_tink_hcvault_token | The authentication token for Hashicorp Vault API calls. | str |  |
-| tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later. | bool |  `false`  |
-| tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  |
+| tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later. | bool |  `False`  |
+| tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  `[]`  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208`  |
 | tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0`  |
@@ -47,7 +47,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| database_deploy | Whether or not to deploy Redis. | bool | no |  `false`  |
+| database_deploy | Whether or not to deploy Redis. | bool | no |  |
 | redis | Details on the Redis connection. | dict of 'redis' options | no |  |
 
 #### Options for main > tas_single_node_rekor_redis > redis
@@ -62,7 +62,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| database_deploy | Whether or not to deploy the database. | bool | no |  `false`  |
+| database_deploy | Whether or not to deploy the database. | bool | no |  |
 | mysql | Details on the database connection. | dict of 'mysql' options | no |  |
 
 #### Options for main > tas_single_node_trillian > mysql
