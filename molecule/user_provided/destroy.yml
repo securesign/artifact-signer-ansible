@@ -1,0 +1,48 @@
+---
+# TODO: improve idempotency and error handling throughout this file,
+# specifically for the testing-farm call
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Load instance config
+      ansible.builtin.set_fact:
+        instance_configs: "{{ (lookup('file', molecule_instance_config, errors='ignore') or '{}') | from_yaml }}"
+
+    - name: Debug instance config
+      ansible.builtin.debug:
+        msg: "{{ instance_configs }}"
+
+    - name: Cancel testing-farm instances
+      ansible.builtin.command:
+        cmd: "testing-farm cancel {{ item['instance'] }}"
+      with_items: "{{ instance_configs }}"
+      changed_when: true
+      failed_when: false
+      register: cancel_results
+
+    - name: Find out if some cancel requests failed
+      ansible.builtin.set_fact:
+        cancel_failed:
+          "{{ cancel_results.results | selectattr('rc', 'ne', 0) | rejectattr('stdout_lines', 'match', '.* already finished.*') }}"
+
+    - name: Fail if some cancel requests failed
+      ansible.builtin.fail:
+        msg: "Failed to cancel some requests: {{ cancel_failed }}"
+      when: cancel_failed | length > 0
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: "{{ {} | to_yaml }}"
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
+
+- name: Remove dynamic molecule inventory
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Remove dynamic inventory file
+      ansible.builtin.file:
+        path: "{{ molecule_ephemeral_directory }}/inventory/molecule_inventory.yml"
+        state: absent

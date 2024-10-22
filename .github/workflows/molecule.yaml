@@ -33,7 +33,7 @@ jobs:
             # ensure we wipe out any data potentially still on the runner from previous run
             molecule reset
             # NOTE: for now we don't run "molecule test", because we don't have proper idempotence yet
-            molecule -v test --scenario-name default
+            molecule -v test --scenario-name user_provided
         - name: Destroy molecule infrastructure
           env:
             TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
