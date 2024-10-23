@@ -32,6 +32,7 @@
   register: podman_login_result
   when: logincheck.stdout | string != tas_single_node_registry_username | string
   changed_when: true
+  no_log: true
 
 - name: Pull all images
   ansible.builtin.command:
