@@ -18,6 +18,33 @@
         mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
   register: secret_result
 
+- name: Read Trillian CA certificate from file
+  ansible.builtin.slurp:
+    src: "{{ trillian_ca_path }}"
+  register: ca_cert_data
+  when: trillian_ca_path is defined and trillian_ca_path != ""
+
+- name: Create Trillian CA certificate ConfigMap (with default empty value if not provided)
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_trillian_ca_configmap }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: trillian-ca-cert
+        namespace: trillian-system
+      data:
+        ca-cert.pem: |
+          {% if trillian_ca_path is defined and trillian_ca_path != "" %}
+          {{ ca_cert_data['content'] | b64decode }}
+          {% else %}
+          # Empty content
+          {% endif %}
+  register: configmap_result
+
 - name: Build Trillian Database Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
@@ -37,9 +64,11 @@
       state: started
       systemd_file: trillian-signer
       network: "{{ tas_single_node_podman_network }}"
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logsigner.yaml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logsigner.j2') | from_yaml }}"
       secret: "{{ tas_single_node_trillian_secret }}"
       secret_changed: "{{ secret_result.changed }}"
+      configmap: "{{ tas_single_node_trillian_ca_configmap }}"
+      configmap_changed: "{{ configmap_result.changed | default('false') }}"
 
 - name: Build Trillian Log Server Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -48,6 +77,8 @@
       state: started
       systemd_file: trillian-server
       network: "{{ tas_single_node_podman_network }}"
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logserver.yaml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logserver.j2') | from_yaml }}"
       secret: "{{ tas_single_node_trillian_secret }}"
       secret_changed: "{{ secret_result.changed }}"
+      configmap: "{{ tas_single_node_trillian_ca_configmap }}"
+      configmap_changed: "{{ configmap_result.changed | default('false') }}"

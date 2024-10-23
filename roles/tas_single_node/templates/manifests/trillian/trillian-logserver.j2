@@ -21,8 +21,19 @@ spec:
         app.kubernetes.io/component: trillian-logserver
         app.kubernetes.io/instance: scaffold
     spec:
+{% if trillian_ca_path is defined and trillian_ca_path != "" %}
+      volumes:
+        - name: ca-trust
+          configMap:
+            name: trillian-ca-cert
+{% endif %}
       containers:
         - name: trillian-trillian-logserver
+{% if trillian_ca_path is defined and trillian_ca_path != "" %}
+          volumeMounts:
+            - name: ca-trust
+              mountPath: /var/run/configs/tas/ca-trust
+{% endif %}
           image: "{{ tas_single_node_trillian_log_server_image }}"
           imagePullPolicy: IfNotPresent
           args:

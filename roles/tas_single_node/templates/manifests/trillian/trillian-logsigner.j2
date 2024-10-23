@@ -32,8 +32,19 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+{% if trillian_ca_path is defined and trillian_ca_path != "" %}
+      volumes:
+        - name: ca-trust
+          configMap:
+            name: trillian-ca-cert
+{% endif %}
       containers:
         - name: trillian-trillian-logsigner
+{% if trillian_ca_path is defined and trillian_ca_path != "" %}
+          volumeMounts:
+            - name: ca-trust
+              mountPath: /var/run/configs/tas/ca-trust
+{% endif %}
           image: "{{ tas_single_node_trillian_log_signer_image }}"
           imagePullPolicy: IfNotPresent
           ports:
