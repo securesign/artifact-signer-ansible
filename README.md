@@ -260,7 +260,7 @@ Steps:
 4. Configure the Ansible collection again.
     * Within `roles/tas_single_node/defaults/main.yml` change the following
 
-        ``yaml
+        ```yaml
         tas_single_node_rekor_redis:
             database_deploy: false
             redis:
