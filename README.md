@@ -228,46 +228,46 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
     
 Prerequisites:
     
-    - An AWS account with necessary permissions to create RDS MariaDB and Elasticache Redis instances.
-    - The RHTAS Ansible collection installed and configured
+* An AWS account with necessary permissions to create RDS MariaDB and Elasticache Redis instances.
+* The RHTAS Ansible collection installed and configured
 
 Steps:
 
-    1. Create a MariaDB instance:
-        - Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html-single/deployment_guide/index#configuring-amazon-rds-for-trusted-artifact-signer_deploy)
-        - Ensure the instance uses the Trillian schema.
-        - Note the instance's hostname, port, username, root password, and password
+1. Create a MariaDB instance:
+    * Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html-single/deployment_guide/index#configuring-amazon-rds-for-trusted-artifact-signer_deploy)
+    * Ensure the instance uses the Trillian schema.
+    * Note the instance's hostname, port, username, root password, and password
 
-    2. Configure the Ansible collection
-        - Within `roles/tas_single_node/defaults/main.yml` change the following
+2. Configure the Ansible collection
+    * Within `roles/tas_single_node/defaults/main.yml` change the following
             
-            ```yaml
-            tas_single_node_trillian:
-                database_deploy: false
-                mysql:
-                    user: <username>
-                    root_password: <rootpassword>
-                    password: <password>
-                    database: <database_name>
-                    host: <hostname>
-                    port: <port>
-            ```
+        ```yaml
+        tas_single_node_trillian:
+            database_deploy: false
+            mysql:
+                user: <username>
+                root_password: <rootpassword>
+                password: <password>
+                database: <database_name>
+                host: <hostname>
+                port: <port>
+        ```
 
-    3. Create a Redis Instance:
-        - Follow the AWS documentation to create an Elasticache Redis instance or any other equivalent provider.
-        - Note the instance's hostname, port, and password.
+3. Create a Redis Instance:
+    * Follow the AWS documentation to create an Elasticache Redis instance or any other equivalent provider.
+    * Note the instance's hostname, port, and password.
 
-    4. Configure the Ansible collection again.
-        - Within `roles/tas_single_node/defaults/main.yml` change the following
+4. Configure the Ansible collection again.
+    * Within `roles/tas_single_node/defaults/main.yml` change the following
 
-            ``yaml
-            tas_single_node_rekor_redis:
-                database_deploy: false
-                redis:
-                    host: <hostname>
-                    port: <port>
-                    password: <password>
-            ```
+        ``yaml
+        tas_single_node_rekor_redis:
+            database_deploy: false
+            redis:
+                host: <hostname>
+                port: <port>
+                password: <password>
+        ```
 
 ## Testing
 
