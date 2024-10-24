@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/component: trillian-logserver
         app.kubernetes.io/instance: scaffold
     spec:
-{% if trillian_ca_path is defined and trillian_ca_path != "" %}
+{% if trillian_ca_cert is defined and trillian_ca_cert != "" %}
       volumes:
         - name: ca-trust
           configMap:
@@ -29,7 +29,7 @@ spec:
 {% endif %}
       containers:
         - name: trillian-trillian-logserver
-{% if trillian_ca_path is defined and trillian_ca_path != "" %}
+{% if trillian_ca_cert is defined and trillian_ca_cert != "" %}
           volumeMounts:
             - name: ca-trust
               mountPath: /var/run/configs/tas/ca-trust

@@ -18,12 +18,6 @@
         mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
   register: secret_result
 
-- name: Read Trillian CA certificate from file
-  ansible.builtin.slurp:
-    src: "{{ trillian_ca_path }}"
-  register: ca_cert_data
-  when: trillian_ca_path is defined and trillian_ca_path != ""
-
 - name: Create Trillian CA certificate ConfigMap (with default empty value if not provided)
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
@@ -38,8 +32,8 @@
         namespace: trillian-system
       data:
         ca-cert.pem: |
-          {% if trillian_ca_path is defined and trillian_ca_path != "" %}
-          {{ ca_cert_data['content'] | b64decode }}
+          {% if trillian_ca_cert is defined and trillian_ca_cert != "" %}
+          {{ trillian_ca_cert }}
           {% else %}
           # Empty content
           {% endif %}
