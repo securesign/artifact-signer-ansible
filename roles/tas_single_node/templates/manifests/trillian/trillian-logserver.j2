@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trillian-logsigner
+  name: trillian-logserver
   namespace: trillian-system
   labels:
-    app.kubernetes.io/component: trillian-logsigner
+    app.kubernetes.io/component: trillian-logserver
     app.kubernetes.io/instance: scaffold
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trillian
@@ -13,39 +13,35 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: trillian-logsigner
+      app.kubernetes.io/component: trillian-logserver
+      app.kubernetes.io/instance: scaffold
   template:
     metadata:
       labels:
-        app: trillian-logsigner
-        app.kubernetes.io/component: trillian-logsigner
+        app.kubernetes.io/component: trillian-logserver
         app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: trillian
-        helm.sh/chart: trillian-0.1.16
     spec:
-      initContainers:
-        - name: wait-for-trillian-db
-          image: "{{ tas_single_node_trillian_netcat_image}}"
-          imagePullPolicy: IfNotPresent
-          command: ["sh", "-c", "until nc -z -w 10 {{ tas_single_node_trillian.mysql.host }} {{ tas_single_node_trillian.mysql.port }}; do echo waiting for trillian mysql; sleep 5; done;"]
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
+{% if trillian_ca_cert is defined and trillian_ca_cert != "" %}
+      volumes:
+        - name: ca-trust
+          configMap:
+            name: trillian-ca-cert
+{% endif %}
       containers:
-        - name: trillian-trillian-logsigner
-          image: "{{ tas_single_node_trillian_log_signer_image }}"
+        - name: trillian-trillian-logserver
+{% if trillian_ca_cert is defined and trillian_ca_cert != "" %}
+          volumeMounts:
+            - name: ca-trust
+              mountPath: /var/run/configs/tas/ca-trust
+{% endif %}
+          image: "{{ tas_single_node_trillian_log_server_image }}"
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8191
-              protocol: TCP
           args:
             - --storage_system=mysql
             - --quota_system=mysql
             - --mysql_uri={{ tas_single_node_trillian.mysql.user }}:{{ tas_single_node_trillian.mysql.password }}@tcp({{ tas_single_node_trillian.mysql.host }}:{{ tas_single_node_trillian.mysql.port }})/{{ tas_single_node_trillian.mysql.database }}
             - --rpc_endpoint=0.0.0.0:8091
             - --http_endpoint=0.0.0.0:8090
-            - --force_master=true
             - --alsologtostderr
           env:
             - name: MYSQL_USER
@@ -66,7 +62,20 @@ spec:
             - name: MYSQL_HOSTNAME
               value: "{{ tas_single_node_trillian.mysql.host }}"
             - name: MYSQL_PORT
-              value: "{{ tas_single_node_trillian.mysql.port | quote }})"
+              value: "{{ tas_single_node_trillian.mysql.port | quote }}"
+          ports:
+            - containerPort: 8091
+              protocol: TCP
+            - containerPort: 8090
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      initContainers:
+        - name: wait-for-trillian-db
+          image: "{{ tas_single_node_trillian_netcat_image }}"
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "until nc -z -w 10 {{ tas_single_node_trillian.mysql.host }} {{ tas_single_node_trillian.mysql.port }}; do echo waiting for trillian-mysql; sleep 5; done;"]
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
@@ -77,10 +86,13 @@ spec:
         kubernetes.io/arch: arm64
       preemptionPolicy: PreemptLowerPriority
       priority: 0
+      # Needs to be set until https://github.com/containers/podman/pull/16698 is downsteamed
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccountName: trillian-logsigner
+      serviceAccount: trillian-logserver
+      serviceAccountName: trillian-logserver
+      terminationGracePeriodSeconds: 30
       tolerations:
         - effect: NoExecute
           key: node.kubernetes.io/not-ready
