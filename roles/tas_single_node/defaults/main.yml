@@ -40,6 +40,8 @@ tas_single_node_oidc_issuers: []
 
 tas_single_node_meta_issuers: []
 
+tas_single_node_trillian_trusted_ca: ""
+
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
 

@@ -46,8 +46,6 @@ tas_single_node_registry_password: "TODO-password"
 tas_single_node_oidc_issuers: "TODO-issuer-url"
 tas_single_node_issuer_url: "TODO-issuer-url"
 
-# Optional: Trillian CA certificate
-# trillian_ca_cert: "TODO-trillian-ca-certificate"
 ```
 
 ### Provisioning the VM and running Ansible
