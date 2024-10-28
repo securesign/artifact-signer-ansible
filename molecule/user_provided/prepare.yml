@@ -74,7 +74,8 @@
         GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY 'rootpassword' WITH GRANT OPTION;
         DELETE FROM mysql.user WHERE User='';
         DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-        CREATE user mysql;
+        CREATE USER mysql;
+        ALTER USER 'mysql'@'localhost' IDENTIFIED BY 'password';
         GRANT ALL ON trillian.* to 'mysql'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
         FLUSH PRIVILEGES;
         EOF
