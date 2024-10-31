@@ -229,7 +229,7 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
 Prerequisites:
     
 * An Amazon Web Services (AWS) account with the ability to create MariaDB and Elasticache Redis instances or equivalent.
-* The RHTAS Ansible Collection installed and configured
+* The RHTAS Ansible Collection installed and configured.
 
 Steps:
 
