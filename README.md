@@ -224,21 +224,21 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
    > [!NOTE]
    Add this certificate to all RHTAS client nodes that use the `cosign` and `gitsign` binaries for signing and verifying artifacts.
 
-## Configuring a User-Provisioned MariaDB and Redis Instance for the RHTAS Ansible Collection
+## Configuring a user-provisioned MariaDB and Redis instance for the RHTAS Ansible Collection
     
 Prerequisites:
     
-* An AWS account with necessary permissions to create RDS MariaDB and Elasticache Redis instances.
-* The RHTAS Ansible collection installed and configured
+* An Amazon Web Services (AWS) account with the ability to create MariaDB and Elasticache Redis instances or equivalent.
+* The RHTAS Ansible Collection installed and configured
 
 Steps:
 
 1. Create a MariaDB instance:
-    * Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html-single/deployment_guide/index#configuring-amazon-rds-for-trusted-artifact-signer_deploy)
+    * Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html-single/deployment_guide/index#configuring-amazon-rds-for-trusted-artifact-signer_deploy).
     * Ensure the instance uses the Trillian schema.
-    * Note the instance's hostname, port, username, root password, and password
+    * Note the instance's hostname, port, username, root password, and password.
 
-2. Configure the Ansible collection
+2. Configure the Ansible collection:
     * Within `roles/tas_single_node/defaults/main.yml` change the following
             
         ```yaml
@@ -253,11 +253,11 @@ Steps:
                 port: <port>
         ```
 
-3. Create a Redis Instance:
+3. Create a Redis instance:
     * Follow the AWS documentation to create an Elasticache Redis instance or any other equivalent provider.
     * Note the instance's hostname, port, and password.
 
-4. Configure the Ansible collection again.
+4. Configure the Ansible collection again:
     * Within `roles/tas_single_node/defaults/main.yml` change the following
 
         ```yaml
