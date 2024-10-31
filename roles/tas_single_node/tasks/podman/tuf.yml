@@ -47,7 +47,19 @@
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | first).content }}
   register: secret_result
 
-- name: Deploy tuf Pod
+- name: Initialize trust root
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: tuf-init-job
+      systemd_type: oneshot
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf-init.j2') | from_yaml }}"
+      secret: "{{ tas_single_node_tuf_secret_config }}"
+      secret_changed: "{{ secret_result.changed }}"
+
+- name: Deploy TUF server pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
     podman_spec:
@@ -55,5 +67,3 @@
       systemd_file: tuf
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.j2') | from_yaml }}"
-      secret: "{{ tas_single_node_tuf_secret_config }}"
-      secret_changed: "{{ secret_result.changed }}"
