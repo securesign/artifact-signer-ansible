@@ -19,6 +19,7 @@ The RHTAS Ansible collection deploys the following RHTAS components:
 * [Rekor](https://docs.sigstore.dev/rekor/overview)
   * [Trillian database](https://github.com/google/trillian)
   * [Optional: A self-managed MariaDB instance, and a Redis instance.](#configuring-a-user-provisioned-mariadb-and-redis-instance-for-the-rhtas-ansible-collection)
+   > [!NOTE] Highly recommended for production deployments to simplify operations and offload service management, including data backup and restoration etc.
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
 * [Timestamp Authority](https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities)
@@ -239,7 +240,7 @@ Steps:
     * Note the instance's hostname, port, username, root password, and password.
 
 2. Configure the Ansible collection:
-    * Within `roles/tas_single_node/defaults/main.yml` change the following
+    * Within the playbook `play.yml` created during step 2, add the following:
             
         ```yaml
         tas_single_node_trillian:
@@ -258,7 +259,7 @@ Steps:
     * Note the instance's hostname, port, and password.
 
 4. Configure the Ansible collection again:
-    * Within `roles/tas_single_node/defaults/main.yml` change the following
+    * Within the playbook `play.yml` created during step 2, add the following:
 
         ```yaml
         tas_single_node_rekor_redis:
