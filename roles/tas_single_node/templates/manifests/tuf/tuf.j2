@@ -25,9 +25,9 @@ spec:
           image: "{{ tas_single_node_tuf_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_tuf_port | int }}
+            - containerPort: {{ tas_single_node_tuf_port }}
               protocol: TCP
-              hostPart: {{ tas_single_node_tuf_port | int }}
+              hostPart: {{ tas_single_node_tuf_port }}
           env:
             - name: NAMESPACE
               value: tuf-system

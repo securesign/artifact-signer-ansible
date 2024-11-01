@@ -29,5 +29,5 @@ spec:
             - name: NEXT_PUBLIC_REKOR_DEFAULT_DOMAIN
               value: https://rekor.{{ tas_single_node_base_hostname }}
           ports:
-            - containerPort: {{ tas_single_node_rekor_search_ui_port | int }}
+            - containerPort: {{ tas_single_node_rekor_search_ui_port }}
               protocol: TCP

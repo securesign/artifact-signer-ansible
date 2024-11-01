@@ -66,9 +66,9 @@ spec:
               value: "/var/run/configs/tas/ca-trust"
 {% endif %}
           ports:
-            - containerPort: {{ tas_single_node_trillian_logserver_port_rpc | int }}
+            - containerPort: {{ tas_single_node_trillian_logserver_port_rpc }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_trillian_logserver_port_http | int }}
+            - containerPort: {{ tas_single_node_trillian_logserver_port_http }}
               protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log

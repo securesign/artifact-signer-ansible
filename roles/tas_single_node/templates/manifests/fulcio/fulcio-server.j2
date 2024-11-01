@@ -41,11 +41,11 @@ spec:
           image: "{{ tas_single_node_fulcio_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_fulcio_port1 | int }}
+            - containerPort: {{ tas_single_node_fulcio_port1 }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_fulcio_port_grpc | int }}
+            - containerPort: {{ tas_single_node_fulcio_port_grpc }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_fulcio_port2 | int }}
+            - containerPort: {{ tas_single_node_fulcio_port2 }}
               protocol: TCP
           resources: {}
           volumeMounts:

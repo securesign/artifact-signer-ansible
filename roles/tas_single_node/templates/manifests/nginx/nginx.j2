@@ -27,11 +27,11 @@ spec:
             - /etc/nginx/conf/nginx.conf
           ports:
             - name: https
-              containerPort: {{ tas_single_node_nginx_port1 | int }}
-              hostPort: {{ tas_single_node_nginx_hostport1 | int }}
+              containerPort: {{ tas_single_node_nginx_port1 }}
+              hostPort: {{ tas_single_node_nginx_hostport1 }}
             - name: http
-              containerPort: {{ tas_single_node_nginx_port2 | int }}
-              hostPort: {{ tas_single_node_nginx_hostport2 | int }}
+              containerPort: {{ tas_single_node_nginx_port2 }}
+              hostPort: {{ tas_single_node_nginx_hostport2 }}
           volumeMounts:
             - mountPath: /certs
               name: nginx-certs
