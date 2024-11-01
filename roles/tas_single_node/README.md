@@ -43,6 +43,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_nginx_image | Nginx image | str |  `registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe`  |
 | tas_single_node_tsa_image | Timestamp Authority Image | str |  `registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:3fba2f8cd09548d2bd2dfff938529952999cb28ff5b7ea42c1c5e722b8eb827f`  |
 | tas_single_node_rekor_search_image | Rekor search UI image | str |  `registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b`  |
+| tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -93,6 +94,20 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
 | client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
 | type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
+
+#### Options for main > tas_single_node_podman
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| policy | Contains the content of a `policy.json` file, which defines security policies for container image sources. Replaces the default policy, allowing you to enforce specific rules for image trust and verification in Podman. | str | no |  |
+| registry | A list of registries and their corresponding mirrors. Each item in the list should specify a registry location and a mirror to use for pulling images. | list of dicts of 'registry' options | no |  |
+
+#### Options for main > tas_single_node_podman > registry
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| location | The primary registry location for the image. | str | yes |  |
+| mirror | The mirror registry to use for pulling images from the primary registry location. | str | yes |  |
 
 ## Example Playbook
 

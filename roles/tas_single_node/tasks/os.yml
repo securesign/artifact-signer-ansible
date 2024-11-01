@@ -25,3 +25,30 @@
     mode: "0644"
     marker: "# {mark} ANSIBLE MANAGED INGRESS BLOCK"
   when: tas_single_node_setup_host_dns | bool
+
+- name: Construct Podman registry configuration blocks
+  ansible.builtin.set_fact:
+    podman_registry_block: |
+      {% for item in tas_single_node_podman.registry %}
+      [[registry]]
+      location = "{{ item.location }}"
+      [[registry.mirror]]
+      location = "{{ item.mirror }}"
+      {% endfor %}
+  when: tas_single_node_podman.registry is defined
+
+- name: Configure Podman registry mirror
+  ansible.builtin.blockinfile:
+    path: /etc/containers/registries.conf
+    marker: "# {mark} ANSIBLE MANAGED REGISTRY BLOCK"
+    block: "{{ podman_registry_block }}"
+  when: tas_single_node_podman.registry is defined
+
+- name: Replace /etc/containers/policy.json
+  ansible.builtin.copy:
+    content: "{{ tas_single_node_podman.policy }}"
+    dest: /etc/containers/policy.json
+    owner: root
+    group: root
+    mode: '0644'
+  when: tas_single_node_podman.policy is defined

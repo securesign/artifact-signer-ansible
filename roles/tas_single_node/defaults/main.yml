@@ -75,3 +75,5 @@ tas_single_node_createtree_image:
 # CLI Server
 tas_single_node_client_server_image:
   "registry.redhat.io/rhtas/client-server-rhel9@sha256:9537329d0166b8d41ffd5f5d79c052fc27abe426a20cba5733c84030013c4e29"
+
+tas_single_node_podman: {}
