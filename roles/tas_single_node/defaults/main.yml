@@ -69,7 +69,7 @@ tas_single_node_rekor_redis_image:
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:501612745e63e5504017079388bec191ffacf00ffdebde7be6ca5b8e4fd9d323"
 tas_single_node_tuf_image:
-  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:982c7774d0cd9e75dc6534a8f4b17ea8dfbd930d11350bc626cc7d6f7b5ed535"
+  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:79340be7918034c68a334a210ab872161827c99c2a1551a4fce8d5d27560a234"
 tas_single_node_http_server_image:
   "registry.access.redhat.com/ubi9/httpd-24@sha256:7874b82335a80269dcf99e5983c2330876f5fe8bdc33dc6aa4374958a2ffaaee"
 tas_single_node_trillian_netcat_image:

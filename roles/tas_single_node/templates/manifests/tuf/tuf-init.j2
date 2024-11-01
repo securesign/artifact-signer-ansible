@@ -5,22 +5,23 @@ apiVersion: apps/v1
 # We solve this by having a deployment with a "restartPolicy: OnFailure" container
 kind: Deployment
 metadata:
-  name: tuf-init
+  name: {{ tas_single_node_tuf_init_pod }}
   namespace: tuf-system
   labels:
-    app.kubernetes.io/component: tuf
-    app.kubernetes.io/name: tuf-init
+    app.component: tuf
+    app.instance: scaffold
+    app.name: tuf-init
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tuf-init
+      app.component: tuf
+      app.instance: scaffold
   template:
     metadata:
       labels:
-        app: tuf-init
-        app.kubernetes.io/component: tuf
-        app.kubernetes.io/name: tuf-init
+        app.component: tuf
+        app.instance: scaffold
     spec:
       containers:
         - name: tuf-init
