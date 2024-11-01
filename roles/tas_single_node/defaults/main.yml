@@ -60,7 +60,7 @@ tas_single_node_rekor_redis_image:
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:501612745e63e5504017079388bec191ffacf00ffdebde7be6ca5b8e4fd9d323"
 tas_single_node_tuf_image:
-  "quay.io/securesign/scaffold-tuf-server@sha256:982c7774d0cd9e75dc6534a8f4b17ea8dfbd930d11350bc626cc7d6f7b5ed535"
+  "registry.redhat.io/rhtas/tuf-server-rhel9@sha256:982c7774d0cd9e75dc6534a8f4b17ea8dfbd930d11350bc626cc7d6f7b5ed535"
 tas_single_node_trillian_netcat_image:
   "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
 tas_single_node_nginx_image:
@@ -71,7 +71,7 @@ tas_single_node_rekor_search_ui_image:
   "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e9233bc0f5d1d441385253771ea4896e16446f08a594553c3d3b182c6e9bb96d"
 # Create Tree
 tas_single_node_createtree_image:
-   "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:c089ee74ce7781f6ac356ff6959bf4e4f520abc0e08820fe891c65b50c8b1e5b"
+  "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:c089ee74ce7781f6ac356ff6959bf4e4f520abc0e08820fe891c65b50c8b1e5b"
 # CLI Server
 tas_single_node_client_server_image:
-   "registry.redhat.io/rhtas/client-server-rhel9@sha256:e81f157c97a55cc572bb3a9abcc7d15ccf840b14620ca653b550a0ea9e83da70"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:e81f157c97a55cc572bb3a9abcc7d15ccf840b14620ca653b550a0ea9e83da70"
