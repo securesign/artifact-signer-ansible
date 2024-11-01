@@ -4,8 +4,8 @@ metadata:
   name: ctlog
   namespace: ctlog-system
   labels:
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/name: ctlog
+    app.instance: scaffold
+    app.name: ctlog
 spec:
   replicas: 1
   selector:
@@ -15,8 +15,8 @@ spec:
     metadata:
       labels:
         app: ctlog
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/name: ctlog
+        app.instance: scaffold
+        app.name: ctlog
     spec:
       containers:
         - name: ctlog

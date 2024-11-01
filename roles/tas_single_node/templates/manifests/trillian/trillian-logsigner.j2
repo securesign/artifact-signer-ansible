@@ -4,11 +4,9 @@ metadata:
   name: trillian-logsigner
   namespace: trillian-system
   labels:
-    app.kubernetes.io/component: trillian-logsigner
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: trillian
-    helm.sh/chart: trillian-0.1.16
+    app.component: trillian-logsigner
+    app.instance: scaffold
+    app.name: trillian
 spec:
   replicas: 1
   selector:
@@ -18,11 +16,9 @@ spec:
     metadata:
       labels:
         app: trillian-logsigner
-        app.kubernetes.io/component: trillian-logsigner
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: trillian
-        helm.sh/chart: trillian-0.1.16
+        app.component: trillian-logsigner
+        app.instance: scaffold
+        app.name: trillian
     spec:
       initContainers:
         - name: wait-for-trillian-db

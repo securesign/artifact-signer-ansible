@@ -4,11 +4,9 @@ metadata:
   name: tuf
   namespace: tuf-system
   labels:
-    app.kubernetes.io/component: tuf
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: tuf
-    helm.sh/chart: tuf-0.1.4
+    app.component: tuf
+    app.instance: scaffold
+    app.name: tuf
 spec:
   replicas: 1
   selector:
@@ -18,11 +16,9 @@ spec:
     metadata:
       labels:
         app: tuf
-        app.kubernetes.io/component: tuf
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: tuf
-        helm.sh/chart: tuf-0.1.4
+        app.component: tuf
+        app.instance: scaffold
+        app.name: tuf
     spec:
       containers:
         - name: tuf

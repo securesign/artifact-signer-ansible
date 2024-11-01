@@ -4,11 +4,9 @@ metadata:
   name: rekor-redis
   namespace: rekor-system
   labels:
-    app.kubernetes.io/component: redis
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: rekor
-    helm.sh/chart: rekor-1.0.3
+    app.component: redis
+    app.instance: scaffold
+    app.name: rekor
 spec:
   replicas: 1
   selector:
@@ -18,11 +16,9 @@ spec:
     metadata:
       labels:
         app: rekor-redis
-        app.kubernetes.io/component: redis
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: rekor
-        helm.sh/chart: rekor-1.0.3
+        app.component: redis
+        app.instance: scaffold
+        app.name: rekor
     spec:
       containers:
         - name: rekor-redis

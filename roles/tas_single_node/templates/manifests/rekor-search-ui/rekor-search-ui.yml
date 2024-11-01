@@ -4,25 +4,22 @@ metadata:
   name: rekor-search-ui
   namespace: rekor-search-ui
   labels:
-    app.kubernetes.io/component: search
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/name: rekor-search-ui
-    helm.sh/chart: rekor-search-1.0.3
+    app.component: search
+    app.instance: scaffold
+    app.name: rekor-search-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: search
-      app.kubernetes.io/instance: scaffold
-      app.kubernetes.io/name: rekor-search-ui
-      helm.sh/chart: rekor-search-1.0.3
+      app.component: search
+      app.instance: scaffold
+      app.name: rekor-search-ui
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: search
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/name: rekor-search-ui
-        helm.sh/chart: rekor-search-1.0.3
+        app.component: search
+        app.instance: scaffold
+        app.name: rekor-search-ui
     spec:
       containers:
         - name: rekor-ui

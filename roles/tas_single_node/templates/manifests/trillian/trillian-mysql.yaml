@@ -4,11 +4,9 @@ metadata:
   name: trillian-mysql
   namespace: trillian-system
   labels:
-    app.kubernetes.io/component: mysql
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: trillian
-    helm.sh/chart: trillian-0.1.16
+    app.component: mysql
+    app.instance: scaffold
+    app.name: trillian
 spec:
   replicas: 1
   selector:
@@ -18,11 +16,9 @@ spec:
     metadata:
       labels:
         app: trillian-mysql
-        app.kubernetes.io/component: mysql
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: trillian
-        helm.sh/chart: trillian-0.1.16
+        app.component: mysql
+        app.instance: scaffold
+        app.name: trillian
     spec:
       containers:
         - name: trillian-mysql

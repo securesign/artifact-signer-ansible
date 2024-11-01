@@ -4,22 +4,20 @@ metadata:
   name: trillian-logserver
   namespace: trillian-system
   labels:
-    app.kubernetes.io/component: trillian-logserver
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: trillian
-    helm.sh/chart: trillian-0.1.16
+    app.component: trillian-logserver
+    app.instance: scaffold
+    app.name: trillian
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: trillian-logserver
-      app.kubernetes.io/instance: scaffold
+      app.component: trillian-logserver
+      app.instance: scaffold
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: trillian-logserver
-        app.kubernetes.io/instance: scaffold
+        app.component: trillian-logserver
+        app.instance: scaffold
     spec:
 {% if tas_single_node_trillian_trusted_ca != "" %}
       volumes:

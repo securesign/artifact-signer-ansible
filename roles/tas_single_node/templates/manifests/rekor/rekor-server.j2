@@ -4,29 +4,24 @@ metadata:
   name: rekor-server
   namespace: rekor-system
   labels:
-    app.kubernetes.io/component: server
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: rekor
-    helm.sh/chart: rekor-1.0.3
+    app.component: server
+    app.instance: scaffold
+    app.name: rekor
     pod-template-hash: 5c755b56f9
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: server
-      app.kubernetes.io/instance: scaffold
-      app.kubernetes.io/name: rekor
-      helm.sh/chart: rekor-1.0.3
+      app.component: server
+      app.instance: scaffold
+      app.name: rekor
       pod-template-hash: 5c755b56f9
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: server
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: rekor
-        helm.sh/chart: rekor-1.0.3
+        app.component: server
+        app.instance: scaffold
+        app.name: rekor
         pod-template-hash: 5c755b56f9
       annotations:
         prometheus.io/path: /metrics

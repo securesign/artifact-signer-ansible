@@ -4,8 +4,8 @@ metadata:
   name: fulcio-server
   namespace: fulcio-system
   labels:
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/name: fulcio
+    app.instance: scaffold
+    app.name: fulcio
     pod-template-hash: 74d5ff6f7f
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: fulcio-server
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/name: fulcio
+        app.instance: scaffold
+        app.name: fulcio
         pod-template-hash: 74d5ff6f7f
     spec:
       automountServiceAccountToken: true

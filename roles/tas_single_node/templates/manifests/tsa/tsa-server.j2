@@ -4,8 +4,8 @@ metadata:
   name: tsa-server
   namespace: tsa-system
   labels:
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/name: tsa
+    app.instance: scaffold
+    app.name: tsa
     pod-template-hash: 74d5ff6f7f
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: tsa-server
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/name: tsa
+        app.instance: scaffold
+        app.name: tsa
         pod-template-hash: 74d5ff6f7f
     spec:
       automountServiceAccountToken: true
