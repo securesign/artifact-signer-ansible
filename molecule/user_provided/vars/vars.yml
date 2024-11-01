@@ -15,11 +15,11 @@ tas_single_node_trillian:
     root_password: rootpassword
     password: password
     database: trillian
-    host: localhost
+    host: "{{ ansible_default_ipv4.address }}"
     port: 3306
 tas_single_node_rekor_redis:
   database_deploy: false
   redis:
-    host: localhost
+    host: "{{ ansible_default_ipv4.address }}"
     port: 6379
     password: password
