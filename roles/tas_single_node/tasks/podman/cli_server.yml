@@ -26,6 +26,6 @@
       state: started
       systemd_file: cli-server
       network: "{{ tas_single_node_podman_network }}"
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/cli-server/cli-server.yml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/cli-server/cli-server.j2') | from_yaml }}"
       configmap: "{{ tas_single_node_apache_config }}"
       configmap_changed: "{{ apache_configmap_result.changed }}"
