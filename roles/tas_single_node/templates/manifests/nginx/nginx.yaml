@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
+  name: "{{ tas_single_node_nginx_pod }}"
   namespace: nginx-system
   labels:
     app: nginx
@@ -27,11 +27,11 @@ spec:
             - /etc/nginx/conf/nginx.conf
           ports:
             - name: https
-              containerPort: 8443
-              hostPort: 443
+              containerPort: {{ tas_single_node_nginx_port1 | int }}
+              hostPort: {{ tas_single_node_nginx_hostport1 | int }}
             - name: http
-              containerPort: 8080
-              hostPort: 80
+              containerPort: {{ tas_single_node_nginx_port2 | int }}
+              hostPort: {{ tas_single_node_nginx_hostport2 | int }}
           volumeMounts:
             - mountPath: /certs
               name: nginx-certs

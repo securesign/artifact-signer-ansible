@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tsa-server
+  name: "{{ tas_single_node_tsa_server_pod }}"
   namespace: tsa-system
   labels:
     app.instance: scaffold
@@ -30,7 +30,7 @@ spec:
           args:
             - "serve"
             - "--host=0.0.0.0"
-            - "--port=3002"
+            - "--port={{ tas_single_node_tsa_server_port }}"
             - "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem"
             - "--timestamp-signer={{ tas_single_node_tsa_signer_type }}"
 {% if tas_single_node_tsa_signer_type == 'file' %}
@@ -46,7 +46,7 @@ spec:
             - '--tink-hcvault-token={{ tas_single_node_tsa_tink_hcvault_token }}"
 {% endif %}
           ports:
-            - containerPort: 3002
+            - containerPort: {{ tas_single_node_tsa_server_port | int }}
               protocol: TCP
           resources: {}
           volumeMounts:

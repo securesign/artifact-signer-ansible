@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trillian-logserver
+  name: "{{ tas_single_node_trillian_logserver_pod }}"
   namespace: trillian-system
   labels:
     app.component: trillian-logserver
@@ -38,8 +38,8 @@ spec:
             - --storage_system=mysql
             - --quota_system=mysql
             - --mysql_uri={{ tas_single_node_trillian.mysql.user }}:{{ tas_single_node_trillian.mysql.password }}@tcp({{ tas_single_node_trillian.mysql.host }}:{{ tas_single_node_trillian.mysql.port }})/{{ tas_single_node_trillian.mysql.database }}
-            - --rpc_endpoint=0.0.0.0:8091
-            - --http_endpoint=0.0.0.0:8090
+            - --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_rpc }}
+            - --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_http }}
             - --alsologtostderr
           env:
             - name: MYSQL_USER
@@ -66,9 +66,9 @@ spec:
               value: "/var/run/configs/tas/ca-trust"
 {% endif %}
           ports:
-            - containerPort: 8091
+            - containerPort: {{ tas_single_node_trillian_logserver_port_rpc | int }}
               protocol: TCP
-            - containerPort: 8090
+            - containerPort: {{ tas_single_node_trillian_logserver_port_http | int }}
               protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log

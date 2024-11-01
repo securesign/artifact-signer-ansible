@@ -18,9 +18,9 @@
 - name: Retrieve Rekor Public Key
   ansible.builtin.command:
     cmd: >-
-      podman exec rekor-server-pod-rekor-server
+      podman exec {{ tas_single_node_rekor_server_pod }}-pod-rekor-server
       curl -k --fail --retry {{ tas_single_node_rekor_public_key_retries }}
-      --retry-delay {{ tas_single_node_rekor_public_key_delay }} http://localhost:3001/api/v1/log/publicKey
+      --retry-delay {{ tas_single_node_rekor_public_key_delay }} http://localhost:{{ tas_single_node_rekor_server_port1 }}/api/v1/log/publicKey
   register: rekor_public_key_result
   changed_when: false
 

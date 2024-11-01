@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trillian-mysql
+  name: "{{ tas_single_node_trillian_mysql_pod }}"
   namespace: trillian-system
   labels:
     app.component: mysql
@@ -25,7 +25,7 @@ spec:
           image: "{{ tas_single_node_trillian_db_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3306
+            - containerPort: {{ tas_single_node_trillian_mysql_port | int }}
               protocol: TCP
           env:
             - name: MYSQL_ROOT_PASSWORD

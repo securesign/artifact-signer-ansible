@@ -30,7 +30,7 @@
         cmd: >-
           podman run --network {{ tas_single_node_podman_network }} --replace
           --name {{ createtree_container_name }} {{ tas_single_node_createtree_image }}
-          --admin_server trillian-logserver-pod:8091
+          --admin_server {{ tas_single_node_trillian_logserver_pod }}-pod:{{ tas_single_node_trillian_logserver_port_rpc }}
       register: createtree_container
       changed_when: true
 

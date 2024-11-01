@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rekor-redis
+  name: "{{ tas_single_node_rekor_redis_pod }}"
   namespace: rekor-system
   labels:
     app.component: redis
@@ -36,7 +36,7 @@ spec:
 {% endif %}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 6379
+            - containerPort: {{ tas_single_node_rekor_redis_port | int }}
               protocol: TCP
           readinessProbe:
             exec:

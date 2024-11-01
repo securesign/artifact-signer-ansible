@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ctlog
+  name: "{{ tas_single_node_ctlog_pod }}"
   namespace: ctlog-system
   labels:
     app.instance: scaffold
@@ -33,13 +33,13 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           ports:
-            - containerPort: 6962
+            - containerPort: {{ tas_single_node_ctlog_port1 | int }}
               protocol: TCP
-            - containerPort: 6963
+            - containerPort: {{ tas_single_node_ctlog_port2 | int }}
               protocol: TCP
           args:
-            - --http_endpoint=0.0.0.0:6962
-            - --metrics_endpoint=0.0.0.0:6963
+            - --http_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port1}}
+            - --metrics_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port2}}
             - --log_config=/config/config
             - --alsologtostderr
           resources: {}
