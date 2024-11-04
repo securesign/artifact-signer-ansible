@@ -21,8 +21,19 @@ spec:
         app.kubernetes.io/component: trillian-logserver
         app.kubernetes.io/instance: scaffold
     spec:
+{% if tas_single_node_trillian_trusted_ca != "" %}
+      volumes:
+        - name: ca-trust
+          configMap:
+            name: {{ tas_single_node_trillian_trusted_ca_configmap_name }}
+{% endif %}
       containers:
         - name: trillian-trillian-logserver
+{% if tas_single_node_trillian_trusted_ca != "" %}
+          volumeMounts:
+            - name: ca-trust
+              mountPath: /var/run/configs/tas/ca-trust
+{% endif %}
           image: "{{ tas_single_node_trillian_log_server_image }}"
           imagePullPolicy: IfNotPresent
           args:
@@ -52,6 +63,10 @@ spec:
               value: "{{ tas_single_node_trillian.mysql.host }}"
             - name: MYSQL_PORT
               value: "{{ tas_single_node_trillian.mysql.port | quote }}"
+{% if tas_single_node_trillian_trusted_ca != "" %}
+            - name: SSL_CERT_DIR
+              value: "/var/run/configs/tas/ca-trust"
+{% endif %}
           ports:
             - containerPort: 8091
               protocol: TCP
