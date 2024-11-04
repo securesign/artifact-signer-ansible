@@ -24,7 +24,7 @@
       shell: |
         echo "CONFIG SET requirepass "password"" | redis-cli
 
-    - name: Uncommenting bind-address
+    - name: Allow external connections for Redis
       shell: |
         sed -i 's/#bind_address=0.0.0.0/bind_address=0.0.0.0/g' /etc/my.cnf.d/mariadb-server.cnf
 
