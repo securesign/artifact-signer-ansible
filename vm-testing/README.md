@@ -45,7 +45,6 @@ tas_single_node_registry_username: "TODO-username"
 tas_single_node_registry_password: "TODO-password"
 tas_single_node_oidc_issuers: "TODO-issuer-url"
 tas_single_node_issuer_url: "TODO-issuer-url"
-
 ```
 
 ### Provisioning the VM and running Ansible

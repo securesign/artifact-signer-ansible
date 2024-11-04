@@ -91,3 +91,6 @@ tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/
 tas_single_node_remote_tsa_leaf_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_leaf_certificate_filename }}"
 tas_single_node_remote_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
 tas_single_node_remote_tsa_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
+
+# Secrets,Certs and Configuration names
+tas_single_node_trillian_trusted_ca_configmap_name: "trillian_trusted_ca"
