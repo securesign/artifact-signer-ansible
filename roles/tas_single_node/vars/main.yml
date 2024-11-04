@@ -97,45 +97,45 @@ tas_single_node_trillian_trusted_ca_configmap_name: "trillian_trusted_ca"
 
 # Pod/Service names + Ports
 tas_single_node_cli_server_pod: cli-server
-tas_single_node_cli_server_port: 8080
+tas_single_node_cli_server_port_http: 8080
 
 tas_single_node_ctlog_pod: ctlog
-tas_single_node_ctlog_port1: 6962
-tas_single_node_ctlog_port2: 6963
+tas_single_node_ctlog_port_http: 6962
+tas_single_node_ctlog_port_tcp: 6963
 
 tas_single_node_fulcio_pod: fulcio-server
 tas_single_node_fulcio_port_grpc: 5554
-tas_single_node_fulcio_port1: 5555
-tas_single_node_fulcio_port2: 2113
+tas_single_node_fulcio_port_http: 5555
+tas_single_node_fulcio_port_tcp: 2113
 
 tas_single_node_nginx_pod: nginx
-tas_single_node_nginx_port1: 8443
-tas_single_node_nginx_port2: 8080
-tas_single_node_nginx_hostport1: 443
-tas_single_node_nginx_hostport2: 80
+tas_single_node_nginx_port_https: 8443
+tas_single_node_nginx_port_http: 8080
+tas_single_node_nginx_hostport_https: 443
+tas_single_node_nginx_hostport_http: 80
 
 tas_single_node_rekor_redis_pod: rekor-redis
-tas_single_node_rekor_redis_port: 6379
+tas_single_node_rekor_redis_port_tcp: 6379
 
 tas_single_node_rekor_server_pod: rekor-server
-tas_single_node_rekor_server_port1: 3001
-tas_single_node_rekor_server_port2: 2112
+tas_single_node_rekor_server_port_http: 3001
+tas_single_node_rekor_server_port_tcp: 2112
 
 tas_single_node_rekor_search_ui_pod: rekor-search-ui
-tas_single_node_rekor_search_ui_port: 3000
+tas_single_node_rekor_search_ui_port_tcp: 3000
 
 tas_single_node_trillian_logserver_pod: trillian-logserver
 tas_single_node_trillian_logserver_port_rpc: 8091
 tas_single_node_trillian_logserver_port_http: 8090
 
 tas_single_node_trillian_logsigner_pod: trillian-logsigner
-tas_single_node_trillian_logsigner_port: 8191
+tas_single_node_trillian_logsigner_port_tcp: 8191
 
 tas_single_node_trillian_mysql_pod: trillian-mysql
-tas_single_node_trillian_mysql_port: 3306
+tas_single_node_trillian_mysql_port_tcp: 3306
 
 tas_single_node_tsa_server_pod: tsa-server
-tas_single_node_tsa_server_port: 3002
+tas_single_node_tsa_server_port_tcp: 3002
 
 tas_single_node_tuf_pod: tuf
-tas_single_node_tuf_port: 8082
+tas_single_node_tuf_port_tcp: 8082

@@ -25,7 +25,7 @@ spec:
         - name: fulcio-server
           args:
             - serve
-            - --port={{ tas_single_node_fulcio_port1 }}
+            - --port={{ tas_single_node_fulcio_port_http }}
             - --grpc-port={{ tas_single_node_fulcio_port_grpc }}
             - --ca=fileca
             - --fileca-key
@@ -34,18 +34,18 @@ spec:
             - /var/run/fulcio-secrets/cert.pem
             - --fileca-key-passwd
             - "{{ tas_single_node_fulcio_ca_passphrase }}"
-            - "--ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port1 }}/{{ tas_single_node_ct_logprefix }}"
+            - "--ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_ct_logprefix }}"
           env:
             - name: SSL_CERT_DIR
               value: /certs
           image: "{{ tas_single_node_fulcio_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_fulcio_port1 }}
+            - containerPort: {{ tas_single_node_fulcio_port_http }}
               protocol: TCP
             - containerPort: {{ tas_single_node_fulcio_port_grpc }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_fulcio_port2 }}
+            - containerPort: {{ tas_single_node_fulcio_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:

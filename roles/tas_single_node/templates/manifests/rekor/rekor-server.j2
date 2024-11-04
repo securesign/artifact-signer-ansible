@@ -49,13 +49,13 @@ spec:
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
             - --enable_attestation_storage
             - --attestation_storage_bucket=file:///var/run/attestations
-            - --port={{ tas_single_node_rekor_server_port1 }}
+            - --port={{ tas_single_node_rekor_server_port_http }}
           image: "{{ tas_single_node_rekor_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_rekor_server_port1 | int }}
+            - containerPort: {{ tas_single_node_rekor_server_port_http }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_rekor_server_port2 | int }}
+            - containerPort: {{ tas_single_node_rekor_server_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:

@@ -30,7 +30,7 @@ spec:
           args:
             - "serve"
             - "--host=0.0.0.0"
-            - "--port={{ tas_single_node_tsa_server_port }}"
+            - "--port={{ tas_single_node_tsa_server_port_tcp }}"
             - "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem"
             - "--timestamp-signer={{ tas_single_node_tsa_signer_type }}"
 {% if tas_single_node_tsa_signer_type == 'file' %}
@@ -46,7 +46,7 @@ spec:
             - '--tink-hcvault-token={{ tas_single_node_tsa_tink_hcvault_token }}"
 {% endif %}
           ports:
-            - containerPort: {{ tas_single_node_tsa_server_port | int }}
+            - containerPort: {{ tas_single_node_tsa_server_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:

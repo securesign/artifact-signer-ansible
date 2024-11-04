@@ -36,7 +36,7 @@ spec:
 {% endif %}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_rekor_redis_port | int }}
+            - containerPort: {{ tas_single_node_rekor_redis_port_tcp }}
               protocol: TCP
           readinessProbe:
             exec:

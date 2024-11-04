@@ -44,7 +44,7 @@ spec:
           image: "{{ tas_single_node_trillian_log_signer_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_trillian_logsigner_port }}
+            - containerPort: {{ tas_single_node_trillian_logsigner_port_tcp }}
               protocol: TCP
           args:
             - --storage_system=mysql

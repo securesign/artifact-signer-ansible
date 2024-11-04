@@ -25,7 +25,7 @@ spec:
           image: "{{ tas_single_node_trillian_db_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_trillian_mysql_port }}
+            - containerPort: {{ tas_single_node_trillian_mysql_port_tcp }}
               protocol: TCP
           env:
             - name: MYSQL_ROOT_PASSWORD

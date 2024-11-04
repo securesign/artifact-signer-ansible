@@ -46,22 +46,22 @@ stream {
   map_hash_bucket_size 128;
   map $ssl_server_name $targetBackend {
 {% if tas_single_node_rekor_enabled %}
-    rekor.{{ tas_single_node_base_hostname }}  {{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port1 }};
+    rekor.{{ tas_single_node_base_hostname }}  {{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }};
 {% endif %}
 {% if tas_single_node_rekor_search_enabled %}
-    rekor-search.{{ tas_single_node_base_hostname }}  {{ tas_single_node_rekor_search_ui_pod }}-pod:{{ tas_single_node_rekor_search_ui_port }};
+    rekor-search.{{ tas_single_node_base_hostname }}  {{ tas_single_node_rekor_search_ui_pod }}-pod:{{ tas_single_node_rekor_search_ui_port_tcp }};
 {% endif %}
 {% if tas_single_node_tuf_enabled %}
-    tuf.{{ tas_single_node_base_hostname }}  {{ tas_single_node_tuf_pod }}-pod:{{ tas_single_node_nginx_port2 }};
+    tuf.{{ tas_single_node_base_hostname }}  {{ tas_single_node_tuf_pod }}-pod:{{ tas_single_node_nginx_port_http }};
 {% endif %}
 {% if tas_single_node_fulcio_enabled %}
-    fulcio.{{ tas_single_node_base_hostname }}  {{ tas_single_node_fulcio_pod }}-pod:{{ tas_single_node_fulcio_port1 }};
+    fulcio.{{ tas_single_node_base_hostname }}  {{ tas_single_node_fulcio_pod }}-pod:{{ tas_single_node_fulcio_port_http }};
 {% endif %}
 {% if tas_single_node_tsa_enabled %}
-    tsa.{{ tas_single_node_base_hostname }}  {{ tas_single_node_tsa_server_pod }}-pod:{{ tas_single_node_tsa_server_port }};
+    tsa.{{ tas_single_node_base_hostname }}  {{ tas_single_node_tsa_server_pod }}-pod:{{ tas_single_node_tsa_server_port_tcp }};
 {% endif %}
 {% if tas_single_node_client_server_enabled %}
-    cli-server.{{ tas_single_node_base_hostname }}  {{ tas_single_node_cli_server_pod }}-pod:{{ tas_single_node_cli_server_port }};
+    cli-server.{{ tas_single_node_base_hostname }}  {{ tas_single_node_cli_server_pod }}-pod:{{ tas_single_node_cli_server_port_http }};
 {% endif %}
   }
 

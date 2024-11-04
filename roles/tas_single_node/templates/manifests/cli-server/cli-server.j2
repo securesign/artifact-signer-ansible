@@ -25,7 +25,7 @@ spec:
           image: "{{ tas_single_node_client_server_image }}"
           imagePullPolicy: Always
           ports:
-            - containerPort: {{ tas_single_node_cli_server_port }}
+            - containerPort: {{ tas_single_node_cli_server_port_http }}
               protocol: TCP
           volumeMounts:
             - name: apache-config
