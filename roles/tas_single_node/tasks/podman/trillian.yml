@@ -28,7 +28,7 @@
       kind: ConfigMap
       apiVersion: v1
       metadata:
-        name: {{ tas_single_node_trillian_trusted_ca_configmap_name }}
+        name: "{{ tas_single_node_trillian_trusted_ca_configmap_name }}"
         namespace: trillian-system
       data:
         trillian-trusted-ca.pem: |

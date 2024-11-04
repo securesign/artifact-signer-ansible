@@ -238,7 +238,9 @@ argument_specs:
             required: true
             version_added: "1.1.0"
       tas_single_node_trillian_trusted_ca:
-        description: "Trillian Trusted CA certificate"
+        description: >
+          Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database.
+          This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges.
         type: "str"
         required: false
         version_added: "1.1.1"
