@@ -1,0 +1,62 @@
+---
+- name: Prepare
+  hosts: molecule
+  gather_facts: true
+  become: yes
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: Install Redis and MariaDB
+      ansible.builtin.yum:
+        name: 
+          - redis
+          - mariadb
+          - mariadb-server
+        state: latest
+
+    - name: Enable and start Redis
+      ansible.builtin.service:
+        name: redis
+        enabled: yes
+        state: started
+
+    - name: Set Redis password
+      shell: |
+        echo "CONFIG SET requirepass "password"" | redis-cli
+
+    - name: Allow external connections for Redis
+      shell: |
+        sed -i 's/#bind_address=0.0.0.0/bind_address=0.0.0.0/g' /etc/my.cnf.d/mariadb-server.cnf
+
+    - name: Enable and start MariaDB
+      ansible.builtin.service:
+        name: mariadb
+        enabled: yes
+        state: started
+
+    - name: Create Trillian Database
+      shell: echo "CREATE DATABASE trillian;" | mysql
+
+    - name: Download Trillian schema
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/securesign/trillian/refs/heads/main/storage/mysql/schema/storage.sql
+        dest: /tmp/schema.sql
+      retries: 5
+      delay: 5
+
+    - name: Import Trillian schema
+      shell: |
+        mysql -u root trillian < /tmp/schema.sql
+ 
+    - name: Prepare MariaDB configuration
+      shell: |
+        mysql <<EOF
+        ALTER USER 'root'@'localhost' IDENTIFIED BY 'rootpassword';
+        GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY 'rootpassword' WITH GRANT OPTION;
+        DELETE FROM mysql.user WHERE User='';
+        DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+        CREATE USER mysql;
+        ALTER USER 'mysql'@'localhost' IDENTIFIED BY 'password';
+        GRANT ALL ON trillian.* to 'mysql'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+        FLUSH PRIVILEGES;
+        EOF
