@@ -1,14 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trillian-mysql
+  name: "{{ tas_single_node_trillian_mysql_pod }}"
   namespace: trillian-system
   labels:
-    app.kubernetes.io/component: mysql
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: trillian
-    helm.sh/chart: trillian-0.1.16
+    app.component: mysql
+    app.instance: scaffold
+    app.name: trillian
 spec:
   replicas: 1
   selector:
@@ -18,18 +16,16 @@ spec:
     metadata:
       labels:
         app: trillian-mysql
-        app.kubernetes.io/component: mysql
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: trillian
-        helm.sh/chart: trillian-0.1.16
+        app.component: mysql
+        app.instance: scaffold
+        app.name: trillian
     spec:
       containers:
         - name: trillian-mysql
           image: "{{ tas_single_node_trillian_db_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3306
+            - containerPort: {{ tas_single_node_trillian_mysql_port_tcp }}
               protocol: TCP
           env:
             - name: MYSQL_ROOT_PASSWORD

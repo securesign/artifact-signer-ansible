@@ -147,7 +147,7 @@
       state: started
       network: "{{ tas_single_node_podman_network }}"
       systemd_file: nginx
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.yaml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.j2') | from_yaml }}"
       configmap: "{{ tas_single_node_nginx_config }}"
       configmap_changed: "{{ configmap_result.changed }}"
       secret: "{{ tas_single_node_nginx_certs_config }}"

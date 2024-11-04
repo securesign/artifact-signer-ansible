@@ -1,14 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rekor-redis
+  name: "{{ tas_single_node_rekor_redis_pod }}"
   namespace: rekor-system
   labels:
-    app.kubernetes.io/component: redis
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: rekor
-    helm.sh/chart: rekor-1.0.3
+    app.component: redis
+    app.instance: scaffold
+    app.name: rekor
 spec:
   replicas: 1
   selector:
@@ -18,11 +16,9 @@ spec:
     metadata:
       labels:
         app: rekor-redis
-        app.kubernetes.io/component: redis
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: rekor
-        helm.sh/chart: rekor-1.0.3
+        app.component: redis
+        app.instance: scaffold
+        app.name: rekor
     spec:
       containers:
         - name: rekor-redis
@@ -40,7 +36,7 @@ spec:
 {% endif %}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 6379
+            - containerPort: {{ tas_single_node_rekor_redis_port_tcp }}
               protocol: TCP
           readinessProbe:
             exec:

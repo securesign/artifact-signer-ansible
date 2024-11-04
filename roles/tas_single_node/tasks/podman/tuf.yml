@@ -18,9 +18,9 @@
 - name: Retrieve Rekor Public Key
   ansible.builtin.command:
     cmd: >-
-      podman exec rekor-server-pod-rekor-server
+      podman exec {{ tas_single_node_rekor_server_pod }}-pod-rekor-server
       curl -k --fail --retry {{ tas_single_node_rekor_public_key_retries }}
-      --retry-delay {{ tas_single_node_rekor_public_key_delay }} http://localhost:3001/api/v1/log/publicKey
+      --retry-delay {{ tas_single_node_rekor_public_key_delay }} http://localhost:{{ tas_single_node_rekor_server_port_http }}/api/v1/log/publicKey
   register: rekor_public_key_result
   changed_when: false
 
@@ -54,6 +54,6 @@
       state: started
       systemd_file: tuf
       network: "{{ tas_single_node_podman_network }}"
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.yaml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf.j2') | from_yaml }}"
       secret: "{{ tas_single_node_tuf_secret_config }}"
       secret_changed: "{{ secret_result.changed }}"

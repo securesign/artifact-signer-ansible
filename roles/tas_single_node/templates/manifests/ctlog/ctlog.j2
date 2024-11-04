@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ctlog
+  name: "{{ tas_single_node_ctlog_pod }}"
   namespace: ctlog-system
   labels:
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/name: ctlog
+    app.instance: scaffold
+    app.name: ctlog
 spec:
   replicas: 1
   selector:
@@ -15,8 +15,8 @@ spec:
     metadata:
       labels:
         app: ctlog
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/name: ctlog
+        app.instance: scaffold
+        app.name: ctlog
     spec:
       containers:
         - name: ctlog
@@ -26,20 +26,20 @@ spec:
             failureThreshold: 3
             httpGet:
               path: /healthz
-              port: 6962
+              port: {{ tas_single_node_ctlog_port_http }}
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
           ports:
-            - containerPort: 6962
+            - containerPort: {{ tas_single_node_ctlog_port_http }}
               protocol: TCP
-            - containerPort: 6963
+            - containerPort: {{ tas_single_node_ctlog_port_tcp }}
               protocol: TCP
           args:
-            - --http_endpoint=0.0.0.0:6962
-            - --metrics_endpoint=0.0.0.0:6963
+            - --http_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port_http}}
+            - --metrics_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port_tcp}}
             - --log_config=/config/config
             - --alsologtostderr
           resources: {}

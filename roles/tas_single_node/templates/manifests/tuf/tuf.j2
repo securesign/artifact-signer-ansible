@@ -1,14 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tuf
+  name: "{{ tas_single_node_tuf_pod }}"
   namespace: tuf-system
   labels:
-    app.kubernetes.io/component: tuf
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: tuf
-    helm.sh/chart: tuf-0.1.4
+    app.component: tuf
+    app.instance: scaffold
+    app.name: tuf
 spec:
   replicas: 1
   selector:
@@ -18,20 +16,18 @@ spec:
     metadata:
       labels:
         app: tuf
-        app.kubernetes.io/component: tuf
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: tuf
-        helm.sh/chart: tuf-0.1.4
+        app.component: tuf
+        app.instance: scaffold
+        app.name: tuf
     spec:
       containers:
         - name: tuf
           image: "{{ tas_single_node_tuf_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8082
+            - containerPort: {{ tas_single_node_tuf_port_tcp }}
               protocol: TCP
-              hostPart: 8082
+              hostPart: {{ tas_single_node_tuf_port_tcp }}
           env:
             - name: NAMESPACE
               value: tuf-system

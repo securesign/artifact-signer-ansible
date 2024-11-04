@@ -42,7 +42,7 @@
       state: started
       systemd_file: trillian-mysql
       network: "{{ tas_single_node_podman_network }}"
-      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-mysql.yaml') | from_yaml }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-mysql.j2') | from_yaml }}"
       secret: "{{ tas_single_node_trillian_secret }}"
       secret_changed: "{{ secret_result.changed }}"
   when: tas_single_node_trillian.database_deploy

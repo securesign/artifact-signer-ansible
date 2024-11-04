@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fulcio-server
+  name: "{{ tas_single_node_fulcio_pod }}"
   namespace: fulcio-system
   labels:
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/name: fulcio
+    app.instance: scaffold
+    app.name: fulcio
     pod-template-hash: 74d5ff6f7f
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: fulcio-server
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/name: fulcio
+        app.instance: scaffold
+        app.name: fulcio
         pod-template-hash: 74d5ff6f7f
     spec:
       automountServiceAccountToken: true
@@ -25,8 +25,8 @@ spec:
         - name: fulcio-server
           args:
             - serve
-            - --port=5555
-            - --grpc-port=5554
+            - --port={{ tas_single_node_fulcio_port_http }}
+            - --grpc-port={{ tas_single_node_fulcio_port_grpc }}
             - --ca=fileca
             - --fileca-key
             - /var/run/fulcio-secrets/key.pem
@@ -34,18 +34,18 @@ spec:
             - /var/run/fulcio-secrets/cert.pem
             - --fileca-key-passwd
             - "{{ tas_single_node_fulcio_ca_passphrase }}"
-            - "--ct-log-url=http://ctlog-pod:6962/{{ tas_single_node_ct_logprefix }}"
+            - "--ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_ct_logprefix }}"
           env:
             - name: SSL_CERT_DIR
               value: /certs
           image: "{{ tas_single_node_fulcio_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5555
+            - containerPort: {{ tas_single_node_fulcio_port_http }}
               protocol: TCP
-            - containerPort: 5554
+            - containerPort: {{ tas_single_node_fulcio_port_grpc }}
               protocol: TCP
-            - containerPort: 2113
+            - containerPort: {{ tas_single_node_fulcio_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:

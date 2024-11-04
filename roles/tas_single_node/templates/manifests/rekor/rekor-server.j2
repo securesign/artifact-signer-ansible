@@ -1,32 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rekor-server
+  name: "{{ tas_single_node_rekor_server_pod }}"
   namespace: rekor-system
   labels:
-    app.kubernetes.io/component: server
-    app.kubernetes.io/instance: scaffold
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: rekor
-    helm.sh/chart: rekor-1.0.3
+    app.component: server
+    app.instance: scaffold
+    app.name: rekor
     pod-template-hash: 5c755b56f9
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: server
-      app.kubernetes.io/instance: scaffold
-      app.kubernetes.io/name: rekor
-      helm.sh/chart: rekor-1.0.3
+      app.component: server
+      app.instance: scaffold
+      app.name: rekor
       pod-template-hash: 5c755b56f9
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: server
-        app.kubernetes.io/instance: scaffold
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: rekor
-        helm.sh/chart: rekor-1.0.3
+        app.component: server
+        app.instance: scaffold
+        app.name: rekor
         pod-template-hash: 5c755b56f9
       annotations:
         prometheus.io/path: /metrics
@@ -37,8 +32,8 @@ spec:
         - name: rekor-server
           args:
             - serve
-            - --trillian_log_server.address=trillian-logserver-pod
-            - --trillian_log_server.port=8091
+            - --trillian_log_server.address={{ tas_single_node_trillian_logserver_pod }}-pod
+            - --trillian_log_server.port={{ tas_single_node_trillian_logserver_port_rpc }}
             - --trillian_log_server.sharding_config=/config/sharding-config.yaml
             - --redis_server.address={{ tas_single_node_rekor_redis.redis.host }}
             - --redis_server.port={{ tas_single_node_rekor_redis.redis.port }}
@@ -54,13 +49,13 @@ spec:
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
             - --enable_attestation_storage
             - --attestation_storage_bucket=file:///var/run/attestations
-            - --port=3001
+            - --port={{ tas_single_node_rekor_server_port_http }}
           image: "{{ tas_single_node_rekor_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3001
+            - containerPort: {{ tas_single_node_rekor_server_port_http }}
               protocol: TCP
-            - containerPort: 2112
+            - containerPort: {{ tas_single_node_rekor_server_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:
