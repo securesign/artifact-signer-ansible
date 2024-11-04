@@ -54,13 +54,13 @@ tas_single_node_trillian_log_signer_image:
 tas_single_node_rekor_server_image:
   "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:81e10e34f02b21bb8295e7b5c93797fc8c0e43a1a0d8304cca1b07415a3ed6f5"
 tas_single_node_ctlog_image:
-  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:792199ba624cc794dcc35e1ceb3c2533882da4788c4beb3023b64ae301bf8189"
+  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:31e7318a9b19ed04ef0f25949f1f1709d293b532316b27a06f83fa5174547b17"
 tas_single_node_rekor_redis_image:
   "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:18820b1fbdbc2cc3e917822974910332d937b03cfe781628bd986fd6a5ee318e"
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:501612745e63e5504017079388bec191ffacf00ffdebde7be6ca5b8e4fd9d323"
 tas_single_node_tuf_image:
-  "registry.redhat.io/rhtas/tuf-server-rhel9@sha256:982c7774d0cd9e75dc6534a8f4b17ea8dfbd930d11350bc626cc7d6f7b5ed535"
+  "registry.redhat.io/rhtas/tuf-server-rhel9@sha256:6987dfce53541679ff5b9d7b03e9891a3986270fdaa90817923e0ca585e5267f"
 tas_single_node_trillian_netcat_image:
   "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
 tas_single_node_nginx_image:
@@ -68,10 +68,10 @@ tas_single_node_nginx_image:
 tas_single_node_timestamp_authority_image:
   "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:fce0a22c8872309554236bab3457715dda0a83eb40dc6a9ecd3477b8023369d0"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e9233bc0f5d1d441385253771ea4896e16446f08a594553c3d3b182c6e9bb96d"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:3c93c15fc5c918a91b3da9f5bf2276e4d46d881b1031287e6ab28e6aeb23e019"
 # Create Tree
 tas_single_node_createtree_image:
   "registry.redhat.io/rhtas/trillian-createtree-rhel9@sha256:c089ee74ce7781f6ac356ff6959bf4e4f520abc0e08820fe891c65b50c8b1e5b"
 # CLI Server
 tas_single_node_client_server_image:
-  "registry.redhat.io/rhtas/client-server-rhel9@sha256:e81f157c97a55cc572bb3a9abcc7d15ccf840b14620ca653b550a0ea9e83da70"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:e70f9862dbee9c3046ded1d93363c2183c4c9be787e4fffb860cc63b1105c799"
