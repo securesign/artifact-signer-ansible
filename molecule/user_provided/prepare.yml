@@ -6,7 +6,7 @@
   vars_files:
     - vars/vars.yml
   tasks:
-    - name: Installing packages
+    - name: Install Redis and MariaDB
       ansible.builtin.yum:
         name: 
           - redis
