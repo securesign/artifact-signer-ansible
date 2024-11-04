@@ -13,7 +13,6 @@ jobs:
         scenario:
           - default
           - user_provided
-    if: ${{ ! (github.event_name == 'push' && matrix.scenario == 'user_provided') }}
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
