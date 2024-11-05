@@ -4,9 +4,10 @@ metadata:
   name: "{{ tas_single_node_fulcio_pod }}"
   namespace: fulcio-system
   labels:
-    app.instance: scaffold
-    app.name: fulcio
-    pod-template-hash: 74d5ff6f7f
+    app.kubernetes.io/component: fulcio
+    app.kubernetes.io/part-of: trusted-artifact-signer
+    app.kubernetes.io/name: fulcio-server
+    pod-template-hash: 5d7c67b946
 spec:
   replicas: 1
   selector:
@@ -16,13 +17,36 @@ spec:
     metadata:
       labels:
         app: fulcio-server
-        app.instance: scaffold
-        app.name: fulcio
-        pod-template-hash: 74d5ff6f7f
+        app.kubernetes.io/component: fulcio
+        app.kubernetes.io/name: fulcio
+        app.kubernetes.io/part-of: trusted-artifact-signer
+        pod-template-hash: 5d7c67b946
     spec:
       automountServiceAccountToken: true
+      priority: 0
       containers:
         - name: fulcio-server
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: {{ tas_single_node_fulcio_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          livelinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: {{ tas_single_node_fulcio_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           args:
             - serve
             - --port={{ tas_single_node_fulcio_port_http }}
@@ -63,6 +87,7 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65533
+        allowPrivilegeEscalation: false
       serviceAccountName: fulcio-server
       tolerations:
         - effect: NoExecute
