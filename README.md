@@ -19,7 +19,7 @@ The RHTAS Ansible collection deploys the following RHTAS components:
 * [Rekor](https://docs.sigstore.dev/rekor/overview)
   * [Trillian database](https://github.com/google/trillian)
   * [Optional: A self-managed MariaDB instance, and a Redis instance.](#configuring-a-user-provisioned-mariadb-and-redis-instance-for-the-rhtas-ansible-collection)
-   > [!NOTE] Highly recommended for production deployments to simplify operations and offload service management, including data backup and restoration etc.
+   > [!NOTE] Highly recommended for production deployments to simplify operations and offload service management, including data backup and restoration.
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
 * [Timestamp Authority](https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities)
