@@ -37,7 +37,7 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           terminationMessagePath: /dev/termination-log
-          livelinessProbe:
+          livenessProbe:
             failureThreshold: 3
             httpGet:
               path: /healthz
