@@ -1,0 +1,51 @@
+---
+- name: Create a non-root sudoer user
+  ansible.builtin.user:
+    name: "{{ item.user }}"
+    shell: /bin/bash
+    group: wheel
+    create_home: yes
+
+- name: Set password for testingUser
+  ansible.builtin.shell: echo {{ item.password }} | passwd --stdin {{ item.user }}
+
+- name: Configure Sudoers for the user
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    line: "{{ item.user }} ALL = (ALL) ALL"
+    validate: 'visudo -cf %s'
+
+- name: Create an .ssh directory
+  ansible.builtin.file:
+    path: "/home/{{ item.user }}/.ssh"
+    state: directory
+    mode: "0700"
+    owner: "{{ item.user }}"
+
+- name: Configure SSH access for new user
+  ansible.builtin.copy:
+    src: "{{ molecule_ephemeral_directory }}/id_rsa.pub"
+    dest: "/home/{{ item.user }}/.ssh/authorized_keys"
+    mode: "0600"
+    owner: "{{ item.user }}"
+
+- name: Edit SSH config to disallow root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^(#*)?PermitRootLogin'
+    line: "PermitRootLogin no"
+
+- name: Restart SSH
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: Modify Molecule inventory
+  ansible.builtin.lineinfile:
+    path: "{{ molecule_ephemeral_directory }}/inventory/molecule_inventory.yml"
+    regexp: 'ansible_user:'
+    line: "ansible_user: {{ item.user }}, ansible_become_password: {{ item.password }}, ansible_become: true}"
+  delegate_to: localhost
+
+- name: Force refresh inventory
+  ansible.builtin.meta: refresh_inventory
