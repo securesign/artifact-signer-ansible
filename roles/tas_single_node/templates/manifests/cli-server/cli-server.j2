@@ -4,20 +4,20 @@ metadata:
   name: "{{ tas_single_node_cli_server_pod }}"
   namespace: cli-server
   labels:
-    app.kubernetes.io/component: client-server
+    app.podman.io/component: client-server
     app.name: client-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: client-server
-      app.kubernetes.io/part-of: trusted-artifact-signer
+      app.podman.io/component: client-server
+      app.podman.io/part-of: trusted-artifact-signer
       app.name: client-server
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: client-server
-        app.kubernetes.io/part-of: trusted-artifact-signer
+        app.podman.io/component: client-server
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: client-server
     spec:
       containers:

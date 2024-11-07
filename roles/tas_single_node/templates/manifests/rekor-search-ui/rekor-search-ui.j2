@@ -4,20 +4,20 @@ metadata:
   name: "{{ tas_single_node_rekor_search_ui_pod }}"
   namespace: rekor-search-ui
   labels:
-    app.kubernetes.io/component: rekor-search-ui
-    app.kubernetes.io/part-of: trusted-artifact-signer
+    app.podman.io/component: rekor-search-ui
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: rekor-search-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: rekor-search-ui
+      app.podman.io/component: rekor-search-ui
       app.name: rekor-search-ui
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: rekor-search-ui
-        app.kubernetes.io/part-of: trusted-artifact-signer
+        app.podman.io/component: rekor-search-ui
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: rekor-search-ui
     spec:
       containers:

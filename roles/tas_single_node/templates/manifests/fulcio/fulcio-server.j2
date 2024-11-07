@@ -4,10 +4,9 @@ metadata:
   name: "{{ tas_single_node_fulcio_pod }}"
   namespace: fulcio-system
   labels:
-    app.kubernetes.io/component: fulcio
-    app.kubernetes.io/part-of: trusted-artifact-signer
-    app.kubernetes.io/name: fulcio-server
-    pod-template-hash: 5d7c67b946
+    app.podman.io/component: fulcio-server
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: fulcio-server
 spec:
   replicas: 1
   selector:
@@ -17,10 +16,9 @@ spec:
     metadata:
       labels:
         app: fulcio-server
-        app.kubernetes.io/component: fulcio
-        app.kubernetes.io/name: fulcio
-        app.kubernetes.io/part-of: trusted-artifact-signer
-        pod-template-hash: 5d7c67b946
+        app.podman.io/component: fulcio
+        app.name: fulcio-server
+        app.podman.io/part-of: trusted-artifact-signer
     spec:
       automountServiceAccountToken: true
       priority: 0

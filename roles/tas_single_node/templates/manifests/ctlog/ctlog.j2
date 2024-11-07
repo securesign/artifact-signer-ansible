@@ -4,9 +4,9 @@ metadata:
   name: "{{ tas_single_node_ctlog_pod }}"
   namespace: ctlog-system
   labels:
-    app.kubernetes.io/component: ctlog
+    app.podman.io/component: ctlog
     app.name: ctlog
-    app.kubernetes.io/part-of: trusted-artifact-signer
+    app.podman.io/part-of: trusted-artifact-signer
 spec:
   replicas: 1
   selector:
@@ -16,9 +16,9 @@ spec:
     metadata:
       labels:
         app: ctlog
-        app.kubernetes.io/component: ctlog
+        app.podman.io/component: ctlog
         app.name: ctlog
-        app.kubernetes.io/part-of: trusted-artifact-signer
+        app.podman.io/part-of: trusted-artifact-signer
     spec:
       containers:
         - name: ctlog

@@ -4,9 +4,8 @@ metadata:
   name: "{{ tas_single_node_tsa_server_pod }}"
   namespace: tsa-system
   labels:
-    app.kubernetes.io/part-of: trusted-artifact-signer
-    app.name: tsa
-    pod-template-hash: 74d5ff6f7f
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: tsa-server
 spec:
   replicas: 1
   selector:
@@ -16,9 +15,8 @@ spec:
     metadata:
       labels:
         app: tsa-server
-        app.kubernetes.io/part-of: trusted-artifact-signer
-        app.name: tsa
-        pod-template-hash: 74d5ff6f7f
+        app.podman.io/part-of: trusted-artifact-signer
+        app.name: tsa-server
     spec:
       automountServiceAccountToken: true
       containers:

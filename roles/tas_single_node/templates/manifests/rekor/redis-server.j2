@@ -4,21 +4,21 @@ metadata:
   name: "{{ tas_single_node_rekor_redis_pod }}"
   namespace: rekor-system
   labels:
-    app.kubernetes.io/component: rekor-redis
-    app.kubernetes.io/part-of: trusted-artifact-signer
-    app.kubernetes.io/name: rekor-redis
+    app.podman.io/component: rekor-redis
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: rekor-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rekor-redis
+      app.name: rekor-redis
   template:
     metadata:
       labels:
         app: rekor-redis
-        app.kubernetes.io/component: rekor-redis
-        app.kubernetes.io/part-of: trusted-artifact-signer
-        app.name: rekor
+        app.podman.io/component: rekor-redis
+        app.podman.io/part-of: trusted-artifact-signer
+        app.name: rekor-redis
     spec:
       containers:
         - name: rekor-redis

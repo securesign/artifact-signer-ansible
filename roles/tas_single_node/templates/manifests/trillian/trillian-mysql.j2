@@ -4,8 +4,8 @@ metadata:
   name: "{{ tas_single_node_trillian_mysql_pod }}"
   namespace: trillian-system
   labels:
-    app.kubernetes.io/component: trillian-mysql
-    app.kubernetes.io/part-of: trusted-artifact-signer
+    app.podman.io/component: trillian-mysql
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: trillian
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: trillian-mysql
-        app.kubernetes.io/component: trillian-mysql
-        app.kubernetes.io/part-of: trusted-artifact-signer
+        app.podman.io/component: trillian-mysql
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: trillian
     spec:
       containers:

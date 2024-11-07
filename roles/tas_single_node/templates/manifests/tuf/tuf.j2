@@ -4,8 +4,8 @@ metadata:
   name: "{{ tas_single_node_tuf_pod }}"
   namespace: tuf-system
   labels:
-    app.kubernetes.io/component: tuf
-    app.kubernetes.io/part-of: trusted-artifact-signer
+    app.podman.io/component: tuf
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: tuf
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: tuf
-        app.kubernetes.io/component: tuf
-        app.kubernetes.io/part-of: trusted-artifact-signer
+        app.podman.io/component: tuf
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: tuf
     spec:
       containers:
