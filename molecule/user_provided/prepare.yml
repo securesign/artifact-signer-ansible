@@ -14,6 +14,10 @@
           - mariadb-server
         state: latest
 
+    - name: Allow external connections for Redis
+      shell: |
+        sed -i 's/bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/g' /etc/redis/redis.conf
+
     - name: Enable and start Redis
       ansible.builtin.service:
         name: redis
@@ -24,7 +28,7 @@
       shell: |
         echo "CONFIG SET requirepass "password"" | redis-cli
 
-    - name: Allow external connections for Redis
+    - name: Allow external connections for MariaDB
       shell: |
         sed -i 's/#bind_address=0.0.0.0/bind_address=0.0.0.0/g' /etc/my.cnf.d/mariadb-server.cnf
 
