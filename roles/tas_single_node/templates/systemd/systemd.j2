@@ -8,7 +8,13 @@ RequiresMountsFor=%t/containers
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 TimeoutStopSec=70
+
+{% if podman_spec.configmap is defined %}
 ExecStart=/usr/bin/podman kube play --replace --service-container=true "{{ kube_play_file }}"  --network "{{ podman_spec.network | default('podman') }}" --configmap "{{ podman_spec.configmap | default(omit) }}"
+{% else %}
+ExecStart=/usr/bin/podman kube play --replace --service-container=true "{{ kube_play_file }}"  --network "{{ podman_spec.network | default('podman') }}"
+{% endif %}
+
 ExecStop=/usr/bin/podman kube down "{{ kube_play_file }}"
 Type=notify
 NotifyAccess=all
