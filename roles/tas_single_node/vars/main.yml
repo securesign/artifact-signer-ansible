@@ -46,14 +46,6 @@ tas_single_node_remote_ctlog_public_key: "{{ tas_single_node_certs_dir }}/{{ tas
 tas_single_node_remote_rekor_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"
 tas_single_node_remote_rekor_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"
 
-# Cert Passphrases
-tas_single_node_fulcio_ca_passphrase: rhtas
-tas_single_node_ctlog_ca_passphrase: rhtas
-tas_single_node_rekor_ca_passphrase: rhtas
-tas_single_node_tsa_ca_passphrase: rhtas
-tas_single_node_tsa_signer_passphrase: rhtas
-tas_single_node_ct_logprefix: rhtasansible
-
 # Functional Keys
 tas_single_node_private_key_filename: rhtas.key
 tas_single_node_ca_filename: rhtas.pem

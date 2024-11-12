@@ -187,6 +187,13 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
            client_id: trusted-artifact-signer
            url: TODO # your OIDC provider (e.g. keycloak) URL
            type: email
+       # create secure unique passphrases
+       tas_single_node_fulcio_ca_passphrase: TODO
+       tas_single_node_ctlog_ca_passphrase: TODO
+       tas_single_node_rekor_ca_passphrase: TODO
+       tas_single_node_tsa_ca_passphrase: TODO
+       tas_single_node_tsa_signer_passphrase: TODO
+       tas_single_node_ct_logprefix: TODO
      tasks:
        - name: Include TAS single node role
          ansible.builtin.include_role:

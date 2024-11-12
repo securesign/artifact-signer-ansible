@@ -29,18 +29,9 @@
 
 - name: Copy Systemd file to Server
   ansible.builtin.template:
-    src: systemd/systemd-cm.j2
+    src: systemd/systemd.j2
     dest: "{{ tas_single_node_systemd_directory + '/' + podman_spec.systemd_file }}.service"
     mode: "0600"
-  when: podman_spec.configmap is defined
-  register: copy_systemd_file
-
-- name: Copy Systemd file to Server
-  ansible.builtin.template:
-    src: systemd/systemd-nocm.j2
-    dest: "{{ tas_single_node_systemd_directory + '/' + podman_spec.systemd_file }}.service"
-    mode: "0600"
-  when: podman_spec.configmap is not defined
   register: copy_systemd_file
 
 - name: Restart Podman Service

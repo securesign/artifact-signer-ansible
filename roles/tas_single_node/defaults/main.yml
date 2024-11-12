@@ -42,6 +42,14 @@ tas_single_node_meta_issuers: []
 
 tas_single_node_trillian_trusted_ca: ""
 
+# Cert Passphrases
+tas_single_node_fulcio_ca_passphrase: rhtas
+tas_single_node_ctlog_ca_passphrase: rhtas
+tas_single_node_rekor_ca_passphrase: rhtas
+tas_single_node_tsa_ca_passphrase: rhtas
+tas_single_node_tsa_signer_passphrase: rhtas
+tas_single_node_ct_logprefix: rhtasansible
+
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
 
