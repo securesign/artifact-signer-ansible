@@ -92,10 +92,6 @@
   ansible.builtin.include_tasks: podman/trillian.yml
   when: tas_single_node_trillian_enabled | bool
 
-- name: Setup Trillian Tree ID
-  ansible.builtin.include_tasks: podman/createtree.yml
-  when: tas_single_node_trillian_enabled | bool
-
 - name: Configure/Deploy Rekor
   ansible.builtin.include_tasks: podman/rekor.yml
   when: tas_single_node_rekor_enabled | bool

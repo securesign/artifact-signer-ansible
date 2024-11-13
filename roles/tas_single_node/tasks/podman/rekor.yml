@@ -1,6 +1,8 @@
 ---
 - name: Obtain Trillian Tree ID
   ansible.builtin.include_tasks: podman/createtree.yml
+  vars:
+    tas_single_node_treeid_config: "{{ tas_single_node_rekor_treeid_config }}"
 
 - name: Create Rekor Sharding ConfigMap
   ansible.builtin.copy:
