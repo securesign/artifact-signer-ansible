@@ -110,7 +110,7 @@ You can also install a specific version of the collection, for example, if you n
 
 2. Initialize The Update Framework (TUF) system:
 
-   cosign initialize
+        cosign initialize
 
    > [!NOTE]
    If you have used `cosign` before, you might need to delete the `~/.sigstore` directory first.
@@ -119,26 +119,26 @@ You can also install a specific version of the collection, for example, if you n
    
    a. Create an empty container image:
       
-      echo "FROM scratch" > ./tmp.Dockerfile
-      podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
+        echo "FROM scratch" > ./tmp.Dockerfile
+        podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
 
    b. Push the empty container image to the `ttl.sh` ephemeral registry:
       
-      podman push ttl.sh/rhtas/test-image:1h
+        podman push ttl.sh/rhtas/test-image:1h
 
    c. Sign the container image:
       
-      cosign sign -y ttl.sh/rhtas/test-image:1h
+        cosign sign -y ttl.sh/rhtas/test-image:1h
 
       A web browser opens allowing you to sign the container image with an email address.
 
    d. Remove the temporary Docker file:
       
-      rm ./tmp.Dockerfile
+        rm ./tmp.Dockerfile
 
 4. Verify the signed image by replacing `TODO` with the signer's email address:
 
-   cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
+        cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
    
    If the signature verification does not result in an error, then the deployment of RHTAS was successful!
 
@@ -159,6 +159,7 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
 2. Create an Ansible Playbook named `play.yml`, and replace `TODO` with your relevant information:
    
    ```yaml
+   ---
    - hosts: rhtas
      vars:
        base_hostname: TODO # e.g. example.com
@@ -184,17 +185,17 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
    
    - If installing from Ansible Automation Hub, then run the following command:
    
-     ansible-playbook -i inventory play.yml
+        ansible-playbook -i inventory play.yml
 
    - If running from a locally-cloned Git repository, then run the following command:
    
-     export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
+        export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
 
 4. Add the root certificate authority (CA) to your local truststore:
   
-   sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
-   sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
-   sudo update-ca-trust
+        sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+        sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
+        sudo update-ca-trust
 
    > [!TIP]
    The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_hostname>` in a web browser.
@@ -211,10 +212,10 @@ This Git repository has GitHub actions that tests incoming PRs with `ansible-lin
 
 To run `ansible-lint` locally:
 
-python3 -m venv venv
-source venv/bin/activate
-pip install -r testing-requirements.txt
-ansible-lint
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install -r testing-requirements.txt
+        ansible-lint
 
 To run `sanity-test` locally:
 
@@ -229,7 +230,7 @@ A valid path for our collection would be, `{...}/ansible_collections/redhat/arti
 
 To achieve this, you can run sanity checks by running the following:
 
-    ansible-test sanity
+        ansible-test sanity
 
 ### Testing Deployment on a virtual machine
 
