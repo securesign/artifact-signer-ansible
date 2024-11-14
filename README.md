@@ -185,17 +185,17 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
    
    - If installing from Ansible Automation Hub, then run the following command:
    
-        ansible-playbook -i inventory play.yml
+            ansible-playbook -i inventory play.yml
 
    - If running from a locally-cloned Git repository, then run the following command:
    
-        export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
+            export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
 
 4. Add the root certificate authority (CA) to your local truststore:
   
-    sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
-    sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
-    sudo update-ca-trust
+        sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+        sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
+        sudo update-ca-trust
 
    > [!TIP]
    The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_hostname>` in a web browser.
