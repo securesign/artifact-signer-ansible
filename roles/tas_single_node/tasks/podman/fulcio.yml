@@ -53,7 +53,6 @@
           {{ tas_single_node_fulcio_trusted_oidc_ca }}
   register: configmap_oidc_result
 
-
 - name: Create Fulcio Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"

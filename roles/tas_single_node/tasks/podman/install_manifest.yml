@@ -43,5 +43,5 @@
   when: |
     copy_manifest.changed or copy_systemd_file.changed or
     (podman_spec.secret is defined and podman_spec.secret_changed) or
-    (podman_spec.configmap is defined and podman_spec.configmap_changed)
+    (podman_spec.configmap is defined and podman_spec.configmap_changed) or
     (podman_spec.configmap_oidc_ca is defined and podman_spec.configmap_oidc_ca_changed)

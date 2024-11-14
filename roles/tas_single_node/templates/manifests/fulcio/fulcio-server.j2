@@ -51,7 +51,7 @@ spec:
           volumeMounts:
 {% if tas_single_node_fulcio_trusted_oidc_ca != "" %}
             - mountPath: /certs
-	      name: fulcio-oidc-ca
+              name: fulcio-oidc-ca
 {% endif %}
             - mountPath: /etc/fulcio-config
               name: fulcio-config
@@ -79,12 +79,12 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: fulcio-config
-	  configMap:
+          configMap:
             defaultMode: 420
             name: fulcio-config
 {% if tas_single_node_fulcio_trusted_oidc_ca != "" %}
-	- name: fulcio-oidc-ca
-	  configMap:
+        - name: fulcio-oidc-ca
+          configMap:
             name: {{ tas_single_node_fulcio_trusted_oidc_ca_configmap_name }}
 {% endif %}
         - name: fulcio-cert
