@@ -193,9 +193,9 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
 
 4. Add the root certificate authority (CA) to your local truststore:
   
-        sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
-        sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
-        sudo update-ca-trust
+    sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
+    sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
+    sudo update-ca-trust
 
    > [!TIP]
    The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_hostname>` in a web browser.
@@ -212,10 +212,10 @@ This Git repository has GitHub actions that tests incoming PRs with `ansible-lin
 
 To run `ansible-lint` locally:
 
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -r testing-requirements.txt
-        ansible-lint
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r testing-requirements.txt
+    ansible-lint
 
 To run `sanity-test` locally:
 
@@ -230,7 +230,7 @@ A valid path for our collection would be, `{...}/ansible_collections/redhat/arti
 
 To achieve this, you can run sanity checks by running the following:
 
-        ansible-test sanity
+    ansible-test sanity
 
 ### Testing Deployment on a virtual machine
 
