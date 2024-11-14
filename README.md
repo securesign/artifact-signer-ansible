@@ -59,14 +59,13 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 
 Before using this collection, you need to install it with the Ansible Galaxy command-line tool:
 
-```
-ansible-galaxy collection install redhat.artifact_signer
-```
+    ansible-galaxy collection install redhat.artifact_signer
 
 You can also include it in a `requirements.yml` file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
 
 
 ```yaml
+---
 collections:
   - name: redhat.artifact_signer
 ```
@@ -74,15 +73,11 @@ collections:
 Note that if you install any collections from Ansible Galaxy, they will not be upgraded automatically when you upgrade the Ansible package.
 To upgrade the collection to the latest available version, run the following command:
 
-```
-ansible-galaxy collection install redhat.artifact_signer --upgrade
-```
+    ansible-galaxy collection install redhat.artifact_signer --upgrade
 
 You can also install a specific version of the collection, for example, if you need to downgrade when something is broken in the latest version (please report an issue in this repository). Use the following syntax to install version 1.1.0:
 
-```
-ansible-galaxy collection install redhat.artifact_signer:==1.1.0
-```
+    ansible-galaxy collection install redhat.artifact_signer:==1.1.0
 
 
 ## Downloading CLI tools
@@ -92,7 +87,7 @@ ansible-galaxy collection install redhat.artifact_signer:==1.1.0
 
 1. Export the following environment variables, replacing `TODO` with your relevant information:
 
-   ```shell
+   ```text
    export BASE_HOSTNAME="TODO"
    export KEYCLOAK_URL="TODO"
    export KEYCLOAK_REALM=TODO
@@ -115,9 +110,7 @@ ansible-galaxy collection install redhat.artifact_signer:==1.1.0
 
 2. Initialize The Update Framework (TUF) system:
 
-   ```shell
    cosign initialize
-   ```
 
    > [!NOTE]
    If you have used `cosign` before, you might need to delete the `~/.sigstore` directory first.
@@ -126,36 +119,26 @@ ansible-galaxy collection install redhat.artifact_signer:==1.1.0
    
    a. Create an empty container image:
       
-      ```shell
       echo "FROM scratch" > ./tmp.Dockerfile
       podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
-      ```
 
    b. Push the empty container image to the `ttl.sh` ephemeral registry:
       
-      ```shell
       podman push ttl.sh/rhtas/test-image:1h
-      ```
 
    c. Sign the container image:
       
-      ```shell
       cosign sign -y ttl.sh/rhtas/test-image:1h
-      ```
 
       A web browser opens allowing you to sign the container image with an email address.
 
    d. Remove the temporary Docker file:
       
-      ```shell
       rm ./tmp.Dockerfile
-      ```
 
 4. Verify the signed image by replacing `TODO` with the signer's email address:
 
-   ```shell
    cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
-   ```
    
    If the signature verification does not result in an error, then the deployment of RHTAS was successful!
 
@@ -167,7 +150,8 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
 
 1. Create an `inventory` file with a single node under the `rhtas` group:
    
-   ```
+   ```yaml
+   ---
    [rhtas]
    123.123.123.123
    ```
@@ -200,23 +184,18 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
    
    - If installing from Ansible Automation Hub, then run the following command:
    
-     ```shell
      ansible-playbook -i inventory play.yml
-     ```
 
    - If running from a locally-cloned Git repository, then run the following command:
    
-     ```shell
      export ANSIBLE_ROLES_PATH="roles/" ; ansible-playbook -i inventory play.yml
-     ```
 
 4. Add the root certificate authority (CA) to your local truststore:
   
-   ```shell
    sudo openssl x509 -in ~/Downloads/root-cert-from-browser -out tas-ca.pem --outform PEM
    sudo mv tas-ca.pem /etc/pki/ca-trust/source/anchors/
    sudo update-ca-trust
-   ```
+
    > [!TIP]
    The certificate can be downloaded from the Certificate Viewer by navigating to `https://rekor.<base_hostname>` in a web browser.
    Download the _root_ certificate that issued the Rekor certificate.
@@ -232,12 +211,10 @@ This Git repository has GitHub actions that tests incoming PRs with `ansible-lin
 
 To run `ansible-lint` locally:
 
-```shell
 python3 -m venv venv
 source venv/bin/activate
 pip install -r testing-requirements.txt
 ansible-lint
-```
 
 To run `sanity-test` locally:
 
@@ -252,9 +229,7 @@ A valid path for our collection would be, `{...}/ansible_collections/redhat/arti
 
 To achieve this, you can run sanity checks by running the following:
 
-```shell
-ansible-test sanity
-```
+    ansible-test sanity
 
 ### Testing Deployment on a virtual machine
 
