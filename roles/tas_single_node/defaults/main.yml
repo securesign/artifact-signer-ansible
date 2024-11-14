@@ -22,6 +22,12 @@ tas_single_node_trillian:
     host: trillian-mysql-pod
     port: 3306
 
+tas_single_node_fulcio:
+  certificate:
+    organization_name: ""
+    organization_email: ""
+    common_name: ""
+
 tas_single_node_rekor_public_key_retries: 5
 tas_single_node_rekor_public_key_delay: 10
 
@@ -50,6 +56,9 @@ tas_single_node_rekor_ca_passphrase: rhtas
 tas_single_node_tsa_ca_passphrase: rhtas
 tas_single_node_tsa_signer_passphrase: rhtas
 tas_single_node_ct_logprefix: rhtasansible
+
+tas_single_node_fulcio_private_key: ""
+tas_single_node_fulcio_root_ca: ""
 
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests

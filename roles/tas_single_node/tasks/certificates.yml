@@ -93,6 +93,14 @@
           -out '{{ tas_single_node_remote_fulcio_private_key }}'
           -passout 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
         creates: "{{ tas_single_node_remote_fulcio_private_key }}"
+      when: tas_single_node_fulcio_private_key == ""
+
+    - name: Load user-provided Fulcio private key
+      ansible.builtin.copy:
+        src: "{{ tas_single_node_fulcio_private_key }}"
+        dest: "{{ tas_single_node_remote_fulcio_private_key }}"
+        mode: '0600'
+      when: tas_single_node_fulcio_private_key != ""
 
     - name: Create Fulcio public key
       ansible.builtin.command:
@@ -108,11 +116,16 @@
         cmd: >-
           openssl req -new -batch
           -key '{{ tas_single_node_remote_fulcio_private_key }}'
+          -subj
+          "/O={{ tas_single_node_fulcio.certificate.organization_name }}
+           /CN={{ tas_single_node_fulcio.certificate.common_name }}
+           /emailAddress={{ tas_single_node_fulcio.certificate.organization_email }}"
           -addext 'basicConstraints=critical,CA:TRUE'
           -addext 'keyUsage = critical,keyCertSign'
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
       register: fulcio_root_csr
       changed_when: false
+      when: tas_single_node_fulcio_root_ca == ""
 
     - name: Create self-signed Fulcio root from CSR
       ansible.builtin.shell:
@@ -126,6 +139,14 @@
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
           -out '{{ tas_single_node_remote_fulcio_root_ca }}'
         creates: "{{ tas_single_node_remote_fulcio_root_ca }}"
+      when: tas_single_node_fulcio_root_ca == ""
+
+    - name: Load user-provided Fulcio root
+      ansible.builtin.copy:
+        src: "{{ tas_single_node_fulcio_root_ca }}"
+        dest: "{{ tas_single_node_remote_fulcio_root_ca }}"
+        mode: '0644'
+      when: tas_single_node_fulcio_root_ca != ""
 
 - name: Create CTLog root
   when: >
