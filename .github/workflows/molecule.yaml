@@ -24,9 +24,6 @@ jobs:
             pip install -r testing-requirements.txt
             ansible-galaxy install -r requirements.yml
             ansible-galaxy install -r molecule/requirements.yml
-        - name: Image mirroring
-          run: |
-            sed -f vm-testing/dev-images.sed  -i roles/tas_single_node/defaults/main.yml
         - name: Run molecule
           env:
             TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}

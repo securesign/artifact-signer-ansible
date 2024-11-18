@@ -317,3 +317,35 @@ argument_specs:
         required: false
         version_added: "1.1.0"
         default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b"
+      tas_single_node_podman:
+        description: "Configuration options for Podman."
+        type: "dict"
+        required: false
+        version_added: "1.1.1"
+        options:
+          policy:
+            description: >
+              Contains the content of a `policy.json` file, which defines security policies for container image sources.
+              Replaces the default policy, allowing you to enforce specific rules for image trust and verification in Podman.
+            type: "str"
+            required: false
+            version_added: "1.1.1"
+          registry:
+            description: >
+              A list of registries and their corresponding mirrors. Each item in the list should specify
+              a registry location and a mirror to use for pulling images.
+            type: "list"
+            elements: "dict"
+            required: false
+            version_added: "1.1.1"
+            options:
+              location:
+                description: "The primary registry location for the image."
+                type: "str"
+                required: true
+                version_added: "1.1.1"
+              mirror:
+                description: "The mirror registry to use for pulling images from the primary registry location."
+                type: "str"
+                required: true
+                version_added: "1.1.1"

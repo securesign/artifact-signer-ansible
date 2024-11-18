@@ -4,6 +4,7 @@
   gather_facts: true
   vars_files:
     - vars/vars.yml
+    - vars/podman.yml
   tasks:
     - name: Error out if registry username is not set
       ansible.builtin.fail:
