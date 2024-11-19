@@ -80,3 +80,35 @@
         #- name: Set up a non-root sudoer to replicate a user environment
         #ansible.builtin.include_tasks: ../testing_user_setup.yaml
         #with_items: "{{ users }}" 
+
+    - name: Set up a non-root sudoer to replicate a user environment
+      ansible.builtin.include_tasks: ../testing_user_setup.yaml
+      with_items: "{{ users }}" 
+
+    - name: Generate TLS certificates
+      shell: |
+        mkdir -p /etc/mysql/ssl
+        openssl genrsa 2048 > /etc/mysql/ssl/server-key.pem
+        openssl req -new -key /etc/mysql/ssl/server-key.pem -subj "/CN=$(hostname)" > /etc/mysql/ssl/server-req.pem
+        openssl x509 -req -in /etc/mysql/ssl/server-req.pem -signkey /etc/mysql/ssl/server-key.pem -out /etc/mysql/ssl/server-cert.pem
+        openssl genrsa 2048 > /etc/mysql/ssl/ca-key.pem
+        openssl req -new -x509 -nodes -days 3650 -key /etc/mysql/ssl/ca-key.pem -subj "/CN=MySQL_CA" -out /etc/mysql/ssl/ca-cert.pem
+      args:
+        creates: /etc/mysql/ssl/server-cert.pem
+
+    - name: Configure TLS for MariaDB
+      blockinfile:
+        path: /etc/my.cnf.d/mariadb-server.cnf
+        block: |
+          [mysqld]
+          ssl-ca=/etc/mysql/ssl/ca-cert.pem
+          ssl-cert=/etc/mysql/ssl/server-cert.pem
+          ssl-key=/etc/mysql/ssl/server-key.pem
+          require_secure_transport=ON
+      notify:
+        - Restart MariaDB
+
+    - name: Restart MariaDB
+      ansible.builtin.service:
+        name: mariadb
+        state: restarted
