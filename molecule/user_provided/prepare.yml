@@ -108,6 +108,7 @@
       notify:
         - Restart MariaDB
 
+  handlers:
     - name: Restart MariaDB
       ansible.builtin.service:
         name: mariadb
