@@ -17,6 +17,7 @@
       when: tas_single_node_registry_password == ""
 
     - name: Setting tas_single_node_trillian_trusted_ca
+      become: yes
       ansible.builtin.set_fact:
         tas_single_node_trillian_trusted_ca: "{{ lookup('ansible.builtin.file', '/etc/mysql/ssl/ca-cert.pem') }}"
 
