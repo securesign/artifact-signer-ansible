@@ -108,6 +108,17 @@
       notify:
         - Restart MariaDB
 
+    - name: Verify CA certificate creation
+      ansible.builtin.stat:
+        path: /etc/mysql/ssl/ca-cert.pem
+      register: ca_cert_stat
+
+    - name: Prints CA certificate
+      ansible.builtin.debug:
+        msg:
+        - "{{ ca_cert_stat }}"
+
+
   handlers:
     - name: Restart MariaDB
       ansible.builtin.service:
