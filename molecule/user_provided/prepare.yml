@@ -108,16 +108,14 @@
       notify:
         - Restart MariaDB
 
-    - name: Verify CA certificate creation
-      ansible.builtin.stat:
-        path: /etc/mysql/ssl/ca-cert.pem
-      register: ca_cert_stat
+    - name: Read Trillian CA certificate
+      ansible.builtin.slurp:
+        src: /etc/mysql/ssl/ca-cert.pem
+      register: ca_cert
 
-    - name: Prints CA certificate
-      ansible.builtin.debug:
-        msg:
-        - "{{ ca_cert_stat }}"
-
+    - name: Save CA certificate content to a fact 
+      ansible.builtin.set_fact:
+        tas_single_node_trillian_trusted_ca: "{{ ca_cert.content }}"
 
   handlers:
     - name: Restart MariaDB
