@@ -108,14 +108,12 @@
       notify:
         - Restart MariaDB
 
-    - name: Read Trillian CA certificate
-      ansible.builtin.slurp:
+    - name: Persist CA certificate to shared location
+      ansible.builtin.copy:
         src: /etc/mysql/ssl/ca-cert.pem
-      register: ca_cert
+        dest: /tmp/ca-cert.pem
+        remote_src: yes
 
-    - name: Save CA certificate content to a fact 
-      ansible.builtin.set_fact:
-        tas_single_node_trillian_trusted_ca: "{{ ca_cert.content }}"
 
   handlers:
     - name: Restart MariaDB
