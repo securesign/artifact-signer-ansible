@@ -34,24 +34,10 @@
       data:
         config.yaml: |
           {{ fulcio_config_content }}
-  register: configmap_result
 
-- name: Create Fulcio Trusted OIDC CA Configmap
-  ansible.builtin.copy:
-    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ tas_single_node_fulcio_trusted_oidc_ca_config }}"
-    mode: "0600"
-  vars:
-    configmap_content:
-      kind: ConfigMap
-      apiVersion: v1
-      metadata:
-        name: "{{ tas_single_node_fulcio_trusted_oidc_ca_configmap_name }}"
-        namespace: fulcio-system
-      data:
         fulcio-trusted-ca.pem: |
           {{ tas_single_node_fulcio_trusted_oidc_ca }}
-  register: configmap_oidc_result
+  register: configmap_result
 
 - name: Create Fulcio Secret
   ansible.builtin.copy:
@@ -85,7 +71,5 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.j2') | from_yaml }}"
       configmap: "{{ tas_single_node_fulcio_server_config }}"
       configmap_changed: "{{ configmap_result.changed }}"
-      configmap_oidc_ca: "{{ tas_single_node_fulcio_trusted_oidc_ca_config }}"
-      configmap_oidc_ca_changed: "{{ configmap_oidc_result.changed }}"
       secret: "{{ tas_single_node_fulcio_server_secret_config }}"
       secret_changed: "{{ secret_result.changed }}"
