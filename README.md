@@ -178,7 +178,7 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
    ```yaml
    - hosts: rhtas
      vars:
-       base_hostname: TODO # e.g. example.com
+       tas_single_node_base_hostname: TODO # e.g. example.com
        # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
        tas_single_node_registry_username: TODO
        tas_single_node_registry_password: TODO
