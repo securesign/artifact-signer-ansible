@@ -34,6 +34,9 @@
       data:
         config.yaml: |
           {{ fulcio_config_content }}
+
+        fulcio-trusted-ca.pem: |
+          {{ tas_single_node_fulcio_trusted_oidc_ca }}
   register: configmap_result
 
 - name: Create Fulcio Secret
