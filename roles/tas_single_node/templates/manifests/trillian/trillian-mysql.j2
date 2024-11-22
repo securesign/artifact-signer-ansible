@@ -4,8 +4,8 @@ metadata:
   name: "{{ tas_single_node_trillian_mysql_pod }}"
   namespace: trillian-system
   labels:
-    app.component: mysql
-    app.instance: scaffold
+    app.podman.io/component: trillian-mysql
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: trillian
 spec:
   replicas: 1
@@ -16,12 +16,34 @@ spec:
     metadata:
       labels:
         app: trillian-mysql
-        app.component: mysql
-        app.instance: scaffold
+        app.podman.io/component: trillian-mysql
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: trillian
     spec:
       containers:
         - name: trillian-mysql
+          readinessProbe:
+            exec:
+              command:
+                - bash
+                - '-c'
+                - 'mariadb -u {{ tas_single_node_trillian.mysql.user }} -p {{ tas_single_node_trillian.mysql.password }} -e "SELECT 1;"'
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - '-c'
+                - 'mariadb-admin -u {{ tas_single_node_trillian.mysql.user }} -p {{ tas_single_node_trillian.mysql.password }} ping'
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
           image: "{{ tas_single_node_trillian_db_image }}"
           imagePullPolicy: IfNotPresent
           ports:

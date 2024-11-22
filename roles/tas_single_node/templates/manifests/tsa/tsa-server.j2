@@ -4,9 +4,8 @@ metadata:
   name: "{{ tas_single_node_tsa_server_pod }}"
   namespace: tsa-system
   labels:
-    app.instance: scaffold
-    app.name: tsa
-    pod-template-hash: 74d5ff6f7f
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: tsa-server
 spec:
   replicas: 1
   selector:
@@ -16,13 +15,32 @@ spec:
     metadata:
       labels:
         app: tsa-server
-        app.instance: scaffold
-        app.name: tsa
-        pod-template-hash: 74d5ff6f7f
+        app.podman.io/part-of: trusted-artifact-signer
+        app.name: tsa-server
     spec:
       automountServiceAccountToken: true
       containers:
         - name: tsa-server
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: {{ tas_single_node_tsa_server_port_tcp }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: {{ tas_single_node_tsa_server_port_tcp }}
+              scheme: HTTP
+            initialDelayDeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
           image: {{ tas_single_node_timestamp_authority_image }}
           imagePullPolicy: IfNotPresent
           command:

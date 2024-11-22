@@ -4,30 +4,24 @@ metadata:
   name: "{{ tas_single_node_rekor_redis_pod }}"
   namespace: rekor-system
   labels:
-    app.component: redis
-    app.instance: scaffold
-    app.name: rekor
+    app.podman.io/component: rekor-redis
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: rekor-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rekor-redis
+      app.name: rekor-redis
   template:
     metadata:
       labels:
         app: rekor-redis
-        app.component: redis
-        app.instance: scaffold
-        app.name: rekor
+        app.podman.io/component: rekor-redis
+        app.podman.io/part-of: trusted-artifact-signer
+        app.name: rekor-redis
     spec:
       containers:
         - name: rekor-redis
-          args:
-            - /usr/bin/run-redis
-            - --bind
-            - 0.0.0.0
-            - --appendonly
-            - "yes"
           image: "{{ tas_single_node_rekor_redis_image }}"
 {% if tas_single_node_rekor_redis.redis.password != "" %}
           env:
@@ -41,11 +35,10 @@ spec:
           readinessProbe:
             exec:
               command:
-                - /usr/bin/run-redis
-                - --bind
-                - 0.0.0.0
-                - --appendonly
-                - "yes"
+                - /bin/sh
+                - '-c'
+                - '-i'
+                - test $(redis-cli -h 127.0.0.1 ping) = 'PONG'
             failureThreshold: 3
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -57,7 +50,13 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       enableServiceLinks: true
-      securityContext: {}
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        runAsUser: 65533
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
       serviceAccountName: rekor-redis
       tolerations:
         - effect: NoExecute

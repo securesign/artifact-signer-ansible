@@ -4,34 +4,53 @@ metadata:
   name: "{{ tas_single_node_cli_server_pod }}"
   namespace: cli-server
   labels:
-    app.instance: scaffold
-    app.name: cli-server
+    app.podman.io/component: client-server
+    app.name: client-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.component: cli-server
-      app.instance: scaffold
-      app.name: cli-server
+      app.podman.io/component: client-server
+      app.podman.io/part-of: trusted-artifact-signer
+      app.name: client-server
   template:
     metadata:
       labels:
-        app.component: cli-server
-        app.instance: scaffold
-        app.name: cli-server
+        app.podman.io/component: client-server
+        app.podman.io/part-of: trusted-artifact-signer
+        app.name: client-server
     spec:
       containers:
-        - name: cli-server
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: cli-server
           image: "{{ tas_single_node_client_server_image }}"
-          imagePullPolicy: Always
+          terminationMessagePolicy: File
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ tas_single_node_cli_server_port_http }}
               protocol: TCP
+          imagePullPolicy: Always
           volumeMounts:
             - name: apache-config
               mountPath: /var/www/html/index.html
               subPath: index.html
       restartPolicy: Always
+      tolerations:
+        - key: node.kubernetes.io/not-ready
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 300
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 300
       volumes:
         - name: apache-config
           configMap:

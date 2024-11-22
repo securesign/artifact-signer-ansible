@@ -4,20 +4,19 @@ metadata:
   name: "{{ tas_single_node_trillian_logserver_pod }}"
   namespace: trillian-system
   labels:
-    app.component: trillian-logserver
-    app.instance: scaffold
+    app.podman.io/component: trillian-logserver
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: trillian
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.component: trillian-logserver
-      app.instance: scaffold
+      app.podman.io/component: trillian-logserver
   template:
     metadata:
       labels:
-        app.component: trillian-logserver
-        app.instance: scaffold
+        app.podman.io/component: trillian-logserver
+        app.podman.io/part-of: trusted-artifact-signer
     spec:
 {% if tas_single_node_trillian_trusted_ca != "" %}
       volumes:

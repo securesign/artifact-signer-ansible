@@ -4,9 +4,9 @@ metadata:
   name: "{{ tas_single_node_fulcio_pod }}"
   namespace: fulcio-system
   labels:
-    app.instance: scaffold
-    app.name: fulcio
-    pod-template-hash: 74d5ff6f7f
+    app.podman.io/component: fulcio-server
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: fulcio-server
 spec:
   replicas: 1
   selector:
@@ -16,13 +16,35 @@ spec:
     metadata:
       labels:
         app: fulcio-server
-        app.instance: scaffold
-        app.name: fulcio
-        pod-template-hash: 74d5ff6f7f
+        app.podman.io/component: fulcio
+        app.name: fulcio-server
+        app.podman.io/part-of: trusted-artifact-signer
     spec:
       automountServiceAccountToken: true
+      priority: 0
       containers:
         - name: fulcio-server
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: {{ tas_single_node_fulcio_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: {{ tas_single_node_fulcio_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           args:
             - serve
             - --port={{ tas_single_node_fulcio_port_http }}
@@ -68,6 +90,7 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65533
+        allowPrivilegeEscalation: false
       serviceAccountName: fulcio-server
       tolerations:
         - effect: NoExecute

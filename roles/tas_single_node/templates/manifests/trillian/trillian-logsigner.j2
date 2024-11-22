@@ -4,8 +4,8 @@ metadata:
   name: "{{ tas_single_node_trillian_logsigner_pod }}"
   namespace: trillian-system
   labels:
-    app.component: trillian-logsigner
-    app.instance: scaffold
+    app.podman.io/component: trillian-logsigner
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: trillian
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: trillian-logsigner
-        app.component: trillian-logsigner
-        app.instance: scaffold
+        app.podman.io/component: trillian-logsigner
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: trillian
     spec:
       initContainers:

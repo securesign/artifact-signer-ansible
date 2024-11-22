@@ -4,30 +4,45 @@ metadata:
   name: "{{ tas_single_node_rekor_search_ui_pod }}"
   namespace: rekor-search-ui
   labels:
-    app.component: search
-    app.instance: scaffold
+    app.podman.io/component: rekor-search-ui
+    app.podman.io/part-of: trusted-artifact-signer
     app.name: rekor-search-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.component: search
-      app.instance: scaffold
+      app.podman.io/component: rekor-search-ui
       app.name: rekor-search-ui
   template:
     metadata:
       labels:
-        app.component: search
-        app.instance: scaffold
+        app.podman.io/component: rekor-search-ui
+        app.podman.io/part-of: trusted-artifact-signer
         app.name: rekor-search-ui
     spec:
       containers:
-        - name: rekor-ui
+        - name: rekor-search-ui
           image: "{{ tas_single_node_rekor_search_ui_image }}"
           imagePullPolicy: Always
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: file
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
           env:
             - name: NEXT_PUBLIC_REKOR_DEFAULT_DOMAIN
               value: https://rekor.{{ tas_single_node_base_hostname }}
           ports:
             - containerPort: {{ tas_single_node_rekor_search_ui_port_tcp }}
               protocol: TCP
+      tolerations:
+        - key: node.kubernetes.io/not-ready
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 300
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 300

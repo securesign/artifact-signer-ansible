@@ -4,8 +4,9 @@ metadata:
   name: "{{ tas_single_node_ctlog_pod }}"
   namespace: ctlog-system
   labels:
-    app.instance: scaffold
+    app.podman.io/component: ctlog
     app.name: ctlog
+    app.podman.io/part-of: trusted-artifact-signer
 spec:
   replicas: 1
   selector:
@@ -15,13 +16,24 @@ spec:
     metadata:
       labels:
         app: ctlog
-        app.instance: scaffold
+        app.podman.io/component: ctlog
         app.name: ctlog
+        app.podman.io/part-of: trusted-artifact-signer
     spec:
       containers:
         - name: ctlog
           image: "{{ tas_single_node_ctlog_image }}"
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: {{ tas_single_node_ctlog_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           livelinessProbe:
             failureThreshold: 3
             httpGet:
@@ -62,6 +74,7 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65533
+        allowPrivilegeEscalation: false
       serviceAccountName: ctlog
       tolerations:
         - effect: NoExecute
@@ -76,6 +89,7 @@ spec:
         - name: keys
           secret:
             secretName: ctlog-secret
+            defaultMode: 420
         - name: config
           configMap:
             name: ctlog-config

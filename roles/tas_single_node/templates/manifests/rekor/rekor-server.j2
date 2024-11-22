@@ -4,25 +4,20 @@ metadata:
   name: "{{ tas_single_node_rekor_server_pod }}"
   namespace: rekor-system
   labels:
-    app.component: server
-    app.instance: scaffold
-    app.name: rekor
-    pod-template-hash: 5c755b56f9
+    app.podman.io/component: rekor-server
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: rekor-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.component: server
-      app.instance: scaffold
-      app.name: rekor
-      pod-template-hash: 5c755b56f9
+      app.name: rekor-server
   template:
     metadata:
       labels:
-        app.component: server
-        app.instance: scaffold
-        app.name: rekor
-        pod-template-hash: 5c755b56f9
+        app.podman.io/component: rekor-server
+        app.podman.io/part-of: trusted-artifact-signer
+        app.name: rekor-redis
       annotations:
         prometheus.io/path: /metrics
         prometheus.io/port: "2112"
@@ -30,6 +25,26 @@ spec:
     spec:
       containers:
         - name: rekor-server
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port : {{ tas_single_node_rekor_server_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port : {{ tas_single_node_rekor_server_port_http }}
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           args:
             - serve
             - --trillian_log_server.address={{ tas_single_node_trillian_logserver_pod }}-pod
@@ -52,6 +67,12 @@ spec:
             - --port={{ tas_single_node_rekor_server_port_http }}
           image: "{{ tas_single_node_rekor_server_image }}"
           imagePullPolicy: IfNotPresent
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: file
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ tas_single_node_rekor_server_port_http }}
               protocol: TCP
