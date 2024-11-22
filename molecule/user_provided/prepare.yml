@@ -108,13 +108,6 @@
       notify:
         - Restart MariaDB
 
-    - name: Persist CA certificate to shared location
-      ansible.builtin.copy:
-        src: /etc/mysql/ssl/ca-cert.pem
-        dest: /tmp/ca-cert.pem
-        remote_src: yes
-
-
   handlers:
     - name: Restart MariaDB
       ansible.builtin.service:
