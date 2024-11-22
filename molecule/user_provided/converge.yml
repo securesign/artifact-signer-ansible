@@ -16,14 +16,14 @@
         msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
       when: tas_single_node_registry_password == ""
 
-    - name: Read CA certificate content on the remote machine
+    - name: Copy CA certificate content into tas_single_node_trillian_trusted_ca
       ansible.builtin.slurp:
         src: "/etc/mysql/ssl/ca-cert.pem"
-      register: ca_cert_remote
+      register: tas_single_node_trillian_trusted_ca
 
     - name: Debug CA certificate content from the remote
       ansible.builtin.debug:
-        msg: "CA Certificate: {{ ca_cert_remote.content | b64decode }}"
+        msg: "CA Certificate: {{ tas_single_node_trillian_trusted_ca.content | b64decode }}"
 
     # - name: Setting tas_single_node_trillian_trusted_ca
     #   ansible.builtin.debug:

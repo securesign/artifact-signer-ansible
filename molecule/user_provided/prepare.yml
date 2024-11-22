@@ -108,13 +108,6 @@
       notify:
         - Restart MariaDB
 
-    - name: Ensure CA certificate is available for Converge playbook
-      ansible.builtin.fetch:
-        src: "/etc/mysql/ssl/ca-cert.pem"
-        dest: "{{ playbook_dir }}/ca-cert.pem"
-        flat: yes
-        mode: '0666'
-
   handlers:
     - name: Restart MariaDB
       ansible.builtin.service:
