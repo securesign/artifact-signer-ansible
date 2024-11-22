@@ -61,11 +61,11 @@
       delay: 5
 
     - name: Import Trillian schema
-      shell: |
+      ansible.builtin.shell: |
         mysql -u root trillian < /tmp/schema.sql
  
     - name: Prepare MariaDB configuration
-      shell: |
+      ansible.builtin.shell: |
         mysql <<EOF
         ALTER USER 'root'@'localhost' IDENTIFIED BY 'rootpassword';
         GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY 'rootpassword' WITH GRANT OPTION;
@@ -86,7 +86,7 @@
       with_items: "{{ users }}" 
 
     - name: Generate TLS certificates
-      shell: |
+      ansible.builtin.shell: |
         mkdir -p /etc/mysql/ssl
         openssl genrsa 2048 > /etc/mysql/ssl/server-key.pem
         openssl req -new -key /etc/mysql/ssl/server-key.pem -subj "/CN=trillian-mysql-pod" > /etc/mysql/ssl/server-req.pem
@@ -97,7 +97,7 @@
         creates: /etc/mysql/ssl/server-cert.pem
 
     - name: Configure TLS for MariaDB
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: /etc/my.cnf.d/mariadb-server.cnf
         block: |
           [mysqld]
@@ -108,14 +108,11 @@
       notify:
         - Restart MariaDB
 
-    - name: Read CA certificate content
-      ansible.builtin.slurp:
-        src: /etc/mysql/ssl/ca-cert.pem
-      register: ca_cert
-
-    - name: Save CA certificate content to tas_single_node_trillian_trusted_ca
-      ansible.builtin.set_fact:
-        tas_single_node_trillian_trusted_ca: "{{ ca_cert.content }}"
+    - name: Ensure CA certificate and key are available for later use
+      ansible.builtin.copy:
+        src: "/etc/mysql/ssl/ca-cert.pem"
+        dest: "{{ playbook_dir }}"
+        mode: '0666'
 
   handlers:
     - name: Restart MariaDB
