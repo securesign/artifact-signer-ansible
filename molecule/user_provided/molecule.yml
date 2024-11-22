@@ -14,8 +14,4 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_ROLES_PATH: "../../roles"
-  config_options:
-    defaults:
-      gathering: smart
-      fact_caching: jsonfile
-      fact_caching_timeout: 7200
+
