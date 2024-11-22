@@ -89,7 +89,7 @@
       shell: |
         mkdir -p /etc/mysql/ssl
         openssl genrsa 2048 > /etc/mysql/ssl/server-key.pem
-        openssl req -new -key /etc/mysql/ssl/server-key.pem -subj "/CN=$(hostname)" > /etc/mysql/ssl/server-req.pem
+        openssl req -new -key /etc/mysql/ssl/server-key.pem -subj "/CN=trillian-mysql-pod" > /etc/mysql/ssl/server-req.pem
         openssl x509 -req -in /etc/mysql/ssl/server-req.pem -signkey /etc/mysql/ssl/server-key.pem -out /etc/mysql/ssl/server-cert.pem
         openssl genrsa 2048 > /etc/mysql/ssl/ca-key.pem
         openssl req -new -x509 -nodes -days 3650 -key /etc/mysql/ssl/ca-key.pem -subj "/CN=MySQL_CA" -out /etc/mysql/ssl/ca-cert.pem
@@ -107,6 +107,15 @@
           require_secure_transport=ON
       notify:
         - Restart MariaDB
+
+    - name: Read CA certificate content
+      ansible.builtin.slurp:
+        src: /etc/mysql/ssl/ca-cert.pem
+      register: ca_cert
+
+    - name: Save CA certificate content to tas_single_node_trillian_trusted_ca
+      ansible.builtin.set_fact:
+        tas_single_node_trillian_trusted_ca: "{{ ca_cert.content }}"
 
   handlers:
     - name: Restart MariaDB
