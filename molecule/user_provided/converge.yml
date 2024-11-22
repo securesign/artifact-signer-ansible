@@ -19,11 +19,11 @@
     - name: Copy CA certificate content into tas_single_node_trillian_trusted_ca
       ansible.builtin.slurp:
         src: "/etc/mysql/ssl/ca-cert.pem"
-      register: tas_single_node_trillian_trusted_ca
+      register: ca_cert_content
 
     - name: Debug CA certificate content from the remote
       ansible.builtin.debug:
-        msg: "CA Certificate: {{ tas_single_node_trillian_trusted_ca.content | b64decode }}"
+        msg: "CA Certificate: {{ ca_cert_content.content | b64decode }}"
 
     # - name: Setting tas_single_node_trillian_trusted_ca
     #   ansible.builtin.debug:
@@ -32,3 +32,5 @@
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
         name: tas_single_node
+      vars:
+        tas_single_node_trillian_trusted_ca: "{{ ca_cert_content }}"
