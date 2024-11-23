@@ -89,10 +89,14 @@
       ansible.builtin.shell: |
         mkdir -p /etc/mysql/ssl
         openssl genrsa 2048 > /etc/mysql/ssl/server-key.pem
-        openssl req -new -key /etc/mysql/ssl/server-key.pem -subj "/CN=trillian-mysql-pod" > /etc/mysql/ssl/server-req.pem
+        openssl req -new -key /etc/mysql/ssl/server-key.pem \
+          -subj "/CN=trillian-mysql-pod" \
+          -addext "subjectAltName=DNS:trillian-mysql-pod,DNS:*,IP:127.0.0.1" > /etc/mysql/ssl/server-req.pem
         openssl x509 -req -in /etc/mysql/ssl/server-req.pem -signkey /etc/mysql/ssl/server-key.pem -out /etc/mysql/ssl/server-cert.pem
         openssl genrsa 2048 > /etc/mysql/ssl/ca-key.pem
-        openssl req -new -x509 -nodes -days 3650 -key /etc/mysql/ssl/ca-key.pem -subj "/CN=MySQL_CA" -out /etc/mysql/ssl/ca-cert.pem
+        openssl req -new -x509 -nodes -days 3650 -key /etc/mysql/ssl/ca-key.pem \
+          -subj "/CN=MySQL_CA" \
+          -addext "subjectAltName=DNS:trillian-mysql-pod,DNS:*,IP:127.0.0.1" -out /etc/mysql/ssl/ca-cert.pem
       args:
         creates: /etc/mysql/ssl/server-cert.pem
 
