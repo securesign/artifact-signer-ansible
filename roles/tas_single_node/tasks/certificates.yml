@@ -89,7 +89,7 @@
           -passout 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
         creates: "{{ tas_single_node_remote_fulcio_private_key }}"
       when: >
-        tas_single_node_fulcio_private_key == "" 
+        tas_single_node_fulcio_private_key == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) == 0
 
     - name: Load user-provided Fulcio private key
@@ -106,6 +106,8 @@
           -in '{{ tas_single_node_remote_fulcio_private_key }}'
           -out '{{ tas_single_node_remote_fulcio_public_key }}'
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
+      changed_when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
       when: >
         tas_single_node_fulcio_private_key != ""
         or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
@@ -124,7 +126,7 @@
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
       register: fulcio_root_csr
       changed_when: false
-      when: > 
+      when: >
         tas_single_node_fulcio_root_ca == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or tas_single_node_fulcio_private_key != ""
@@ -141,7 +143,7 @@
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
           -out '{{ tas_single_node_remote_fulcio_root_ca }}'
         creates: "{{ tas_single_node_remote_fulcio_root_ca }}"
-      when: > 
+      when: >
         tas_single_node_fulcio_root_ca == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or tas_single_node_fulcio_private_key != ""
