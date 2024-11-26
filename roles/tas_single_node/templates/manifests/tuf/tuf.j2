@@ -26,6 +26,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: {{ tas_single_node_tuf_port_http }}
+              # specify hostPort explicitly because of older podman versions that expose
+              # automatically, so we need to prevent clash with other container ports
+              hostPort: {{ tas_single_node_tuf_host_port_http }}
               protocol: TCP
           readinessProbe:
             httpGet:
