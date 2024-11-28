@@ -1,0 +1,10 @@
+---
+- name: Prepare
+  hosts: molecule
+  gather_facts: false
+  vars_files:
+    - vars/vars.yml
+
+  tasks:
+    - name: Configure Dex OIDC instance
+      ansible.builtin.include_tasks: ../dex-config.yaml

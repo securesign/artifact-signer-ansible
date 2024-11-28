@@ -1,0 +1,31 @@
+---
+- name: Podman
+  ansible.builtin.package:
+    name: podman
+    state: present
+
+- name: Create dir
+  ansible.builtin.file:
+    path: "/etc/dex/config"
+    state: directory
+    mode: "0755"
+
+- name: Copy Dex config over
+  ansible.builtin.copy:
+    src: "../../vm-testing/dex-config.yaml"
+    dest: "/etc/dex/config/dex.yaml"
+    mode: "0644"
+
+- name: Run Dex container
+  ansible.builtin.shell: |
+      sudo podman run -d \
+      --name dex-idp \
+      -p 5556:5556 \
+      -v /etc/dex/config/dex.yaml:/etc/dex/cfg/dex.yaml:Z \
+      quay.io/asiek/dexidp:v2.32.0 \
+      dex serve /etc/dex/cfg/dex.yaml
+
+- name: Dex container health check
+  ansible.builtin.shell: curl http://127.0.0.1:5556/dex/healthz
+  retries: 3
+  delay: 5

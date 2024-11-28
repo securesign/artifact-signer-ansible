@@ -38,6 +38,16 @@ http {
       return 301 https://$host$request_uri;
     }
 
+    server {
+	listen 8080;
+	server_name dex-idp;
+
+	location / {
+            proxy_pass http://dex-idp:5556;
+	}
+
+    }
+
 }
 
 
