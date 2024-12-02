@@ -85,6 +85,20 @@ You can also install a specific version of the collection, for example, if you n
 ansible-galaxy collection install redhat.artifact_signer:==1.1.0
 ```
 
+### Monitoring of containers with Cockpit
+To monitor containers with Cockpit, you need to install the Red Hat Enterprise Linux System Roles Ansible Collection using the following command: `ansible-galaxy collection install redhat.rhel_system_roles`
+After installing the collection, you can enable and configure Cockpit as shown below
+
+```
+tas_single_node_cockpit:
+  enabled: true
+  cockpit_packages:
+    - cockpit-storaged
+    - cockpit-podman
+    - cockpit
+  cockpit_manage_firewall: true
+  cockpit_port: 9090
+```
 
 ## Downloading CLI tools
    To Download tools to interact with Red Hat Trusted Artifact Signer, you can visit `https://cli-server.<base_hostname>`
