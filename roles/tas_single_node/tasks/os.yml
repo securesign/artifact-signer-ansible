@@ -8,14 +8,6 @@
     name: "{{ tas_single_node_system_packages }}"
     state: latest
 
-- name: Install Cockpit
-  ansible.builtin.include_role:
-    name: cockpit
-  vars:
-    cockpit_packages: "{{ tas_single_node_cockpit.cockpit_packages }}"
-    cockpit_manage_firewall: "{{ tas_single_node_cockpit.cockpit_manage_firewall }}"
-  when: tas_single_node_cockpit.enabled | bool
-
 - name: Configure /etc/hosts DNS block
   ansible.builtin.blockinfile:
     dest: /etc/hosts

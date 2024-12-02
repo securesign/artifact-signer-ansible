@@ -9,6 +9,15 @@
   ansible.builtin.include_tasks: os.yml
   when: not tas_single_node_skip_os_install
 
+- name: Install Cockpit
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.cockpit
+  vars:
+    cockpit_packages: "{{ tas_single_node_cockpit.cockpit_packages }}"
+    cockpit_manage_firewall: "{{ tas_single_node_cockpit.cockpit_manage_firewall }}"
+    cockpit_port: "{{ tas_single_node_cockpit.cockpit_port }}"
+  when: tas_single_node_cockpit.enabled | bool
+
 - name: Create Certificates
   ansible.builtin.include_tasks: certificates.yml
 
