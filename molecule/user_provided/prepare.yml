@@ -5,7 +5,7 @@
   vars:
     users:
       - user: testingUser
-        password: testingUser0x
+        password: password123
   vars_files:
     - vars/vars.yml
   tasks:
