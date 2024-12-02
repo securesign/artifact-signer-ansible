@@ -1,10 +1,10 @@
 ---
-- name: Podman
+- name: Check if Podman is available
   ansible.builtin.package:
     name: podman
     state: present
 
-- name: Create dir
+- name: Create Dex config directory
   ansible.builtin.file:
     path: "/etc/dex/config"
     state: directory
@@ -18,7 +18,7 @@
 
 - name: Run Dex container
   ansible.builtin.shell: |
-      sudo podman run -d \
+      podman run -d \
       --name dex-idp \
       -p 5556:5556 \
       -v /etc/dex/config/dex.yaml:/etc/dex/cfg/dex.yaml:Z \

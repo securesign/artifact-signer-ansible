@@ -13,7 +13,6 @@ cp "${BASE_HOSTNAME}".pem /etc/pki/ca-trust/source/anchors/
 update-ca-trust
 
 # set up cosign env
-export OIDC_ISSUER_URL=http://dex-idp:5556/dex
 export TUF_URL=https://tuf.$BASE_HOSTNAME
 export OIDC_ISSUER_URL=$OIDC_ISSUER_URL
 export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
