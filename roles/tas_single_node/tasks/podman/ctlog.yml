@@ -5,13 +5,22 @@
     tas_single_node_treeid_config: "{{ tas_single_node_ctlog_treeid_config }}"
 
 - name: Slurp ctlog Certificates
-  ansible.builtin.slurp:
+  ansible.builtin.slurp: 
     src: "{{ item }}"
-  loop:
-    - "{{ tas_single_node_remote_ctlog_private_key }}"
-    - "{{ tas_single_node_remote_ctlog_public_key }}"
-    - "{{ tas_single_node_remote_fulcio_root_ca }}"
+  with_items: 
+    - "{{tas_single_node_remote_fulcio_root_ca}}"
+    - |
+      {%- if tas_single_node_custom_ctlog_private_key_names != "" and tas_single_node_custom_ctlog_private_keys is defined -%}
+      {{ tas_single_node_custom_ctlog_private_key_names }}
+      {%- else -%} 
+      {{tas_single_node_remote_private_key}} {%- endif -%}
+    - |
+      {%- if tas_single_node_custom_ctlog_public_key_names != "" and tas_single_node_custom_ctlog_private_keys is defined -%}
+      {{ tas_single_node_custom_ctlog_public_key_names }}
+      {%- else -%} 
+      {{tas_single_node_remote_public_key}} {%- endif -%}
   register: remote_ctlog_certificates
+
 
 - name: Load ctlog config content
   block:
@@ -53,10 +62,14 @@
         name: ctlog-secret
         namespace: ctlog-system
       data:
-        private: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_private_key) | list | first).content }}
-        public: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
+        private0: |
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', '/etc/rhtas/certs/ctlog0.key') | list | first).content }}
+        private1: |
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', '/etc/rhtas/certs/ctlog1.key') | list | first).content }}
+        public0: |
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', '/etc/rhtas/certs/ctlog0.pub') | list | first).content }}
+        public1: |
+          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', '/etc/rhtas/certs/ctlog0.pub') | list | first).content }}
         fulcio-0: |
           {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
   register: secret_result
