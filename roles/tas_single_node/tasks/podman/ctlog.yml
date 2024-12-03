@@ -14,8 +14,15 @@
   register: remote_ctlog_certificates
 
 - name: Load ctlog config content
-  ansible.builtin.set_fact:
-    ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config.j2') }}"
+  block:
+    - name: Use Custom Config
+      when: tas_single_node_custom_ctlog_config != ""
+      ansible.builtin.set_fact:
+        ctlog_config_content: '{{ tas_single_node_custom_ctlog_config }}'
+    - name: Use Template Ctlog Config
+      when: tas_single_node_custom_ctlog_config == ""
+      ansible.builtin.set_fact:
+        ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config.j2') }}"
 
 - name: Create ctlog configmap
   ansible.builtin.copy:
