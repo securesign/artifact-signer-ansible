@@ -51,16 +51,6 @@ tas_single_node_tsa_ca_passphrase: rhtas
 tas_single_node_tsa_signer_passphrase: rhtas
 tas_single_node_ct_logprefix: rhtasansible
 
-# Cert Passphrases
-tas_single_node_fulcio_ca_passphrase: rhtas
-tas_single_node_ctlog_ca_passphrase: rhtas
-tas_single_node_rekor_ca_passphrase: rhtas
-tas_single_node_tsa_ca_passphrase: rhtas
-tas_single_node_tsa_signer_passphrase: rhtas
-tas_single_node_ct_logprefix: rhtasansible
-
-
-
 # CTLog Custom Key Configuration
 tas_single_node_custom_ctlog_public_key_names: []
 tas_single_node_custom_ctlog_private_key_names: []
