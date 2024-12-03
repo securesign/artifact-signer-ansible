@@ -29,5 +29,6 @@ $ip_address rekor.myrhtas
 $ip_address rekor-search.myrhtas
 $ip_address tsa.myrhtas
 $ip_address cli-server.myrhtas
+$ip_address dex-idp
 EOT"
 EOF

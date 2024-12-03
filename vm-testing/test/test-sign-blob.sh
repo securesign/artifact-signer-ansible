@@ -53,4 +53,4 @@ echo "testing" > to-sign
 
 cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp=timestamp.txt
 
-cosign --verbose verify-blob --certificate-identity="${EMAIL}" --bundle signed.bundle to-sign --rfc3161-timestamp=timestamp.txt --use-signed-timestamps
+cosign --verbose verify-blob --certificate-identity="${EMAIL}" --certificate-oidc-issuer="${OIDC_ISSUER_URL}" --bundle signed.bundle to-sign --rfc3161-timestamp=timestamp.txt --use-signed-timestamps
