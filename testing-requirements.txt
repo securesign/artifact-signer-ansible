@@ -4,4 +4,4 @@ galaxy-importer==0.4.26
 molecule==24.9.0
 # testing farm should depend on setuptools, but it doesn't; list them here explicitly
 setuptools==75.6.0
-tft-cli==0.0.21
+tft-cli==0.0.17
