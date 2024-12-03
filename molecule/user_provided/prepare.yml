@@ -2,10 +2,14 @@
 - name: Prepare
   hosts: molecule
   gather_facts: true
-  become: yes
+  vars:
+    users:
+      - user: testingUser
+        password: password123
   vars_files:
     - vars/vars.yml
   tasks:
+
     - name: Configure Dex OIDC instance
       ansible.builtin.include_tasks: ../dex-config.yaml
 
@@ -17,19 +21,27 @@
           - mariadb-server
         state: latest
 
+    - name: Set Redis password
+      shell: |
+        echo "CONFIG SET requirepass "password"" | redis-cli
+
+    - name: Allow external connections for Redis
+      ansible.builtin.lineinfile:
+        path: /etc/redis/redis.conf
+        regexp: 'bind 127.0.0.1 -::1'
+        line: "#bind 127.0.0.1 -::1"
+
     - name: Enable and start Redis
       ansible.builtin.service:
         name: redis
         enabled: yes
         state: started
 
-    - name: Set Redis password
-      shell: |
-        echo "CONFIG SET requirepass "password"" | redis-cli
-
-    - name: Allow external connections for Redis
-      shell: |
-        sed -i 's/#bind_address=0.0.0.0/bind_address=0.0.0.0/g' /etc/my.cnf.d/mariadb-server.cnf
+    - name: Allow external connections for MariaDB
+      ansible.builtin.lineinfile:
+        path: /etc/my.cnf.d/mariadb-server.cnf
+        regexp: '#bind_address=0.0.0.0'
+        line: "bind_address=0.0.0.0"
 
     - name: Enable and start MariaDB
       ansible.builtin.service:
@@ -63,3 +75,7 @@
         GRANT ALL ON trillian.* to 'mysql'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
         FLUSH PRIVILEGES;
         EOF
+
+    - name: Set up a non-root sudoer to replicate a user environment
+      ansible.builtin.include_tasks: ../testing_user_setup.yaml
+      with_items: "{{ users }}" 

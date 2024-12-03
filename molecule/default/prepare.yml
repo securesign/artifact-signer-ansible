@@ -2,9 +2,18 @@
 - name: Prepare
   hosts: molecule
   gather_facts: false
+  vars:
+    users:
+      - user: testingUser
+        password: password123
   vars_files:
     - vars/vars.yml
 
   tasks:
+
     - name: Configure Dex OIDC instance
       ansible.builtin.include_tasks: ../dex-config.yaml
+
+    - name: Setup a non-root sudoer to replicate a user environment
+      ansible.builtin.include_tasks: ../testing_user_setup.yaml
+      with_items: "{{ users }}"
