@@ -1,13 +1,17 @@
 ---
+- name: Make sure Passlib is present
+  ansible.builtin.pip:
+    name: passlib
+    state: present
+  delegate_to: localhost
+
 - name: Create a non-root sudoer user
   ansible.builtin.user:
     name: "{{ item.user }}"
     shell: /bin/bash
     group: wheel
+    password: "{{ item.password | password_hash }}"
     create_home: yes
-
-- name: Set password for testingUser
-  ansible.builtin.shell: echo {{ item.password }} | passwd --stdin {{ item.user }}
 
 - name: Configure Sudoers for the user
   ansible.builtin.lineinfile:
