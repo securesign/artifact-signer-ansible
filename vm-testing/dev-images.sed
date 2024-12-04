@@ -5,7 +5,6 @@ s#registry.redhat.io/rhtas/fulcio-rhel9#quay.io/securesign/fulcio-server#
 s#registry.redhat.io/rhtas/trillian-redis-rhel9#quay.io/securesign/trillian-redis#
 s#registry.redhat.io/rhtas/rekor-server-rhel9#quay.io/securesign/rekor-server#
 s#registry.redhat.io/rhtas/rekor-search-ui-rhel9#quay.io/securesign/rekor-search-ui#
-s#registry.redhat.io/rhtas/rekor-backfill-redis-rhel9#quay.io/securesign/trillian-redis#
 s#registry.redhat.io/rhtas/tuf-server-rhel9#quay.io/securesign/scaffold-tuf-server#
 s#registry.redhat.io/rhtas/tuffer-rhel9#quay.io/securesign/tuffer#
 s#registry.redhat.io/rhtas/certificate-transparency-rhel9#quay.io/securesign/certificate-transparency-go#
@@ -15,3 +14,4 @@ s#registry.redhat.io/rhtas/segment-reporting-rhel9#quay.io/securesign/segment-ba
 s#registry.redhat.io/rhtas/timestamp-authority-rhel9#quay.io/securesign/timestamp-authority#
 s#registry.redhat.io/rhtas/trillian-createtree-rhel9#quay.io/securesign/trillian-createtree#
 s#registry.redhat.io/rhtas/client-server-rhel9#quay.io/securesign/client-server#
+s#registry.redhat.io/rhtas/rekor-backfill-redis-rhel9#quay.io/securesign/rekor-backfill-redis#

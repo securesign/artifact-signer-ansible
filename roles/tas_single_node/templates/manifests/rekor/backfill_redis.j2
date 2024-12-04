@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backfill-redis
+  namespace: backfill-redis
+  labels:
+    app.component: backfill-redis
+    app.instance: backfill-redis
+    app.name: backfill-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.component: backfill-redis
+      app.instance: backfill-redis
+      app.name: backfill-redis
+  template:
+    metadata:
+      labels:
+        app.component: backfill-redis
+        app.instance: backfill-redis
+        app.name: backfill-redis
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: backfill-redis
+          image: "{{ tas_single_node_backfill_redis_image }}"
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - >
+              endIndex=$(curl -sS http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}/api/v1/log | sed -E 's/.*"treeSize":([0-9]+).*/\1/');
+              endIndex=$((endIndex-1));
+              if [ "${endIndex}" -lt 0 ]; then
+                echo "info: no rekor entries found";
+                exit 0;
+              fi;
+              backfill-redis 
+              --hostname={{ tas_single_node_rekor_redis.redis.host }}
+              --port={{ tas_single_node_rekor_redis.redis.port }}
+              --password="{{ tas_single_node_rekor_redis.redis.password }}"
+              --rekor-address=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}
+              --enable-redis-index-resume=true --end=${endIndex};
