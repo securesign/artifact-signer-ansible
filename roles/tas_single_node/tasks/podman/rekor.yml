@@ -69,3 +69,29 @@
       configmap_changed: "{{ configmap_result.changed }}"
       secret: "{{ tas_single_node_rekor_secret }}"
       secret_changed: "{{ secret_result.changed }}"
+
+- name: Deploy backfill Redis job
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: backfill_redis
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('template', 'manifests/rekor/backfill_redis.j2') | from_yaml }}"
+  when: tas_single_node_backfill_redis_enabled
+
+- name: Copy backfill_redis.timer file to server
+  ansible.builtin.template:
+    src: systemd/backfill_redis.timer.j2
+    dest: "{{ tas_single_node_systemd_directory }}/backfill_redis.timer"
+    mode: "0644"
+  when: tas_single_node_backfill_redis_enabled
+  register: copy_timer_systemd_file
+
+- name: Enable and start backfill_redis.timer
+  ansible.builtin.systemd:
+    name: backfill_redis.timer
+    enabled: true
+    state: started
+    daemon_reload: "{{ copy_timer_systemd_file.changed }}"
+  when: tas_single_node_backfill_redis_enabled

@@ -62,6 +62,12 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.1.0"
+      tas_single_node_backfill_redis_enabled:
+        description: "Enable or disable the backfill redis job"
+        type: "bool"
+        required: false
+        version_added: "1.1.1"
+        default: true
       tas_single_node_trillian:
         description: "Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance."
         type: "dict"
