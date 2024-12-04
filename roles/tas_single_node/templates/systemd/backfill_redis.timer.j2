@@ -1,0 +1,10 @@
+[Unit]
+Description=Runs The backfill redis job
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+Persistent=true
+Unit=backfill_redis.service
+
+[Install]
+WantedBy=timers.target
