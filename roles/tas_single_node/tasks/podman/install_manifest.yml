@@ -44,3 +44,33 @@
     copy_manifest.changed or copy_systemd_file.changed or
     (podman_spec.secret is defined and podman_spec.secret_changed) or
     (podman_spec.configmap is defined and podman_spec.configmap_changed)
+  register: podman_service_restart
+
+# We do all this because checking exit status of the container by the systemd unit has only been added in podman 4.6.0
+- name: Check result of Podman service if it is oneshot
+  when: podman_service_restart.changed and "systemd_type" in podman_spec and podman_spec.systemd_type == "oneshot"
+  block:
+    - name: Construct container name
+      ansible.builtin.set_fact:
+        container_name: "{{ podman_spec.kube_file_content.metadata.name }}-pod-{{ podman_spec.kube_file_content.spec.template.spec.containers[0].name }}"
+
+    - name: Get container exit code
+      ansible.builtin.command:
+        cmd: "podman inspect '{{ container_name }}' --format \"{{ '{{' }}.State.ExitCode{{ '}}' }}\""
+      register: container_exit_code
+      changed_when: false
+
+    - name: Get container logs
+      ansible.builtin.command:
+        cmd: "podman logs '{{ container_name }}'"
+      register: container_logs
+      when: container_exit_code.stdout != "0"
+      changed_when: false
+
+    - name: Fail if the container exited with non-0 exit code
+      ansible.builtin.fail:
+        msg:
+          - "Job in container {{ container_name }} failed:"
+          - "stdout: {{ container_logs.stdout }}"
+          - "stderr: {{ container_logs.stderr }}"
+      when: container_exit_code.stdout != "0"

@@ -22,22 +22,38 @@ spec:
     spec:
       containers:
         - name: tuf
-          image: "{{ tas_single_node_tuf_image }}"
+          image: "{{ tas_single_node_http_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ tas_single_node_tuf_port_tcp }}
+            - containerPort: {{ tas_single_node_tuf_port_http }}
+              # specify hostPort explicitly because of older podman versions that expose
+              # automatically, so we need to prevent clash with other container ports
+              hostPort: {{ tas_single_node_tuf_host_port_http }}
               protocol: TCP
-              hostPart: {{ tas_single_node_tuf_port_tcp }}
-          env:
-            - name: NAMESPACE
-              value: tuf-system
-          args: ["-no-k8s"]
+          readinessProbe:
+            httpGet:
+              port: {{ tas_single_node_tuf_port_http }}
+              path: "/1.root.json"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              port: {{ tas_single_node_tuf_port_http }}
+              path: "/1.root.json"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-            - mountPath: /var/run/tuf-secrets
-              name: tuf-secrets
+            - mountPath: /var/www/html
+              name: "{{ tas_single_node_tuf_repository_volume_name }}"
               readOnly: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
@@ -53,6 +69,6 @@ spec:
           operator: Exists
           tolerationSeconds: 300
       volumes:
-        - name: tuf-secrets
-          secret:
-            secretName: tuf-secret
+        - name: "{{ tas_single_node_tuf_repository_volume_name }}"
+          persistentVolumeClaim:
+            claimName: "{{ tas_single_node_tuf_repository_volume_name }}"

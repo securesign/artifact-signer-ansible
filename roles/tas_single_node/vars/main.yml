@@ -79,6 +79,10 @@ tas_single_node_trillian_trusted_ca_configmap: "{{ tas_single_node_kube_configma
 tas_single_node_tsa_secret: "{{ tas_single_node_kube_configmap_dir }}/tsa-secret.yaml"
 tas_single_node_systemd_directory: /etc/systemd/system
 
+# Volumes
+tas_single_node_tuf_repository_volume_name: "tuf-repository"
+tas_single_node_tuf_signing_keys_volume_name: "tuf-signing-keys"
+
 # Timestamp Authority Config
 tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
 tas_single_node_remote_tsa_leaf_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_leaf_certificate_filename }}"
@@ -131,4 +135,7 @@ tas_single_node_tsa_server_pod: tsa-server
 tas_single_node_tsa_server_port_tcp: 3002
 
 tas_single_node_tuf_pod: tuf
-tas_single_node_tuf_port_tcp: 8082
+tas_single_node_tuf_port_http: 8080
+tas_single_node_tuf_host_port_http: 8085
+
+tas_single_node_tuf_init_pod: tuf-init
