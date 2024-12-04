@@ -85,18 +85,21 @@
       ansible.builtin.include_tasks: ../testing_user_setup.yaml
       with_items: "{{ users }}" 
 
-    - name: Generate TLS certificates
+    - name: Generate TLS certificates for MariaDB
       ansible.builtin.shell: |
         mkdir -p /etc/mysql/ssl
-        openssl genrsa 2048 > /etc/mysql/ssl/server-key.pem
+        openssl genrsa -out /etc/mysql/ssl/server-key.pem 2048
         openssl req -new -key /etc/mysql/ssl/server-key.pem \
-          -subj "/CN=trillian-mysql-pod" \
-          -addext "subjectAltName=DNS:trillian-mysql-pod,DNS:*,IP:127.0.0.1" > /etc/mysql/ssl/server-req.pem
-        openssl x509 -req -in /etc/mysql/ssl/server-req.pem -signkey /etc/mysql/ssl/server-key.pem -out /etc/mysql/ssl/server-cert.pem
-        openssl genrsa 2048 > /etc/mysql/ssl/ca-key.pem
+          -subj "/CN=localhost" \
+          -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+          -out /etc/mysql/ssl/server-req.pem
+        openssl x509 -req -in /etc/mysql/ssl/server-req.pem -signkey /etc/mysql/ssl/server-key.pem \
+          -out /etc/mysql/ssl/server-cert.pem -days 365
+        openssl genrsa -out /etc/mysql/ssl/ca-key.pem 2048
         openssl req -new -x509 -nodes -days 3650 -key /etc/mysql/ssl/ca-key.pem \
           -subj "/CN=MySQL_CA" \
-          -addext "subjectAltName=DNS:trillian-mysql-pod,DNS:*,IP:127.0.0.1" -out /etc/mysql/ssl/ca-cert.pem
+          -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+          -out /etc/mysql/ssl/ca-cert.pem
       args:
         creates: /etc/mysql/ssl/server-cert.pem
 
