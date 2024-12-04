@@ -2,7 +2,7 @@
 - name: Prepare
   hosts: molecule
   gather_facts: true
-  enabled: yes
+  become: true
   vars:
     users:
       - user: testingUser
