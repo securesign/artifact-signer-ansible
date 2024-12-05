@@ -37,14 +37,18 @@ openstack_network = "TODO-openstack-network"
 # openstack_vm_image = "TODO-vm-image"
 ```
 
-Create `vars.yml` file with the following variables for the `tas_single_node` role (you will need a working OIDC provider URL, e.g. Keycloak, with a `trusted-artifact-signer` realm):
+Create `vars.yml` file with the following variables for the `tas_single_node` role (Dex is instantiated and configured with our testing workflow):
 
 ```
 # Get registry credentials at https://access.redhat.com/terms-based-registry
 tas_single_node_registry_username: "TODO-username"
 tas_single_node_registry_password: "TODO-password"
-tas_single_node_oidc_issuers: "TODO-issuer-url"
-tas_single_node_issuer_url: "TODO-issuer-url"
+tas_single_node_oidc_issuers:
+    - issuer: "http://dex-idp:5556/dex"
+      client_id: example-app
+      url: "http://dex-idp:5556/dex"
+      type: email
+tas_single_node_issuer_url: "http://dex-idp:5556/dex"
 ```
 
 ### Provisioning the VM and running Ansible

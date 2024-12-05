@@ -16,6 +16,12 @@
     dest: "/etc/dex/config/dex.yaml"
     mode: "0644"
 
+- name: Checking if Dex container exists
+  ansible.builtin.shell: |
+    podman ps -a | grep dex-idp
+  register: container_check
+  ignore_errors: true
+
 - name: Run Dex container
   ansible.builtin.shell: |
       podman run -d \
@@ -24,6 +30,7 @@
       -v /etc/dex/config/dex.yaml:/etc/dex/cfg/dex.yaml:Z \
       quay.io/asiek/dexidp:v2.32.0 \
       dex serve /etc/dex/cfg/dex.yaml
+  when: container_check.stdout == ""
 
 - name: Dex container health check
   ansible.builtin.shell: curl http://127.0.0.1:5556/dex/healthz

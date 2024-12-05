@@ -1,0 +1,50 @@
+---
+- name: Prepare playbook
+  hosts: rhtas
+  gather_facts: false
+  vars:
+    user: testingUser
+    password: password123
+
+  tasks:
+    - name: Create a non-root sudoer user
+      ansible.builtin.user:
+        name: "{{ user }}"
+        shell: /bin/bash
+        group: wheel
+        create_home: yes
+
+    - name: Set password for testingUser
+      ansible.builtin.shell: echo {{ password }} | passwd --stdin {{ user }}
+
+    - name: Configure Sudoers for the user
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        line: "{{ user }} ALL = (ALL) ALL"
+        validate: 'visudo -cf %s'
+
+    - name: Edit SSH config to disallow root login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^(#*)?PermitRootLogin'
+        line: "PermitRootLogin no"
+
+    - name: Create .ssh directory
+      ansible.builtin.file:
+        path: "/home/{{ user }}/.ssh"
+        state: directory
+        mode: "0700"
+        owner: "{{ user }}"
+    
+    - name: Configure key
+      ansible.builtin.copy:
+        src: ".ssh/authorized_keys"
+        dest: "/home/{{ user }}/.ssh/authorized_keys"
+        mode: "0600"
+        owner: "{{ user }}"
+        remote_src: yes
+
+    - name: Restart SSH
+      ansible.builtin.service:
+        name: sshd
+        state: restarted

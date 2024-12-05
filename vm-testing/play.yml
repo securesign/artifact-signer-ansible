@@ -13,6 +13,31 @@
     # * tas_single_node_issuer_url
     - vars.yml
   tasks:
+    - name: Create Dex instance for testing
+      ansible.builtin.include_tasks: ./playbooks/dex-config.yaml
+
     - name: Include TAS single node
       ansible.builtin.include_role:
         name: tas_single_node
+
+    - name: Check if Dex is in RHTAS network
+      ansible.builtin.shell: |
+        podman inspect dex-idp | grep rhtas
+      register: rhtas_check
+      ignore_errors: true
+
+    - name: Adding Dex to RHTAS network
+      ansible.builtin.shell: |
+        podman network connect rhtas dex-idp
+      when: rhtas_check.stdout == ""
+
+    - name: Check if Dex is in Podman network
+      ansible.builtin.shell: |
+        podman inspect dex-idp | grep '"podman":'
+      register: podman_check
+      ignore_errors: true
+
+    - name: Disconnect Dex from podman network
+      ansible.builtin.shell: |
+        podman network disconnect podman dex-idp
+      when: podman_check.stdout
