@@ -86,7 +86,7 @@ ansible-galaxy collection install redhat.artifact_signer:==1.1.0
 ```
 
 ### Monitoring of containers with Cockpit
-To monitor containers with Cockpit, you need to install the Red Hat Enterprise Linux System Roles Ansible Collection using the following command: `ansible-galaxy collection install redhat.rhel_system_roles`
+To monitor containers with Cockpit, you need to install the Red Hat Enterprise Linux System Roles Ansible Collection, found [here](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles/) using the following command: `ansible-galaxy collection install redhat.rhel_system_roles`, authentication with AAH (Ansible Automation Hub) is required for this.
 After installing the collection, you can enable and configure Cockpit as shown below
 
 ```
@@ -99,6 +99,21 @@ tas_single_node_cockpit:
   cockpit_manage_firewall: true
   cockpit_port: 9090
 ```
+
+Once installation is complete, you can access Cockpit by navigating to the RHEL system's port 9090 (or the port defined in tas_single_node_cockpit.cockpit_port). To log in, you may use an existing user account authenticated on the RHEL machine. However, it's recommended to create a dedicated account for Cockpit. You can do this with the following commands:
+
+```
+sudo adduser cockpit-user
+sudo passwd cockpit-user
+```
+
+If you want this new user to have administrative privileges, run:
+
+```
+sudo usermod -aG wheel cockpit-user
+```
+
+Note: You may need to log out and then log back in to the Cockpit interface for these changes to take effect.
 
 ## Downloading CLI tools
    To Download tools to interact with Red Hat Trusted Artifact Signer, you can visit `https://cli-server.<base_hostname>`
