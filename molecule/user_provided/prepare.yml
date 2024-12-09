@@ -85,81 +85,37 @@
       ansible.builtin.include_tasks: ../testing_user_setup.yaml
       with_items: "{{ users }}" 
 
-    - name: Clean SSL directory for MariaDB
-      ansible.builtin.file:
-        path: /etc/mysql/ssl/
-        state: absent
-
-    - name: Recreate SSL directory for MariaDB
-      ansible.builtin.file:
-        path: /etc/mysql/ssl/
-        state: directory
-        owner: mysql
-        group: mysql
-        mode: '0755'
-
-    - name: Generate CA private key
+    - name: Generate TLS certificates for MariaDB
       ansible.builtin.shell: |
+        rm -rf /etc/mysql/ssl
+        mkdir -p /etc/mysql/ssl
         openssl genrsa -out /etc/mysql/ssl/ca-key.pem 2048
-      args:
-        creates: /etc/mysql/ssl/ca-key.pem
-
-    - name: Generate CA certificate
-      ansible.builtin.shell: |
-        openssl req -new -x509 -days 3650 \
-          -key /etc/mysql/ssl/ca-key.pem \
-          -subj "/CN=MySQL_CA" \
-          -out /etc/mysql/ssl/ca-cert.pem
-      args:
-        creates: /etc/mysql/ssl/ca-cert.pem
-
-    - name: Generate server private key
-      ansible.builtin.shell: |
+        openssl req -x509 -new -nodes -key /etc/mysql/ssl/ca-key.pem -sha256 -days 3650 -out /etc/mysql/ssl/ca-cert.pem -subj "/CN=CustomCA" \
+          -addext "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}"
         openssl genrsa -out /etc/mysql/ssl/server-key.pem 2048
-      args:
-        creates: /etc/mysql/ssl/server-key.pem
+        openssl req -new -key /etc/mysql/ssl/server-key.pem -out /etc/mysql/ssl/server-req.pem -subj "/CN=MySQLServer" \
+            -addext "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}"
+        openssl x509 -req -in /etc/mysql/ssl/server-req.pem -CA /etc/mysql/ssl/ca-cert.pem -CAkey /etc/mysql/ssl/ca-key.pem -CAcreateserial \
+            -out /etc/mysql/ssl/server-cert.pem -days 365 -sha256 -extfile <(printf "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}")
 
-    - name: Generate server CSR
-      ansible.builtin.shell: |
-        openssl req -new -key /etc/mysql/ssl/server-key.pem \
-          -subj "/CN=localhost" \
-          -out /etc/mysql/ssl/server-req.pem
-      args:
-        creates: /etc/mysql/ssl/server-req.pem
-
-    - name: Sign server certificate with CA
-      ansible.builtin.shell: |
-        openssl x509 -req -in /etc/mysql/ssl/server-req.pem \
-          -CA /etc/mysql/ssl/ca-cert.pem \
-          -CAkey /etc/mysql/ssl/ca-key.pem \
-          -CAcreateserial \
-          -out /etc/mysql/ssl/server-cert.pem \
-          -days 365
+        chmod 600 /etc/mysql/ssl/*.pem
+        chown mysql:mysql /etc/mysql/ssl/*.pem
       args:
         creates: /etc/mysql/ssl/server-cert.pem
 
-    - name: Set permissions for SSL files
-      ansible.builtin.file:
-        path: /etc/mysql/ssl/{{ item }}
-        owner: mysql
-        group: mysql
-        mode: '0600'
-      with_items:
-        - ca-key.pem
-        - ca-cert.pem
-        - server-key.pem
-        - server-cert.pem
-
-    - name: Configure MariaDB to use TLS certificates
+    - name: Configure TLS for MariaDB
       ansible.builtin.blockinfile:
         path: /etc/my.cnf.d/mariadb-server.cnf
         block: |
           [mysqld]
+          skip-name-resolve
+          max_allowed_packet=64M
+          max_connections=200
+          wait_timeout=600
+          interactive_timeout=600
           ssl-ca=/etc/mysql/ssl/ca-cert.pem
           ssl-cert=/etc/mysql/ssl/server-cert.pem
           ssl-key=/etc/mysql/ssl/server-key.pem
-          require_secure_transport=ON
-        marker: "# {mark} Managed by Ansible"
       notify:
         - Restart MariaDB
 
