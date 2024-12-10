@@ -6,15 +6,8 @@
     - vars/vars.yml
     - vars/podman.yml
   tasks:
-    - name: Error out if registry username is not set
-      ansible.builtin.fail:
-        msg: "Username for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_USERNAME env variable"
-      when: tas_single_node_registry_username == ""
-
-    - name: Error out if registry password is not set
-      ansible.builtin.fail:
-        msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
-      when: tas_single_node_registry_password == ""
+    - name: Ensure Registry credentials are set
+      ansible.builtin.include_tasks: ../check_creds.yml
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
