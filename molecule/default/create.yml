@@ -22,10 +22,6 @@
           "tag:Name": CI-TEST
       register: vpcs
 
-    - name: print vpc
-      debug:
-        msg: "{{ vpcs }}"
-
     - name: Create VPC if it does not exist yet
       amazon.aws.ec2_vpc_net:
         name: "CI-TEST"
