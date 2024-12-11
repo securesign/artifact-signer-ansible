@@ -126,9 +126,9 @@
     - name: Gather route table facts
       amazon.aws.ec2_vpc_route_table_info:
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
-        vpc-id: "{{ vpc_id }}"
         filters:
           "tag:Name": "CI-TEST"
+          vpc-id: "{{ vpc_id }}"
       register: route_table
 
     - name: print
