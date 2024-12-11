@@ -224,7 +224,7 @@
 
     - name: Output EC2 instance details
       debug:
-        msg: "EC2 Instance ID: {{ ec2_instance.instance_id }}, Public IP: {{ ec2_instance.public_ip_address }}"
+        msg: "EC2 Instance ID: {{ ec2_instance.instances[0].instance_id }}, Public IP: {{ ec2_instance.instances[0].network_interfaces[0].association.public_ip }}"
 
     - name: Add VM to molecule_inventory
       vars:
@@ -233,13 +233,12 @@
             children:
               molecule:
                 hosts:
-                  "{{ item.address }}":
-                    ansible_user: {{ item.user }}
-                    ansible_ssh_private_key_file: {{ private_key_path }}
+                  "{{ ec2_instance.instances[0].network_interfaces[0].association.public_ip }}":
+                    ansible_user: ec2-user 
+                    ansible_ssh_private_key_file: ~/.ssh/id_rsa
       ansible.builtin.set_fact:
         molecule_inventory: >
           {{ molecule_inventory | combine(inventory_partial_yaml | from_yaml, recursive=true) }}
-      loop: "{{ instance_conf }}"
 
     - name: Dump molecule_inventory
       ansible.builtin.copy:
