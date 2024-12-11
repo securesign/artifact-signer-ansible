@@ -94,12 +94,12 @@
       register: igw_exists
 
     - name: Use pre-existing gateway ID if it exists
-      set_facts:
+      ansible.builtin.set_fact:
         igw_id: "{{ igw_facts.igw.id }}"
       when: igw_facts
 
     - name: use new gateway ID
-      set_facts:
+      set_fact:
         igw_id: "{{ igw_exists.igw.id }}"
       when: igw_facts == ""
 
@@ -173,12 +173,12 @@
       register: created_security_group
 
     - name: Setting security group ID if it existed
-      set_facts:
+      set_fact:
         sgID: "{{ security_group_security_group_id }}"
       when: security_group.stdout
 
     - name: Setting security group ID to new group
-      set_facts:
+      set_fact:
         sgID: "{{ created_security_group.security_group.id }}"
       when: security_group.stout == ""
 
