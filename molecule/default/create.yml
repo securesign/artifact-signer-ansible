@@ -67,7 +67,7 @@
 
     - name: Create subnet if it does not exist
       amazon.aws.ec2_vpc_subnet:
-        vpc_id: "{{ vpc_id }}"
+        vpc-id: "{{ vpc_id }}"
         cidr_block: "10.0.0.0/24"
         availability_zone: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
@@ -103,7 +103,7 @@
 
     - name: Create internet gateway if it does not exist
       amazon.aws.ec2_vpc_igw:
-        vpc_id: "{{ vpc_id }}"
+        vpc-id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
       when: igw_facts | length == 0
@@ -126,7 +126,7 @@
     - name: Gather route table facts
       amazon.aws.ec2_vpc_route_table_info:
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
-        vpc_id: "{{ vpc_id }}"
+        vpc-id: "{{ vpc_id }}"
         filters:
           "tag:Name": "CI-TEST"
       register: route_table
@@ -137,7 +137,7 @@
 
     - name: Create route table if it does not exist
       amazon.aws.ec2_vpc_route_table:
-        vpc_id: "{{ vpc_id }}"
+        vpc-id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
         routes:
