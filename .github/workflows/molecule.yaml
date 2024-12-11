@@ -37,3 +37,6 @@ jobs:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           run: |
+            source venv/bin/activate
+            molecule reset
+            molecule -v test --scenario-name default
