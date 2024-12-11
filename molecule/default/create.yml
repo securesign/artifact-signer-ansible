@@ -139,9 +139,10 @@
         routes:
           - destination_cidr_block: "0.0.0.0/0"
             gateway_id: "{{ igw_id }}"
-        name: "CI-TEST"
-        when: route_table | length == 0
-        register: created_route_table
+        tags:
+          Name: "CI-TEST"
+      when: route_table | length == 0
+      register: created_route_table
 
     - name: Set pre-existing route table ID
       set_fact:
