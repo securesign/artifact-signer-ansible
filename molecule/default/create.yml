@@ -20,11 +20,11 @@
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         filters:
           "tag:Name": CI-TEST
-      register: vpc
+      register: vpcs
 
     - name: print vpc
       debug:
-        msg: "{{ vpc }}"
+        msg: "{{ vpcs }}"
 
     - name: Create VPC if it does not exist yet
       amazon.aws.ec2_vpc_net:
@@ -32,7 +32,7 @@
         cidr_block: "10.0.0.0/24"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
-      when: vpc | length == 0
+      when: vpcs | length == 0
       register: created_vpc
 
     - name: print created vpc
@@ -41,12 +41,12 @@
 
     - name: Set VPC ID if new VPC created
       ansible.builtin.set_fact:
-        vpc_id: "{{ created_vpc.vpcs.id }}"
-      when: vpc | length == 0
+        vpc_id: "{{ created_vpc.vpcs[0].id }}"
+      when: vpcs | length == 0
 
     - name: Set VPC ID to pre-existing VPC ID
       ansible.builtin.set_fact:
-        vpc_id: "{{ vpc.vpcs[0].vpc_id }}"
+        vpc_id: "{{ vpcs.vpcs[0].id }}"
       when: vpc | length > 0
 
     - name: print
@@ -59,11 +59,11 @@
         filters:
           vpc-id: "{{ vpc_id }}"
           "tag:Name": CI-TEST
-      register: subnet
+      register: subnets
 
     - name: print
       debug:
-        msg: "{{ subnet }}" 
+        msg: "{{ subnets }}" 
 
     - name: Create subnet if it does not exist
       amazon.aws.ec2_vpc_subnet:
@@ -73,18 +73,18 @@
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         name: "CI-TEST"
         state: present
-      when: subnet | length == 0
+      when: subnets | length == 0
       register: created_subnet
 
     - name: Set new subnet ID if it did not exist
       ansible.builtin.set_fact:
-        subnet_id: "{{ created_subnet.subnet[0].id }}"
-      when: subnet | length == 0
+        subnet_id: "{{ created_subnets.subnets[0].id }}"
+      when: subnets | length == 0
 
     - name: Set subnet to pre-existing ID
       ansible.builtin.set_fact:
-        subnet_id: "{{ subnet.subnet[0].id }}"
-      when: subnet | length > 0
+        subnet_id: "{{ subnet.subnets[0].id }}"
+      when: subnets | length > 0
 
     - name: print
       debug:
@@ -102,18 +102,22 @@
         vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
-      when: igw_facts == ""
+      when: igw_facts | length == 0
       register: igw_exists
 
     - name: Use pre-existing gateway ID if it exists
       ansible.builtin.set_fact:
-        igw_id: "{{ igw_facts.igw.id }}"
+        igw_id: "{{ igw_facts.igw[0].id }}"
       when: igw_facts
 
     - name: use new gateway ID
       set_fact:
-        igw_id: "{{ igw_exists.igw.id }}"
-      when: igw_facts == ""
+        igw_id: "{{ igw_exists.igw[0].id }}"
+      when: igw_facts | length > 0
+
+    - name: print
+      debug:
+        msg: "{{ igw_facts }}"
 
     - name: Gather route table facts
       amazon.aws.ec2_vpc_route_table_info:
