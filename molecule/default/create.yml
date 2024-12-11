@@ -145,12 +145,12 @@
 
     - name: Set pre-existing route table ID
       set_fact:
-        route_table_id: "{{ route_table.route_tables[0].route_table_id }}"
+        route_table_id: "{{ route_table.route_tables[0].id }}"
       when: route_table | length > 0
 
     - name: Set route table ID to new route
       set_fact:
-        route_table_id: "{{ created_route_table.route_table[0].route_table_id }}"
+        route_table_id: "{{ created_route_table.route_tables[0].id }}"
       when: route_table | length == 0
 
     - name: Check if a security group has been instantiated
@@ -189,18 +189,18 @@
             cidr_ip: "0.0.0.0/0"
             rule_desc: Allow traffic for using Dex as OIDC server + IDP
         state: present
-      when: security_group.stdout == ""
+      when: security_group | length == 0
       register: created_security_group
 
     - name: Setting security group ID if it existed
       set_fact:
         sgID: "{{ security_group_security_group_id }}"
-      when: security_group.stdout
+      when: security_group | length > 0
 
     - name: Setting security group ID to new group
       set_fact:
         sgID: "{{ created_security_group.security_group.id }}"
-      when: security_group.stout == ""
+      when: security_group | length == 0
 
     - name: Launch EC2 instance
       amazon.aws.ec2_instance:
