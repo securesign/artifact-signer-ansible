@@ -133,7 +133,7 @@
 
     - name: Create route table if it does not exist
       amazon.aws.ec2_vpc_route_table:
-        vpc-id: "{{ vpc_id }}"
+        vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
         routes:
