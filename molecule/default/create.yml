@@ -47,7 +47,7 @@
     - name: Set VPC ID to pre-existing VPC ID
       ansible.builtin.set_fact:
         vpc_id: "{{ vpcs.vpcs[0].id }}"
-      when: vpc | length > 0
+      when: vpcs | length > 0
 
     - name: print
       debug:
