@@ -195,12 +195,12 @@
 
     - name: Setting security group ID if it existed
       set_fact:
-        sgID: "{{ security_group_security_group_id }}"
+        sgID: "{{ security_group.security_groups[0].group_id }}"
       when: security_group | length > 0
 
     - name: Setting security group ID to new group
       set_fact:
-        sgID: "{{ created_security_group.security_group.id }}"
+        sgID: "{{ created_security_group.security_groups[0].group_id }}"
       when: security_group | length == 0
 
     - name: Launch EC2 instance
