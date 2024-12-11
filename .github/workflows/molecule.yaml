@@ -7,12 +7,12 @@ on:
 
 jobs:
   molecule:
-    runs-on: testing-farm
-    strategy:
-      matrix:
-        scenario:
-          - default
-          - user_provided
+    runs-on: ubuntu-latest
+    #strategy:
+      #matrix:
+      #scenario:
+      #- default
+      #- user_provided
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -24,22 +24,16 @@ jobs:
             pip install -r testing-requirements.txt
             ansible-galaxy install -r requirements.yml
             ansible-galaxy install -r molecule/requirements.yml
+        - name: Set up SSH key
+          run: |
+            mkdir -p ~/.ssh
+            echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
         - name: Run molecule
           env:
             TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
             TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
-            TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           run: |
-            eval $(ssh-agent -s) # testing-farm CLI right now mandates that ssh-agent is running
-            source venv/bin/activate
-            # ensure we wipe out any data potentially still on the runner from previous run
-            molecule reset
-            # NOTE: for now we don't run "molecule test", because we don't have proper idempotence yet
-            molecule -v test --scenario-name ${{ matrix.scenario }}
-        - name: Destroy molecule infrastructure
-          env:
-            TESTING_FARM_API_TOKEN: ${{ secrets.TESTING_FARM_API_TOKEN }}
-          if: always()
-          run:
-            source venv/bin/activate
-            molecule destroy

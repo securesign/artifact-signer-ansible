@@ -1,5 +1,6 @@
 ansible-lint==24.9.0
 antsibull-docs==2.16.1
+awscli==1.36.19
 galaxy-importer==0.4.26
 molecule==24.9.0
 # testing farm should depend on setuptools, but it doesn't; list them here explicitly
