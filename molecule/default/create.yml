@@ -55,11 +55,15 @@
 
     - name: Check if a subnet exists in the VPC
       amazon.aws.ec2_vpc_subnet_info:
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         filters:
-          region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
           vpc_id: "{{ vpc_id }}"
           "tag:Name": CI-TEST
       register: subnet
+
+    - name: print
+      debug:
+        msg: "{{ subnet }}" 
 
     - name: Create subnet if it does not exist
       amazon.aws.ec2_vpc_subnet:
@@ -69,18 +73,22 @@
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         name: "CI-TEST"
         state: present
-      when: subnet.stdout == ""
+      when: subnet | length == 0
       register: created_subnet
 
     - name: Set new subnet ID if it did not exist
       ansible.builtin.set_fact:
-        subnet_id: "{{ created_subnet.subnet.id }}"
-      when: subnet.stdout == ""
+        subnet_id: "{{ created_subnet.subnet[0].id }}"
+      when: subnet | length == 0
 
     - name: Set subnet to pre-existing ID
       ansible.builtin.set_fact:
-        subnet_id: "{{ subnet.subnet.id }}"
-      when: subnet.stdout
+        subnet_id: "{{ subnet.subnet[0].id }}"
+      when: subnet | length > 0
+
+    - name: print
+      debug:
+        msg: "{{ subnet_id }}" 
 
     - name: Check if internet gateway exists
       amazon.aws.ec2_vpc_igw_info:
