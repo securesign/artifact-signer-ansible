@@ -97,6 +97,10 @@
           "tag:Name": "CI-TEST"
       register: igw_facts
 
+    - name: print
+      debug:
+        msg: "{{ igw_facts }}"
+
     - name: Create internet gateway if it does not exist
       amazon.aws.ec2_vpc_igw:
         vpc_id: "{{ vpc_id }}"
@@ -107,13 +111,13 @@
 
     - name: Use pre-existing gateway ID if it exists
       ansible.builtin.set_fact:
-        igw_id: "{{ igw_facts.igw[0].id }}"
-      when: igw_facts
+        igw_id: "{{ igw_facts.internet_gateways[0].internet_gateway_id }}"
+      when: igw_facts | length > 0
 
     - name: use new gateway ID
       set_fact:
-        igw_id: "{{ igw_exists.igw[0].id }}"
-      when: igw_facts | length > 0
+        igw_id: "{{ igw_exists.internet_gateways[0].internet_gateway_id }}"
+      when: igw_facts | length == 0
 
     - name: print
       debug:
@@ -127,6 +131,10 @@
           "tag:Name": "CI-TEST"
       register: route_table
 
+    - name: print
+      debug:
+        msg: "{{ route_table }}"
+
     - name: Create route table if it does not exist
       amazon.aws.ec2_vpc_route_table:
         vpc_id: "{{ vpc_id }}"
@@ -136,18 +144,18 @@
           - destination_cidr_block: "0.0.0.0/0"
             gateway_id: "{{ igw_id }}"
         name: "CI-TEST"
-        when: route_table.stdout == ""
+        when: route_table | length == 0
         register: created_route_table
 
     - name: Set pre-existing route table ID
       set_fact:
-        route_table_id: "{{ route_table.route_table.id }}"
-      when: route_table.stdout
+        route_table_id: "{{ route_table.route_tables[0].route_table_id }}"
+      when: route_table | length > 0
 
     - name: Set route table ID to new route
       set_fact:
-        route_table_id: "{{ created_route_table.route_table.id }}"
-      when: route_tabke.stdout == ""
+        route_table_id: "{{ created_route_table.route_table[0].route_table_id }}"
+      when: route_table | length == 0
 
     - name: Check if a security group has been instantiated
       amazon.aws.ec2_security_group_info:
