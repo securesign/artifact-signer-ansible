@@ -211,10 +211,16 @@
         image_id: ami-0cd93da2da7f10cab
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         vpc_subnet_id: "{{ subnet_id }}"
+        network:
+          assign_public_ip: true
         security_group: "{{ sgID }}"
         wait: yes
-        state: present
+        state: running
       register: ec2_instance
+
+    - name: print
+      debug:
+        msg: "{{ ec2_instance }}"
 
     - name: Output EC2 instance details
       debug:
