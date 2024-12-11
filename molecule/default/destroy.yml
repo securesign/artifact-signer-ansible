@@ -1,42 +1,39 @@
 ---
-# TODO: improve idempotency and error handling throughout this file,
-# specifically for the testing-farm call
 - name: Destroy
   hosts: localhost
   connection: local
   gather_facts: false
   tasks:
-    - name: Load instance config
-      ansible.builtin.set_fact:
-        instance_configs: "{{ (lookup('file', molecule_instance_config, errors='ignore') or '{}') | from_yaml }}"
 
-    - name: Debug instance config
-      ansible.builtin.debug:
-        msg: "{{ instance_configs }}"
+    - name: Check if instance ID file exists
+      ansible.builtin.stat:
+        path: "/tmp/instanceID.json"
+      register: instanceStat
 
-    - name: Cancel testing-farm instances
-      ansible.builtin.command:
-        cmd: "testing-farm cancel {{ item['instance'] }}"
-      with_items: "{{ instance_configs }}"
-      changed_when: true
-      failed_when: false
-      register: cancel_results
+    - name: Terminate EC2 Instance
+      block:
+        - name: Load the instance ID from file
+          ansible.builtin.slurp:
+            src: "/tmp/instanceID.json"
+          register: instanceFile
 
-    - name: Find out if some cancel requests failed
-      ansible.builtin.set_fact:
-        cancel_failed:
-          "{{ cancel_results.results | selectattr('rc', 'ne', 0) | rejectattr('stdout_lines', 'match', '.* already finished.*') }}"
+        - name: Set the fact from the file
+          ansible.builtin.set_fact:
+            instanceID: "{{ instanceFile.content | b64decode | from_json }}"
+          when: instanceStat.stat.exists
 
-    - name: Fail if some cancel requests failed
-      ansible.builtin.fail:
-        msg: "Failed to cancel some requests: {{ cancel_failed }}"
-      when: cancel_failed | length > 0
+        - name: Terminate EC2 instance
+          amazon.aws.ec2_instance:
+            state: absent
+            instance_ids:
+              - "{{ instanceID }}"
+            region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+          register: terminate_result
 
-    - name: Dump instance config
-      ansible.builtin.copy:
-        content: "{{ {} | to_yaml }}"
-        dest: "{{ molecule_instance_config }}"
-        mode: "0600"
+        - name: Print terminate result
+          ansible.builtin.debug:
+            var: terminate_result
+      when: instanceStat.stat.exists
 
 - name: Remove dynamic molecule inventory
   hosts: localhost

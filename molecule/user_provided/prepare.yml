@@ -2,6 +2,7 @@
 - name: Prepare
   hosts: molecule
   gather_facts: true
+  become: yes
   vars:
     users:
       - user: testingUser
@@ -76,6 +77,6 @@
         FLUSH PRIVILEGES;
         EOF
 
-    - name: Set up a non-root sudoer to replicate a user environment
-      ansible.builtin.include_tasks: ../testing_user_setup.yaml
-      with_items: "{{ users }}" 
+        #- name: Set up a non-root sudoer to replicate a user environment
+        #ansible.builtin.include_tasks: ../testing_user_setup.yaml
+        #with_items: "{{ users }}" 

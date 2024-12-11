@@ -8,11 +8,11 @@ on:
 jobs:
   molecule:
     runs-on: ubuntu-latest
-    #strategy:
-      #matrix:
-      #scenario:
-      #- default
-      #- user_provided
+    strategy:
+      matrix:
+        scenario:
+          - default
+          - user_provided
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -37,3 +37,11 @@ jobs:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           run: |
+            source venv/bin/activate
+            molecule reset
+            molecule -v test --scenario-name ${{ matrix.scenario }}
+        - name: Destroy molecule infrastructure
+          if: always()
+          run: |
+            source venv/bin/activate
+            molecule destroy
