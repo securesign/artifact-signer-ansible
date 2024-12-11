@@ -32,7 +32,7 @@
         cidr_block: "10.0.0.0/24"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
-      when: vpc.stdout == ""
+      when: vpc | length == 0
       register: created_vpc
 
     - name: print created vpc
@@ -41,13 +41,17 @@
 
     - name: Set VPC ID if new VPC created
       ansible.builtin.set_fact:
-        vpc_id: "{{ created_vpc.Vpc.VpcId }}"
-      when: vpc.stdout == ""
+        vpc_id: "{{ created_vpc.vpcs.id }}"
+      when: vpc | length == 0
 
     - name: Set VPC ID to pre-existing VPC ID
       ansible.builtin.set_fact:
-        vpc_id: "{{ vpc.Vpc.VpcId }}"
-      when: vpc.stdout
+        vpc_id: "{{ vpc.vpcs.id }}"
+      when: vpc | length > 0
+
+    - name: print
+      debug:
+        msg: "{{ vpc_id }}" 
 
     - name: Check if a subnet exists in the VPC
       amazon.aws.ec2_vpc_subnet_info:
