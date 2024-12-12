@@ -166,6 +166,7 @@
     - name: Create 'CI-TEST' security group if it does not exist
       amazon.aws.ec2_security_group:
         name: CI-TEST
+        group_name: CI_TEST
         description: "Security group for CI testing"
         vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
