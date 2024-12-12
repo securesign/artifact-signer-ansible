@@ -13,6 +13,7 @@ jobs:
         scenario:
           - default
           - user_provided
+      max-parallel: 1
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -36,6 +37,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            GITHUB_RUN_ID: ${{ github.run_id }}
           run: |
             source venv/bin/activate
             molecule reset

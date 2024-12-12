@@ -8,8 +8,27 @@
     - vars/vars.yml
   tasks:
 
+    - name: Checking RHTAS network for Dex instance
+      ansible.builtin.shell: |
+        podman inspect dex-idp | rhtas
+      register: rhtas_check
+      ignore_errors: true
+
     - name: Adding Dex instance to RHTAS network
       ansible.builtin.shell: podman network connect rhtas dex-idp
+      when: rhtas_check.stdout == ""
+      ignore_errors: true
+
+    - name: Checking Podman network for Dex instance
+      ansible.builtin.shell: |
+        podman inspect dex-idp | grep '"podman":'
+      register: podman_check
+      ignore_errors: true
+
+    - name: Disconnecting Dex from Podman network
+      ansible.builtin.shell: |
+        podman network disconnect podman dex-idp
+      when: podman_check.stdout
 
     - name: Get IP of the current node
       # The tasks below run locally, so their ansible_ssh_host is 127.0.0.1

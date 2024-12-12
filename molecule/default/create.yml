@@ -24,10 +24,6 @@
           "tag:Name": CI-TEST
       register: vpcs
 
-    - name: print
-      debug:
-        msg: "{{ vpcs }}"
-
     - name: Create VPC if it does not exist yet
       amazon.aws.ec2_vpc_net:
         name: "CI-TEST"
@@ -36,10 +32,6 @@
         state: present
       when: vpcs.vpcs | length == 0
       register: created_vpc
-
-    - name: print
-      debug:
-        msg: "{{ created_vpc }}"
 
     - name: Set VPC ID if new VPC created
       ansible.builtin.set_fact:
@@ -58,10 +50,6 @@
           vpc-id: "{{ vpc_id }}"
           "tag:Name": CI-TEST
       register: subnets
-
-    - name: print
-      debug:
-        msg: "{{ subnets }}"
 
     - name: Create subnet if it does not exist
       amazon.aws.ec2_vpc_subnet:
@@ -91,10 +79,6 @@
           "tag:Name": "CI-TEST"
       register: igw_facts
 
-    - name: print
-      debug:
-        msg: "{{ igw_facts }}"
-
     - name: Create internet gateway if it does not exist
       amazon.aws.ec2_vpc_igw:
         vpc_id: "{{ vpc_id }}"
@@ -102,10 +86,6 @@
         state: present
       when: igw_facts.internet_gateways | length == 0
       register: igw_exists
-
-    - name: print
-      debug:
-        msg: "{{ igw_exists }}"
 
     - name: Use pre-existing gateway ID if it exists
       ansible.builtin.set_fact:
@@ -125,10 +105,6 @@
           vpc-id: "{{ vpc_id }}"
       register: route_table
 
-    - name: print
-      debug:
-        msg: "{{ route_table }}"
-
     - name: Create route table if it does not exist
       amazon.aws.ec2_vpc_route_table:
         vpc_id: "{{ vpc_id }}"
@@ -137,6 +113,8 @@
         routes:
           - dest: "0.0.0.0/0"
             gateway_id: "{{ igw_id }}"
+        subnets:
+          - "{{ subnet_id }}"
         tags:
           Name: "CI-TEST"
       when: route_table.route_tables | length == 0
@@ -159,34 +137,25 @@
           group-name: CI-TEST
       register: security_group
 
-    - name: print
-      debug:
-        msg: "{{ security_group }}"
-
     - name: Create 'CI-TEST' security group if it does not exist
       amazon.aws.ec2_security_group:
-        name: CI-TEST
-        group_name: CI_TEST
+        name: "CI-TEST"
         description: "Security group for CI testing"
         vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         rules:
           - proto: tcp
-            ports:
-              - "22"
-            cidr_ip: "0.0.0.0./0"
+            ports: 22
+            cidr_ip: 0.0.0.0./0
           - proto: tcp
-            ports:
-              - "80"
-            cird_ip: "0.0.0.0/0"
+            ports: 80
+            cidr_ip: 0.0.0.0/0
           - proto: tcp
-            ports:
-              - "443"
-            cidr_ip: "0.0.0.0/0"
+            ports: 443
+            cidr_ip: 0.0.0.0/0
           - proto: tcp
-            ports:
-              - "5556"
-            cidr_ip: "0.0.0.0/0"
+            ports: 5556
+            cidr_ip: 0.0.0.0/0
             rule_desc: Allow traffic for using Dex as OIDC server + IDP
         state: present
       when: security_group.security_groups | length == 0
@@ -194,18 +163,22 @@
 
     - name: Setting security group ID if it existed
       ansible.builtin.set_fact:
-        sgID: "{{ security_group.security_groups[0].group_id }}"
+        sgID: "{{ security_group.security_groups[0]['group_id'] }}"
       when: security_group.security_groups | length > 0
 
     - name: Setting security group ID to new group
       ansible.builtin.set_fact:
-        sgID: "{{ created_security_group.security_group.group_id }}"
-      when: security_group | length == 0
+        sgID: "{{ created_security_group.group_id }}"
+      when: security_group.security_groups | length == 0
+
+    - name: Generate instance ID
+      ansible.builtin.set_fact:
+        instance_id: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
 
     - name: Launch EC2 instance
       amazon.aws.ec2_instance:
-        name: "CI-TEST"
-        key_name: "CI-TEST"
+        name: "{{ 'CI-' + (lookup('env', 'GITHUB_RUN_ID') if lookup('env', 'GITHUB_RUN_ID') | length > 0 else instance_id) }}"
+        key_name: "{{ aws_key_name }}"
         instance_type: "{{ instance_type }}"
         image_id: "{{ image_id }}" 
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
@@ -249,9 +222,8 @@
     - name: Add AWS EC2 Instance to known hosts
       ansible.builtin.shell:
         cmd: ssh-keyscan -H {{ instanceIP }} >> ~/.ssh/known_hosts
-      retries: 5
-      delay: 10
-      ignore_errors: true
+      retries: 3
+      delay: 5
 
     - name: Dump molecule_inventory
       ansible.builtin.copy:
@@ -268,4 +240,4 @@
         that: "'molecule' in groups"
         fail_msg: |
           molecule group was not found inside inventory groups: {{ groups }}
-      run_once: true # noqa: run-once[task]
+      run_once: true
