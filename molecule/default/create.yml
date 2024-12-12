@@ -24,24 +24,32 @@
           "tag:Name": CI-TEST
       register: vpcs
 
+    - name: print
+      debug:
+        msg: "{{ vpcs }}"
+
     - name: Create VPC if it does not exist yet
       amazon.aws.ec2_vpc_net:
         name: "CI-TEST"
         cidr_block: "10.0.0.0/24"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
-      when: vpcs | length == 0
+      when: vpcs.vpcs | length == 0
       register: created_vpc
+
+    - name: print
+      debug:
+        msg: "{{ created_vpc }}"
 
     - name: Set VPC ID if new VPC created
       ansible.builtin.set_fact:
-        vpc_id: "{{ created_vpc.vpcs[0].id }}"
-      when: vpcs | length == 0
+        vpc_id: "{{ created_vpc.vpc.id }}"
+      when: vpcs.vpcs | length == 0
 
     - name: Set VPC ID to pre-existing VPC ID
       ansible.builtin.set_fact:
         vpc_id: "{{ vpcs.vpcs[0].id }}"
-      when: vpcs | length > 0
+      when: vpcs.vpcs | length > 0
 
     - name: Check if a subnet exists in the VPC
       amazon.aws.ec2_vpc_subnet_info:
@@ -51,26 +59,30 @@
           "tag:Name": CI-TEST
       register: subnets
 
+    - name: print
+      debug:
+        msg: "{{ subnets }}"
+
     - name: Create subnet if it does not exist
       amazon.aws.ec2_vpc_subnet:
-        vpc-id: "{{ vpc_id }}"
-        cidr_block: "10.0.0.0/24"
-        availability_zone: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "10.0.0.0/24"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
-        name: "CI-TEST"
+        tags:
+          Name: CI-TEST
         state: present
-      when: subnets | length == 0
+      when: subnets.subnets | length == 0
       register: created_subnet
 
     - name: Set new subnet ID if it did not exist
       ansible.builtin.set_fact:
-        subnet_id: "{{ created_subnets.subnets[0].id }}"
-      when: subnets | length == 0
+        subnet_id: "{{ created_subnet.subnet.id }}"
+      when: subnets.subnets | length == 0
 
     - name: Set subnet to pre-existing ID
       ansible.builtin.set_fact:
         subnet_id: "{{ subnets.subnets[0].id }}"
-      when: subnets | length > 0
+      when: subnets.subnets | length > 0
 
     - name: Check if internet gateway exists
       amazon.aws.ec2_vpc_igw_info:
@@ -79,23 +91,31 @@
           "tag:Name": "CI-TEST"
       register: igw_facts
 
+    - name: print
+      debug:
+        msg: "{{ igw_facts }}"
+
     - name: Create internet gateway if it does not exist
       amazon.aws.ec2_vpc_igw:
-        vpc-id: "{{ vpc_id }}"
+        vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
-      when: igw_facts | length == 0
+      when: igw_facts.internet_gateways | length == 0
       register: igw_exists
+
+    - name: print
+      debug:
+        msg: "{{ igw_exists }}"
 
     - name: Use pre-existing gateway ID if it exists
       ansible.builtin.set_fact:
         igw_id: "{{ igw_facts.internet_gateways[0].internet_gateway_id }}"
-      when: igw_facts | length > 0
+      when: igw_facts.internet_gateways | length > 0
 
     - name: use new gateway ID
       set_fact:
-        igw_id: "{{ igw_exists.internet_gateways[0].internet_gateway_id }}"
-      when: igw_facts | length == 0
+        igw_id: "{{ igw_exists.gateway_id }}"
+      when: igw_facts.internet_gateways | length == 0
 
     - name: Gather route table facts
       amazon.aws.ec2_vpc_route_table_info:
@@ -105,28 +125,32 @@
           vpc-id: "{{ vpc_id }}"
       register: route_table
 
+    - name: print
+      debug:
+        msg: "{{ route_table }}"
+
     - name: Create route table if it does not exist
       amazon.aws.ec2_vpc_route_table:
         vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
         state: present
         routes:
-          - destination_cidr_block: "0.0.0.0/0"
+          - dest: "0.0.0.0/0"
             gateway_id: "{{ igw_id }}"
         tags:
           Name: "CI-TEST"
-      when: route_table | length == 0
+      when: route_table.route_tables | length == 0
       register: created_route_table
 
     - name: Set pre-existing route table ID
       set_fact:
         route_table_id: "{{ route_table.route_tables[0].id }}"
-      when: route_table | length > 0
+      when: route_table.route_tables | length > 0
 
     - name: Set route table ID to new route
       set_fact:
-        route_table_id: "{{ created_route_table.route_tables[0].id }}"
-      when: route_table | length == 0
+        route_table_id: "{{ created_route_table.route_table.id }}"
+      when: route_table.route_tables | length == 0
 
     - name: Check if a security group has been instantiated
       amazon.aws.ec2_security_group_info:
@@ -135,9 +159,13 @@
           group-name: CI-TEST
       register: security_group
 
+    - name: print
+      debug:
+        msg: "{{ security_group }}"
+
     - name: Create 'CI-TEST' security group if it does not exist
       amazon.aws.ec2_security_group:
-        name: "CI-TEST"
+        name: CI-TEST
         description: "Security group for CI testing"
         vpc_id: "{{ vpc_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
@@ -160,17 +188,17 @@
             cidr_ip: "0.0.0.0/0"
             rule_desc: Allow traffic for using Dex as OIDC server + IDP
         state: present
-      when: security_group | length == 0
+      when: security_group.security_groups | length == 0
       register: created_security_group
 
     - name: Setting security group ID if it existed
       ansible.builtin.set_fact:
         sgID: "{{ security_group.security_groups[0].group_id }}"
-      when: security_group | length > 0
+      when: security_group.security_groups | length > 0
 
     - name: Setting security group ID to new group
       ansible.builtin.set_fact:
-        sgID: "{{ created_security_group.security_groups[0].group_id }}"
+        sgID: "{{ created_security_group.security_group.group_id }}"
       when: security_group | length == 0
 
     - name: Launch EC2 instance
