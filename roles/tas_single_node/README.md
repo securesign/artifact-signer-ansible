@@ -20,6 +20,9 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_podman_network | Name of the Podman network for containers to use. | str |  `rhtas`  |
 | tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
 | tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}}`  |
+| tas_single_node_fulcio | Details on the certificate settings for Fulcio. You can configure the certificate with the organization's details. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}}`  |
+| tas_single_node_fulcio_private_key | Private key for Fulcio, used for signing root certificate. | str |  |
+| tas_single_node_fulcio_root_ca | The root certificate for Fulcio. | str |  |
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
@@ -78,6 +81,20 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | user | The database user. | str | no |  |
 | root_password | The root password for the database. | str | no |  |
 | database | The database name to connect to. | str | no |  |
+
+#### Options for main > tas_single_node_fulcio
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | Details on the certificate attributes for Fulcio. | dict of 'certificate' options | no |  |
+
+#### Options for main > tas_single_node_fulcio > certificate
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| organization_name | The name of the organization. | str | no |  |
+| organization_email | The email address of the organization. | str | no |  |
+| common_name | The common name (e.g., hostname) for the certificate. | str | no |  |
 
 #### Options for main > tas_single_node_oidc_issuers
 
