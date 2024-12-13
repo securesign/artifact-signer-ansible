@@ -19,7 +19,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|
 | tas_single_node_podman_network | Name of the Podman network for containers to use. | str |  `rhtas`  |
 | tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
-| tas_single_node_backfill_redis_enabled | Enable or disable the backfill redis job | bool |  `True`  |
+| tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
 | tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}}`  |
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
@@ -61,6 +61,13 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | host | The Redis host. | str | no |  |
 | port | The Redis host port number. | int | no |  |
 | password | The Redis password. | str | no |  |
+
+#### Options for main > tas_single_node_backfill_redis
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| enabled | Enable or disable the backfill redis job. | bool | no |  |
+| schedule | Schedule the backfill redis job should follow. | str | no |  |
 
 #### Options for main > tas_single_node_trillian
 

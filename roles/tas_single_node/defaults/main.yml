@@ -12,7 +12,9 @@ tas_single_node_rekor_redis:
     port: 6379
     password: password
 
-tas_single_node_backfill_redis_enabled: true
+tas_single_node_backfill_redis:
+  enabled: true
+  schedule: "*-*-* 00:00:00"
 
 tas_single_node_trillian:
   database_deploy: true
