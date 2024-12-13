@@ -5,3 +5,4 @@
 collections:
   - community.crypto
   - containers.podman
+  - amazon.aws

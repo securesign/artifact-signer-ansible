@@ -1,10 +1,10 @@
 ---
-# TODO: improve idempotency and error handling throughout this file,
-# specifically for the testing-farm call
 - name: Create
   hosts: localhost
   connection: local
   gather_facts: false
+  vars_files:
+    - vars/vars.yml
   vars:
     debug_outputs: true
     molecule_inventory:
@@ -15,85 +15,202 @@
   tasks:
     - name: Inform user we're about to create the VM
       ansible.builtin.debug:
-        msg: Creating Testing Farm VM instance
+        msg: Creating AWS EC2 VM instance
 
-    - name: Define private key path
+    - name: Gather VPC facts
+      amazon.aws.ec2_vpc_net_info:
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        filters:
+          "tag:Name": CI-TEST
+      register: vpcs
+
+    - name: Create VPC if it does not exist yet
+      amazon.aws.ec2_vpc_net:
+        name: "CI-TEST"
+        cidr_block: "10.0.0.0/24"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        state: present
+      when: vpcs.vpcs | length == 0
+      register: created_vpc
+
+    - name: Set VPC ID if new VPC created
       ansible.builtin.set_fact:
-        private_key_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/id_rsa"
+        vpc_id: "{{ created_vpc.vpc.id }}"
+      when: vpcs.vpcs | length == 0
 
-    - name: "Generate local key pair {{ private_key_path }}"
-      community.crypto.openssh_keypair:
-        path: "{{ private_key_path }}"
-        type: rsa
-        size: 4096
-        regenerate: never
-        backend: cryptography
-        private_key_format: pkcs1
-      register: local_keypair
+    - name: Set VPC ID to pre-existing VPC ID
+      ansible.builtin.set_fact:
+        vpc_id: "{{ vpcs.vpcs[0].id }}"
+      when: vpcs.vpcs | length > 0
 
-    - name: Create the VM using testing-farm
-      ansible.builtin.command:
-        cmd: >-
-          testing-farm reserve
-            --compose {{ item.compose }}
-            --arch {{ item.arch | default("x86_64", true) }}
-            --duration {{ item.duration | default(30, true) }}
-            --ssh-public-key {{ private_key_path }}.pub
-            --no-autoconnect
-      register: tf_results
+    - name: Check if a subnet exists in the VPC
+      amazon.aws.ec2_vpc_subnet_info:
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        filters:
+          vpc-id: "{{ vpc_id }}"
+          "tag:Name": CI-TEST
+      register: subnets
+
+    - name: Create subnet if it does not exist
+      amazon.aws.ec2_vpc_subnet:
+        vpc_id: "{{ vpc_id }}"
+        cidr: "10.0.0.0/24"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        tags:
+          Name: CI-TEST
+        state: present
+      when: subnets.subnets | length == 0
+      register: created_subnet
+
+    - name: Set new subnet ID if it did not exist
+      ansible.builtin.set_fact:
+        subnet_id: "{{ created_subnet.subnet.id }}"
+      when: subnets.subnets | length == 0
+
+    - name: Set subnet to pre-existing ID
+      ansible.builtin.set_fact:
+        subnet_id: "{{ subnets.subnets[0].id }}"
+      when: subnets.subnets | length > 0
+
+    - name: Check if internet gateway exists
+      amazon.aws.ec2_vpc_igw_info:
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        filters:
+          "tag:Name": "CI-TEST"
+      register: igw_facts
+
+    - name: Create internet gateway if it does not exist
+      amazon.aws.ec2_vpc_igw:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        state: present
+      when: igw_facts.internet_gateways | length == 0
+      register: igw_exists
+
+    - name: Use pre-existing gateway ID if it exists
+      ansible.builtin.set_fact:
+        igw_id: "{{ igw_facts.internet_gateways[0].internet_gateway_id }}"
+      when: igw_facts.internet_gateways | length > 0
+
+    - name: use new gateway ID
+      set_fact:
+        igw_id: "{{ igw_exists.gateway_id }}"
+      when: igw_facts.internet_gateways | length == 0
+
+    - name: Gather route table facts
+      amazon.aws.ec2_vpc_route_table_info:
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        filters:
+          "tag:Name": "CI-TEST"
+          vpc-id: "{{ vpc_id }}"
+      register: route_table
+
+    - name: Create route table if it does not exist
+      amazon.aws.ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        state: present
+        routes:
+          - dest: "0.0.0.0/0"
+            gateway_id: "{{ igw_id }}"
+        subnets:
+          - "{{ subnet_id }}"
+        tags:
+          Name: "CI-TEST"
+      when: route_table.route_tables | length == 0
+      register: created_route_table
+
+    - name: Set pre-existing route table ID
+      set_fact:
+        route_table_id: "{{ route_table.route_tables[0].id }}"
+      when: route_table.route_tables | length > 0
+
+    - name: Set route table ID to new route
+      set_fact:
+        route_table_id: "{{ created_route_table.route_table.id }}"
+      when: route_table.route_tables | length == 0
+
+    - name: Check if a security group has been instantiated
+      amazon.aws.ec2_security_group_info:
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        filters:
+          group-name: CI-TEST
+      register: security_group
+
+    - name: Create 'CI-TEST' security group if it does not exist
+      amazon.aws.ec2_security_group:
+        name: "CI-TEST"
+        description: "Security group for CI testing"
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        rules:
+          - proto: tcp
+            ports: 22
+            cidr_ip: 0.0.0.0./0
+          - proto: tcp
+            ports: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            ports: 443
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            ports: 5556
+            cidr_ip: 0.0.0.0/0
+            rule_desc: Allow traffic for using Dex as OIDC server + IDP
+        state: present
+      when: security_group.security_groups | length == 0
+      register: created_security_group
+
+    - name: Setting security group ID if it existed
+      ansible.builtin.set_fact:
+        sgID: "{{ security_group.security_groups[0]['group_id'] }}"
+      when: security_group.security_groups | length > 0
+
+    - name: Setting security group ID to new group
+      ansible.builtin.set_fact:
+        sgID: "{{ created_security_group.group_id }}"
+      when: security_group.security_groups | length == 0
+
+    - name: Generate instance ID
+      ansible.builtin.set_fact:
+        instance_id: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
+
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        name: "{{ 'CI-' + (lookup('env', 'GITHUB_RUN_ID') if lookup('env', 'GITHUB_RUN_ID') | length > 0 else instance_id) }}"
+        key_name: "{{ item.aws_key_name }}"
+        instance_type: "{{ item.instance_type }}"
+        image_id: "{{ item.image_id }}" 
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        vpc_subnet_id: "{{ subnet_id }}"
+        network:
+          assign_public_ip: true
+        security_group: "{{ sgID }}"
+        wait: yes
+        state: running
       with_items: "{{ molecule_yml.platforms }}"
-      changed_when: true
-      async: 500
-      poll: 5
+      register: ec2_instance
 
-    # - name: Testing output
-    #   ansible.builtin.command:
-    #     cmd: "echo '0acccef6-7ce6-4bb6-a0b4-3428762aa3ae root@1.2.3.4'"
-    #   register: tf_results
-    #   with_items: "{{ molecule_yml.platforms }}"
-    #   changed_when: true
-
-    - name: Debug testing-farm results
-      ansible.builtin.debug:
-        msg: "{{ tf_results }}"
-      when: debug_outputs
-
-    - name: Initialize variable for parsed testing-farm results
+    - name: Set instance ID and IP
       ansible.builtin.set_fact:
-        tf_parsed_results: []
+        instanceID: "{{ ec2_instance.results[0].instances[0].instance_id }}"
+        instanceIP: "{{ ec2_instance.results[0].instances[0].network_interfaces[0].association.public_ip }}"
 
-    - name: Parse testing-farm result
-      ansible.builtin.include_tasks:
-        file: "tasks/_parse_tf_results.yml"
-      with_items: "{{ tf_results.results }}"
-
-    - name: Debug parsed testing-farm results
-      ansible.builtin.debug:
-        msg: "{{ tf_parsed_results }}"
-      when: debug_outputs
-
-    # TODO: idempotency
-    - name: Populate instance config dict  # noqa jinja
+    - name: Populate instance config dict
       ansible.builtin.set_fact:
         instance_conf_dict: {
-          'instance': "{{ item.uuid }}",
-          'address': "{{ item.ip }}",
-          # TODO: testing-farm is giving us root by default, ideally we would get non-root to get conditions closer to prod environments
-          'user': "{{ item.username }}",
-          'port': "22", # TODO: get it dynamically
-          'identity_file': "{{ private_key_path  }}",
+          'instance': "{{ instanceID }}",
+          'address': "{{ instanceIP }}",
+          'user': "ec2-user",
+          'port': "22",
+          'identity_file': "{{ item.aws_key_name }}",
         }
-      with_items: "{{ tf_parsed_results }}"
+      with_items: "{{ molecule_yml.platforms }}"
       register: instance_config_dict
 
     - name: Convert instance config dict to a list
       ansible.builtin.set_fact:
         instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
-
-    - name: Debug instance_conf
-      ansible.builtin.debug:
-        msg: "{{ instance_conf }}"
-      when: debug_outputs
 
     - name: Dump instance config
       ansible.builtin.copy:
@@ -111,13 +228,20 @@
             children:
               molecule:
                 hosts:
-                  "{{ item.address }}":
-                    ansible_user: {{ item.user }}
-                    ansible_ssh_private_key_file: {{ private_key_path }}
+                  "{{ instanceIP }}":
+                    ansible_user: ec2-user 
+                    ansible_ssh_private_key_file: "{{ item.private_key_file_path }}"
+                    ansible_become: true
       ansible.builtin.set_fact:
         molecule_inventory: >
           {{ molecule_inventory | combine(inventory_partial_yaml | from_yaml, recursive=true) }}
-      loop: "{{ instance_conf }}"
+      with_items: "{{ molecule_yml.platforms }}"
+
+    - name: Add AWS EC2 Instance to known hosts
+      ansible.builtin.shell:
+        cmd: ssh-keyscan -H {{ instanceIP }} >> ~/.ssh/known_hosts
+      retries: 5
+      delay: 5
 
     - name: Dump molecule_inventory
       ansible.builtin.copy:
@@ -134,4 +258,4 @@
         that: "'molecule' in groups"
         fail_msg: |
           molecule group was not found inside inventory groups: {{ groups }}
-      run_once: true # noqa: run-once[task]
+      run_once: true

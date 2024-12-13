@@ -20,6 +20,7 @@
   ansible.builtin.shell: |
       podman run -d \
       --name dex-idp \
+      --replace \
       -p 5556:5556 \
       -v /etc/dex/config/dex.yaml:/etc/dex/cfg/dex.yaml:Z \
       quay.io/asiek/dexidp:v2.32.0 \
