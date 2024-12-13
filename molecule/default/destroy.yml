@@ -5,35 +5,30 @@
   gather_facts: false
   tasks:
 
-    - name: Check if instance ID file exists
-      ansible.builtin.stat:
-        path: "/tmp/instanceID.json"
-      register: instanceStat
+    - name: Load instance configs
+      ansible.builtin.set_fact:
+        instance_configs: "{{ (lookup('file', molecule_instance_config, errors='ignore') or '{}') | from_yaml }}"
 
-    - name: Terminate EC2 Instance
-      block:
-        - name: Load the instance ID from file
-          ansible.builtin.slurp:
-            src: "/tmp/instanceID.json"
-          register: instanceFile
+    - name: print
+      debug:
+        msg: "{{ instance_configs }}"
 
-        - name: Set the fact from the file
-          ansible.builtin.set_fact:
-            instanceID: "{{ instanceFile.content | b64decode | from_json }}"
-          when: instanceStat.stat.exists
+    - name: Terminate EC2 instance
+      amazon.aws.ec2_instance:
+        state: absent
+        instance_ids:
+          - "{{ item['instance'] }}"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+      register: terminate_result
+      with_items: "{{ instance_configs }}"
+      changed_when: true
+      failed_when: false
 
-        - name: Terminate EC2 instance
-          amazon.aws.ec2_instance:
-            state: absent
-            instance_ids:
-              - "{{ instanceID }}"
-            region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
-          register: terminate_result
-
-        - name: Print terminate result
-          ansible.builtin.debug:
-            var: terminate_result
-      when: instanceStat.stat.exists
+    - name: Dump instance configs
+      ansible.builtin.copy:
+        content: "{{ {} | to_yaml }}"
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
 
 - name: Remove dynamic molecule inventory
   hosts: localhost

@@ -4,10 +4,6 @@ tas_single_node_oidc_issuers:
     client_id: example-app
     type: email
 tas_single_node_base_hostname: myrhtas
-private_key_file_path: ~/.ssh/id_rsa
-image_id: ami-0cd93da2da7f10cab
-instance_type: m5.xlarge
-aws_key_name: CI-TEST
 tas_single_node_cockpit:
   enabled: false
 tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
