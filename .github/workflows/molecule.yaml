@@ -43,6 +43,10 @@ jobs:
             molecule reset
             molecule -v test --scenario-name ${{ matrix.scenario }}
         - name: Destroy molecule infrastructure
+          env:
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           if: always()
           run: |
             source venv/bin/activate
