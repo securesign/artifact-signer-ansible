@@ -2,7 +2,7 @@
 Description=Runs The backfill redis job
 
 [Timer]
-OnCalendar=*-*-* 00:00:00
+OnCalendar={{ tas_single_node_backfill_redis.schedule }}
 Persistent=true
 Unit=backfill_redis.service
 

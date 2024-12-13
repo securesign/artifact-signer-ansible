@@ -29,16 +29,40 @@ spec:
             - /bin/sh
             - -c
           args:
-            - >
-              endIndex=$(curl -sS http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}/api/v1/log | sed -E 's/.*"treeSize":([0-9]+).*/\1/');
-              endIndex=$((endIndex-1));
+            - |
+              endIndex=$(curl -sS http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}/api/v1/log | sed -E 's/.*"treeSize":([0-9]+).*/\1/')
+              endIndex=$((endIndex-1))
+
               if [ "${endIndex}" -lt 0 ]; then
-                echo "info: no rekor entries found";
-                exit 0;
-              fi;
-              backfill-redis 
-              --hostname={{ tas_single_node_rekor_redis.redis.host }}
-              --port={{ tas_single_node_rekor_redis.redis.port }}
-              --password="{{ tas_single_node_rekor_redis.redis.password }}"
-              --rekor-address=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}
-              --enable-redis-index-resume=true --end=${endIndex};
+                echo "info: no rekor entries found"
+                exit 0
+              fi
+
+              startIndex=$(redis-cli \
+                -h {{ tas_single_node_rekor_redis.redis.host }} \
+                -p {{ tas_single_node_rekor_redis.redis.port }} \
+{% if tas_single_node_rekor_redis.redis.password != "" %}
+                -a "{{ tas_single_node_rekor_redis.redis.password }}" \
+{% endif %}
+                GET last_filled_index)
+
+              if [ -z "$startIndex" ]; then
+                startIndex=0
+              fi
+
+              backfill-redis \
+                --redis-hostname={{ tas_single_node_rekor_redis.redis.host }} \
+                --redis-port={{ tas_single_node_rekor_redis.redis.port }} \
+{% if tas_single_node_rekor_redis.redis.password != "" %}
+                --redis-password="{{ tas_single_node_rekor_redis.redis.password }}" \
+{% endif %}
+                --rekor-address=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} \
+                --start="${startIndex}" --end="${endIndex}"
+
+              redis-cli \
+                -h {{ tas_single_node_rekor_redis.redis.host }} \
+                -p {{ tas_single_node_rekor_redis.redis.port }} \
+{% if tas_single_node_rekor_redis.redis.password != "" %}
+                -a "{{ tas_single_node_rekor_redis.redis.password }}" \
+{% endif %}
+                SET last_filled_index "$((endIndex + 1))"

@@ -12,7 +12,9 @@ tas_single_node_rekor_redis:
     port: 6379
     password: password
 
-tas_single_node_backfill_redis_enabled: true
+tas_single_node_backfill_redis:
+  enabled: true
+  schedule: "*-*-* 00:00:00"
 
 tas_single_node_trillian:
   database_deploy: true
@@ -69,7 +71,7 @@ tas_single_node_ctlog_image:
 tas_single_node_rekor_redis_image:
   "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:18820b1fbdbc2cc3e917822974910332d937b03cfe781628bd986fd6a5ee318e"
 tas_single_node_backfill_redis_image:
-  "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:c5995c88063bd9875ae61c299bcf549002fcde724aab09807c70934e73daf356"
+  "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:6aa3ca40e0f9e32a0a211a930b21ff009b83e46609bfa5bb328979e4799d13c7"
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:501612745e63e5504017079388bec191ffacf00ffdebde7be6ca5b8e4fd9d323"
 tas_single_node_tuf_image:
