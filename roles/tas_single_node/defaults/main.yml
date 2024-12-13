@@ -91,9 +91,7 @@ tas_single_node_podman: {}
 
 tas_single_node_cockpit:
   enabled: false # install redhat.rhel_system_roles before enabling
-  cockpit_packages:
-    - cockpit-storaged
-    - cockpit-podman
-    - cockpit
-  cockpit_manage_firewall: true
-  cockpit_port: 9090
+  user:
+    create: false
+    username: cockpit-user
+    password: password
