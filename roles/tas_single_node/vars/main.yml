@@ -6,12 +6,11 @@ tas_single_node_system_packages:
   - firewalld
 
 tas_single_node_cockpit:
-  enabled: false
-  cockpit_packages:
-    - cockpit-storaged
-    - cockpit-podman
-    - cockpit
-  cockpit_manage_firewall: true
+  enabled: false # install redhat.rhel_system_roles before enabling
+  user:
+    create: false
+    username: cockpit-user
+    password: password
 
 tas_single_node_rekor_signer_type: file # to be exposed to users later on
 tas_single_node_rekor_templates:

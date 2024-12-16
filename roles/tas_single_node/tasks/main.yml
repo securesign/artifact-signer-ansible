@@ -9,6 +9,28 @@
   ansible.builtin.include_tasks: os.yml
   when: not tas_single_node_skip_os_install
 
+- name: Create cockpit-user
+  ansible.builtin.user:
+    name: "{{ tas_single_node_cockpit.user.username }}"
+    shell: /bin/bash
+    group: wheel
+    password: "{{ tas_single_node_cockpit.user.password | password_hash('sha512') }}"
+    create_home: true
+  when:
+    - tas_single_node_cockpit.enabled | bool
+    - tas_single_node_cockpit.user.create | bool
+
+- name: Install Cockpit
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.cockpit
+  vars:
+    cockpit_packages:
+      - cockpit-storaged
+      - cockpit-podman
+      - cockpit
+    cockpit_manage_firewall: true
+  when: tas_single_node_cockpit.enabled | bool
+
 - name: Create Certificates
   ansible.builtin.include_tasks: certificates.yml
 
