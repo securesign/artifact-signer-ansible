@@ -191,8 +191,8 @@
           openssl x509 -noout -modulus -in '{{ tas_single_node_remote_fulcio_root_ca }}' | openssl md5 &&
           openssl rsa -noout -modulus -in '{{ tas_single_node_remote_fulcio_private_key }}' -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}' |
           openssl md5
-      when: > 
-        key_type_check.stdout == "RSA Key" 
+      when: >
+        key_type_check.stdout == "RSA Key"
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
       register: key_cert_match_check
       changed_when: false
