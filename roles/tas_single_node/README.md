@@ -20,7 +20,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_podman_network | Name of the Podman network for containers to use. | str |  `rhtas`  |
 | tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
 | tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}}`  |
-| tas_single_node_fulcio | Details on the certificate settings for Fulcio. You can configure the certificate with the organization's details. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}}`  |
+| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'tas_single_node_fulcio_private_key': '', 'tas_single_node_fulcio_root_ca': ''}`  |
 | tas_single_node_fulcio_private_key | Private key for Fulcio, used for signing root certificate. | str |  |
 | tas_single_node_fulcio_root_ca | The root certificate for Fulcio. | str |  |
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
@@ -87,6 +87,8 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | certificate | Details on the certificate attributes for Fulcio. | dict of 'certificate' options | no |  |
+| tas_single_node_fulcio_private_key | The user-provided private key for Fulcio, used for signing root certificate (only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported). | str | no |  |
+| tas_single_node_fulcio_root_ca | The user-provided root certificate for Fulcio. | str | no |  |
 
 #### Options for main > tas_single_node_fulcio > certificate
 

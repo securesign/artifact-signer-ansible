@@ -119,7 +119,8 @@ argument_specs:
                 required: false
                 version_added: "1.1.0"
       tas_single_node_fulcio:
-        description: "Details on the certificate settings for Fulcio. You can configure the certificate with the organization's details."
+        description: "Details on the certificate settings for Fulcio. Includes organizational details,
+          the user-provided private key for signing the root certificate, and the user-provided root certificate itself."
         type: "dict"
         required: false
         version_added: "1.1.1"
@@ -128,6 +129,8 @@ argument_specs:
             organization_name: ""
             organization_email: ""
             common_name: ""
+          tas_single_node_fulcio_private_key: ""
+          tas_single_node_fulcio_root_ca: ""
         options:
           certificate:
             description: "Details on the certificate attributes for Fulcio."
@@ -150,6 +153,18 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.1.1"
+          tas_single_node_fulcio_private_key:
+            description: "The user-provided private key for Fulcio,
+              used for signing root certificate (only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported)."
+            type: "str"
+            required: false
+            version_added: "1.1.1"
+          tas_single_node_fulcio_root_ca:
+            description: "The user-provided root certificate for Fulcio."
+            type: "str"
+            required: false
+            version_added: "1.1.1"
+
       tas_single_node_fulcio_private_key:
         description: >
           Private key for Fulcio, used for signing root certificate.

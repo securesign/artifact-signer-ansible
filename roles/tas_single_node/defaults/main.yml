@@ -27,6 +27,8 @@ tas_single_node_fulcio:
     organization_name: ""
     organization_email: ""
     common_name: ""
+  tas_single_node_fulcio_private_key: ""
+  tas_single_node_fulcio_root_ca: ""
 
 tas_single_node_rekor_public_key_retries: 5
 tas_single_node_rekor_public_key_delay: 10
