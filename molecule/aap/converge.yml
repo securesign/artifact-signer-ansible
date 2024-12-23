@@ -13,3 +13,7 @@
       loop:
         - infra.aap_utilities.aap_setup_download
         - infra.aap_utilities.aap_setup_prepare
+
+    - name: Install AAP
+      ansible.builtin.shell:
+        cmd: cat /var/tmp/ansible-automation-platform-containerized-setup-2.5-*/inventory
