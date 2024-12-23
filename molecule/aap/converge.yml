@@ -2,10 +2,13 @@
 - name: Converge
   hosts: molecule
   gather_facts: true
+  vars_files:
+    - vars/vars.yml
+    - vars/aap_nodes.yml
   tasks:
-    - name: Include aap variables
-      ansible.builtin.include_vars:
-        file: vars/aap_nodes.yml
+    # - name: Include aap variables
+    #   ansible.builtin.include_vars:
+    #     file: vars/aap_nodes.yml
 
     - name: Include and execute AAP utility roles for setup
       ansible.builtin.include_role:
