@@ -1,0 +1,50 @@
+name: Using Ansible Molecule, test the collection deployed from AAP
+
+# on:
+#   schedule:
+#   - cron: "0 0 * * *"
+
+on:
+  pull_request:
+
+jobs:
+  create-aap-vm:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+        - name: Install dependencies
+          run: |
+            python -m venv venv
+            source venv/bin/activate
+            python -m pip install --upgrade pip
+            pip install -r testing-requirements.txt
+            ansible-galaxy install -r requirements.yml
+            ansible-galaxy install -r molecule/requirements.yml
+        - name: Set up SSH key
+          run: |
+            mkdir -p ~/.ssh
+            echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+        - name: Run molecule
+          env:
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            GITHUB_RUN_ID: ${{ github.run_id }}
+          run: |
+            source venv/bin/activate
+            molecule reset
+            molecule -v test --scenario-name aap
+        - name: Sleep for 300 seconds
+          run: sleep 300s
+          shell: bash
+        - name: Destroy molecule infrastructure
+          env:
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          if: always()
+          run: |
+            source venv/bin/activate
+            molecule destroy
