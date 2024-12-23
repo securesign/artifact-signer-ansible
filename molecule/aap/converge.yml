@@ -3,6 +3,10 @@
   hosts: molecule
   gather_facts: true
   tasks:
+    - name: Include aap variables
+      ansible.builtin.include_vars:
+        file: vars/aap_nodes.yml
+
     - name: Error out if registry username is not set
       ansible.builtin.debug:
-        msg: "converge"
+        msg: "{{ automationcontroller }}"
