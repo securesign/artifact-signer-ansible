@@ -295,6 +295,17 @@
               postgresql_admin_username: postgres
               postgresql_admin_password: password
 
+    # Remove Later
+    - name: Debug instanceIP
+      ansible.builtin.debug:
+        msg: "{{ instanceIP }}"
+
+    - name: debug vars/aap_nodes.yml
+      ansible.builtin.shell:
+        cmd: |
+          cat vars/aap_nodes.yml
+      changed_when: false
+
     - name: Fail if molecule group is missing
       ansible.builtin.assert:
         that: "'molecule' in groups"
