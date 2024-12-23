@@ -266,18 +266,14 @@
           aap_setup_inst_containerized: true
           aap_setup_containerized: true
           aap_setup_arch: "x86_64"
+          aap_setup_prep_process_template: true
 
           aap_setup_prep_inv_nodes:
-            automationcontroller:
-              "{{ instanceIP }}"
-            automationhub:
-              "{{ instanceIP }}"
-            database:
-              "{{ instanceIP }}"
-            automationgateway:
-              "{{ instanceIP }}"
-            automationeda:
-              "{{ instanceIP }}"
+            automationcontroller: "{{ instanceIP }}"
+            automationhub: "{{ instanceIP }}"
+            database: "{{ instanceIP }}"
+            automationgateway: "{{ instanceIP }}"
+            automationeda: "{{ instanceIP }}"
           aap_setup_prep_inv_vars:
             all:
               ansible_user: "{{ user }}"
