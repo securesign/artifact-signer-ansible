@@ -9,4 +9,4 @@
 
     - name: Error out if registry username is not set
       ansible.builtin.debug:
-        msg: "{{ automationcontroller }}"
+        msg: "{{ aap_setup_prep_inv_nodes.automationcontroller }}"
