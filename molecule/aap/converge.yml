@@ -7,6 +7,9 @@
       ansible.builtin.include_vars:
         file: vars/aap_nodes.yml
 
-    - name: Check automationcontroller
-      ansible.builtin.debug:
-        msg: "{{ aap_setup_prep_inv_nodes.automationcontroller }}"
+    - name: Include and execute AAP utility roles for setup
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      loop:
+        - infra.aap_utilities.aap_setup_download
+        - infra.aap_utilities.aap_setup_prepare
