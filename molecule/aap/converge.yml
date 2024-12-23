@@ -7,6 +7,6 @@
       ansible.builtin.include_vars:
         file: vars/aap_nodes.yml
 
-    - name: Error out if registry username is not set
+    - name: Check automationcontroller
       ansible.builtin.debug:
         msg: "{{ aap_setup_prep_inv_nodes.automationcontroller }}"

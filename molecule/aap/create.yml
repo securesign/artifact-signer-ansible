@@ -291,9 +291,6 @@
               postgresql_admin_username: postgres
               postgresql_admin_password: password
 
-    - name: Verify aap_nodes.yml content
-      shell: cat vars/aap_nodes.yml
-
     - name: Fail if molecule group is missing
       ansible.builtin.assert:
         that: "'molecule' in groups"
