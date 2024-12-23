@@ -257,8 +257,6 @@
     - name: Create AAP variables file
       ansible.builtin.copy:
         dest: vars/aap_nodes.yml
-        owner: "{{ user }}"
-        group: "{{ user }}"
         mode: '0600'
         content: |
           aap_setup_prep_inv_nodes:
