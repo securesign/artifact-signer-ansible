@@ -18,5 +18,6 @@
       ansible.builtin.shell:
         cmd: |
           cat /var/tmp/ansible-automation-platform-containerized-setup-2.5-*/inventory
+          cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
           ansible-playbook -i inventory ansible.containerized_installer.install
       changed_when: false
