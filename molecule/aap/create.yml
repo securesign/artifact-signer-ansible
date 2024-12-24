@@ -281,7 +281,7 @@
               {{ instanceIP }}:
           aap_setup_prep_inv_vars:
             all:
-              ansible_user: "{{ user }}"
+              ansible_user: "nonroot"
               ansible_connection: local
               become: false
               redis_mode: standalone
