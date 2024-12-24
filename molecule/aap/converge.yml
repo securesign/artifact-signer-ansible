@@ -28,6 +28,21 @@
         shell: /bin/bash
         create_home: true
 
+    # make nonroot user sudo
+    - name: Add nonroot user to the sudoers file for passwordless sudo
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        line: "nonroot ALL=(ALL) NOPASSWD:ALL"
+        validate: 'visudo -cf %s'
+        state: present
+
+    - name: Ensure nonroot user is in the sudo group (if applicable)
+      ansible.builtin.user:
+        name: nonroot
+        groups: wheel
+        append: true
+      when: ansible_facts['distribution'] in ['CentOS', 'RedHat', 'Fedora']
+
     - name: Include and execute AAP utility roles for setup
       ansible.builtin.include_role:
         name: "{{ item }}"
