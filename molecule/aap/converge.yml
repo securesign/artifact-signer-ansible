@@ -43,6 +43,13 @@
         append: true
       when: ansible_facts['distribution'] in ['CentOS', 'RedHat', 'Fedora']
 
+    - name: Grant nonroot permission to control podman.socket service
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        line: "nonroot ALL=(ALL) NOPASSWD: /bin/systemctl start podman.socket, /bin/systemctl enable podman.socket, /bin/systemctl status podman.socket"
+        validate: 'visudo -cf %s'
+        state: present
+
     - name: Include and execute AAP utility roles for setup
       ansible.builtin.include_role:
         name: "{{ item }}"
@@ -69,7 +76,7 @@
       become_user: root
 
     - name: Install AAP
-      become: true
+      # become: true
       become_user: nonroot
       ansible.builtin.shell:
         cmd: |
