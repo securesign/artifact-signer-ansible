@@ -27,13 +27,19 @@
         - infra.aap_utilities.aap_setup_download
         - infra.aap_utilities.aap_setup_prepare
 
+    - name: Create a normal user for running the task
+      ansible.builtin.user:
+        name: nonroot
+        state: present
+        shell: /bin/bash
+        create_home: true
+
     - name: Install AAP
       become: false
+      become_user: nonroot
       ansible.builtin.shell:
         cmd: |
           cat /var/tmp/ansible-automation-platform-containerized-setup-2.5-*/inventory
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
-          whoami
-          id -u ${USER}
           ansible-playbook -i inventory ansible.containerized_installer.install
       changed_when: false
