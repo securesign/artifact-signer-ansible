@@ -52,11 +52,16 @@
     #     state: present
 
     - name: Include and execute AAP utility roles for setup
-      ansible.builtin.include_role:
-        name: "{{ item }}"
-      loop:
-        - infra.aap_utilities.aap_setup_download
-        - infra.aap_utilities.aap_setup_prepare
+      become: true
+      become_user: ec2-user
+      block:
+        - name: Include the AAP setup download role
+          ansible.builtin.include_role:
+            name: infra.aap_utilities.aap_setup_download
+
+        - name: Include the AAP setup prepare role
+          ansible.builtin.include_role:
+            name: infra.aap_utilities.aap_setup_prepare
 
     - name: Ensure ec2-user user has access to the setup directory
       ansible.builtin.file:
@@ -66,7 +71,7 @@
         mode: '0755'
       become: true
       become_user: root
-      changed_when: false
+      # changed_when: false
 
     - name: Ensure ec2-user user has access to the inventory file
       ansible.builtin.file:
@@ -76,7 +81,7 @@
         mode: '0644'
       become: true
       become_user: root
-      changed_when: false
+      # changed_when: false
 
     - name: Install AAP
       become: false
