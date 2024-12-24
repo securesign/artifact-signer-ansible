@@ -4,7 +4,7 @@
   gather_facts: true
   vars_files:
     - vars/vars.yml
-    - vars/aap_nodes.yml
+    # - vars/aap_nodes.yml
   tasks:
     # - name: Include aap variables
     #   ansible.builtin.include_vars:
