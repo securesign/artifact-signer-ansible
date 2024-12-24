@@ -46,7 +46,7 @@
 
     - name: Ensure nonroot user has access to the inventory file
       ansible.builtin.file:
-        path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-*/inventory"
+        path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7/inventory"
         owner: nonroot
         group: nonroot
         mode: '0644'
