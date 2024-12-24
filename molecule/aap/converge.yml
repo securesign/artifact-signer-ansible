@@ -66,6 +66,7 @@
         mode: '0755'
       become: true
       become_user: root
+      changed_when: false
 
     - name: Ensure ec2-user user has access to the inventory file
       ansible.builtin.file:
@@ -75,6 +76,7 @@
         mode: '0644'
       become: true
       become_user: root
+      changed_when: false
 
     - name: Install AAP
       become: false
@@ -84,5 +86,4 @@
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
           # ansible-playbook -i inventory ansible.containerized_installer.install
           whoami
-
       changed_when: false
