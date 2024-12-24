@@ -68,6 +68,12 @@
       become: true
       become_user: root
 
+    - name: Enable podman socket
+      ansible.builtin.systemd:
+        name: podman.socket
+        enabled: true
+        state: started
+
     - name: Install AAP
       become: false
       become_user: nonroot
