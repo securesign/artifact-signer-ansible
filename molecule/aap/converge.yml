@@ -57,6 +57,7 @@
       loop:
         - infra.aap_utilities.aap_setup_download
         - infra.aap_utilities.aap_setup_prepare
+        - infra.aap_utilities.aap_setup_install
 
     # - name: Ensure ec2-user user has access to the setup directory
     #   ansible.builtin.file:
@@ -79,19 +80,19 @@
     #   changed_when: false
 
 
-    - name: Install AAP with async
-      ansible.builtin.shell:
-        cmd: |
-          cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
-          ansible-playbook -i inventory ansible.containerized_installer.install
-      async: 1200
-      poll: 0
-      register: install_aap_job
+    # - name: Install AAP with async
+    #   ansible.builtin.shell:
+    #     cmd: |
+    #       cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
+    #       ansible-playbook -i inventory ansible.containerized_installer.install
+    #   async: 1200  # Allow up to 20 minutes
+    #   poll: 0      # Start the task without waiting for it to complete
+    #   register: install_aap_job
 
-    - name: Wait for AAP installation to complete
-      ansible.builtin.async_status:
-        jid: "{{ install_aap_job.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 120
-      delay: 10
+    # - name: Wait for AAP installation to complete
+    #   ansible.builtin.async_status:
+    #     jid: "{{ install_aap_job.ansible_job_id }}"
+    #   register: job_result
+    #   until: job_result.finished
+    #   retries: 120
+    #   delay: 10
