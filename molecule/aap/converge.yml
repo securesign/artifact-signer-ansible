@@ -79,14 +79,19 @@
     #   changed_when: false
 
 
-    - name: Install AAP
-      # become: false
-      # become_user: ec2-user
+    - name: Install AAP with async
       ansible.builtin.shell:
         cmd: |
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
           ansible-playbook -i inventory ansible.containerized_installer.install
-      vars:
-        ansible_ssh_timeout: 600
-        ansible_ssh_extra_args: "-o ControlMaster=no"
-      changed_when: false
+      async: 1200
+      poll: 0
+      register: install_aap_job
+
+    - name: Wait for AAP installation to complete
+      ansible.builtin.async_status:
+        jid: "{{ install_aap_job.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 120
+      delay: 10
