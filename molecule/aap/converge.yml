@@ -2,6 +2,7 @@
 - name: Converge
   hosts: molecule
   gather_facts: true
+  tags: aap_installation
   vars_files:
     - vars/vars.yml
     - vars/aap_nodes.yml
@@ -50,12 +51,12 @@
     #     validate: 'visudo -cf %s'
     #     state: present
 
-    # - name: Include and execute AAP utility roles for setup
-    #   ansible.builtin.include_role:
-    #     name: "{{ item }}"
-    #   loop:
-    #     - infra.aap_utilities.aap_setup_download
-    #     - infra.aap_utilities.aap_setup_prepare
+    - name: Include and execute AAP utility roles for setup
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      loop:
+        - infra.aap_utilities.aap_setup_download
+        - infra.aap_utilities.aap_setup_prepare
 
     # - name: Ensure nonroot user has access to the setup directory
     #   ansible.builtin.file:
