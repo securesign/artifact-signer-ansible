@@ -75,6 +75,12 @@
       become: true
       become_user: root
 
+
+    - name: Ensure dbus-user-session is installed
+      ansible.builtin.yum:
+        name: dbus-user-session
+        state: present
+
     - name: Install AAP
       become: false
       become_user: nonroot
