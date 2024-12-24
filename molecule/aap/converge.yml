@@ -80,12 +80,12 @@
 
 
     - name: Install AAP
-      become: false
-      become_user: ec2-user
+      # become: false
+      # become_user: ec2-user
       ansible.builtin.shell:
         cmd: |
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
-          ansible-playbook -i inventory ansible.containerized_installer.uninstall
+          ansible-playbook -i inventory ansible.containerized_installer.install
       vars:
-        ansible_ssh_timeout: 300
+        ansible_ssh_timeout: 600
       changed_when: false
