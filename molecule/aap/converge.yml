@@ -21,69 +21,63 @@
       when: aap_setup_prep_inv_secrets.all.registry_password == ""
 
 
-    - name: Create a normal user for running the task
-      ansible.builtin.user:
-        name: nonroot
-        state: present
-        shell: /bin/bash
-        create_home: true
+    # - name: Create a normal user for running the task
+    #   ansible.builtin.user:
+    #     name: nonroot
+    #     state: present
+    #     shell: /bin/bash
+    #     create_home: true
 
     # make nonroot user sudo
-    - name: Add nonroot user to the sudoers file for passwordless sudo
-      ansible.builtin.lineinfile:
-        path: /etc/sudoers
-        line: "nonroot ALL=(ALL) NOPASSWD:ALL"
-        validate: 'visudo -cf %s'
-        state: present
+    # - name: Add nonroot user to the sudoers file for passwordless sudo
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/sudoers
+    #     line: "nonroot ALL=(ALL) NOPASSWD:ALL"
+    #     validate: 'visudo -cf %s'
+    #     state: present
 
-    - name: Ensure nonroot user is in the sudo group (if applicable)
-      ansible.builtin.user:
-        name: nonroot
-        groups: wheel
-        append: true
-      when: ansible_facts['distribution'] in ['CentOS', 'RedHat', 'Fedora']
+    # - name: Ensure nonroot user is in the sudo group (if applicable)
+    #   ansible.builtin.user:
+    #     name: nonroot
+    #     groups: wheel
+    #     append: true
+    #   when: ansible_facts['distribution'] in ['CentOS', 'RedHat', 'Fedora']
 
-    - name: Grant nonroot permission to control podman.socket service
-      ansible.builtin.lineinfile:
-        path: /etc/sudoers
-        line: "nonroot ALL=(ALL) NOPASSWD: /bin/systemctl start podman.socket, /bin/systemctl enable podman.socket, /bin/systemctl status podman.socket"
-        validate: 'visudo -cf %s'
-        state: present
+    # - name: Grant nonroot permission to control podman.socket service
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/sudoers
+    #     line: "nonroot ALL=(ALL) NOPASSWD: /bin/systemctl start podman.socket, /bin/systemctl enable podman.socket, /bin/systemctl status podman.socket"
+    #     validate: 'visudo -cf %s'
+    #     state: present
 
-    - name: Include and execute AAP utility roles for setup
-      ansible.builtin.include_role:
-        name: "{{ item }}"
-      loop:
-        - infra.aap_utilities.aap_setup_download
-        - infra.aap_utilities.aap_setup_prepare
+    # - name: Include and execute AAP utility roles for setup
+    #   ansible.builtin.include_role:
+    #     name: "{{ item }}"
+    #   loop:
+    #     - infra.aap_utilities.aap_setup_download
+    #     - infra.aap_utilities.aap_setup_prepare
 
-    - name: Ensure nonroot user has access to the setup directory
-      ansible.builtin.file:
-        path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7"
-        owner: nonroot
-        group: nonroot
-        mode: '0755'
-      become: true
-      become_user: root
+    # - name: Ensure nonroot user has access to the setup directory
+    #   ansible.builtin.file:
+    #     path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7"
+    #     owner: nonroot
+    #     group: nonroot
+    #     mode: '0755'
+    #   become: true
+    #   become_user: root
 
-    - name: Ensure nonroot user has access to the inventory file
-      ansible.builtin.file:
-        path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7/inventory"
-        owner: nonroot
-        group: nonroot
-        mode: '0644'
-      become: true
-      become_user: root
-
-
-    - name: Ensure dbus-user-session is installed
-      ansible.builtin.yum:
-        name: dbus-user-session
-        state: present
+    # - name: Ensure nonroot user has access to the inventory file
+    #   ansible.builtin.file:
+    #     path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7/inventory"
+    #     owner: nonroot
+    #     group: nonroot
+    #     mode: '0644'
+    #   become: true
+    #   become_user: root
 
     - name: Install AAP
       become: false
-      become_user: nonroot
+      # become_user: nonroot
       ansible.builtin.shell:
         cmd: |
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7

@@ -270,32 +270,32 @@
 
           aap_setup_prep_inv_nodes:
             automationcontroller:
-              {{ instanceIP }}:
+              127.0.0.1:
             automationhub:
-              {{ instanceIP }}:
+              127.0.0.1:
             database:
-              {{ instanceIP }}:
+              127.0.0.1:
             automationgateway:
-              {{ instanceIP }}:
+              127.0.0.1:
             automationeda:
-              {{ instanceIP }}:
+              127.0.0.1:
           aap_setup_prep_inv_vars:
             all:
-              ansible_user: "nonroot"
+              ansible_user: "{{ user }}"
               ansible_connection: local
               become: false
               redis_mode: standalone
               gateway_admin_password: pass
-              gateway_pg_host: "{{ instanceIP }}"
+              gateway_pg_host: "127.0.0.1"
               gateway_pg_password: pass
               controller_admin_password: pass
-              controller_pg_host: "{{ instanceIP }}"
+              controller_pg_host: "127.0.0.1"
               controller_pg_password: pass
               hub_admin_password: pass
-              hub_pg_host: "{{ instanceIP }}"
+              hub_pg_host: "127.0.0.1"
               hub_pg_password: pass
               eda_admin_password: pass
-              eda_pg_host: "{{ instanceIP }}"
+              eda_pg_host: "127.0.0.1"
               eda_pg_password: pass
               postgresql_admin_username: postgres
               postgresql_admin_password: password
