@@ -20,12 +20,16 @@
         msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
       when: aap_setup_prep_inv_secrets.all.registry_password == ""
 
-    - name: Include and execute AAP utility roles for setup
-      ansible.builtin.include_role:
-        name: "{{ item }}"
-      loop:
-        - infra.aap_utilities.aap_setup_download
-        - infra.aap_utilities.aap_setup_prepare
+    - name: Include and execute AAP utility roles for setup with root privileges
+      become: true
+      block:
+        - name: Run aap_setup_download role
+          ansible.builtin.include_role:
+            name: infra.aap_utilities.aap_setup_download
+
+        - name: Run aap_setup_prepare role
+          ansible.builtin.include_role:
+            name: infra.aap_utilities.aap_setup_prepare
 
     - name: Install AAP
       ansible.builtin.shell:
