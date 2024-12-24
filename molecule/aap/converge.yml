@@ -29,7 +29,6 @@
         create_home: true
 
     - name: Include and execute AAP utility roles for setup
-      become_user: nonroot
       ansible.builtin.include_role:
         name: "{{ item }}"
       loop:
