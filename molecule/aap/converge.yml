@@ -78,11 +78,11 @@
 
     - name: Install AAP
       become: false
-      # become_user: nonroot
+      become_user: ec2-user
       ansible.builtin.shell:
         cmd: |
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
           # ansible-playbook -i inventory ansible.containerized_installer.install
           whoami
-          
+
       changed_when: false
