@@ -189,6 +189,11 @@
         security_group: "{{ sgID }}"
         wait: yes
         state: running
+        volumes:
+          - device_name: /dev/xvda
+            volume_size: 15
+            volume_type: gp2
+            delete_on_termination: true 
       with_items: "{{ molecule_yml.platforms }}"
       register: ec2_instance
 
