@@ -85,8 +85,5 @@
       ansible.builtin.shell:
         cmd: |
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
-          ansible-playbook -i inventory \
-          ansible.containerized_installer.install \
-          -e "ansible_ssh_args='-o ConnectTimeout=600 -o ServerAliveInterval=60 -o ServerAliveCountMax=3'" \
-          --timeout 600
+          ansible-playbook -i inventory ansible.containerized_installer.install
       changed_when: false
