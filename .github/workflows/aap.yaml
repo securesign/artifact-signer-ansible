@@ -38,8 +38,7 @@ jobs:
           run: |
             source venv/bin/activate
             molecule reset
-            # molecule -v test --scenario-name aap
-            molecule -v create --scenario-name aap
+            molecule -v test --scenario-name aap
         - name: Destroy molecule infrastructure
           env:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
