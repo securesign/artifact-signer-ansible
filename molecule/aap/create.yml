@@ -303,6 +303,7 @@
               eda_pg_password: pass
               postgresql_admin_username: postgres
               postgresql_admin_password: password
+              _gateway_redis_password: password
 
     - name: Fail if molecule group is missing
       ansible.builtin.assert:
