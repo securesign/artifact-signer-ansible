@@ -7,10 +7,6 @@
     - vars/vars.yml
     - vars/aap_nodes.yml
   tasks:
-    # - name: Include aap variables
-    #   ansible.builtin.include_vars:
-    #     file: vars/aap_nodes.yml
-
     - name: Error out if registry username is not set
       ansible.builtin.fail:
         msg: "Username for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_USERNAME env variable"
@@ -20,36 +16,6 @@
       ansible.builtin.fail:
         msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
       when: aap_setup_prep_inv_secrets.all.registry_password == ""
-
-
-    # - name: Create a normal user for running the task
-    #   ansible.builtin.user:
-    #     name: nonroot
-    #     state: present
-    #     shell: /bin/bash
-    #     create_home: true
-
-    # make nonroot user sudo
-    # - name: Add nonroot user to the sudoers file for passwordless sudo
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/sudoers
-    #     line: "nonroot ALL=(ALL) NOPASSWD:ALL"
-    #     validate: 'visudo -cf %s'
-    #     state: present
-
-    # - name: Ensure nonroot user is in the sudo group (if applicable)
-    #   ansible.builtin.user:
-    #     name: nonroot
-    #     groups: wheel
-    #     append: true
-    #   when: ansible_facts['distribution'] in ['CentOS', 'RedHat', 'Fedora']
-
-    # - name: Grant nonroot permission to control podman.socket service
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/sudoers
-    #     line: "nonroot ALL=(ALL) NOPASSWD: /bin/systemctl start podman.socket, /bin/systemctl enable podman.socket, /bin/systemctl status podman.socket"
-    #     validate: 'visudo -cf %s'
-    #     state: present
 
     - name: Include and execute AAP utility roles for setup
       ansible.builtin.include_role:
@@ -78,12 +44,20 @@
     #   become_user: root
     #   changed_when: false
 
-
     - name: Install AAP
-      # become: false
-      # become_user: ec2-user
       ansible.builtin.shell:
         cmd: |
           cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
           ansible-playbook -i inventory ansible.containerized_installer.install
+      async: 1800
+      poll: 0
+      register: aap_install_task
       changed_when: false
+
+    - name: Wait for AAP installation to complete
+      ansible.builtin.async_status:
+        jid: "{{ aap_install_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 60
+      delay: 30
