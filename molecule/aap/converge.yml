@@ -24,30 +24,26 @@
         - infra.aap_utilities.aap_setup_download
         - infra.aap_utilities.aap_setup_prepare
 
-    # - name: Ensure ec2-user user has access to the setup directory
-    #   ansible.builtin.file:
-    #     path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7"
-    #     owner: ec2-user
-    #     group: ec2-user
-    #     mode: '0755'
-    #   become: true
-    #   become_user: root
-    #   changed_when: false
+    - name: Find the latest AAP setup folder
+      ansible.builtin.find:
+        paths: /var/tmp
+        patterns: ansible-automation-platform-containerized-setup-*
+        file_type: directory
+        recurse: false
+      register: aap_folders
 
-    # - name: Ensure ec2-user user has access to the inventory file
-    #   ansible.builtin.file:
-    #     path: "/var/tmp/ansible-automation-platform-containerized-setup-2.5-7/inventory"
-    #     owner: ec2-user
-    #     group: ec2-user
-    #     mode: '0644'
-    #   become: true
-    #   become_user: root
-    #   changed_when: false
+    - name: Set the latest AAP setup path
+      ansible.builtin.set_fact:
+        aap_setup_path: >-
+          {{
+            (aap_folders.files | sort(attribute='mtime', reverse=true) | first | default('')).path
+            if aap_folders.files | length > 0 else ''
+          }}
 
     - name: Install AAP
       ansible.builtin.shell:
         cmd: |
-          cd /var/tmp/ansible-automation-platform-containerized-setup-2.5-7
+          cd {{ aap_setup_path }}
           ansible-playbook -i inventory ansible.containerized_installer.install
       async: 1800
       poll: 0
