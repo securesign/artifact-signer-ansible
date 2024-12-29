@@ -58,9 +58,21 @@
       retries: 60
       delay: 30
 
-    - name: Debug aap_instance_ip
-      ansible.builtin.debug:
-        msg: "https://{{ aap_instance_ip }}/"
+    - name: Create "redhat" namespace
+      delegate_to: localhost
+      infra.ah_configuration.ah_namespace:
+        name: redhat
+        description: "This is the Redhat Namespace"
+        company: "Redhat"
+        email: "user@example.com"
+        links:
+          - name: "homepage"
+            url: "https://www.redhat.com"
+        state: present
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_username: "admin"
+        ah_password: "pass"
+        validate_certs: false
 
     - name: Build redhat.artifact_signer collection
       delegate_to: localhost
