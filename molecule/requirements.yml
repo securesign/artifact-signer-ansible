@@ -7,3 +7,4 @@ collections:
   - containers.podman
   - amazon.aws
   - infra.aap_utilities
+  - infra.ah_configuration
