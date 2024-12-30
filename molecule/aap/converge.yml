@@ -78,7 +78,7 @@
             url: "https://www.redhat.com"
         state: present
         ah_host: https://{{ aap_instance_ip }}/
-        ah_token: "{{ ah_token }}"
+        ah_token: "{{ ah_token.token }}"
         validate_certs: false
 
     - name: Build redhat.artifact_signer collection
@@ -91,9 +91,10 @@
     - name: Upload redhat.artifact_signer to the private AAP
       delegate_to: localhost
       infra.ah_configuration.ah_collection_upload:
+        # TODO: dynamic filename
         path: /tmp/redhat-artifact_signer-1.1.0.tar.gz
         ah_host: https://{{ aap_instance_ip }}/
-        ah_token: "{{ ah_token }}"
+        ah_token: "{{ ah_token.token }}"
         validate_certs: false
 
     - name: Install redhat.artifact_signer collection from the private AAP
@@ -101,7 +102,7 @@
       ansible.builtin.shell:
         cmd: |
           ansible-galaxy collection install redhat.artifact_signer -s https://{{ aap_instance_ip }}/pulp_ansible/galaxy/staging/api/ \
-          --ignore-certs --token {{ ah_token }}
+          --ignore-certs --token {{ ah_token.token }}
       changed_when: false
 
     - name: Verify redhat.artifact_signer collection is installed
