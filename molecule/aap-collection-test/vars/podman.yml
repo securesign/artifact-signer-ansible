@@ -1,0 +1,27 @@
+tas_single_node_podman:
+  policy: "{{ lookup('ansible.builtin.file', lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') + '/../../vm-testing/containers/policy.json') }}"
+  registry:
+    - location: registry.redhat.io/rhtas/fulcio-rhel9
+      mirror: quay.io/securesign/fulcio-server
+    - location: registry.redhat.io/rhtas/trillian-logserver-rhel9
+      mirror: quay.io/securesign/trillian-logserver
+    - location: registry.redhat.io/rhtas/trillian-logsigner-rhel9
+      mirror: quay.io/securesign/trillian-logsigner
+    - location: registry.redhat.io/rhtas/rekor-server-rhel9
+      mirror: quay.io/securesign/rekor-server
+    - location: registry.redhat.io/rhtas/certificate-transparency-rhel9
+      mirror: quay.io/securesign/certificate-transparency-go
+    - location: registry.redhat.io/rhtas/trillian-redis-rhel9
+      mirror: quay.io/securesign/trillian-redis
+    - location: registry.redhat.io/rhtas/trillian-database-rhel9
+      mirror: quay.io/securesign/trillian-database
+    - location: registry.redhat.io/rhtas/tuf-server-rhel9
+      mirror: quay.io/securesign/scaffold-tuf-server
+    - location: registry.redhat.io/rhtas/timestamp-authority-rhel9
+      mirror: quay.io/securesign/timestamp-authority
+    - location: registry.redhat.io/rhtas/rekor-search-ui-rhel9
+      mirror: quay.io/securesign/rekor-search-ui
+    - location: registry.redhat.io/rhtas/trillian-createtree-rhel9
+      mirror: quay.io/securesign/trillian-createtree
+    - location: registry.redhat.io/rhtas/client-server-rhel9
+      mirror: quay.io/securesign/client-server

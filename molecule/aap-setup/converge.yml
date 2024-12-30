@@ -55,7 +55,7 @@
         jid: "{{ aap_install_task.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: 60
+      retries: 100
       delay: 30
 
     - name: Create a new token using username/password
@@ -102,14 +102,14 @@
       ansible.builtin.shell:
         cmd: |
           ansible-galaxy collection install redhat.artifact_signer -s https://{{ aap_instance_ip }}/pulp_ansible/galaxy/staging/api/ \
-          --ignore-certs --token {{ ah_token.token }}
+          --ignore-certs --token {{ ah_token.token }} --force
       changed_when: false
 
     - name: Verify redhat.artifact_signer collection is installed
       delegate_to: localhost
       ansible.builtin.shell:
         cmd: |
-          set -o pipefail
+          set -o pipefail &&
           ansible-galaxy collection list | grep redhat.artifact_signer
       register: collection_check
       changed_when: false
