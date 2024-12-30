@@ -114,6 +114,3 @@
       changed_when: false
       failed_when: collection_check.rc != 0
 
-    - name: Debug collection installation result
-      ansible.builtin.debug:
-        var: collection_check.stdout
