@@ -86,13 +86,26 @@
       infra.ah_configuration.ah_build:
         path: ../../.
         force: true
-        output_path: /tmp
+        output_path: /var/tmp
+
+    - name: Find the collection build path
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: |
+          bash -c 'set -o pipefail; find /var/tmp -maxdepth 1 -type f \
+                  -name "redhat-artifact_signer-*.tar.gz" -printf "%T@ %p\n" | sort -n -r | head -n 1 | cut -d" " -f2'
+      register: collection_build_path
+      changed_when: false
+      failed_when: collection_build_path.rc != 0
+
+    - name: Set the latest collection build path
+      ansible.builtin.set_fact:
+        collection_build_path: "{{ collection_build_path.stdout | default('') }}"
 
     - name: Upload redhat.artifact_signer to the private AAP
       delegate_to: localhost
       infra.ah_configuration.ah_collection_upload:
-        # TODO: dynamic filename
-        path: /tmp/redhat-artifact_signer-1.1.0.tar.gz
+        path: "{{ collection_build_path }}"
         ah_host: https://{{ aap_instance_ip }}/
         ah_token: "{{ ah_token.token }}"
         validate_certs: false
@@ -113,4 +126,3 @@
       register: collection_check
       changed_when: false
       failed_when: collection_check.rc != 0
-

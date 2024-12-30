@@ -8,7 +8,7 @@ on:
   pull_request:
 
 jobs:
-  create-aap-vm:
+  test-aap-collection:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout code
