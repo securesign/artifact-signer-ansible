@@ -58,6 +58,14 @@
       retries: 60
       delay: 30
 
+    - name: Create a new token using username/password
+      infra.ah_configuration.ah_token:
+        state: present
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_username: "admin"
+        ah_password: "pass"
+        validate_certs: false
+
     - name: Create "redhat" namespace
       delegate_to: localhost
       infra.ah_configuration.ah_namespace:
@@ -70,8 +78,7 @@
             url: "https://www.redhat.com"
         state: present
         ah_host: https://{{ aap_instance_ip }}/
-        ah_username: "admin"
-        ah_password: "pass"
+        ah_token: "{{ ah_token }}"
         validate_certs: false
 
     - name: Build redhat.artifact_signer collection
@@ -81,22 +88,32 @@
         force: true
         output_path: /tmp
 
-    - name: Upload redhat.artifact_signer to automation hub
+    - name: Upload redhat.artifact_signer to the private AAP
       delegate_to: localhost
       infra.ah_configuration.ah_collection_upload:
         path: /tmp/redhat-artifact_signer-1.1.0.tar.gz
         ah_host: https://{{ aap_instance_ip }}/
-        ah_username: "admin"
-        ah_password: "pass"
+        ah_token: "{{ ah_token }}"
         validate_certs: false
 
-    - name: Approve redhat.artifact_signer
+    - name: Install redhat.artifact_signer collection from the private AAP
       delegate_to: localhost
-      infra.ah_configuration.ah_approval:
-        namespace: redhat
-        name: artifact_signer
-        version: 1.1.0
-        ah_host: https://{{ aap_instance_ip }}/
-        ah_username: "admin"
-        ah_password: "pass"
-        validate_certs: false
+      ansible.builtin.shell:
+        cmd: |
+          ansible-galaxy collection install redhat.artifact_signer -s https://{{ aap_instance_ip }}/pulp_ansible/galaxy/staging/api/ \
+          --ignore-certs --token {{ ah_token }}
+      changed_when: false
+
+    - name: Verify redhat.artifact_signer collection is installed
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          ansible-galaxy collection list | grep redhat.artifact_signer
+      register: collection_check
+      changed_when: false
+      failed_when: collection_check.rc != 0
+
+    - name: Debug collection installation result
+      ansible.builtin.debug:
+        var: collection_check.stdout
