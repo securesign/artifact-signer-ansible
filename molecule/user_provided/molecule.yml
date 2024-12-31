@@ -1,1 +1,17 @@
-../default/molecule.yml
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: molecule/requirements.yml
+driver:
+  name: default
+platforms:
+  - name: instance
+    private_key_file_path: ~/.ssh/id_rsa
+    image_id: ami-0cd93da2da7f10cab
+    instance_type: m5.large
+    aws_key_name: CI-TEST
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "../../roles"

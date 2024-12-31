@@ -61,11 +61,11 @@
       delay: 5
 
     - name: Import Trillian schema
-      shell: |
+      ansible.builtin.shell: |
         mysql -u root trillian < /tmp/schema.sql
  
     - name: Prepare MariaDB configuration
-      shell: |
+      ansible.builtin.shell: |
         mysql <<EOF
         ALTER USER 'root'@'localhost' IDENTIFIED BY 'rootpassword';
         GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY 'rootpassword' WITH GRANT OPTION;
@@ -80,3 +80,43 @@
         #- name: Set up a non-root sudoer to replicate a user environment
         #ansible.builtin.include_tasks: ../testing_user_setup.yaml
         #with_items: "{{ users }}" 
+
+    - name: Generate TLS certificates for MariaDB
+      ansible.builtin.shell: |
+        rm -rf /etc/mysql/ssl
+        mkdir -p /etc/mysql/ssl
+        openssl genrsa -out /etc/mysql/ssl/ca-key.pem 2048
+        openssl req -x509 -new -nodes -key /etc/mysql/ssl/ca-key.pem -sha256 -days 3650 -out /etc/mysql/ssl/ca-cert.pem -subj "/CN=CustomCA" \
+          -addext "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}"
+        openssl genrsa -out /etc/mysql/ssl/server-key.pem 2048
+        openssl req -new -key /etc/mysql/ssl/server-key.pem -out /etc/mysql/ssl/server-req.pem -subj "/CN=MySQLServer" \
+            -addext "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}"
+        openssl x509 -req -in /etc/mysql/ssl/server-req.pem -CA /etc/mysql/ssl/ca-cert.pem -CAkey /etc/mysql/ssl/ca-key.pem -CAcreateserial \
+            -out /etc/mysql/ssl/server-cert.pem -days 365 -sha256 -extfile <(printf "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}")
+
+        chmod 600 /etc/mysql/ssl/*.pem
+        chown mysql:mysql /etc/mysql/ssl/*.pem
+      args:
+        creates: /etc/mysql/ssl/server-cert.pem
+
+    - name: Configure TLS for MariaDB
+      ansible.builtin.blockinfile:
+        path: /etc/my.cnf.d/mariadb-server.cnf
+        block: |
+          [mysqld]
+          skip-name-resolve
+          max_allowed_packet=64M
+          max_connections=200
+          wait_timeout=600
+          interactive_timeout=600
+          ssl-ca=/etc/mysql/ssl/ca-cert.pem
+          ssl-cert=/etc/mysql/ssl/server-cert.pem
+          ssl-key=/etc/mysql/ssl/server-key.pem
+      notify:
+        - Restart MariaDB
+
+  handlers:
+    - name: Restart MariaDB
+      ansible.builtin.service:
+        name: mariadb
+        state: restarted
