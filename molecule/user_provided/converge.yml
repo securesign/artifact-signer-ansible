@@ -14,10 +14,6 @@
         src: "/etc/mysql/ssl/ca-cert.pem"
       register: ca_cert_content
 
-    - name: Debug CA certificate content from the remote
-      ansible.builtin.debug:
-        msg: "CA Certificate: {{ ca_cert_content.content | b64decode }}"
-
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
         name: tas_single_node
