@@ -81,10 +81,6 @@
         #ansible.builtin.include_tasks: ../testing_user_setup.yaml
         #with_items: "{{ users }}" 
 
-    - name: Set up a non-root sudoer to replicate a user environment
-      ansible.builtin.include_tasks: ../testing_user_setup.yaml
-      with_items: "{{ users }}" 
-
     - name: Generate TLS certificates for MariaDB
       ansible.builtin.shell: |
         rm -rf /etc/mysql/ssl
