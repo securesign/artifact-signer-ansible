@@ -1,0 +1,128 @@
+---
+- name: Converge
+  hosts: molecule
+  gather_facts: true
+  tags: aap_installation
+  vars_files:
+    - vars/vars.yml
+    - vars/aap_nodes.yml
+  tasks:
+    - name: Error out if registry username is not set
+      ansible.builtin.fail:
+        msg: "Username for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_USERNAME env variable"
+      when: aap_setup_prep_inv_secrets.all.registry_username == ""
+
+    - name: Error out if registry password is not set
+      ansible.builtin.fail:
+        msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
+      when: aap_setup_prep_inv_secrets.all.registry_password == ""
+
+    - name: Include and execute AAP utility roles for setup
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      loop:
+        - infra.aap_utilities.aap_setup_download
+        - infra.aap_utilities.aap_setup_prepare
+
+    - name: Find the latest AAP setup folder
+      ansible.builtin.find:
+        paths: /var/tmp
+        patterns: ansible-automation-platform-containerized-setup-*
+        file_type: directory
+        recurse: false
+      register: aap_folders
+
+    - name: Set the latest AAP setup path
+      ansible.builtin.set_fact:
+        aap_setup_path: >-
+          {{
+            (aap_folders.files | sort(attribute='mtime', reverse=true) | first | default('')).path
+            if aap_folders.files | length > 0 else ''
+          }}
+
+    - name: Install AAP
+      ansible.builtin.shell:
+        cmd: |
+          cd {{ aap_setup_path }}
+          ansible-playbook -i inventory ansible.containerized_installer.install
+      async: 1800
+      poll: 0
+      register: aap_install_task
+      changed_when: false
+
+    - name: Wait for AAP installation to complete
+      ansible.builtin.async_status:
+        jid: "{{ aap_install_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 30
+
+    - name: Create a new token using username/password
+      infra.ah_configuration.ah_token:
+        state: present
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_username: "admin"
+        ah_password: "password"
+        validate_certs: false
+
+    - name: Create "redhat" namespace
+      delegate_to: localhost
+      infra.ah_configuration.ah_namespace:
+        name: redhat
+        description: "Redhat Namespace"
+        company: "Redhat"
+        email: "user@example.com"
+        links:
+          - name: "homepage"
+            url: "https://www.redhat.com"
+        state: present
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_token: "{{ ah_token.token }}"
+        validate_certs: false
+
+    - name: Build redhat.artifact_signer collection
+      delegate_to: localhost
+      infra.ah_configuration.ah_build:
+        path: ../../.
+        force: true
+        output_path: /var/tmp
+
+    - name: Find the collection build path
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: |
+          bash -c 'set -o pipefail; find /var/tmp -maxdepth 1 -type f \
+                  -name "redhat-artifact_signer-*.tar.gz" -printf "%T@ %p\n" | sort -n -r | head -n 1 | cut -d" " -f2'
+      register: collection_build_path
+      changed_when: false
+      failed_when: collection_build_path.rc != 0
+
+    - name: Set the latest collection build path
+      ansible.builtin.set_fact:
+        collection_build_path: "{{ collection_build_path.stdout }}"
+
+    - name: Upload redhat.artifact_signer to the private AAP
+      delegate_to: localhost
+      infra.ah_configuration.ah_collection_upload:
+        path: "{{ collection_build_path }}"
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_token: "{{ ah_token.token }}"
+        validate_certs: false
+
+    - name: Install redhat.artifact_signer collection from the private AAP
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: |
+          ansible-galaxy collection install redhat.artifact_signer -s https://{{ aap_instance_ip }}/pulp_ansible/galaxy/staging/api/ \
+          --ignore-certs --token {{ ah_token.token }} --force
+      changed_when: false
+
+    - name: Verify redhat.artifact_signer collection is installed
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: |
+          bash -c 'set -o pipefail && ansible-galaxy collection list | grep redhat.artifact_signer'
+      register: collection_check
+      changed_when: false
+      failed_when: collection_check.rc != 0
