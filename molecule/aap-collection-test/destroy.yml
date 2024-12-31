@@ -9,8 +9,8 @@
       ansible.builtin.set_fact:
         instance_configs: "{{ (lookup('file', molecule_instance_config, errors='ignore') or '{}') | from_yaml }}"
 
-    - name: print
-      debug:
+    - name: Print instance_configs
+      ansible.builtin.debug:
         msg: "{{ instance_configs }}"
 
     - name: Terminate EC2 instance

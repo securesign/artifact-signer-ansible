@@ -63,14 +63,14 @@
         state: present
         ah_host: https://{{ aap_instance_ip }}/
         ah_username: "admin"
-        ah_password: "pass"
+        ah_password: "password"
         validate_certs: false
 
     - name: Create "redhat" namespace
       delegate_to: localhost
       infra.ah_configuration.ah_namespace:
         name: redhat
-        description: "This is the Redhat Namespace"
+        description: "Redhat Namespace"
         company: "Redhat"
         email: "user@example.com"
         links:
@@ -100,7 +100,7 @@
 
     - name: Set the latest collection build path
       ansible.builtin.set_fact:
-        collection_build_path: "{{ collection_build_path.stdout | default('') }}"
+        collection_build_path: "{{ collection_build_path.stdout }}"
 
     - name: Upload redhat.artifact_signer to the private AAP
       delegate_to: localhost

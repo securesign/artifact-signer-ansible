@@ -290,18 +290,18 @@
               ansible_connection: local
               become: false
               redis_mode: standalone
-              gateway_admin_password: pass
+              gateway_admin_password: password
               gateway_pg_host: "127.0.0.1"
-              gateway_pg_password: pass
-              controller_admin_password: pass
+              gateway_pg_password: password
+              controller_admin_password: password
               controller_pg_host: "127.0.0.1"
-              controller_pg_password: pass
-              hub_admin_password: pass
+              controller_pg_password: password
+              hub_admin_password: password
               hub_pg_host: "127.0.0.1"
-              hub_pg_password: pass
-              eda_admin_password: pass
+              hub_pg_password: password
+              eda_admin_password: password
               eda_pg_host: "127.0.0.1"
-              eda_pg_password: pass
+              eda_pg_password: password
               postgresql_admin_username: postgres
               postgresql_admin_password: password
               _gateway_redis_password: password

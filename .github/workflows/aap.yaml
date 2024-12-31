@@ -1,4 +1,4 @@
-name: Using Ansible Molecule, test the collection deployed from AAP
+name: Using Ansible Molecule, test RHTAS collection from a private AAP
 
 # on:
 #   schedule:
