@@ -241,7 +241,7 @@
       ansible.builtin.shell:
         cmd: ssh-keyscan -H {{ instanceIP }} >> ~/.ssh/known_hosts
       retries: 15
-      delay: 10
+      delay: 15
 
     - name: Dump molecule_inventory
       ansible.builtin.copy:
