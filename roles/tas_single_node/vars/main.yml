@@ -39,6 +39,8 @@ tas_single_node_kube_configmap_dir: "{{ tas_single_node_config_dir }}/configs"
 tas_single_node_remote_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_private_key_filename }}"
 tas_single_node_remote_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ca_filename }}"
 tas_single_node_remote_fulcio_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_private_key_filename }}"
+tas_single_node_remote_fulcio_auto_generated_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_auto_generated_private_key_filename }}"
+tas_single_node_remote_fulcio_user_provided_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_user_provided_private_key_filename }}"
 tas_single_node_remote_fulcio_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_public_key_filename }}"
 tas_single_node_remote_fulcio_root_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_root_ca_filename }}"
 tas_single_node_remote_ctlog_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_private_key_filename }}"
@@ -50,6 +52,8 @@ tas_single_node_remote_rekor_public_key: "{{ tas_single_node_certs_dir }}/{{ tas
 tas_single_node_private_key_filename: rhtas.key
 tas_single_node_ca_filename: rhtas.pem
 tas_single_node_fulcio_private_key_filename: fulcio.key
+tas_single_node_fulcio_auto_generated_private_key_filename: auto_generated_fulcio.key
+tas_single_node_fulcio_user_provided_private_key_filename: user_provided_fulcio.key
 tas_single_node_fulcio_public_key_filename: fulcio.pub
 tas_single_node_fulcio_root_ca_filename: fulcio.pem
 tas_single_node_ctlog_private_key_filename: ctlog.key
