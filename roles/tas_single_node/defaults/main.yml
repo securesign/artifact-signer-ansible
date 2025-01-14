@@ -94,4 +94,4 @@ tas_single_node_cockpit:
   user:
     create: false
     username: cockpit-user
-    password: password
+    password: ""

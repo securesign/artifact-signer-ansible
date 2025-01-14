@@ -366,7 +366,6 @@ argument_specs:
           user:
             create: false
             username: cockpit-user
-            password: password
         options:
           enabled:
             description: "Whether or not to install Cockpit."
@@ -392,5 +391,5 @@ argument_specs:
               password:
                 description: "Password for the cockpit user."
                 type: "str"
-                required: false
+                required: true
                 version_added: "1.1.1"
