@@ -240,7 +240,7 @@
     - name: Add AWS EC2 Instance to known hosts
       ansible.builtin.shell:
         cmd: ssh-keyscan -H {{ instanceIP }} >> ~/.ssh/known_hosts
-      retries: 10
+      retries: 15
       delay: 10
 
     - name: Dump molecule_inventory
