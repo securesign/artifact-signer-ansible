@@ -265,7 +265,7 @@
         content: |
           aap_instance_ip: {{ instanceIP }}
           aap_setup_down_version: "2.5"
-          aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
+          aap_setup_down_offline_token: "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NzQzYTkzMC03YmJiLTRkZGQtOTgzMS00ODcxNGRlZDc0YjUifQ.eyJpYXQiOjE3MzAxMzAyMzEsImp0aSI6IjY2OThiODQ0LTQzYzUtNDE5ZS05OTBjLTU3ODc0MTI3YWJiOSIsImlzcyI6Imh0dHBzOi8vc3NvLnJlZGhhdC5jb20vYXV0aC9yZWFsbXMvcmVkaGF0LWV4dGVybmFsIiwiYXVkIjoiaHR0cHM6Ly9zc28ucmVkaGF0LmNvbS9hdXRoL3JlYWxtcy9yZWRoYXQtZXh0ZXJuYWwiLCJzdWIiOiJmOjUyOGQ3NmZmLWY3MDgtNDNlZC04Y2Q1LWZlMTZmNGZlMGNlNjpyaC1lZS1mZ2hhbm1pIiwidHlwIjoiT2ZmbGluZSIsImF6cCI6InJoc20tYXBpIiwic2lkIjoiMmQ3NTY2ZmMtZThjMS00ZTBlLWE2ZDEtZjUwMWFmZWY2MTBjIiwic2NvcGUiOiJiYXNpYyByb2xlcyB3ZWItb3JpZ2lucyBjbGllbnRfdHlwZS5wcmVfa2MyNSBvZmZsaW5lX2FjY2VzcyJ9.wELfcaB5FPBLd6kCbOpHbfptzE4ioSKHEeLBMS5HLXEtoGy7o_jSCHG24ddsDHaeD6tsbQdf0_TgJYW0u3R51w"
           aap_setup_down_type: "setup"
           aap_setup_rhel_version: 9
           aap_setup_inst_containerized: true
