@@ -35,6 +35,7 @@ jobs:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             GITHUB_RUN_ID: ${{ github.run_id }}
+            REDHAT_API_TOKEN: ${{ secrets.REDHAT_API_TOKEN }}
           run: |
             source venv/bin/activate
             molecule reset

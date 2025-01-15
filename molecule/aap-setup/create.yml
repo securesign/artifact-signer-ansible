@@ -265,7 +265,7 @@
         content: |
           aap_instance_ip: {{ instanceIP }}
           aap_setup_down_version: "2.5"
-          aap_setup_down_offline_token: "${{ secrets.REDHAT_API_TOKEN }}"
+          aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
           aap_setup_down_type: "setup"
           aap_setup_rhel_version: 9
           aap_setup_inst_containerized: true
