@@ -160,7 +160,7 @@ argument_specs:
             required: false
             version_added: "1.1.1"
           tas_single_node_fulcio_root_ca:
-            description: "The user-provided root certificate for Fulcio."
+            description: "The user-provided root certificate for Fulcio. This field is mutually exclusive with the certificate field."
             type: "str"
             required: false
             version_added: "1.1.1"
