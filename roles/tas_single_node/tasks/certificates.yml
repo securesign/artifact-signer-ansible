@@ -112,16 +112,6 @@
         state: absent
       when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
 
-    # - name: Check if auto-generated private key exists
-    #   ansible.builtin.stat:
-    #     path: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
-    #   register: auto_generated_key_stat
-
-    # - name: Check if user-provided private key exists
-    #   ansible.builtin.stat:
-    #     path: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
-    #   register: user_provided_key_stat
-
     - name: Copy auto-generated Fulcio private key into tas_single_node_remote_fulcio_private_key
       ansible.builtin.copy:
         src: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
