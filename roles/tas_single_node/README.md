@@ -88,7 +88,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | certificate | Details on the certificate attributes for Fulcio. | dict of 'certificate' options | no |  |
 | tas_single_node_fulcio_private_key | The user-provided private key for Fulcio, used for signing root certificate (only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported). | str | no |  |
-| tas_single_node_fulcio_root_ca | The user-provided root certificate for Fulcio. | str | no |  |
+| tas_single_node_fulcio_root_ca | The user-provided root certificate for Fulcio. This field is mutually exclusive with the certificate field. | str | no |  |
 
 #### Options for main > tas_single_node_fulcio > certificate
 
