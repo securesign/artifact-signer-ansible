@@ -12,7 +12,7 @@
   loop:
     - "{{ tas_single_node_remote_ctlog_public_key }}"
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
-    - "{{ tas_single_node_remote_tsa_certificate_chain }}"
+    - "{{ tas_single_node_tsa_certificate_chain }}"
   register: remote_tuf_certificates
 
 - name: Retrieve Rekor Public Key
@@ -44,7 +44,7 @@
         rekor-pubkey: |
           {{ rekor_public_key_result.stdout | b64encode }}
         tsa-cert: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | first).content }}
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_tsa_certificate_chain) | list | first).content }}
   register: secret_result
 
 - name: Initialize trust root

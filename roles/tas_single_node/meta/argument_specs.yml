@@ -216,6 +216,25 @@ argument_specs:
         type: str
         required: false
         version_added: "1.1.0"
+      tas_single_node_tsa_ntp_config:
+        description: >
+          The filepath to a custom ntpsync.yaml file for time syncing within a unified consensus of vendors such as Google, Amazon, and more.
+          Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml)
+        type: str
+        required: false
+        version_added: "1.2.0"
+      tas_single_node_tsa_user_signer_private_key:
+        description: >
+          The filepath to a user provided private key used in conjunction with a certificate chain for the 'file' signer type within TSA.
+        type: str
+        required: false
+        version_added: "1.2.0"
+      tas_single_node_tsa_user_certificate_chain:
+        description: >
+          The filepath to a user provided certificate chain to be used alongside the 'file', 'kms', and 'tink' signer types and related data.
+        type: str
+        required: false
+        version_added: "1.2.0"
       tas_single_node_tsa_kms_key_resource:
         description: >
           The Key Management Services (KMS) key for signing timestamp responses.

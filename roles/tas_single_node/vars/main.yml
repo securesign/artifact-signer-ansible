@@ -58,9 +58,10 @@ tas_single_node_ctlog_public_key_filename: ctlog.pub
 tas_single_node_rekor_signer_filename: rekor-signer.key
 tas_single_node_rekor_public_key_filename: rekor-pub-key.pub
 tas_single_node_tsa_private_key_filename: tsa.key
-tas_single_node_tsa_certificate_chain_filename: tsa-certificate-chain.pem
 tas_single_node_tsa_leaf_certificate_filename: tsa-leaf-certificate.pem
 tas_single_node_tsa_signer_private_key_filename: tsa-signer-private-key.pem
+tas_single_node_tsa_cert_chain_filename: tsa-cert-chain.pem
+tas_single_node_tsa_ntp_config_filename: ntpsync.yaml
 
 # Secrets,Certs and Configuration locations
 tas_single_node_fulcio_server_config: "{{ tas_single_node_kube_configmap_dir }}/fulcio-config.yaml"
@@ -78,6 +79,7 @@ tas_single_node_nginx_certs_config: "{{ tas_single_node_kube_configmap_dir }}/ng
 tas_single_node_trillian_secret: "{{ tas_single_node_kube_configmap_dir }}/trillian-secret.yaml"
 tas_single_node_trillian_trusted_ca_configmap: "{{ tas_single_node_kube_configmap_dir }}/trillian-trusted-ca-configmap.yaml"
 tas_single_node_tsa_secret: "{{ tas_single_node_kube_configmap_dir }}/tsa-secret.yaml"
+tas_single_node_tsa_config: "{{ tas_single_node_kube_configmap_dir }}/tsa-config.yaml"
 tas_single_node_systemd_directory: /etc/systemd/system
 
 # Volumes
@@ -85,10 +87,11 @@ tas_single_node_tuf_repository_volume_name: "tuf-repository"
 tas_single_node_tuf_signing_keys_volume_name: "tuf-signing-keys"
 
 # Timestamp Authority Config
-tas_single_node_remote_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
+tas_single_node_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
 tas_single_node_remote_tsa_leaf_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_leaf_certificate_filename }}"
-tas_single_node_remote_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_certificate_chain_filename }}"
+tas_single_node_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_cert_chain_filename }}"
 tas_single_node_remote_tsa_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_private_key_filename }}"
+tas_single_node_tsa_ntp_config_file: "{{ tas_single_node_config_dir }}/{{ tas_single_node_tsa_ntp_config_filename }}"
 
 # Secrets,Certs and Configuration names
 tas_single_node_trillian_trusted_ca_configmap_name: "trillian_trusted_ca"
