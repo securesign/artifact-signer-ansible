@@ -51,23 +51,31 @@ spec:
             - "--port={{ tas_single_node_tsa_server_port_tcp }}"
             - "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem"
             - "--timestamp-signer={{ tas_single_node_tsa_signer_type }}"
+{% if tas_single_node_tsa_ntp_config != '' %}
+            - "--ntp-monitoring=/etc/config/ntpsync.yaml"
+{% endif %}
 {% if tas_single_node_tsa_signer_type == 'file' %}
             - "--file-signer-key-path=/etc/secrets/keys/private_key.pem"
             - "--file-signer-passwd={{ tas_single_node_tsa_signer_passphrase }}"
 {% endif %}
 {% if tas_single_node_tsa_signer_type == 'kms' %}
-            - '--kms-key-resource={{ tas_single_node_tsa_kms_key_resource }}"
+            - "--kms-key-resource={{ tas_single_node_tsa_kms_key_resource }}"
 {% endif %}
 {% if tas_single_node_tsa_signer_type == 'tink' %}
-            - '--tink-key-resource={{ tas_single_node_tsa_tink_key_resource }}"
-            - '--tink-keyset-path=/etc/secrets/keys/encrypted_key_set"
-            - '--tink-hcvault-token={{ tas_single_node_tsa_tink_hcvault_token }}"
+            - "--tink-key-resource={{ tas_single_node_tsa_tink_key_resource }}"
+            - "--tink-keyset-path=/etc/secrets/keys/encrypted_key_set"
+            - "--tink-hcvault-token={{ tas_single_node_tsa_tink_hcvault_token }}"
 {% endif %}
           ports:
             - containerPort: {{ tas_single_node_tsa_server_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:
+{% if tas_single_node_tsa_ntp_config_file != '' %}
+            - name: tsa-ntp-config
+              mountPath: /etc/config/ntpsync.yaml
+              subPath: ntpsync.yaml
+{% endif %}
             - name: tsa-cert-chain
               mountPath: /etc/secrets/cert_chain
               readOnly: true
@@ -98,6 +106,15 @@ spec:
           operator: Exists
           tolerationSeconds: 300
       volumes:
+{% if tas_single_node_tsa_ntp_config_file != '' %}
+        - name: tsa-ntp-config
+          configMap:
+            defaultMode: 420
+            name: tsa-config
+            items:
+              - key: ntpsync.yaml
+                path: ntpsync.yaml
+{% endif %}
         - name: tsa-cert-chain
           secret:
             secretName: tsa-server-secret

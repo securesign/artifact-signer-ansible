@@ -23,3 +23,6 @@ tas_single_node_rekor_redis:
     host: "{{ ansible_default_ipv4.address }}"
     port: 6379
     password: password
+tas_single_node_tsa_ntp_config: "{{ molecule_ephemeral_directory }}/test_creds/ntpsync.yaml"
+tas_single_node_tsa_private_key_file: "{{ molecule_ephemeral_directory }}/test_creds/private-key.pem"
+tas_single_node_tsa_certificate_chain_file: "{{ molecule_ephemeral_directory }}/test_creds/cert-chain.pem"

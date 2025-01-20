@@ -26,6 +26,9 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_tsa_signer_type | Signer type to use for TSA. Valid options are: [file, kms, tink]. | str |  |
+| tas_single_node_tsa_ntp_config | The filepath to a custom ntpsync.yaml file for time syncing within a unified consensus of vendors such as Google, Amazon, and more. Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml) | str |  |
+| tas_single_node_tsa_user_signer_private_key | The filepath to a user provided private key used in conjunction with a certificate chain for the 'file' signer type within TSA. | str |  |
+| tas_single_node_tsa_user_certificate_chain | The filepath to a user provided certificate chain to be used alongside the 'file', 'kms', and 'tink' signer types and related data. | str |  |
 | tas_single_node_tsa_kms_key_resource | The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource]. | str |  |
 | tas_single_node_tsa_tink_key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str |  |
 | tas_single_node_tsa_tink_keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str |  |

@@ -305,6 +305,10 @@
         creates: "{{ tas_single_node_remote_rekor_public_key }}"
 
 - name: Handle TSA certificate chain
+  when: >
+    tas_single_node_tsa_user_signer_private_key == ''
+    and tas_single_node_tsa_user_certificate_chain == ''
+    and tas_single_node_tsa_signer_type == 'file'
   block:
     - name: Create TSA root private key
       ansible.builtin.shell:
@@ -317,8 +321,7 @@
         creates: "{{ tas_single_node_remote_tsa_private_key }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) == 0
-        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
 
     - name: Create certificate signing request (CSR) for TSA root certificate
       ansible.builtin.command:
@@ -331,8 +334,7 @@
           -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
       register: tsa_root_csr
       when: >
-        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
       changed_when: false
 
     - name: Create self-signed TSA root CA from CSR
@@ -345,11 +347,10 @@
           -copy_extensions copyall
           -signkey '{{ tas_single_node_remote_tsa_private_key }}'
           -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
-          -out '{{ tas_single_node_remote_tsa_certificate_chain }}'
-        creates: "{{ tas_single_node_remote_tsa_certificate_chain }}"
+          -out '{{ tas_single_node_tsa_certificate_chain }}'
+        creates: "{{ tas_single_node_tsa_certificate_chain }}"
       when: >
-        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
 
     # Leaf certificate
     - name: Create TSA leaf CA private key
@@ -358,19 +359,18 @@
           set -o pipefail &&
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
-          -out '{{ tas_single_node_remote_tsa_signer_private_key }}'
+          -out '{{ tas_single_node_tsa_signer_private_key }}'
           -passout 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_tsa_signer_private_key }}"
+        creates: "{{ tas_single_node_tsa_signer_private_key }}"
       when: >
-        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_signer_private_key) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_signer_private_key) | list | length) == 0
 
     - name: Create TSA leaf CSR
       ansible.builtin.command:
         cmd: >-
           openssl req -new -batch
-          -key '{{ tas_single_node_remote_tsa_signer_private_key }}'
+          -key '{{ tas_single_node_tsa_signer_private_key }}'
           -subj '/CN=TSA Leaf certificate'
           -addext 'basicConstraints=critical,CA:FALSE'
           -addext 'keyUsage = critical,digitalSignature'
@@ -378,8 +378,7 @@
           -passin 'pass:{{ tas_single_node_tsa_signer_passphrase }}'
       register: tsa_leaf_csr
       when: >
-        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
       changed_when: false
 
     - name: Sign leaf certificate with Root CA
@@ -390,15 +389,13 @@
           echo "{{ tsa_leaf_csr.stdout }}" |
           openssl x509 -req -days 730
           -copy_extensions copyall
-          -CA '{{ tas_single_node_remote_tsa_certificate_chain }}'
+          -CA '{{ tas_single_node_tsa_certificate_chain }}'
           -CAkey '{{ tas_single_node_remote_tsa_private_key }}'
           -passin 'pass:{{ tas_single_node_tsa_ca_passphrase }}'
           -out '{{ tas_single_node_remote_tsa_leaf_certificate }}'
         creates: "{{ tas_single_node_remote_tsa_leaf_certificate }}"
       when: >
-        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
-
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
 
     - name: Create temporary directory for manipulating CA certificate chain
       ansible.builtin.tempfile:
@@ -410,16 +407,33 @@
     - name: Combine leaf and root CA certificates into a chain
       ansible.builtin.command: >
         /bin/bash -c '
-        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_remote_tsa_certificate_chain }} > {{ tmpdir.path }}/certificate-chain.tmp &&
-        mv {{ tmpdir.path }}/certificate-chain.tmp {{ tas_single_node_remote_tsa_certificate_chain }};'
+        cat {{ tas_single_node_remote_tsa_leaf_certificate }} {{ tas_single_node_tsa_certificate_chain }} > {{ tmpdir.path }}/certificate-chain.tmp &&
+        mv {{ tmpdir.path }}/certificate-chain.tmp {{ tas_single_node_tsa_certificate_chain }};'
       register: result
       changed_when: "'changed' in result.stdout"
       when: >
-        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | length) == 0
-        and tas_single_node_tsa_signer_type == 'file'
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
 
     - name: Delete content & directory
       ansible.builtin.file:
         state: absent
         path: '{{ tmpdir.path }}'
       changed_when: false
+
+- name: Handle user provided TSA cert chain and private key
+  block:
+    - name: Set user provided certificate chain
+      ansible.builtin.copy:
+        src: "{{ tas_single_node_tsa_user_certificate_chain }}"
+        dest: "{{ tas_single_node_tsa_certificate_chain }}"
+        mode: '0600'
+      when: tas_single_node_tsa_user_certificate_chain != ''
+
+    - name: Set user provided private key
+      ansible.builtin.copy:
+        src: "{{ tas_single_node_tsa_user_signer_private_key }}"
+        dest: "{{ tas_single_node_tsa_signer_private_key }}"
+        mode: '600'
+      when: >
+        tas_single_node_tsa_user_signer_private_key != ''
+        and tas_single_node_tsa_signer_type == 'file'
