@@ -165,20 +165,6 @@ argument_specs:
             required: false
             version_added: "1.1.1"
 
-      tas_single_node_fulcio_private_key:
-        description: >
-          Private key for Fulcio, used for signing root certificate.
-        type: "str"
-        required: false
-        version_added: "1.1.1"
-        default: ""
-      tas_single_node_fulcio_root_ca:
-        description: >
-          The root certificate for Fulcio.
-        type: "str"
-        required: false
-        version_added: "1.1.1"
-        default: ""
       tas_single_node_rekor_public_key_retries:
         description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
         type: "int"
