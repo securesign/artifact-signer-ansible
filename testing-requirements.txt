@@ -1,5 +1,5 @@
 ansible-lint==24.9.0
-antsibull-docs==2.16.3
+antsibull-docs==2.16.1
 awscli==1.37.2
 botocore==1.36.2
 boto3==1.36.2
