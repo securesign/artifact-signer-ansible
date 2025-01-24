@@ -77,11 +77,6 @@
     dns_name: "{{ cert_name }}.{{ tas_single_node_base_hostname }}"
 
 - name: Create Fulcio root
-  when: >
-    (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
-
   block:
     - name: Create Fulcio private key
       # NOTE: As of cosign 2.3.0, only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported
@@ -90,9 +85,59 @@
           set -o pipefail &&
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
-          -out '{{ tas_single_node_remote_fulcio_private_key }}'
+          -out '{{ tas_single_node_remote_fulcio_auto_generated_private_key }}'
           -passout 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_fulcio_private_key }}"
+        creates: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
+      when: >
+        tas_single_node_fulcio.tas_single_node_fulcio_private_key is not defined
+        or tas_single_node_fulcio.tas_single_node_fulcio_private_key == ""
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0
+
+    - name: Load user-provided Fulcio private key
+      ansible.builtin.copy:
+        content: "{{ tas_single_node_fulcio.tas_single_node_fulcio_private_key }}"
+        dest: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
+        mode: '0600'
+      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
+
+    - name: Clean-up old tas_single_node_remote_fulcio_user_provided_private_key
+      ansible.builtin.file:
+        path: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
+        state: absent
+      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is not defined or tas_single_node_fulcio.tas_single_node_fulcio_private_key == ""
+
+    - name: Clean-up old tas_single_node_remote_fulcio_auto_generated_private_key
+      ansible.builtin.file:
+        path: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
+        state: absent
+      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
+
+    - name: Copy auto-generated Fulcio private key into tas_single_node_remote_fulcio_private_key
+      ansible.builtin.copy:
+        src: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
+        dest: "{{ tas_single_node_remote_fulcio_private_key }}"
+        mode: '0600'
+        remote_src: true
+      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is not defined or tas_single_node_fulcio.tas_single_node_fulcio_private_key == ""
+
+    - name: Copy user-provided Fulcio private key into tas_single_node_remote_fulcio_private_key
+      ansible.builtin.copy:
+        src: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
+        dest: "{{ tas_single_node_remote_fulcio_private_key }}"
+        mode: '0600'
+        remote_src: true
+      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
+
+    - name: Verify if public key matches the private key
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl ec -pubout -in '{{ tas_single_node_remote_fulcio_private_key }}' -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}' |
+          openssl md5 | awk '{print $NF}' &&
+          openssl md5 '{{ tas_single_node_remote_fulcio_public_key }}' | awk '{print $NF}'
+      register: public_key_match_check
+      changed_when: false
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) != 0
 
     - name: Create Fulcio public key
       ansible.builtin.command:
@@ -101,18 +146,84 @@
           -in '{{ tas_single_node_remote_fulcio_private_key }}'
           -out '{{ tas_single_node_remote_fulcio_public_key }}'
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_fulcio_public_key }}"
+      changed_when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
+        or public_key_match_check.stdout_lines[0] != public_key_match_check.stdout_lines[1]
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
+        or public_key_match_check.stdout_lines[0] != public_key_match_check.stdout_lines[1]
+
+    - name: Detect private key type
+      ansible.builtin.shell:
+        cmd: >-
+          if grep -q "BEGIN PRIVATE KEY" {{ tas_single_node_remote_fulcio_private_key }}; then
+            echo "RSA Key";
+          elif grep -q "BEGIN EC PRIVATE KEY" {{ tas_single_node_remote_fulcio_private_key }}; then
+            echo "EC Key";
+          else
+            echo "Unsupported key type";
+          fi
+      register: key_type_check
+      changed_when: false
+      failed_when: key_type_check.stdout == "Unsupported key type"
+
+    - name: Load user-provided Fulcio root
+      ansible.builtin.copy:
+        content: "{{ tas_single_node_fulcio.tas_single_node_fulcio_root_ca }}"
+        dest: "{{ tas_single_node_remote_fulcio_root_ca }}"
+        mode: '0644'
+      when: tas_single_node_fulcio.tas_single_node_fulcio_root_ca is defined and tas_single_node_fulcio.tas_single_node_fulcio_root_ca != ""
+
+    - name: Verify if RSA private key matches the certificate
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl x509 -noout -modulus -in '{{ tas_single_node_remote_fulcio_root_ca }}' | openssl md5 &&
+          openssl rsa -noout -modulus -in '{{ tas_single_node_remote_fulcio_private_key }}' -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}' |
+          openssl md5
+      when: >
+        key_type_check.stdout == "RSA Key"
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
+      register: rsa_key_cert_match_check
+      changed_when: false
+
+    - name: Verify if EC private key matches the certificate
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          openssl x509 -pubkey -noout -in '{{ tas_single_node_remote_fulcio_root_ca }}' |
+          openssl pkey -pubin -outform pem | openssl md5 &&
+          openssl ec -pubout -in '{{ tas_single_node_remote_fulcio_private_key }}' -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}' |
+          openssl md5
+      when: >
+        key_type_check.stdout == "EC Key"
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
+      register: ec_key_cert_match_check
+      changed_when: false
 
     - name: Create certificate signing request (CSR) for Fulcio root certificate
       ansible.builtin.command:
         cmd: >-
           openssl req -new -batch
           -key '{{ tas_single_node_remote_fulcio_private_key }}'
+          -subj
+          "/O={{ tas_single_node_fulcio.certificate.organization_name | default('') == "" }}
+           /CN={{ tas_single_node_fulcio.certificate.common_name | default('') == "" }}
+           /emailAddress={{ tas_single_node_fulcio.certificate.organization_email | default('') == "" }}"
           -addext 'basicConstraints=critical,CA:TRUE'
           -addext 'keyUsage = critical,keyCertSign'
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
       register: fulcio_root_csr
       changed_when: false
+      when: >
+        (tas_single_node_fulcio.tas_single_node_fulcio_root_ca is not defined or tas_single_node_fulcio.tas_single_node_fulcio_root_ca == "")
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
+        or (
+            key_type_check.stdout == "RSA Key" and
+            (rsa_key_cert_match_check.stdout_lines and rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
+            or key_type_check.stdout == "EC Key" and
+            (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
+        )
 
     - name: Create self-signed Fulcio root from CSR
       ansible.builtin.shell:
@@ -125,7 +236,24 @@
           -signkey '{{ tas_single_node_remote_fulcio_private_key }}'
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
           -out '{{ tas_single_node_remote_fulcio_root_ca }}'
-        creates: "{{ tas_single_node_remote_fulcio_root_ca }}"
+      changed_when: >
+        (tas_single_node_fulcio.tas_single_node_fulcio_root_ca is not defined or tas_single_node_fulcio.tas_single_node_fulcio_root_ca == "")
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
+        or (
+            key_type_check.stdout == "RSA Key" and
+            (rsa_key_cert_match_check.stdout_lines and rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
+            or key_type_check.stdout == "EC Key" and
+            (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
+        )
+      when: >
+        (tas_single_node_fulcio.tas_single_node_fulcio_root_ca is not defined or tas_single_node_fulcio.tas_single_node_fulcio_root_ca == "")
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
+        or (
+            key_type_check.stdout == "RSA Key" and
+            (rsa_key_cert_match_check.stdout_lines and rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
+            or key_type_check.stdout == "EC Key" and
+            (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
+        )
 
 - name: Create CTLog root
   when: >
