@@ -4,4 +4,4 @@ awscli==1.37.2
 botocore==1.36.2
 boto3==1.36.2
 galaxy-importer==0.4.27
-molecule==24.12.0
+molecule==25.1.0
