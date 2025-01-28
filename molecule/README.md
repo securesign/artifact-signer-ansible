@@ -23,12 +23,9 @@ export TAS_SINGLE_NODE_REGISTRY_USERNAME=<your-username-for-registry.redhat.io>
 export TAS_SINGLE_NODE_REGISTRY_PASSWORD=<your-password-for-registry.redhat.io>
 ```
 
-Lastly, you will be required to install `aws-cli` locally and logging in with your user credentials
-
-You will need to contact our AWS groups admin to create a user for you within the IAM center with poweruser privileges. You will receive cli login credentials from your own user page which can be used to authenticate with `aws-cli` locally. A keypair needs to be created to allow for ssh access to any created vm's.
-
-Once you have logged into `aws-cli` locally and have your own keypair created and configured within `molecule.yml` under aws_key_name you are ready to start using Molecule and EC2
-You might also need to ssh-add the keypair locally
+Install and configure the AWS CLI tool on your local machine. You will need to contact the AWS groups administrator to create an IAM user with power user privileges.
+Use the provided user credentials to log in to AWS CLI locally. Create a keypair for SSH access to VMs, you can also add the key pair to your SSH agent using `ssh-add`.
+Configure the `aws_key_name` variable in `molecule.yml` to point to your key pair.
 
 ### Usage
 
@@ -50,7 +47,7 @@ Note that each of the above commands can be followed by scenario name, e.g. `mol
 
 AWS EC2 VMs expire and are destroyed automatically after a period of time (Pruned around midnight daily). Any infrastructure set up to allow for an EC2 instance to work is also pruned, but the molecule create command sets everything up again if they were deleted.
 
-If you are having issues adding the vm to known hosts, you need to manually prune all infrastructure in the aws console, then run molecule create again which will set up a fresh infrastructure ready to use
+If you are having issues adding the vm to known hosts, you need to manually prune all infrastructure in the aws console, then run molecule create again which will set up a fresh infrastructure ready to use.
 
 When a VM expires or is pruned, you have to run `molecule reset` to remove locally cached information about it and start over.
 
