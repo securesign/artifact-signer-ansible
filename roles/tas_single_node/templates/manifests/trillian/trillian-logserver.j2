@@ -38,7 +38,7 @@ spec:
             - --quota_system=mysql
             - --mysql_uri={{ tas_single_node_trillian.mysql.user }}:{{ tas_single_node_trillian.mysql.password }}@tcp({{ tas_single_node_trillian.mysql.host }}:{{ tas_single_node_trillian.mysql.port }})/{{ tas_single_node_trillian.mysql.database }}
             - --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_rpc }}
-            - --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_http }}
+            - --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_metrics }}
             - --alsologtostderr
 {% if tas_single_node_trillian_trusted_ca != "" and not tas_single_node_trillian.database_deploy %}
             - --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem
@@ -71,7 +71,7 @@ spec:
           ports:
             - containerPort: {{ tas_single_node_trillian_logserver_port_rpc }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_trillian_logserver_port_http }}
+            - containerPort: {{ tas_single_node_trillian_logserver_port_metrics }}
               protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
