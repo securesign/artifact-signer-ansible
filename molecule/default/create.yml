@@ -178,7 +178,7 @@
     - name: Launch EC2 instance
       amazon.aws.ec2_instance:
         name: "{{ 'CI-' + (lookup('env', 'GITHUB_RUN_ID') if lookup('env', 'GITHUB_RUN_ID') | length > 0 else instance_id) }}"
-        key_name: "{{ item.aws_key_name }}"
+        key_name: "{{ lookup('env', 'AWS_KEY_NAME') }}"
         instance_type: "{{ item.instance_type }}"
         image_id: "{{ item.image_id }}" 
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
@@ -203,9 +203,8 @@
           'address': "{{ instanceIP }}",
           'user': "ec2-user",
           'port': "22",
-          'identity_file': "{{ item.aws_key_name }}",
+          'identity_file': "{{ lookup('env', 'AWS_KEY_NAME') }}",
         }
-      with_items: "{{ molecule_yml.platforms }}"
       register: instance_config_dict
 
     - name: Convert instance config dict to a list

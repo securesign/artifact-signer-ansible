@@ -32,6 +32,7 @@ jobs:
             chmod 600 ~/.ssh/id_rsa
         - name: Run molecule
           env:
+            AWS_KEY_NAME: ${{ secrets.AWS_KEY_NAME }}
             TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
             TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}

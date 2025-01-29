@@ -10,7 +10,6 @@ platforms:
     private_key_file_path: ~/.ssh/id_rsa
     image_id: ami-0cd93da2da7f10cab
     instance_type: m5.large
-    aws_key_name: CI-TEST
 provisioner:
   name: ansible
   env:
