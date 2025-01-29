@@ -203,13 +203,13 @@
           'address': "{{ instanceIP }}",
           'user': "ec2-user",
           'port': "22",
-          'identity_file': "{{ lookup('env', 'AWS_KEY_NAME') }}",
+          'identity_file': "CI-TEST",
         }
       register: instance_config_dict
 
     - name: Convert instance config dict to a list
       ansible.builtin.set_fact:
-        instance_conf: "{{ instance_config_dict | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+        instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
 
     - name: Dump instance config
       ansible.builtin.copy:
