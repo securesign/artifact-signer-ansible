@@ -204,7 +204,6 @@
           'address': "{{ instanceIP }}",
           'user': "ec2-user",
           'port': "22",
-          'identity_file': "{{ keyName }}",
         }
       register: instance_config_dict
 
