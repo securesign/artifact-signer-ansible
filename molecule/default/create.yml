@@ -203,8 +203,9 @@
           'address': "{{ instanceIP }}",
           'user': "ec2-user",
           'port': "22",
-          'identity_file': "CI-TEST",
+          'identity_file': "{{ item.aws_key_name }}",
         }
+      with_items: "{{ molecule_yml.platforms }}"
       register: instance_config_dict
 
     - name: Convert instance config dict to a list
