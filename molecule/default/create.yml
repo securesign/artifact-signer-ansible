@@ -195,6 +195,7 @@
       ansible.builtin.set_fact:
         instanceID: "{{ ec2_instance.results[0].instances[0].instance_id }}"
         instanceIP: "{{ ec2_instance.results[0].instances[0].network_interfaces[0].association.public_ip }}"
+        keyName: "{{ lookup('env', 'AWS_KEY_NAME') }}"
 
     - name: Populate instance config dict
       ansible.builtin.set_fact:
@@ -203,7 +204,7 @@
           'address': "{{ instanceIP }}",
           'user': "ec2-user",
           'port': "22",
-          'identity_file': "{{ lookup('env', 'AWS_KEY_NAME') }}",
+          'identity_file': "{{ keyName }}",
         }
       register: instance_config_dict
 
