@@ -26,7 +26,11 @@ export TAS_SINGLE_NODE_REGISTRY_PASSWORD=<your-password-for-registry.redhat.io>
 Install and configure the AWS CLI tool on your local machine. You will need to contact the AWS groups administrator to create an IAM user with power user privileges.
 Use the provided user credentials to log in to AWS CLI locally. Create a keypair for SSH access to VMs, you can also add the key pair to your SSH agent using `ssh-add`.
 
-`export AWS_KEY_NAME=<your-keypair-name-on-aws>`
+```
+export AWS_KEY_NAME=<your-keypair-name-on-aws>
+export AWS_DEFAULT_REGION="eu-north-1"
+```
+
 ### Usage
 
 Molecule has [multiple commands](https://ansible.readthedocs.io/projects/molecule/usage/#molecule-list). The most important are:
