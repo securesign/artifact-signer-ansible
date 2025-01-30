@@ -13,7 +13,7 @@
     - name: Update ansible.cfg with Automation Hub configuration
       delegate_to: localhost
       ansible.builtin.copy:
-        dest: /home/runner/.cache/molecule/artifact-signer-ansible/aap-setup/ansible.cfg
+        dest: /home/runner/.cache/molecule/artifact-signer-ansible/aap-test/ansible.cfg
         mode: '0644'
         content: |
           [galaxy]
