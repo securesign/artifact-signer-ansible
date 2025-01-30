@@ -63,6 +63,13 @@ tas_single_node_tsa_ca_passphrase: rhtas
 tas_single_node_tsa_signer_passphrase: rhtas
 tas_single_node_ct_logprefix: rhtasansible
 
+# CTLog Custom Key Configuration
+tas_single_node_custom_ctlog_public_key_names: []
+tas_single_node_custom_ctlog_private_key_names: []
+tas_single_node_custom_ctlog_private_keys: ""
+tas_single_node_custom_ctlog_public_keys: ""
+tas_single_node_custom_ctlog_config: ""
+tas_single_node_custom_ctlog_ca_passphrase: ""
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
 
