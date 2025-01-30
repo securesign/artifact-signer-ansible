@@ -1,6 +1,6 @@
 # Molecule Testing
 
-This directory contains tests that run using [Ansible Molecule](https://ansible.readthedocs.io/projects/molecule/). By default, [testing-farm](https://docs.testing-farm.io/) is used as the VM provider.
+This directory contains tests that run using [Ansible Molecule](https://ansible.readthedocs.io/projects/molecule/). By default, [AWS EC2](https://aws.amazon.com/ec2/) is used as the VM provider.
 
 ## Using Molecule
 
@@ -21,12 +21,15 @@ Next, export following values in your shell environment:
 ```
 export TAS_SINGLE_NODE_REGISTRY_USERNAME=<your-username-for-registry.redhat.io>
 export TAS_SINGLE_NODE_REGISTRY_PASSWORD=<your-password-for-registry.redhat.io>
-# get a token at https://testing-farm.io/tokens/
-# you can sign in with a Fedora account, but it must be "CLA+1" (signed CLA and a member of at least 1 other group)
-export TESTING_FARM_API_TOKEN=<your-testing-farm-token>
 ```
 
-Last, ask the Testing Farm team to allow your IP to run Molecule tests (run `curl icanhazip.com` to get your IP address).
+Install and configure the AWS CLI tool on your local machine. You will need to contact the AWS groups administrator to create an IAM user with power user privileges.
+Use the provided user credentials to log in to AWS CLI locally. Create a keypair for SSH access to VMs, you can also add the key pair to your SSH agent using `ssh-add`.
+
+```
+export AWS_KEY_NAME=<your-keypair-name-on-aws>
+export AWS_DEFAULT_REGION="eu-north-1"
+```
 
 ### Usage
 
@@ -44,11 +47,13 @@ When doing local development, it's most useful to run `molecule converge` until 
 
 Note that each of the above commands can be followed by scenario name, e.g. `molecule converge <scenario>` to test a specific scenario (`default` is the default scenario). Scenarios are subdirectories of this directory.
 
-## Testing Farm/Molecule integration specifics
+## AWS EC2 integration specifics
 
-Testing Farm VMs expire and are destroyed automatically after a period of time (Testing Farm default is 30 minutes). This can be changed in the `molecule.yml` of an individual scenario (e.g. `molecule/default/molecule.yml`). To change this value, set the `duration` attribute of a `platforms` item to number of minutes after which the VM will be destroyed.
+AWS EC2 VMs expire and are destroyed automatically after a period of time (Pruned around midnight daily). Any infrastructure set up to allow for an EC2 instance to work is also pruned, but the molecule create command sets everything up again if they were deleted.
 
-When a VM expires, you have to run `molecule reset` to remove locally cached information about it and start over.
+If you are having issues adding the vm to known hosts, you need to manually prune all infrastructure in the aws console, then run molecule create again which will set up a fresh infrastructure ready to use.
+
+When a VM expires or is pruned, you have to run `molecule reset` to remove locally cached information about it and start over.
 
 ## Using a different VM provider
 
