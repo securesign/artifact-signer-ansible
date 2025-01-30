@@ -6,3 +6,6 @@ collections:
   - community.crypto
   - containers.podman
   - amazon.aws
+  - infra.aap_utilities
+  - infra.ah_configuration
+  - infra.aap_configuration

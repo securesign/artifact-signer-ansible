@@ -1,0 +1,38 @@
+---
+- name: Prepare
+  hosts: worker_group
+  gather_facts: false
+  become: true
+  vars:
+    users:
+      - user: testingUser
+        password: password123
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: Update ansible.cfg with Automation Hub configuration
+      delegate_to: localhost
+      ansible.builtin.copy:
+        dest: /home/runner/.cache/molecule/artifact-signer-ansible/aap-setup/ansible.cfg
+        mode: '0644'
+        content: |
+          [galaxy]
+          server_list = automation_hub, ansible_galaxy
+
+          [galaxy_server.ansible_galaxy]
+          url = https://galaxy.ansible.com
+
+          [galaxy_server.automation_hub]
+          url = https://console.redhat.com/api/automation-hub/
+          auth_url = https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+          token = "{{ lookup('ansible.builtin.env', 'AUTOMATION_HUB_TOKEN') }}"
+
+    - name: Install ansible.controller collection
+      become: false
+      delegate_to: localhost
+      ansible.builtin.command:
+        cmd: "ansible-galaxy collection install ansible.controller"
+      changed_when: false
+
+    - name: Configure Dex OIDC instance
+      ansible.builtin.include_tasks: ../dex-config.yaml

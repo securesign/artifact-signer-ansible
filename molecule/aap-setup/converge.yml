@@ -1,0 +1,325 @@
+---
+- name: Converge
+  hosts: aap_group
+  gather_facts: true
+  tags: aap_installation
+  collections:
+    - ansible.controller
+  vars_files:
+    - vars/vars.yml
+    - vars/aap_nodes.yml
+  tasks:
+    - name: Error out if registry username is not set
+      ansible.builtin.fail:
+        msg: "Username for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_USERNAME env variable"
+      when: aap_setup_prep_inv_secrets.all.registry_username == ""
+
+    - name: Error out if registry password is not set
+      ansible.builtin.fail:
+        msg: "Password for registry.redhat.io is not set, please provide it via TAS_SINGLE_NODE_REGISTRY_PASSWORD env variable"
+      when: aap_setup_prep_inv_secrets.all.registry_password == ""
+
+    - name: Include and execute AAP utility roles for setup
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      loop:
+        - infra.aap_utilities.aap_setup_download
+        - infra.aap_utilities.aap_setup_prepare
+
+    - name: Find the latest AAP setup folder
+      ansible.builtin.find:
+        paths: /var/tmp
+        patterns: ansible-automation-platform-containerized-setup-*
+        file_type: directory
+        recurse: false
+      register: aap_folders
+
+    - name: Set the latest AAP setup path
+      ansible.builtin.set_fact:
+        aap_setup_path: >-
+          {{
+            (aap_folders.files | sort(attribute='mtime', reverse=true) | first | default('')).path
+            if aap_folders.files | length > 0 else ''
+          }}
+
+    - name: Install AAP
+      ansible.builtin.shell:
+        cmd: |
+          cd {{ aap_setup_path }}
+          ansible-playbook -i inventory ansible.containerized_installer.install
+      async: 1800
+      poll: 0
+      register: aap_install_task
+      changed_when: false
+
+    - name: Wait for AAP installation to complete
+      ansible.builtin.async_status:
+        jid: "{{ aap_install_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 30
+
+    - name: Create a new token using username/password
+      infra.ah_configuration.ah_token:
+        state: present
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_username: "admin"
+        ah_password: "password"
+        validate_certs: false
+
+    - name: Create "redhat" namespace
+      delegate_to: localhost
+      infra.ah_configuration.ah_namespace:
+        name: redhat
+        description: "Redhat Namespace"
+        company: "Redhat"
+        email: "user@example.com"
+        links:
+          - name: "homepage"
+            url: "https://www.redhat.com"
+        state: present
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_token: "{{ ah_token.token }}"
+        validate_certs: false
+
+    - name: Switch images from `registry.redhat.io` images to the dev images
+      delegate_to: localhost
+      ansible.builtin.shell: |
+        sed -f ../../vm-testing/dev-images.sed  -i ../../roles/tas_single_node/defaults/main.yml
+
+    - name: Build redhat.artifact_signer collection
+      delegate_to: localhost
+      infra.ah_configuration.ah_build:
+        path: ../../.
+        force: true
+        output_path: /var/tmp
+
+    - name: Find the collection build path
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: |
+          bash -c 'set -o pipefail; find /var/tmp -maxdepth 1 -type f \
+                  -name "redhat-artifact_signer-*.tar.gz" -printf "%T@ %p\n" | sort -n -r | head -n 1 | cut -d" " -f2'
+      register: collection_build_path
+      changed_when: false
+      failed_when: collection_build_path.rc != 0
+
+    - name: Set the latest collection build path
+      ansible.builtin.set_fact:
+        collection_build_path: "{{ collection_build_path.stdout }}"
+
+    - name: Upload redhat.artifact_signer to the private AAP
+      delegate_to: localhost
+      retries: 3
+      delay: 10
+      infra.ah_configuration.ah_collection_upload:
+        path: "{{ collection_build_path }}"
+        ah_host: https://{{ aap_instance_ip }}/
+        ah_token: "{{ ah_token.token }}"
+        request_timeout: 1200
+        wait: true
+        validate_certs: false
+
+    - name: Update ansible.cfg with Automation Hub configuration
+      delegate_to: localhost
+      ansible.builtin.copy:
+        dest: /home/runner/.cache/molecule/artifact-signer-ansible/aap-setup/ansible.cfg
+        mode: '0644'
+        content: |
+          [galaxy]
+          server_list = automation_hub, ansible_galaxy
+
+          [galaxy_server.ansible_galaxy]
+          url = https://galaxy.ansible.com
+
+          [galaxy_server.automation_hub]
+          url = https://console.redhat.com/api/automation-hub/
+          auth_url = https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+          token = "{{ lookup('ansible.builtin.env', 'AUTOMATION_HUB_TOKEN') }}"
+      become: true
+
+    - name: Install ansible.platform collection
+      delegate_to: localhost
+      ansible.builtin.command:
+        cmd: "ansible-galaxy collection install ansible.platform"
+      changed_when: false
+
+    - name: Install ansible.controller collection
+      delegate_to: localhost
+      ansible.builtin.command:
+        cmd: "ansible-galaxy collection install ansible.controller"
+      changed_when: false
+
+    - name: Add controller licence (Subscription)
+      delegate_to: localhost
+      block:
+        - name: Include role to add subscription to controller
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_license
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            redhat_subscription_username: "{{ lookup('ansible.builtin.env', 'SUB_USERNAME') }}"
+            redhat_subscription_password: "{{ lookup('ansible.builtin.env', 'SUB_PASSWORD') }}"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_license:
+              use_lookup: true
+              force: true
+
+    - name: Create project for TAS single node playbook
+      delegate_to: localhost
+      block:
+        - name: Include role to create project
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_projects
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_projects:
+              - name: rhtas
+                organization: Default
+                scm_branch: aap_test_ci
+                scm_clean: 'no'
+                scm_delete_on_update: 'no'
+                scm_type: git
+                scm_update_on_launch: 'no'
+                scm_url: https://github.com/securesign/artifact-signer-ansible
+
+    - name: Create rhtas inventory
+      delegate_to: localhost
+      block:
+        - name: Include role to create inventory
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_inventories
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_inventories:
+              - name: rhtas
+                organization: Default
+
+    - name: Create rhtas host
+      delegate_to: localhost
+      block:
+        - name: Include role to create host
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_hosts
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_hosts:
+              - name: "{{ worker_instance_ip }}"
+                inventory: rhtas
+
+    - name: Create rhtas group
+      delegate_to: localhost
+      block:
+        - name: Include role to create group
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_host_groups
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_groups:
+              - name: molecule
+                inventory: rhtas
+                variables:
+                  ansible_user: ec2-user
+                  ansible_become: true
+                hosts:
+                  - "{{ worker_instance_ip }}"
+
+    - name: Create rhtas credential
+      delegate_to: localhost
+      block:
+        - name: Include role to create credential (private key)
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_credentials
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_credentials:
+              - name: rhtas_key
+                organization: Default
+                credential_type: Machine
+                inputs:
+                  username: ec2-user
+                  ssh_key_data: "{{ lookup('ansible.builtin.file', molecule_yml.platforms[0].private_key_file_path) }}"
+
+    - name: Create job template
+      delegate_to: localhost
+      block:
+        - name: Include role to configure controller job templates
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_job_templates
+          collections:
+            - ansible.controller
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_templates:
+              - name: "rhtas"
+                job_type: "run"
+                inventory: "rhtas"
+                project: "rhtas"
+                playbook: "molecule/aap-setup/files/play.yml"
+                credentials:
+                  - rhtas_key
+                extra_vars:
+                  aap_instance_ip: "{{ aap_instance_ip }}"
+                  token: "{{ ah_token.token }}"
+                  tas_single_node_oidc_issuers:
+                    - issuer: "http://dex-idp:5556/dex"
+                      url: "http://dex-idp:5556/dex"
+                      client_id: example-app
+                      type: email
+                  tas_single_node_base_hostname: myrhtas
+                  tas_single_node_cockpit:
+                    enabled: false
+                  tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
+                  tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
+
+    - name: Launch job template
+      delegate_to: localhost
+      block:
+        - name: Launch job template and wait
+          ansible.builtin.include_role:
+            name: infra.aap_configuration.controller_job_launch
+          vars:
+            controller_dependency_check: true
+            aap_hostname: "{{ aap_instance_ip }}"
+            aap_username: "admin"
+            aap_password: "password"
+            aap_validate_certs: false
+            aap_request_timeout: 900
+            controller_launch_jobs:
+              - name: "rhtas"
+                wait: true
