@@ -1,12 +1,21 @@
-name: Test the collection using Ansible Molecule
+name: Test the collection using Ansible Molecule and securesign/sigstore-e2e test suite
 on:
   push:
     branches:
       - 'main'
   pull_request:
-
 jobs:
   molecule:
+    env:
+      AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+      AWS_KEY_NAME: ${{ secrets.AWS_KEY_NAME }}
+      TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
+      TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_DEFAULT_REGION: "eu-north-1"
+      GITHUB_RUN_ID: ${{ github.run_id }}
+      SCENARIO_NAME: ${{ matrix.scenario }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -15,41 +24,32 @@ jobs:
           - user_provided
       max-parallel: 2
     steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-        - name: Install dependencies
-          run: |
-            python -m venv venv
-            source venv/bin/activate
-            python -m pip install --upgrade pip
-            pip install -r testing-requirements.txt
-            ansible-galaxy install -r requirements.yml
-            ansible-galaxy install -r molecule/requirements.yml
-        - name: Set up SSH key
-          run: |
-            mkdir -p ~/.ssh
-            echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-        - name: Run molecule
-          env:
-            AWS_KEY_NAME: ${{ secrets.AWS_KEY_NAME }}
-            TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
-            TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_DEFAULT_REGION: "eu-north-1"
-            RUN_ID: ${{ github.run_id }}
-            SCENARIO_NAME: ${{ matrix.scenario }}
-          run: |
-            source venv/bin/activate
-            molecule reset
-            molecule -v test --scenario-name ${{ matrix.scenario }}
-        - name: Destroy molecule infrastructure
-          env:
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          if: always()
-          run: |
-            source venv/bin/activate
-            molecule destroy --scenario-name ${{ matrix.scenario }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install TAS using molecule converge
+        uses: ./.github/actions/molecule-converge
+        with:
+          scenario: ${{ matrix.scenario }}
+
+      - name: Molecule verify
+        run: |
+          source venv/bin/activate
+          molecule -v verify --scenario-name ${{ matrix.scenario }}
+
+      - name: Extract TAS IP address
+        run: |
+          cat ~/.cache/molecule/artifact-signer-ansible/${{ matrix.scenario }}/inventory/molecule_inventory.yml
+          tas_singlenode_address=$(cat ~/.cache/molecule/artifact-signer-ansible/${{ matrix.scenario }}/inventory/molecule_inventory.yml | yq e '.all.children.molecule.hosts | keys | .[0]')
+          echo "tas_singlenode_address=$tas_singlenode_address" >> $GITHUB_ENV
+
+      - name: Execute e2e test suite
+        uses: ./.github/actions/go-e2e
+        with:
+          tas_address: ${{ env.tas_singlenode_address }}
+
+      - name: Destroy molecule infrastructure
+        if: always()
+        run: |
+          source venv/bin/activate
+          molecule destroy --scenario-name ${{ matrix.scenario }}

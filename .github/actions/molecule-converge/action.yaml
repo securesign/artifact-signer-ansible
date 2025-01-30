@@ -1,0 +1,47 @@
+name: 'Install TAS Server Using Molecule'
+description: 'Action to install TAS server using Molecule'
+inputs:
+  scenario:
+    description: 'Molecule scenario'
+    required: true
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Cache venv test directory
+      uses: actions/cache@v3
+      with:
+        path: venv
+        key: ${{ runner.os }}-python-venv-${{ hashFiles('testing-requirements.txt') }}
+
+    - name: Cache Ansible Galaxy roles and collections
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.ansible/roles
+          ~/.ansible/collections
+        key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('requirements.yml', 'molecule/requirements.yml') }}
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r testing-requirements.txt
+        ansible-galaxy install -r requirements.yml
+        ansible-galaxy install -r molecule/requirements.yml
+
+    - name: Set up SSH key
+      shell: bash
+      run: |
+        mkdir -p ~/.ssh
+        echo "$AWS_SSH_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Run molecule converge
+      shell: bash
+      run: |
+        source venv/bin/activate
+        molecule reset
+        molecule -v converge --scenario-name ${{ inputs.scenario }}
