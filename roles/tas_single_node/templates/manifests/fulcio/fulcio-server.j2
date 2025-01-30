@@ -49,6 +49,7 @@ spec:
             - serve
             - --port={{ tas_single_node_fulcio_port_http }}
             - --grpc-port={{ tas_single_node_fulcio_port_grpc }}
+            - --metrics-port={{ tas_single_node_fulcio_port_metrics }}
             - --ca=fileca
             - --fileca-key
             - /var/run/fulcio-secrets/key.pem
@@ -67,7 +68,7 @@ spec:
               protocol: TCP
             - containerPort: {{ tas_single_node_fulcio_port_grpc }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_fulcio_port_tcp }}
+            - containerPort: {{ tas_single_node_fulcio_port_metrics }}
               protocol: TCP
           resources: {}
           volumeMounts:

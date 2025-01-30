@@ -47,11 +47,11 @@ spec:
           ports:
             - containerPort: {{ tas_single_node_ctlog_port_http }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_ctlog_port_tcp }}
+            - containerPort: {{ tas_single_node_ctlog_port_metrics }}
               protocol: TCP
           args:
-            - --http_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port_http}}
-            - --metrics_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port_tcp}}
+            - --http_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port_http }}
+            - --metrics_endpoint=0.0.0.0:{{ tas_single_node_ctlog_port_metrics }}
             - --log_config=/config/config
             - --alsologtostderr
           resources: {}

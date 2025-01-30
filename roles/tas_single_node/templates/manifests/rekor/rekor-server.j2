@@ -76,7 +76,7 @@ spec:
           ports:
             - containerPort: {{ tas_single_node_rekor_server_port_http }}
               protocol: TCP
-            - containerPort: {{ tas_single_node_rekor_server_port_tcp }}
+            - containerPort: {{ tas_single_node_rekor_server_port_metrics }}
               protocol: TCP
           resources: {}
           volumeMounts:
