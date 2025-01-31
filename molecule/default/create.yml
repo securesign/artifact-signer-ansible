@@ -175,9 +175,14 @@
       ansible.builtin.set_fact:
         instance_id: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
 
+    - name: Set CI workflow name
+      ansible.builtin.set_fact:
+        workflow_id: "{{ lookup('env', 'RUN_ID') + '-' + lookup('env', 'SCENARIO_NAME') }}"
+      when: lookup('env', 'RUN_ID')  | length > 0
+
     - name: Launch EC2 instance
       amazon.aws.ec2_instance:
-        name: "{{ 'CI-' + (lookup('env', 'GITHUB_RUN_ID') if lookup('env', 'GITHUB_RUN_ID') | length > 0 else instance_id) }}"
+        name: "{{ 'CI-' + workflow_id | default(instance_id) }}"
         key_name: "{{ lookup('env', 'AWS_KEY_NAME') }}"
         instance_type: "{{ item.instance_type }}"
         image_id: "{{ item.image_id }}" 
