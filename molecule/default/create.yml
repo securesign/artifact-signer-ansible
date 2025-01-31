@@ -177,7 +177,7 @@
 
     - name: Set CI workflow name
       ansible.builtin.set_fact:
-        workflow_id: "{{ lookup('env', 'RUN_ID') + '-' + lookup('env', 'JOB_ID') }}"
+        workflow_id: "{{ lookup('env', 'RUN_ID') + '-' + lookup('env', 'COMMIT_SHA') }}"
       when: lookup('env', 'RUN_ID')  | length > 0
 
     - name: Launch EC2 instance
