@@ -1,0 +1,88 @@
+name: 'Go E2E Tests Reusable Action'
+description: 'Run Go E2E tests using the provided TAS server and Go version.'
+inputs:
+  tas_address:
+    description: 'TAS server address'
+    required: true
+    type: string
+  fulcio_host:
+    description: 'Fulcio server hostname'
+    required: false
+    default: 'fulcio.myrhtas'
+  rekor_host:
+    description: 'Rekor server hostname'
+    required: false
+    default: 'rekor.myrhtas'
+  rekor_search_host:
+    description: 'Rekor search server hostname'
+    required: false
+    default: 'rekor-search.myrhtas'
+  tuf_host:
+    description: 'TUF server hostname'
+    required: false
+    default: 'tuf.myrhtas'
+  tsa_hostname:
+    description: 'TSA server url'
+    required: false
+    default: 'tsa.myrhtas'
+  cli_server_host:
+    description: 'Client server hostname'
+    required: false
+    default: 'cli-server.myrhtas'
+  oidc_host:
+    description: 'OIDC provider hostname'
+    required: false
+    default: 'dex-idp'
+  oidc_url:
+    description: 'OIDC provider url'
+    required: false
+    default: 'http://dex-idp:5556/dex'
+  go_version:
+    description: 'Go version'
+    required: true
+    default: '1.21'
+    type: string
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout go test source code
+      uses: actions/checkout@v4
+      with:
+        repository: "securesign/sigstore-e2e"
+        path: e2e
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ inputs.go_version }}
+
+    - name: Resolve TAS_SINGLENODE hostname
+      shell: bash
+      run: |
+        echo "${{ inputs.tas_address }} ${{ inputs.fulcio_host }} ${{ inputs.tuf_host }} ${{ inputs.rekor_host }} ${{ inputs.tsa_host }} ${{ inputs.rekor_search_host }} ${{ inputs.cli_server_host }}" | sudo tee -a /etc/hosts
+
+    - name: Resolve OIDC hostname
+      if: ${{ inputs.oidc_host != '' }}
+      shell: bash
+      run: |
+        echo "${{ inputs.tas_address }} ${{ inputs.oidc_host }}" | sudo tee -a /etc/hosts
+
+    - name: Resolve certificates
+      shell: bash
+      run: |
+        sudo bash -c "source vm-testing/test/extract_root_cert.sh; extractRootCert ${{ inputs.rekor_host }} /usr/local/share/ca-certificates/myrhtas.crt"
+        sudo update-ca-certificates
+
+    - name: Run e2e
+      shell: bash
+      env:
+        SIGSTORE_OIDC_ISSUER: ${{ inputs.oidc_url }}
+        KEYKLOAK_REALM: example-app
+        CLI_STRATEGY: cli_server
+        CLI_SERVER_URL: "https://${{ inputs.cli_server_host }}"
+        FULCIO_URL: "https://${{ inputs.fulcio_host }}"
+        REKOR_URL: "https://${{ inputs.rekor_host }}"
+        TUF_URL: "https://${{ inputs.tuf_host }}"
+        TSA_URL: "https://:${{ inputs.tsa_hostname }}"
+      run: |
+        cd e2e
+        go test -v ./test/...

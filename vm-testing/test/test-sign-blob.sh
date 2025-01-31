@@ -4,12 +4,9 @@ set -ex
 # NOTE: this script requires BASE_HOSTNAME and KEYCLOAK_URL to be set
 
 # extract the root certificate and make it trusted
-openssl s_client -showcerts -connect rekor."${BASE_HOSTNAME}":443 < /dev/null | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}'
-for cert in *.pem; do
-  newname="$(openssl x509 -noout -subject -in "$cert" | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/-/; s/^_//g;p' | tr '[:upper:]' '[:lower:]')".pem
-  echo "${newname}"; mv "${cert}" "${newname}" 
-done
-cp "${BASE_HOSTNAME}".pem /etc/pki/ca-trust/source/anchors/
+script_dir="$(dirname "$(readlink -f "$0")")"
+source "${script_dir}/extract_root_cert.sh"
+extractRootCert "rekor.${BASE_HOSTNAME}" "/etc/pki/ca-trust/source/anchors/${BASE_HOSTNAME}.pem"
 update-ca-trust
 
 # set up cosign env
