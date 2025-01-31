@@ -1,0 +1,49 @@
+# Number of attempts to contact a ntp server before giving up.
+request_attempts: 3
+# The timeout in seconds for a request to respond. This value must be
+# smaller than max_time_delta.
+request_timeout: 5
+# Number of randomly selected ntp servers to interrogate.
+num_servers: 4
+# Number of servers who must agree with local time.
+server_threshold: 3
+# Maximum number of seconds the local time is allowed to drift from the
+# response of a ntp server
+max_time_delta: 6
+# Period (in seconds) for polling ntp servers
+period: 60
+# List of servers to contact. Many DNS names resolves to multiple A records.
+servers:
+  # stratum 1 servers:
+  - "time.apple.com"
+
+  - "time.google.com"
+  - "time1.google.com"
+  - "time2.google.com"
+  - "time3.google.com"
+  - "time4.google.com"
+
+  - "time-a-b.nist.gov"
+  - "time-b-b.nist.gov"
+  - "time-c-b.nist.gov"
+  - "time-d-b.nist.gov"
+
+  - "gbg1.ntp.se"
+  - "gbg2.ntp.se"
+  - "mmo1.ntp.se"
+  - "mmo2.ntp.se"
+  - "sth1.ntp.se"
+  - "sth2.ntp.se"
+  - "svl1.ntp.se"
+  - "svl2.ntp.se"
+
+  - "ntp1.net.berkeley.edu"
+  - "ntp2.net.berkeley.edu"
+
+  # stratum 3 servers:
+  - "time.cloudflare.com"
+  - "time.windows.com"
+
+  # stratum 4 servers:
+  # AWS AS16509
+  - "time.aws.com"
