@@ -1,4 +1,4 @@
-ansible-lint==24.9.0
+ansible-lint==25.1.1
 antsibull-docs==2.16.3
 awscli==1.37.6
 botocore==1.36.6
