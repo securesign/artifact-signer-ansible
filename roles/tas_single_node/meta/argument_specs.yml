@@ -247,7 +247,7 @@ argument_specs:
       tas_single_node_skip_os_install:
         description: >
           Whether or not to skip the installation of the required operating system packages.
-          Only use this option when all packages are already installed at the versions released for RHEL 9.2 or later.
+          Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later.
         type: "bool"
         required: false
         version_added: "1.1.0"

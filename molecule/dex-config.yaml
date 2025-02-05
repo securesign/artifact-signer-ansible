@@ -3,6 +3,8 @@
   ansible.builtin.package:
     name: podman
     state: present
+    enable_plugin:
+      - versionlock
 
 - name: Create Dex config directory
   ansible.builtin.file:

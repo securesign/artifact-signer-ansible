@@ -42,7 +42,7 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 
 * Ansible 2.16.0 or greater
 * Python 3.9.0 or greater
-* RHEL x86\_64 9.2 or greater.
+* RHEL x86\_64 9.4 or greater.
 * All client nodes using `cosign`, `gitsign`, and `ec` need the following:
   * Command-line access to the node with a user that has `sudo` privileges.
   * Updated DNS records or `/etc/hosts` entries with the ingress host names and IP addresses.
