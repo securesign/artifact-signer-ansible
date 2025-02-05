@@ -6,28 +6,6 @@
       - tas_single_node_base_hostname | trim | length > 0
     msg: "'tas_single_node_base_hostname' must be specified"
 
-- name: Set default TSA NTP config
-  ansible.builtin.set_fact:
-    tsa_ntp_config_content: ""
-
-- name: Handle user-provided custom NTP monitoring file
-  when: tas_single_node_tsa_ntp_config != ''
-  block:
-    - name: Copy custom NTP config
-      ansible.builtin.copy:
-        src: "{{ tas_single_node_tsa_ntp_config }}"
-        dest: "{{ tas_single_node_tsa_ntp_config_file }}"
-        mode: '0600'
-
-    - name: Slurp TSA config
-      ansible.builtin.slurp:
-        src: "{{ tas_single_node_tsa_ntp_config_file }}"
-      register: tsa_ntp_config
-
-    - name: Set NTP config content
-      ansible.builtin.set_fact:
-        tsa_ntp_config_content: "{{ tsa_ntp_config.content | b64decode }}"
-
 - name: Slurp TSA certs
   ansible.builtin.slurp:
     src: "{{ item }}"
@@ -46,13 +24,13 @@
 
 - name: Add TSA secret password (if applicable)
   ansible.builtin.set_fact:
-    secret_data: "{{ secret_data | combine({'password': tas_single_node_tsa_signer_passphrase | b64encode}) }}"
-  when: tas_single_node_tsa_signer_type == 'file'
+    secret_data: "{{ secret_data | combine({'password': tas_single_node_tsa.signer_passphrase | b64encode}) }}"
+  when: tas_single_node_tsa.signer_type == 'file'
 
 - name: Add TSA secret Tink keyset (if applicable)
   ansible.builtin.set_fact:
-    secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa_tink_keyset | b64encode}) }}"
-  when: tas_single_node_tsa_signer_type == 'tink'
+    secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa.tink.keyset | b64encode}) }}"
+  when: tas_single_node_tsa.signer_type == 'tink'
 
 - name: Create TSA Secret
   ansible.builtin.copy:
@@ -83,7 +61,7 @@
         namespace: tsa-system
       data:
         ntpsync.yaml: |
-          {{ tsa_ntp_config_content }}
+          {{ tas_single_node_tsa.ntp_config }}
   register: configmap_result
 
 - name: Deploy TSA Pod

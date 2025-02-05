@@ -50,28 +50,28 @@ spec:
             - "--host=0.0.0.0"
             - "--port={{ tas_single_node_tsa_server_port_tcp }}"
             - "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem"
-            - "--timestamp-signer={{ tas_single_node_tsa_signer_type }}"
-{% if tas_single_node_tsa_ntp_config != '' %}
+            - "--timestamp-signer={{ tas_single_node_tsa.signer_type }}"
+{% if tas_single_node_tsa.ntp_config != '' %}
             - "--ntp-monitoring=/etc/config/ntpsync.yaml"
 {% endif %}
-{% if tas_single_node_tsa_signer_type == 'file' %}
+{% if tas_single_node_tsa.signer_type == 'file' %}
             - "--file-signer-key-path=/etc/secrets/keys/private_key.pem"
-            - "--file-signer-passwd={{ tas_single_node_tsa_signer_passphrase }}"
+            - "--file-signer-passwd={{ tas_single_node_tsa.signer_passphrase }}"
 {% endif %}
-{% if tas_single_node_tsa_signer_type == 'kms' %}
-            - "--kms-key-resource={{ tas_single_node_tsa_kms_key_resource }}"
+{% if tas_single_node_tsa.signer_type == 'kms' %}
+            - "--kms-key-resource={{ tas_single_node_tsa.kms.key_resource }}"
 {% endif %}
-{% if tas_single_node_tsa_signer_type == 'tink' %}
-            - "--tink-key-resource={{ tas_single_node_tsa_tink_key_resource }}"
+{% if tas_single_node_tsa.signer_type == 'tink' %}
+            - "--tink-key-resource={{ tas_single_node_tsa.tink.key_resource }}"
             - "--tink-keyset-path=/etc/secrets/keys/encrypted_key_set"
-            - "--tink-hcvault-token={{ tas_single_node_tsa_tink_hcvault_token }}"
+            - "--tink-hcvault-token={{ tas_single_node_tsa.tink.hcvault_token }}"
 {% endif %}
           ports:
             - containerPort: {{ tas_single_node_tsa_server_port_tcp }}
               protocol: TCP
           resources: {}
           volumeMounts:
-{% if tas_single_node_tsa_ntp_config_file != '' %}
+{% if tas_single_node_tsa.ntp_config != '' %}
             - name: tsa-ntp-config
               mountPath: /etc/config/ntpsync.yaml
               subPath: ntpsync.yaml
@@ -79,12 +79,12 @@ spec:
             - name: tsa-cert-chain
               mountPath: /etc/secrets/cert_chain
               readOnly: true
-{% if tas_single_node_tsa_signer_type == 'file' %}
+{% if tas_single_node_tsa.signer_type == 'file' %}
             - name: tsa-file-signer-config
               mountPath: /etc/secrets/keys
               readOnly: true
 {% endif %}
-{% if tas_single_node_tsa_signer_type == 'tink' %}
+{% if tas_single_node_tsa.signer_type == 'tink' %}
             - name: tsa-file-signer-config
               mountPath: /etc/secrets/keys
               readOnly: true
@@ -106,7 +106,7 @@ spec:
           operator: Exists
           tolerationSeconds: 300
       volumes:
-{% if tas_single_node_tsa_ntp_config_file != '' %}
+{% if tas_single_node_tsa.ntp_config != '' %}
         - name: tsa-ntp-config
           configMap:
             defaultMode: 420
@@ -121,7 +121,7 @@ spec:
             items:
               - key: certificate-chain.pem
                 path: certificate-chain.pem
-{% if tas_single_node_tsa_signer_type == 'file' %}
+{% if tas_single_node_tsa.signer_type == 'file' %}
         - name: tsa-file-signer-config
           secret:
             secretName: tsa-server-secret
@@ -129,7 +129,7 @@ spec:
               - key: private_key.pem
                 path: private_key.pem
 {% endif %}
-{% if tas_single_node_tsa_signer_type == 'tink' %}
+{% if tas_single_node_tsa.signer_type == 'tink' %}
         - name: tsa-file-signer-config
           secret:
             secretName: tsa-server-secret

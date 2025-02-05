@@ -209,60 +209,121 @@ argument_specs:
         type: "str"
         required: true
         version_added: "1.1.0"
-        # we provide no default value here intentionall
-      tas_single_node_tsa_signer_type:
+        # we provide no default value here intentionally
+      tas_single_node_tsa:
         description: >
-          Signer type to use for TSA. Valid options are: [file, kms, tink].
-        type: str
-        required: false
-        version_added: "1.1.0"
-      tas_single_node_tsa_ntp_config:
-        description: >
-          The filepath to a custom ntpsync.yaml file for time syncing within a unified consensus of vendors such as Google, Amazon, and more.
-          Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml)
-        type: str
-        required: false
+          Details on the certificate and configuration options for Timestamp Authority. Includes organizational details,
+          the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key.
+        type: "dict"
         version_added: "1.2.0"
-      tas_single_node_tsa_user_signer_private_key:
-        description: >
-          The filepath to a user provided private key used in conjunction with a certificate chain for the 'file' signer type within TSA.
-        type: str
         required: false
-        version_added: "1.2.0"
-      tas_single_node_tsa_user_certificate_chain:
-        description: >
-          The filepath to a user provided certificate chain to be used alongside the 'file', 'kms', and 'tink' signer types and related data.
-        type: str
-        required: false
-        version_added: "1.2.0"
-      tas_single_node_tsa_kms_key_resource:
-        description: >
-          The Key Management Services (KMS) key for signing timestamp responses.
-          Valid options are: [gcpkms://resource, azurekms://resource, hashivault://resource, awskms://resource].
-        type: "str"
-        required: false
-        version_added: "1.1.0"
-        default: ""
-      tas_single_node_tsa_tink_key_resource:
-        description: >
-          The KMS key for signing timestamp responses for Tink keysets.
-          Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].
-        type: "str"
-        required: false
-        version_added: "1.1.0"
-        default: ""
-      tas_single_node_tsa_tink_keyset:
-        description: "The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string."
-        type: "str"
-        required: false
-        version_added: "1.1.0"
-        default: ""
-      tas_single_node_tsa_tink_hcvault_token:
-        description: "The authentication token for Hashicorp Vault API calls."
-        type: "str"
-        required: false
-        version_added: "1.1.0"
-        default: ""
+        default:
+          signer_type: file
+          certificate:
+            organization_name: ""
+            organization_email: ""
+            common_name: ""
+          kms:
+            key_resource: ""
+          tink:
+            key_resource: ""
+            keyset: ""
+            hcvault_token: ""
+          signer_private_key: ""
+          certificate_chain: ""
+          signer_passphrase: rhtas
+          ca_passphrase: rhtas
+          ntp_config: ""
+        options:
+          signer_type:
+            description: "The signer type for TSA. Options include `file`, `kms`, `tink`."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          certificate:
+            description: "Details on the certificate attributes for TSA."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              organization_name:
+                description: "The name of the organization."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              organization_email:
+                description: "The email of the organization."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              common_name:
+                description: "The common name (e.g., hostname) for the certificate."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          kms:
+            description: >
+              The Key Management Services (KMS) key for signing timestamp responses.
+              Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+            options:
+              key_resource:
+                description: "Key resource used to access signer private key from AWS/GCP/Azure."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          tink:
+            description: "Tink file signer type configuration for TSA."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+            options:
+              key_resource:
+                description: >
+                  The KMS key for signing timestamp responses for Tink keysets.
+                  Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              keyset:
+                description: "The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              hcvault_token:
+                description: "The authentication token for Hashicorp Vault API calls."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          signer_private_key:
+            description: "Signer private key used in conjuction with the certificate chain for signing and verifying."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          certificate_chain:
+            description: "Certificate chain used in conjuction with the signer private key for signing and verifying."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          signer_passphrase:
+            description: "Passphrase used to access signer private key."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          ca_passphrase:
+            description: "Passphrase used to access certificate authority."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          ntp_config:
+            description: >
+              NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more.
+              Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml).
+            type: "str"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_skip_os_install:
         description: >
           Whether or not to skip the installation of the required operating system packages.
