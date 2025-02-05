@@ -139,6 +139,5 @@ tas_single_node_tsa_server_port_tcp: 3002
 
 tas_single_node_tuf_pod: tuf
 tas_single_node_tuf_port_http: 8080
-tas_single_node_tuf_host_port_http: 8085
 
 tas_single_node_tuf_init_pod: tuf-init

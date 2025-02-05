@@ -7,6 +7,8 @@
   ansible.builtin.package: # noqa: package-latest
     name: "{{ tas_single_node_system_packages }}"
     state: latest
+    enable_plugin: # respect user's version locked packages, if any
+      - versionlock
 
 - name: Configure /etc/hosts DNS block
   ansible.builtin.blockinfile:
