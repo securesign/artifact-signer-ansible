@@ -2,11 +2,13 @@
 - name: Install System Packages dependencies
   # We use noqa here, because having all the packages upgrade to the latest version when
   # available is actually what we want. We need to prevent locking ourselves at old
-  # version with potential CVEs (at the same time we must upgrade to at least RHEL 9.2
+  # version with potential CVEs (at the same time we must upgrade to at least RHEL 9.4
   # package releases to ensure we can actually work).
   ansible.builtin.package: # noqa: package-latest
     name: "{{ tas_single_node_system_packages }}"
     state: latest
+    enable_plugin: # respect user's version locked packages, if any
+      - versionlock
 
 - name: Configure /etc/hosts DNS block
   ansible.builtin.blockinfile:
