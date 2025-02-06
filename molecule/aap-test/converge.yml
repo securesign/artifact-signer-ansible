@@ -7,7 +7,19 @@
     - ansible.controller
   vars_files:
     - vars/vars.yml
-    - vars/aap_nodes.yml
+  vars:
+    aap_instance_ip: "{{ hostvars['localhost']['aap_instance_ip'] }}"
+    worker_instance_ip: "{{ hostvars['localhost']['worker_instance_ip'] }}"
+    aap_setup_down_version: "{{ hostvars['localhost']['aap_setup_down_version'] }}"
+    aap_setup_down_offline_token: "{{ hostvars['localhost']['aap_setup_down_offline_token'] }}"
+    aap_setup_down_type: "{{ hostvars['localhost']['aap_setup_down_type'] }}"
+    aap_setup_rhel_version: "{{ hostvars['localhost']['aap_setup_rhel_version'] }}"
+    aap_setup_inst_containerized: "{{ hostvars['localhost']['aap_setup_inst_containerized'] }}"
+    aap_setup_containerized: "{{ hostvars['localhost']['aap_setup_containerized'] }}"
+    aap_setup_arch: "{{ hostvars['localhost']['aap_setup_arch'] }}"
+    aap_setup_prep_process_template: "{{ hostvars['localhost']['aap_setup_prep_process_template'] }}"
+    aap_setup_prep_inv_nodes: "{{ hostvars['localhost']['aap_setup_prep_inv_nodes'] }}"
+    aap_setup_prep_inv_vars: "{{ hostvars['localhost']['aap_setup_prep_inv_vars'] }}"
   tasks:
     - name: Error out if registry username is not set
       ansible.builtin.fail:
