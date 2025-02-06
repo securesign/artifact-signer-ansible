@@ -8,18 +8,49 @@
   vars_files:
     - vars/vars.yml
   vars:
-    aap_instance_ip: "{{ hostvars['localhost']['aap_instance_ip'] }}"
-    worker_instance_ip: "{{ hostvars['localhost']['worker_instance_ip'] }}"
-    aap_setup_down_version: "{{ hostvars['localhost']['aap_setup_down_version'] }}"
-    aap_setup_down_offline_token: "{{ hostvars['localhost']['aap_setup_down_offline_token'] }}"
-    aap_setup_down_type: "{{ hostvars['localhost']['aap_setup_down_type'] }}"
-    aap_setup_rhel_version: "{{ hostvars['localhost']['aap_setup_rhel_version'] }}"
-    aap_setup_inst_containerized: "{{ hostvars['localhost']['aap_setup_inst_containerized'] }}"
-    aap_setup_containerized: "{{ hostvars['localhost']['aap_setup_containerized'] }}"
-    aap_setup_arch: "{{ hostvars['localhost']['aap_setup_arch'] }}"
-    aap_setup_prep_process_template: "{{ hostvars['localhost']['aap_setup_prep_process_template'] }}"
-    aap_setup_prep_inv_nodes: "{{ hostvars['localhost']['aap_setup_prep_inv_nodes'] }}"
-    aap_setup_prep_inv_vars: "{{ hostvars['localhost']['aap_setup_prep_inv_vars'] }}"
+    aap_instance_ip: "{{ groups['aap_group'][0] }}"
+    worker_instance_ip: "{{ groups['worker_group'][0] }}"
+    aap_setup_down_version: "2.5"
+    aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
+    aap_setup_down_type: "setup"
+    aap_setup_rhel_version: 9
+    aap_setup_inst_containerized: true
+    aap_setup_containerized: true
+    aap_setup_arch: "x86_64"
+    aap_setup_prep_process_template: true
+
+    aap_setup_prep_inv_nodes:
+      automationcontroller:
+        127.0.0.1:
+      automationhub:
+        127.0.0.1:
+      database:
+        127.0.0.1:
+      automationgateway:
+        127.0.0.1:
+      automationeda:
+        127.0.0.1:
+    aap_setup_prep_inv_vars:
+      all:
+        ansible_user: "ec2-user"
+        ansible_connection: local
+        become: false
+        redis_mode: standalone
+        gateway_admin_password: password
+        gateway_pg_host: "127.0.0.1"
+        gateway_pg_password: password
+        controller_admin_password: password
+        controller_pg_host: "127.0.0.1"
+        controller_pg_password: password
+        hub_admin_password: password
+        hub_pg_host: "127.0.0.1"
+        hub_pg_password: password
+        eda_admin_password: password
+        eda_pg_host: "127.0.0.1"
+        eda_pg_password: password
+        postgresql_admin_username: postgres
+        postgresql_admin_password: password
+        _gateway_redis_password: password
   tasks:
     - name: Error out if registry username is not set
       ansible.builtin.fail:

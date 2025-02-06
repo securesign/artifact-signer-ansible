@@ -7,7 +7,6 @@
     - vars/vars.yml
   vars:
     debug_outputs: true
-    user: ec2-user
     molecule_inventory:
       all:
         children:
@@ -145,52 +144,6 @@
 
     - name: Force inventory refresh
       ansible.builtin.meta: refresh_inventory
-
-    - name: Set AAP variables
-      ansible.builtin.set_fact:
-        aap_instance_ip: "{{ instance_data['AAP'].ip }}"
-        worker_instance_ip: "{{ instance_data['Worker'].ip }}"
-        aap_setup_down_version: "2.5"
-        aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
-        aap_setup_down_type: "setup"
-        aap_setup_rhel_version: 9
-        aap_setup_inst_containerized: true
-        aap_setup_containerized: true
-        aap_setup_arch: "x86_64"
-        aap_setup_prep_process_template: true
-
-        aap_setup_prep_inv_nodes:
-          automationcontroller:
-            127.0.0.1:
-          automationhub:
-            127.0.0.1:
-          database:
-            127.0.0.1:
-          automationgateway:
-            127.0.0.1:
-          automationeda:
-            127.0.0.1:
-        aap_setup_prep_inv_vars:
-          all:
-            ansible_user: "{{ user }}"
-            ansible_connection: local
-            become: false
-            redis_mode: standalone
-            gateway_admin_password: password
-            gateway_pg_host: "127.0.0.1"
-            gateway_pg_password: password
-            controller_admin_password: password
-            controller_pg_host: "127.0.0.1"
-            controller_pg_password: password
-            hub_admin_password: password
-            hub_pg_host: "127.0.0.1"
-            hub_pg_password: password
-            eda_admin_password: password
-            eda_pg_host: "127.0.0.1"
-            eda_pg_password: password
-            postgresql_admin_username: postgres
-            postgresql_admin_password: password
-            _gateway_redis_password: password
 
     - name: Fail if molecule group is missing
       ansible.builtin.assert:
