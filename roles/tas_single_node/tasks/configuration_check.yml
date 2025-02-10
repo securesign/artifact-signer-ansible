@@ -7,7 +7,7 @@
 - name: Prevent usage of memory signer for TSA
   ansible.builtin.fail:
     msg: "'memory' signer can't be used for TSA"
-  when: tas_single_node_tsa_signer_type == "memory"
+  when: tas_single_node_tsa.signer_type == "memory"
 
 - name: Prevent usage of memory signer for Rekor
   ansible.builtin.fail:

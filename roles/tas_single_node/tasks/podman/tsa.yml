@@ -1,33 +1,36 @@
 ---
-- name: Confirmed required parameters provided
+- name: Ensure required parameters are provided
   ansible.builtin.assert:
     that:
       - tas_single_node_base_hostname is defined
       - tas_single_node_base_hostname | trim | length > 0
     msg: "'tas_single_node_base_hostname' must be specified"
 
-- name: Slurp TSA Certificates chain
+- name: Slurp TSA certs
   ansible.builtin.slurp:
     src: "{{ item }}"
   loop:
-    - "{{ tas_single_node_remote_tsa_private_key }}"
-    - "{{ tas_single_node_remote_tsa_certificate_chain }}"
-    - "{{ tas_single_node_remote_tsa_signer_private_key }}"
-  register: remote_tsa_certificates
+    - "{{ tas_single_node_tsa_certificate_chain }}"
+    - "{{ tas_single_node_tsa_signer_private_key }}"
+  register: tsa_certs
 
-- name: Define TSA base secret data
+- name: Set TSA Secret data
   ansible.builtin.set_fact:
     secret_data:
       private_key.pem: |
-        {{ (remote_tsa_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_tsa_signer_private_key) | list | first).content }}
+        {{ (tsa_certs.results | selectattr('source', 'equalto', tas_single_node_tsa_signer_private_key) | list | first).content }}
       certificate-chain.pem: |
-        {{ (remote_tsa_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_tsa_certificate_chain) | list | first).content }}
-      password: "{{ tas_single_node_tsa_signer_passphrase | b64encode }}"
+        {{ (tsa_certs.results | selectattr('source', 'equalto', tas_single_node_tsa_certificate_chain) | list | first).content }}
 
-- name: Append Tink secret data
+- name: Add TSA secret password (if applicable)
   ansible.builtin.set_fact:
-    secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa_tink_keyset | b64encode}) }}"
-  when: tas_single_node_tsa_signer_type == 'tink'
+    secret_data: "{{ secret_data | combine({'password': tas_single_node_tsa.signer_passphrase | b64encode}) }}"
+  when: tas_single_node_tsa.signer_type == 'file'
+
+- name: Add TSA secret Tink keyset (if applicable)
+  ansible.builtin.set_fact:
+    secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa.tink.keyset | b64encode}) }}"
+  when: tas_single_node_tsa.signer_type == 'tink'
 
 - name: Create TSA Secret
   ansible.builtin.copy:
@@ -44,6 +47,23 @@
       data: "{{ secret_data }}"
   register: tsa_secret_result
 
+- name: Create TSA ConfigMap
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_tsa_config }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: tsa-config
+        namespace: tsa-system
+      data:
+        ntpsync.yaml: |
+          {{ tas_single_node_tsa.ntp_config }}
+  register: configmap_result
+
 - name: Deploy TSA Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:
@@ -52,5 +72,7 @@
       systemd_file: tsa
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tsa/tsa-server.j2') | from_yaml }}"
+      configmap: "{{ tas_single_node_tsa_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
       secret: "{{ tas_single_node_tsa_secret }}"
       secret_changed: "{{ tsa_secret_result.changed }}"

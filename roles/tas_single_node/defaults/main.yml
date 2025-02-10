@@ -40,11 +40,23 @@ tas_single_node_rekor_public_key_delay: 10
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
 
-tas_single_node_tsa_signer_type: file
-tas_single_node_tsa_kms_key_resource: ""
-tas_single_node_tsa_tink_key_resource: ""
-tas_single_node_tsa_tink_keyset: ""
-tas_single_node_tsa_tink_hcvault_token: ""
+tas_single_node_tsa:
+  signer_type: file
+  certificate:
+    organization_name: ""
+    organization_email: ""
+    common_name: ""
+  kms:
+    key_resource: ""
+  tink:
+    key_resource: ""
+    keyset: ""
+    hcvault_token: ""
+  signer_private_key: ""
+  certificate_chain: ""
+  signer_passphrase: rhtas
+  ca_passphrase: rhtas
+  ntp_config: ""
 
 tas_single_node_skip_os_install: false
 
@@ -59,8 +71,6 @@ tas_single_node_fulcio_trusted_oidc_ca: ""
 tas_single_node_fulcio_ca_passphrase: rhtas
 tas_single_node_ctlog_ca_passphrase: rhtas
 tas_single_node_rekor_ca_passphrase: rhtas
-tas_single_node_tsa_ca_passphrase: rhtas
-tas_single_node_tsa_signer_passphrase: rhtas
 tas_single_node_ct_logprefix: rhtasansible
 
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
