@@ -89,28 +89,28 @@
           -passout 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
         creates: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
       when: >
-        tas_single_node_fulcio.tas_single_node_fulcio_private_key is not defined
-        or tas_single_node_fulcio.tas_single_node_fulcio_private_key == ""
+        tas_single_node_fulcio.private_key is not defined
+        or tas_single_node_fulcio.private_key == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0
 
     - name: Load user-provided Fulcio private key
       ansible.builtin.copy:
-        content: "{{ tas_single_node_fulcio.tas_single_node_fulcio_private_key }}"
+        content: "{{ tas_single_node_fulcio.private_key }}"
         dest: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
         mode: '0600'
-      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
+      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
 
     - name: Clean-up old tas_single_node_remote_fulcio_user_provided_private_key
       ansible.builtin.file:
         path: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
         state: absent
-      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is not defined or tas_single_node_fulcio.tas_single_node_fulcio_private_key == ""
+      when: tas_single_node_fulcio.private_key is not defined or tas_single_node_fulcio.private_key == ""
 
     - name: Clean-up old tas_single_node_remote_fulcio_auto_generated_private_key
       ansible.builtin.file:
         path: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
         state: absent
-      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
+      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
 
     - name: Copy auto-generated Fulcio private key into tas_single_node_remote_fulcio_private_key
       ansible.builtin.copy:
@@ -118,7 +118,7 @@
         dest: "{{ tas_single_node_remote_fulcio_private_key }}"
         mode: '0600'
         remote_src: true
-      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is not defined or tas_single_node_fulcio.tas_single_node_fulcio_private_key == ""
+      when: tas_single_node_fulcio.private_key is not defined or tas_single_node_fulcio.private_key == ""
 
     - name: Copy user-provided Fulcio private key into tas_single_node_remote_fulcio_private_key
       ansible.builtin.copy:
@@ -126,7 +126,7 @@
         dest: "{{ tas_single_node_remote_fulcio_private_key }}"
         mode: '0600'
         remote_src: true
-      when: tas_single_node_fulcio.tas_single_node_fulcio_private_key is defined and tas_single_node_fulcio.tas_single_node_fulcio_private_key != ""
+      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
 
     - name: Verify if public key matches the private key
       ansible.builtin.shell:
@@ -169,10 +169,10 @@
 
     - name: Load user-provided Fulcio root
       ansible.builtin.copy:
-        content: "{{ tas_single_node_fulcio.tas_single_node_fulcio_root_ca }}"
+        content: "{{ tas_single_node_fulcio.root_ca }}"
         dest: "{{ tas_single_node_remote_fulcio_root_ca }}"
         mode: '0644'
-      when: tas_single_node_fulcio.tas_single_node_fulcio_root_ca is defined and tas_single_node_fulcio.tas_single_node_fulcio_root_ca != ""
+      when: tas_single_node_fulcio.root_ca is defined and tas_single_node_fulcio.root_ca != ""
 
     - name: Verify if RSA private key matches the certificate
       ansible.builtin.shell:
@@ -216,7 +216,7 @@
       register: fulcio_root_csr
       changed_when: false
       when: >
-        (tas_single_node_fulcio.tas_single_node_fulcio_root_ca is not defined or tas_single_node_fulcio.tas_single_node_fulcio_root_ca == "")
+        (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or (
             key_type_check.stdout == "RSA Key" and
@@ -237,7 +237,7 @@
           -passin 'pass:{{ tas_single_node_fulcio_ca_passphrase }}'
           -out '{{ tas_single_node_remote_fulcio_root_ca }}'
       changed_when: >
-        (tas_single_node_fulcio.tas_single_node_fulcio_root_ca is not defined or tas_single_node_fulcio.tas_single_node_fulcio_root_ca == "")
+        (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or (
             key_type_check.stdout == "RSA Key" and
@@ -246,7 +246,7 @@
             (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
         )
       when: >
-        (tas_single_node_fulcio.tas_single_node_fulcio_root_ca is not defined or tas_single_node_fulcio.tas_single_node_fulcio_root_ca == "")
+        (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or (
             key_type_check.stdout == "RSA Key" and

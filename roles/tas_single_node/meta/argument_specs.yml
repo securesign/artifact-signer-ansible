@@ -148,8 +148,8 @@ argument_specs:
             organization_name: ""
             organization_email: ""
             common_name: ""
-          tas_single_node_fulcio_private_key: ""
-          tas_single_node_fulcio_root_ca: ""
+          private_key: ""
+          root_ca: ""
         options:
           certificate:
             description: "Details on the certificate attributes for Fulcio."
@@ -172,13 +172,13 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.1.1"
-          tas_single_node_fulcio_private_key:
+          private_key:
             description: "The user-provided private key for Fulcio,
               used for signing root certificate (only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported)."
             type: "str"
             required: false
             version_added: "1.1.1"
-          tas_single_node_fulcio_root_ca:
+          root_ca:
             description: "The user-provided root certificate for Fulcio. This field is mutually exclusive with the certificate field."
             type: "str"
             required: false
