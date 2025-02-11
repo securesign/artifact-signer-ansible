@@ -1,11 +1,3 @@
-tas_single_node_oidc_issuers:
-  - issuer: "http://dex-idp:5556/dex"
-    url: "http://dex-idp:5556/dex"
-    client_id: example-app
-    type: email
-tas_single_node_base_hostname: myrhtas
-tas_single_node_cockpit:
-  enabled: false
 aap_setup_prep_inv_secrets:
   all:
     registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"

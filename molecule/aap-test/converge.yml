@@ -7,6 +7,7 @@
     - ansible.controller
   vars_files:
     - vars/vars.yml
+    - vars/podman.yml
   vars:
     aap_instance_ip: "{{ groups['aap_group'][0] }}"
     worker_instance_ip: "{{ groups['worker_group'][0] }}"
@@ -125,11 +126,6 @@
         ah_host: https://{{ aap_instance_ip }}/
         ah_token: "{{ ah_token.token }}"
         validate_certs: false
-
-    - name: Switch images from `registry.redhat.io` images to the dev images
-      delegate_to: localhost
-      ansible.builtin.shell: |
-        sed -f ../../vm-testing/dev-images.sed  -i ../../roles/tas_single_node/defaults/main.yml
 
     - name: Build redhat.artifact_signer collection
       delegate_to: localhost
