@@ -333,6 +333,7 @@
                 credentials:
                   - rhtas_key
                 extra_vars:
+                  tas_single_node_podman: "{{ tas_single_node_podman }}"
                   aap_instance_ip: "{{ aap_instance_ip }}"
                   token: "{{ ah_token.token }}"
                   tas_single_node_oidc_issuers:
