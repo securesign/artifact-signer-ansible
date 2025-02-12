@@ -10,13 +10,13 @@ platforms:
     private_key_file_path: ~/.ssh/id_rsa
     image_id: ami-0dac29b55bd7c33aa
     instance_type: m5.2xlarge
-    aws_key_name: CI-TEST
+    aws_key_name: AAP-TEST
     volume_size: 32
   - name: worker-instance
     private_key_file_path: ~/.ssh/id_rsa
     image_id: ami-0dac29b55bd7c33aa
     instance_type: m5.large
-    aws_key_name: CI-TEST
+    aws_key_name: AAP-TEST
     volume_size: 10
 provisioner:
   name: ansible
