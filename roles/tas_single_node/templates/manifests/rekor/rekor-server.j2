@@ -63,7 +63,9 @@ spec:
             - --enable_retrieve_api=true
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
             - --enable_attestation_storage
-            - --attestation_storage_bucket=file:///var/run/attestations
+            # NOTE: we need to use no_tmp_dir=true with file-based storage to prevent
+            # cross-device link error - see https://github.com/google/go-cloud/issues/3314
+            - "--attestation_storage_bucket=file:///var/run/attestations?no_tmp_dir=true"
             - --port={{ tas_single_node_rekor_server_port_http }}
           image: "{{ tas_single_node_rekor_server_image }}"
           imagePullPolicy: IfNotPresent
