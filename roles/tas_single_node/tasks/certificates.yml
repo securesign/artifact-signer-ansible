@@ -302,7 +302,7 @@
         loop_var: KeyVar
       ansible.builtin.set_fact:
         tas_single_node_custom_ctlog_public_key_names: >
-          "{{ tas_single_node_custom_ctlog_public_key_names + [tas_single_node_certs_dir ~'/ctlog' ~ keyNum ~ '.pub']}}"
+          {{ tas_single_node_custom_ctlog_public_key_names + [tas_single_node_certs_dir ~'/ctlog' ~ keyNum ~ '.pub']}}
 
 
 - name: Generate CTLog root
