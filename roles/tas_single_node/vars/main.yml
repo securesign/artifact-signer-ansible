@@ -48,8 +48,6 @@ tas_single_node_remote_rekor_public_key: "{{ tas_single_node_certs_dir }}/{{ tas
 # Custom Key
 tas_single_node_custom_ctlog_public_key_names: []
 tas_single_node_custom_ctlog_private_key_names: []
-tas_single_node_custom_ctlog_private_keys: ""
-tas_single_node_custom_ctlog_public_keys: ""
 
 # Functional Keys
 tas_single_node_private_key_filename: rhtas.key
