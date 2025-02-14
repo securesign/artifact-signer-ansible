@@ -300,7 +300,7 @@
 - name: Generate CTLog root
   when: >
     ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0 )
+    and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0 )
   block:
     - name: Create CTLog private key
       ansible.builtin.shell:
