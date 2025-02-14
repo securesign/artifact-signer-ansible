@@ -71,7 +71,7 @@
         secret_name: ctlog-secret
         secret_namespace: ctlog-system
         keyName: [ private, public, fulcio ]
-        keyLists: [ '{{ ctlog_priv_keys }}', '{{ ctlog_pub_keys }}' ,'{{ tas_single_node_remote_fulcio_root_ca }}']
+        keyLists: [ '{{ ctlog_priv_keys }}', '{{ ctlog_pub_keys }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
         slurpedCerts: '{{ remote_ctlog_certificates }}'
 
 - name: Create Custom ctlog Secret

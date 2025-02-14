@@ -257,6 +257,7 @@
 
 - name: Custom CTLog Root
   when: > 
+    tas_single_node_custom_ctlog_private_keys is defined and tas_single_node_custom_ctlog_public_keys is defined and
     (tas_single_node_custom_ctlog_private_keys | length > 0 ) and (tas_single_node_custom_ctlog_public_keys | length > 0 ) 
   block:
     - name: Create Custom CTlog Private Key
