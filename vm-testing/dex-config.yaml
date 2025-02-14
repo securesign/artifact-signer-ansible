@@ -38,5 +38,5 @@ oauth2:
 
 expiry:
   signingKeys: "24h"
-  idTokens: "1m"
+  idTokens: "10m"
   authRequests: "24h"

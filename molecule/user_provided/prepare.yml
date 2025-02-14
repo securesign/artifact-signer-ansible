@@ -23,8 +23,10 @@
         state: latest
 
     - name: Set Redis password
-      shell: |
-        echo "CONFIG SET requirepass "password"" | redis-cli
+      ansible.builtin.lineinfile:
+        path: /etc/redis/redis.conf
+        regexp: '^# requirepass'
+        line: 'requirepass password'
 
     - name: Allow external connections for Redis
       ansible.builtin.lineinfile:
