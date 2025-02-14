@@ -137,6 +137,128 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.1.0"
+      tas_single_node_ingress_certificates:
+        description: "Details on the certificate settings for various services in the ingress layer.
+          Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server."
+        type: "dict"
+        required: false
+        version_added: "1.2.0"
+        default:
+          fulcio:
+            certificate: ""
+            private_key: ""
+          rekor:
+            certificate: ""
+            private_key: ""
+          tuf:
+            certificate: ""
+            private_key: ""
+          tsa:
+            certificate: ""
+            private_key: ""
+          rekor-search:
+            certificate: ""
+            private_key: ""
+          cli-server:
+            certificate: ""
+            private_key: ""
+        options:
+          fulcio:
+            description: "Certificate details for the fulcio service."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              certificate:
+                description: "The user-provided certificate for fulcio."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "The user-provided private key for fulcio."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          rekor:
+            description: "Certificate details for the rekor service."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              certificate:
+                description: "The user-provided certificate for rekor."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "The user-provided private key for rekor."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          tuf:
+            description: "Certificate details for the TUF service."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              certificate:
+                description: "The user-provided certificate for TUF."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "The user-provided private key for TUF."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          tsa:
+            description: "Certificate details for the TSA service."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              certificate:
+                description: "The user-provided certificate for TSA."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "The user-provided private key for TSA."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          rekor-search:
+            description: "Certificate details for the rekor-search service."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              certificate:
+                description: "The user-provided certificate for rekor-search."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "The user-provided private key for rekor-search."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          cli-server:
+            description: "Certificate details for the cli-server service."
+            type: "dict"
+            required: false
+            version_added: "1.2.0"
+            options:
+              certificate:
+                description: "The user-provided certificate for cli-server."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "The user-provided private key for cli-server."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
       tas_single_node_fulcio:
         description: "Details on the certificate settings for Fulcio. Includes organizational details,
           the user-provided private key for signing the root certificate, and the user-provided root certificate itself."

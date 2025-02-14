@@ -21,6 +21,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
 | tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
 | tas_single_node_trillian | Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}}`  |
+| tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
 | tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': ''}`  |
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
@@ -84,6 +85,59 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | user | The database user. | str | no |  |
 | root_password | The root password for the database. | str | no |  |
 | database | The database name to connect to. | str | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| fulcio | Certificate details for the fulcio service. | dict of 'fulcio' options | no |  |
+| rekor | Certificate details for the rekor service. | dict of 'rekor' options | no |  |
+| tuf | Certificate details for the TUF service. | dict of 'tuf' options | no |  |
+| tsa | Certificate details for the TSA service. | dict of 'tsa' options | no |  |
+| rekor-search | Certificate details for the rekor-search service. | dict of 'rekor-search' options | no |  |
+| cli-server | Certificate details for the cli-server service. | dict of 'cli-server' options | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > fulcio
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | The user-provided certificate for fulcio. | str | no |  |
+| private_key | The user-provided private key for fulcio. | str | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > rekor
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | The user-provided certificate for rekor. | str | no |  |
+| private_key | The user-provided private key for rekor. | str | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > tuf
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | The user-provided certificate for TUF. | str | no |  |
+| private_key | The user-provided private key for TUF. | str | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > tsa
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | The user-provided certificate for TSA. | str | no |  |
+| private_key | The user-provided private key for TSA. | str | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > rekor-search
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | The user-provided certificate for rekor-search. | str | no |  |
+| private_key | The user-provided private key for rekor-search. | str | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > cli-server
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| certificate | The user-provided certificate for cli-server. | str | no |  |
+| private_key | The user-provided private key for cli-server. | str | no |  |
 
 #### Options for main > tas_single_node_fulcio
 
