@@ -37,19 +37,20 @@ tas_single_node_custom_ctlog_private_keys:
   - |
     -----BEGIN EC PRIVATE KEY-----
     Proc-Type: 4,ENCRYPTED
-    DEK-Info: DES-EDE3-CBC,88AC4C29A69188C9
+    DEK-Info: DES-EDE3-CBC,57FCEE878B07AC16
 
-    vi9qVLa8vG7dv8N4o+dBUNg8IFZq1wuSOZkWP5Hn4HInrJSm4k+PLNqDL7kyEMAm
-    CoL/niZS+EgfsfYgUj+TEB9f5IrcCO2B5rvHOkR8PmD9Tc86+DfBHDn+GWndStfQ
-    o4JabdBmkeiVHF9G2Yh76WF2bpLdaizhCN9W7sAR1eQ=
+    787ec4wduqkMZIaoOEA2RHU2yBZkrWzWtemXr6VEkJ2hZAhclgRkYl+/rGXvPrDJ
+    fDMlDQFtmni5fKciBdDWgnqBeqjLEvUFYNPa8PQRl+GkOb8OhqnYr49G9OLcE6FJ
+    stoyTGmUhzhUqT5gP4RRWiaoDC7sc2QFKPbP3ddVJPw=
     -----END EC PRIVATE KEY-----
 
 tas_single_node_custom_ctlog_public_keys: 
   - |
     -----BEGIN PUBLIC KEY-----
-    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6eVbjvymisv1VZYe8bZ5hIsHfhTg
-    nrByohpB1XkB2qS0+DaEY9k3RyORK1NWjCrJ7901l777dBhVM9gYcqAVjw==
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC8gDOBUfTkXGEipKeYScT7uiud4s
+    JPjVrEjwILyLwgvpfjx1YxAi/N3b2Fa8aF9l0JaQ0J19ITKwZaXaak54Hw==
     -----END PUBLIC KEY-----
+
 
 tas_single_node_custom_ctlog_sharded_config:
   - config:
