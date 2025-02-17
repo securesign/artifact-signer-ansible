@@ -4,6 +4,13 @@
     remote_key_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.key"
     remote_cert_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.pem"
 
+- name: Fail if only the ingress certificate is provided without a private key
+  ansible.builtin.fail:
+    msg: "Ingress certificate '{{ cert_name }}' is provided, but the corresponding private key is missing. Please provide both the certificate and private key."
+  when: >
+    tas_single_node_ingress_certificates[cert_name].certificate | default('') != ''
+    and tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
+
 - name: Load user-provided ingress private key for {{ cert_name }}
   ansible.builtin.copy:
     content: "{{ tas_single_node_ingress_certificates[cert_name].private_key }}"
