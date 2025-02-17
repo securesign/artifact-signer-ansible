@@ -26,6 +26,26 @@ tas_single_node_trillian:
     host: trillian-mysql-pod
     port: 3306
 
+tas_single_node_ingress_certificates:
+  fulcio:
+    certificate: ""
+    private_key: ""
+  rekor:
+    certificate: ""
+    private_key: ""
+  tuf:
+    certificate: ""
+    private_key: ""
+  tsa:
+    certificate: ""
+    private_key: ""
+  rekor-search:
+    certificate: ""
+    private_key: ""
+  cli-server:
+    certificate: ""
+    private_key: ""
+
 tas_single_node_fulcio:
   certificate:
     organization_name: ""

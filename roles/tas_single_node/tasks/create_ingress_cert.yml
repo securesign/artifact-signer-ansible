@@ -4,10 +4,36 @@
     remote_key_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.key"
     remote_cert_path: "{{ tas_single_node_certs_dir }}/ingress-{{ cert_name }}.pem"
 
+- name: Fail if only the ingress certificate is provided without a private key
+  ansible.builtin.fail:
+    msg: "Ingress certificate '{{ cert_name }}' is provided, but the corresponding private key is missing. Please provide both the certificate and private key."
+  when: >
+    tas_single_node_ingress_certificates[cert_name].certificate | default('') != ''
+    and tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
+
+- name: Load user-provided ingress private key for {{ cert_name }}
+  ansible.builtin.copy:
+    content: "{{ tas_single_node_ingress_certificates[cert_name].private_key }}"
+    dest: "{{ remote_key_path }}"
+    mode: '0600'
+  when: tas_single_node_ingress_certificates[cert_name].private_key | default('') != ''
+
+- name: Load user-provided ingress certificate for {{ cert_name }}
+  ansible.builtin.copy:
+    content: "{{ tas_single_node_ingress_certificates[cert_name].certificate }}"
+    dest: "{{ remote_cert_path }}"
+    mode: '0600'
+  when: >
+    tas_single_node_ingress_certificates[cert_name].certificate | default('') != ''
+    and tas_single_node_ingress_certificates[cert_name].private_key | default('') != ''
+
 - name: Create certificate and private key for {{ cert_name }}
   when: >
-    (existing_files.files | selectattr('path', 'equalto', remote_key_path) | list | length) == 0
-    or (existing_files.files | selectattr('path', 'equalto', remote_cert_path) | list | length) == 0
+    ((existing_files.files | selectattr('path', 'equalto', remote_key_path) | list | length) == 0
+    or (existing_files.files | selectattr('path', 'equalto', remote_cert_path) | list | length) == 0)
+    and (
+      (tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
+       or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''))
   #   when: ((existing_files.files | selectattr('path', 'equalto', key_path) | list | length) == 0)
   #         and (existing_files.files | selectattr('path', 'equalto', cert_path) | list | length) == 0))
   block:
@@ -15,6 +41,7 @@
       ansible.builtin.command:
         cmd: "openssl genrsa -out '{{ remote_key_path }}' 4096"
         creates: "{{ remote_key_path }}"
+      when: tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
 
     # TODO: Allow more parameters to be provided
     - name: Create certificate signing request (CSR) for certificate for {{ cert_name }}
@@ -29,6 +56,9 @@
           -addext 'extendedKeyUsage = serverAuth'
       register: csr
       changed_when: false
+      when: >
+        tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
+        or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
 
     - name: Sign certificate with our CA for {{ cert_name }}
       ansible.builtin.shell:
@@ -42,3 +72,6 @@
           -CAkey '{{ remote_ca_key_path }}'
           -out '{{ remote_cert_path }}'
         creates: "{{ remote_cert_path }}"
+      when: >
+        tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
+        or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
