@@ -1,0 +1,153 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - vars/vars.yml
+  vars:
+    debug_outputs: true
+    molecule_inventory:
+      all:
+        children:
+          molecule:
+            hosts: {}
+  tasks:
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/create_common.yml
+
+    - name: Generate instance IDs
+      ansible.builtin.set_fact:
+        instance_ids:
+          aap: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
+          worker: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
+
+    - name: Launch EC2 instances
+      amazon.aws.ec2_instance:
+        name: "{{ item.key }}-VM"
+        key_name: "{{ item.value.aws_key_name }}"
+        instance_type: "{{ item.value.instance_type }}"
+        image_id: "{{ item.value.image_id }}"
+        region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+        vpc_subnet_id: "{{ subnet_id }}"
+        network:
+          assign_public_ip: true
+        security_group: "{{ sgID }}"
+        wait: true
+        state: running
+        volumes:
+          - device_name: /dev/sda1
+            ebs:
+              volume_size: "{{ item.value.volume_size }}"
+              delete_on_termination: true
+      loop:
+        - { key: "AAP", value: "{{ molecule_yml.platforms[0] }}" }
+        - { key: "Worker", value: "{{ molecule_yml.platforms[1] }}" }
+      register: ec2_instances
+
+    - name: Debug ec2_instances
+      ansible.builtin.debug:
+        msg: "{{ ec2_instances }}"
+
+    - name: Set instance IDs and IPs
+      ansible.builtin.set_fact:
+        instance_data: >
+          {%- set instances = {} -%}
+          {%- for result in ec2_instances.results -%}
+            {%- set _ = instances.update({ result.item.key: {
+              'id': result.instances[0].instance_id,
+              'ip': result.instances[0].network_interfaces[0].association.public_ip
+            }}) -%}
+          {%- endfor -%}
+          {{ instances }}
+
+    - name: Populate instance config dict
+      ansible.builtin.set_fact:
+        instance_conf_dict: {
+          'instance': "{{ item.value.id }}",
+          'address': "{{ item.value.ip }}",
+          'user': "ec2-user",
+          'port': "22",
+          'identity_file': "{{ molecule_yml.platforms[0].aws_key_name }}",
+        }
+      with_items:
+        - "{{ instance_data | dict2items }}"
+      register: instance_config_dict
+
+    - name: Convert instance config dict to a list
+      ansible.builtin.set_fact:
+        instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+
+    - name: Debug instance_conf
+      ansible.builtin.debug:
+        msg: "{{ instance_conf }}"
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: |
+          # Molecule managed
+
+          {{ instance_conf | to_json | from_json | to_yaml }}
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
+
+    - name: Add VMs to molecule_inventory
+      vars:
+        inventory_partial_yaml: |
+          all:
+            children:
+              molecule:
+                hosts:
+                  "{{ item.value.ip }}":
+                    ansible_user: ec2-user
+                    ansible_ssh_private_key_file: "{{ molecule_yml.platforms[0].private_key_file_path }}"
+      ansible.builtin.set_fact:
+        molecule_inventory: >
+          {{ molecule_inventory | combine(inventory_partial_yaml | from_yaml, recursive=true) }}
+      with_items:
+        - "{{ instance_data | dict2items }}"
+
+    - name: Add VMs groups to molecule_inventory
+      vars:
+        inventory_partial_yaml: |
+          all:
+            children:
+              aap_group:
+                hosts:
+                  "{{ instance_data['AAP'].ip }}":
+                    ansible_user: ec2-user
+                    ansible_ssh_private_key_file: "{{ molecule_yml.platforms[0].private_key_file_path }}"
+              worker_group:
+                hosts:
+                  "{{ instance_data['Worker'].ip }}":
+                    ansible_user: ec2-user
+                    ansible_ssh_private_key_file: "{{ molecule_yml.platforms[0].private_key_file_path }}"
+                    ansible_become: true
+      ansible.builtin.set_fact:
+        molecule_inventory: >
+          {{ molecule_inventory | combine(inventory_partial_yaml | from_yaml, recursive=true) }}
+
+    - name: Add AWS EC2 Instances to known hosts
+      ansible.builtin.shell:
+        cmd: ssh-keyscan -H {{ item.value.ip }} >> ~/.ssh/known_hosts
+      loop: "{{ instance_data | dict2items }}"
+      retries: 15
+      delay: 15
+
+    - name: Dump molecule_inventory
+      ansible.builtin.copy:
+        content: |
+          {{ molecule_inventory | to_yaml }}
+        dest: "{{ molecule_ephemeral_directory }}/inventory/molecule_inventory.yml"
+        mode: "0600"
+
+    - name: Force inventory refresh
+      ansible.builtin.meta: refresh_inventory
+
+    - name: Fail if molecule group is missing
+      ansible.builtin.assert:
+        that: "'molecule' in groups"
+        fail_msg: |
+          molecule group was not found inside inventory groups: {{ groups }}
+      run_once: true
