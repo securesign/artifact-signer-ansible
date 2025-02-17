@@ -29,3 +29,32 @@ tas_single_node_tsa:
   ntp_config: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ntpsync.yaml') }}"
   signer_private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/private-key.pem') }}"
   certificate_chain: "{{ lookup('file', molecule_scenario_directory + '/test_creds/cert-chain.pem') }}"
+tas_single_node_custom_ctlog_public_key_names: []
+tas_single_node_custom_ctlog_private_key_names: []
+tas_single_node_custom_ctlog_private_keys: 
+  - |
+    -----BEGIN EC PRIVATE KEY-----
+    Proc-Type: 4,ENCRYPTED
+    DEK-Info: DES-EDE3-CBC,57FCEE878B07AC16
+
+    787ec4wduqkMZIaoOEA2RHU2yBZkrWzWtemXr6VEkJ2hZAhclgRkYl+/rGXvPrDJ
+    fDMlDQFtmni5fKciBdDWgnqBeqjLEvUFYNPa8PQRl+GkOb8OhqnYr49G9OLcE6FJ
+    stoyTGmUhzhUqT5gP4RRWiaoDC7sc2QFKPbP3ddVJPw=
+    -----END EC PRIVATE KEY-----
+
+tas_single_node_custom_ctlog_public_keys: 
+  - |
+    -----BEGIN PUBLIC KEY-----
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC8gDOBUfTkXGEipKeYScT7uiud4s
+    JPjVrEjwILyLwgvpfjx1YxAi/N3b2Fa8aF9l0JaQ0J19ITKwZaXaak54Hw==
+    -----END PUBLIC KEY-----
+
+
+tas_single_node_custom_ctlog_sharded_config:
+  - config:
+    treeid: 
+    prefix: "rhtasansible"
+    root_pem_file: "/ctfe-keys/fulcio-0"
+    password: "password"
+    private_key: "private-0"
+tas_single_node_custom_ctlog_config: ""
