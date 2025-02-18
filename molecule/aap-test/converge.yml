@@ -225,7 +225,7 @@
             controller_projects:
               - name: rhtas
                 organization: Default
-                scm_branch: aap_test_ci
+                scm_branch: main
                 scm_clean: 'no'
                 scm_delete_on_update: 'no'
                 scm_type: git
