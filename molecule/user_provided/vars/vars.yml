@@ -52,11 +52,28 @@ tas_single_node_custom_ctlog_public_keys:
     -----END PUBLIC KEY-----
 
 
-tas_single_node_custom_ctlog_sharded_config:
-  - config:
-    treeid: 
-    prefix: "rhtasansible"
-    root_pem_file: "/ctfe-keys/fulcio-0"
-    password: "password"
-    private_key: "private-0"
-tas_single_node_custom_ctlog_config: ""
+tas_single_node_ctlog:
+  sharded_config:
+    - config:
+      treeid:
+      prefix: "rhtasansible"
+      root_pem_file: "/ctfe-keys/fulcio-0"
+      password: "rhtas"
+      private_key: "private-0"
+  private_keys:
+    - |
+      -----BEGIN EC PRIVATE KEY-----
+      Proc-Type: 4,ENCRYPTED
+      DEK-Info: DES-EDE3-CBC,57FCEE878B07AC16
+
+      787ec4wduqkMZIaoOEA2RHU2yBZkrWzWtemXr6VEkJ2hZAhclgRkYl+/rGXvPrDJ
+      fDMlDQFtmni5fKciBdDWgnqBeqjLEvUFYNPa8PQRl+GkOb8OhqnYr49G9OLcE6FJ
+      stoyTGmUhzhUqT5gP4RRWiaoDC7sc2QFKPbP3ddVJPw=
+      -----END EC PRIVATE KEY-----
+  public_keys:
+    - |
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC8gDOBUfTkXGEipKeYScT7uiud4s
+      JPjVrEjwILyLwgvpfjx1YxAi/N3b2Fa8aF9l0JaQ0J19ITKwZaXaak54Hw==
+      -----END PUBLIC KEY-----
+
