@@ -5,10 +5,29 @@
   vars_files:
     - vars/vars.yml
     - vars/podman.yml
+  vars:
+    tas_single_node_data_protection:
+      backup:
+        enabled: false
+        schedule: "*-*-* 00:00:00"
+        force_on_run: false
+        user_playbook_path: ""
+      restore:
+        backup_file: "BACKUP-2025-02-27-04-41-UTC"
+      shared:
+        backup_directory: "~/tas_backups"
+        passphrase: rhtas123
+
   tasks:
     - name: Ensure Registry credentials are set
       ansible.builtin.include_tasks: ../check_creds.yml
 
-    - name: Apply tas_single_node role
-      ansible.builtin.include_role:
-        name: tas_single_node
+    - name: Apply restore tasks
+      include_tasks: ../restoreTasks.yml
+ 
+      #- name: Apply tas_single_node role
+      #ansible.builtin.include_role:
+      #  name: tas_single_node
+        
+      #- name: Apply backup tasks
+      #include_tasks: ../backupTasks.yml

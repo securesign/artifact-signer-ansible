@@ -1,0 +1,24 @@
+- name: Backup task block
+  block:
+    - name: Deploy `create_backup` service
+      ansible.builtin.include_tasks: podman/install_manifest.yml
+      vars:
+        podman_spec:
+          state: started
+          systemd_file: create_backup
+          network: "{{ tas_single_node_podman_network }}"
+          kube_file_content: "{{ lookup('template', 'systemd/create_backup.service.j2') }}"
+
+    - name: Copy create_backup.timer file to server
+      ansible.builtin.template:
+        src: systemd/create_backup.timer.j2
+        dest: "{{ tas_single_node_systemd_directory }}/create_backup.timer"
+        mode: "0644"
+
+    - name: Enable and start create_backup.timer
+      ansible.builtin.systemd:
+        name: create_backup.timer
+        enabled: true
+        state: started
+        daemon_reload: "{{ copy_timer_systemd_file.changed }}"
+  when: tas_single_node_data_protection.backup.enabled

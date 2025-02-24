@@ -1,0 +1,62 @@
+- name: Push Encrypted Backup Tarball to Remote Server
+  ansible.builtin.copy:
+    src: "{{ tas_single_node_data_protection.shared.backup_directory }}/{{ tas_single_node_data_protection.restore.backup_file }}.tar.zst.enc"
+    dest: "/root/{{ tas_single_node_data_protection.restore.backup_file }}.tar.zst.enc"
+    remote_src: no
+
+- name: Decrypt Backup Tarball
+  ansible.builtin.shell: |
+    openssl enc -d -aes-256-cbc -salt -pbkdf2 -iter 600000 \
+    -in "{{ tas_single_node_data_protection.restore.backup_file}}.tar.zst.enc" \
+    -out "{{ tas_single_node_data_protection.restore.backup_file }}.tar.zst" \
+    -pass pass:"{{ tas_single_node_data_protection.shared.passphrase }}"
+  args:
+    executable: /bin/bash
+    chdir: /root/
+
+- name: Delete Encrypted Backup Tarball on Remote Server
+  ansible.builtin.file:
+    path: "/root/{{ tas_single_node_data_protection.restore.backup_file }}.tar.zst.enc"
+    state: absent
+
+- name: Install zstd on Remote Host
+  ansible.builtin.dnf:
+    name: zstd
+    state: present
+
+- name: Extract Compressed Backup Tarball
+  ansible.builtin.shell: |
+    tar --zstd -xvf "{{ tas_single_node_data_protection.restore.backup_file }}.tar.zst"
+  args:
+    executable: /bin/bash
+    chdir: /root/
+
+- name: Delete Backup Tarball on Remote Server
+  ansible.builtin.file:
+    path: "/root/{{ tas_single_node_data_protection.restore.backup_file }}.tar.zst"
+    state: absent
+
+- name: Stop Podman Containers
+  ansible.builtin.shell: podman stop $(podman ps -aq)
+
+- name: Restore Podman Volumes
+  ansible.builtin.copy:
+    src: "/root/{{ tas_single_node_data_protection.restore.backup_file }}/volumes/"
+    dest: /var/lib/containers/storage/volumes/
+    remote_src: yes
+    force: yes
+
+- name: Restore Configuration Files
+  ansible.builtin.copy:
+    src: "/root/{{ tas_single_node_data_protection.restore.backup_file }}/rhtas/"
+    dest: /etc/rhtas/
+    remote_src: yes
+    force: yes
+
+- name: Start Podman Containers
+  ansible.builtin.shell: podman start $(podman ps -aq --filter "status=exited")
+
+- name: Delete Uncompressed Tarball
+  ansible.builtin.file:
+    path: "/root/{{ tas_single_node_data_protection.restore.backup_file }}"
+    state: absent

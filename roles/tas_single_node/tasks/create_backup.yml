@@ -1,0 +1,75 @@
+- name: Create Local Backup Directory (on Ansible Control Node)
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ tas_single_node_data_protection.shared.backup_directory }}"
+    state: directory
+
+- name: Generate Backup Timestamp
+  ansible.builtin.shell: "date -u +BACKUP-%Y-%m-%d-%H-%M-UTC"
+  register: timestamp
+
+- name: Create Remote Backup Directory
+  ansible.builtin.file:
+    path: "/root/{{ timestamp.stdout }}"
+    state: directory
+
+- name: Stop Podman Containers
+  ansible.builtin.shell: podman stop $(podman ps -aq)
+
+- name: Copy Configuration Files to Backup Directory
+  ansible.builtin.copy:
+    src: /etc/rhtas
+    dest: "/root/{{ timestamp.stdout }}/"
+    remote_src: yes
+
+- name: Copy Podman Volumes to Backup Directory
+  ansible.builtin.copy:
+    src: /var/lib/containers/storage/volumes
+    dest: "/root/{{ timestamp.stdout }}/"
+    remote_src: yes
+
+- name: Start Podman Containers
+  ansible.builtin.shell: podman start $(podman ps -aq --filter "status=exited")
+
+- name: Install zstd on Remote Host
+  become: yes
+  ansible.builtin.dnf:
+    name: zstd
+    state: present
+
+- name: Create Compressed Backup Tarball
+  ansible.builtin.shell: |
+    tar --zstd -cvf "{{ timestamp.stdout }}.tar.zst" "{{ timestamp.stdout }}"
+  args:
+    executable: /bin/bash
+    chdir: /root/
+
+- name: Delete Uncompressed Backup Directory on Remote Host
+  ansible.builtin.file:
+    path: "/root/{{ timestamp.stdout }}"
+    state: absent
+
+- name: Encrypt Backup Tarball
+  ansible.builtin.shell: |
+    openssl enc -aes-256-cbc -salt -pbkdf2 -iter 600000 -in "{{ timestamp.stdout }}.tar.zst" \
+    -out "{{ timestamp.stdout }}.tar.zst.enc" \
+    -pass pass:"{{ tas_single_node_data_protection.shared.passphrase }}"
+  args:
+    executable: /bin/bash
+    chdir: /root/
+
+- name: Delete Unencrypted Backup Tarball
+  ansible.builtin.file:
+    path: "/root/{{ timestamp.stdout }}.tar.zst"
+    state: absent
+
+- name: Pull Encrypted Backup Tarball to Local Backup Directory
+  ansible.builtin.fetch:
+    src: "/root/{{ timestamp.stdout }}.tar.zst.enc"
+    dest: "{{ tas_single_node_data_protection.shared.backup_directory }}/"
+    flat: yes
+
+- name: Delete Encrypted Backup Tarball on Remote Server
+  ansible.builtin.file:
+    path: "/root/{{ timestamp.stdout }}.tar.zst.enc"
+    state: absent

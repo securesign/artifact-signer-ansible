@@ -1,0 +1,9 @@
+[Unit]
+Description=Runs backup playbook
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ansible-playbook {{ tas_single_node_data_protection.backup.user_playbook_path }}
+
+[Install]
+WantedBy]multi-user.target

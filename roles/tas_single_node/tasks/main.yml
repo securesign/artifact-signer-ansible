@@ -9,6 +9,19 @@
   ansible.builtin.include_tasks: os.yml
   when: not tas_single_node_skip_os_install
 
+- name: Run Restore Tasks
+  ansible.builtin.include_tasks: restore.yml
+  when: tas_single_node_data_protection.restore.backup_file
+
+- name: Run Manual Backup and Exit
+  block:
+    - name: Run Backup Tasks
+      ansible.builtin.include_tasks: create_backup.yml
+
+    - name: Exit after Backup
+      meta: end_host
+  when: tas_single_node_data_protection.backup.force_on_run
+
 - name: Create cockpit-user
   ansible.builtin.user:
     name: "{{ tas_single_node_cockpit.user.username }}"

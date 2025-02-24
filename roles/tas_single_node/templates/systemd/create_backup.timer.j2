@@ -1,0 +1,10 @@
+[Unit]
+Description= Run `create_backup` service
+
+[Timer]
+OnCalendar={{ tas_single_node_data_protection.backup.schedule }}
+Persistent=true
+Unit=create_backup.service
+
+[Install]
+WantedBy=timers.target

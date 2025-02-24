@@ -119,3 +119,7 @@
 - name: Configure/Deploy RekorSearch
   ansible.builtin.include_tasks: podman/rekor_search.yml
   when: tas_single_node_rekor_search_enabled | bool
+
+- name: Configure/Deploy Backup Service
+  ansible.builtin.include_tasks: podman/backup.yml
+  when: tas_single_node_data_protection.backup.enabled

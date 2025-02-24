@@ -5,6 +5,18 @@ tas_single_node_registry_password: ""
 
 tas_single_node_podman_network: rhtas
 
+tas_single_node_data_protection:
+  backup:
+    enabled: false
+    schedule: "*-*-* 00:00:00"
+    force_on_run: false
+    user_playbook_path: ""
+  restore:
+    backup_file: ""
+  shared:
+    backup_directory: ""
+    passphrase: rhtas123
+
 tas_single_node_rekor_redis:
   database_deploy: true
   redis:

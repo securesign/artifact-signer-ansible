@@ -40,10 +40,6 @@
     enabled: true
     daemon_reload: true
     name: "{{ podman_spec.systemd_file }}"
-  when: |
-    copy_manifest.changed or copy_systemd_file.changed or
-    (podman_spec.secret is defined and podman_spec.secret_changed) or
-    (podman_spec.configmap is defined and podman_spec.configmap_changed)
   register: podman_service_restart
 
 # We do all this because checking exit status of the container by the systemd unit has only been added in podman 4.6.0
