@@ -73,3 +73,9 @@ spec:
                 -a "{{ tas_single_node_rekor_redis.redis.password }}" \
 {% endif %}
                 SET last_filled_index "$((endIndex + 1))"
+          volumeMounts:
+            - mountPath: /var/lib/redis/data
+              name: redis-backfill-storage
+      volumes:
+        - name: redis-backfill-storage
+          emptyDir: {}
