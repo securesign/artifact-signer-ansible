@@ -1,4 +1,21 @@
 ---
+- name: Run Manual Backup and Exit
+  when: tas_single_node_data_protection.backup.force_run and
+        not tas_single_node_data_protection.restore.enabled
+  block:
+    - name: Run Backup Oneshot Job
+      ansible.builtin.systemd:
+        name: tas_backup.service
+        state: started
+
+    - name: Exit after Backup
+      ansible.builtin.meta: end_host
+
+- name: Run TAS System Restore
+  ansible.builtin.include_tasks: podman/restore.yml
+  when: tas_single_node_data_protection.restore.enabled and
+        not tas_single_node_data_protection.backup.force_run
+
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
 
