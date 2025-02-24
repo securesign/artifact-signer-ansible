@@ -17,8 +17,8 @@ tas_single_node_podman:
       mirror: quay.io/securesign/trillian-redis
     - location: registry.redhat.io/rhtas/trillian-database-rhel9
       mirror: quay.io/securesign/trillian-database
-    - location: registry.redhat.io/rhtas/tuf-server-rhel9
-      mirror: quay.io/securesign/scaffold-tuf-server
+    - location: registry.redhat.io/rhtas/tuffer-rhel9
+      mirror: quay.io/securesign/tuffer
     - location: registry.redhat.io/rhtas/timestamp-authority-rhel9
       mirror: quay.io/securesign/timestamp-authority
     - location: registry.redhat.io/rhtas/rekor-search-ui-rhel9
