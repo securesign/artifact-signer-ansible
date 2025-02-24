@@ -1,0 +1,21 @@
+---
+- name: Mount the Volume
+  ansible.builtin.command:
+    cmd: podman volume mount "{{ item }}"
+  register: mount_path
+  changed_when: false
+
+- name: Copy backup data to mounted volume
+  ansible.builtin.copy:
+    src: "{{ restore_dir }}/{{ restore_file }}/volumes/{{ item }}/"
+    dest: "{{ mount_path.stdout | dirname }}/"
+    remote_src: true
+    mode: "0700"
+  when: mount_path.stdout | length > 0
+
+- name: Unmount the volume after copying
+  ansible.builtin.command:
+    cmd: podman volume unmount "{{ item }}"
+  register: unmount_result
+  when: mount_path.stdout | length > 0
+  changed_when: unmount_result.rc == 0 and unmount_result.stdout | length > 0

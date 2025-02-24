@@ -2,6 +2,31 @@
 - name: Importing default values
   ansible.builtin.import_tasks: set_defaults.yml
 
+- name: Run Manual Backup and Exit
+  when: tas_single_node_backup_restore.backup.force_run and
+        not tas_single_node_backup_restore.restore.enabled
+  block:
+    - name: Fail if passphrase is not provided
+      ansible.builtin.fail:
+        msg: "Passphrase must be set for the backup to complete successfully and securely."
+      when: tas_single_node_backup_restore.backup.passphrase == ''
+
+    - name: Populate service facts
+      ansible.builtin.service_facts:
+
+    - name: Inform the user if tas_backup service doesn't exist
+      ansible.builtin.fail:
+        msg: "The tas_backup service does not exist. Please ensure a successful collection run has completed without the force_run option."
+      when: "'tas_backup.service' not in services"
+
+    - name: Run Backup Oneshot Job
+      ansible.builtin.systemd:
+        name: tas_backup.service
+        state: started
+
+    - name: Exit after Backup
+      ansible.builtin.meta: end_host
+
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
 
@@ -14,6 +39,11 @@
 
 - name: Create Podman Volumes
   ansible.builtin.include_tasks: volumes.yml
+
+- name: Run TAS System Restore
+  ansible.builtin.include_tasks: podman/backup_restore/restore.yml
+  when: tas_single_node_backup_restore.restore.enabled and
+        not tas_single_node_backup_restore.backup.force_run
 
 - name: Create cockpit-user
   ansible.builtin.user:
