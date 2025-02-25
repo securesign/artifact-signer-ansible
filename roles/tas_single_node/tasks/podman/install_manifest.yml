@@ -26,7 +26,7 @@
     cmd: "podman kube play {{ podman_spec.secret }}"
   when: podman_spec.secret is defined
   changed_when: podman_spec.secret is defined and podman_spec.secret_changed
-  no_log : true
+  no_log: true
 
 - name: Copy Systemd file to Server
   ansible.builtin.template:
