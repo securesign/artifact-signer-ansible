@@ -48,5 +48,3 @@ tas_single_node_ctlog:
   public_keys:
     - |
       {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}
-
-
