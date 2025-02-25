@@ -259,47 +259,50 @@
   when: >
     tas_single_node_ctlog.private_keys is defined and tas_single_node_ctlog.public_keys is defined and
     (tas_single_node_ctlog.private_keys | length > 0 ) and (tas_single_node_ctlog.public_keys | length > 0 )
+  no_log: true
   block:
     - name: Create Custom CTlog Private Key
-      when: KeyVar != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
+      when: keyVar != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
       changed_when: false
-      ansible.builtin.shell:
-        cmd: >-
-          echo -n '{{ KeyVar }}' > '{{ tas_single_node_certs_dir}}/ctlog{{ keyNum }}.key'
+      ansible.builtin.copy:
+        content: "{{ keyVar }}"
+        dest: "{{ tas_single_node_certs_dir}}/ctlog{{ keyNum }}.key"
+        mode: 0600
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
-        loop_var: KeyVar
+        loop_var: keyVar
         index_var: keyNum
 
     - name: Track CTlog Private Keys
-      when: KeyVar != "" and tas_single_node_custom_ctlog_private_keys | length > 0
+      when: keyVar != "" and tas_single_node_ctlog.private_keys | length > 0
       changed_when: false
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
         index_var: keyNum
-        loop_var: KeyVar
+        loop_var: keyVar
       ansible.builtin.set_fact:
         tas_single_node_custom_ctlog_private_key_names: >
           {{ tas_single_node_custom_ctlog_private_key_names + [tas_single_node_certs_dir ~'/ctlog' ~ keyNum ~ '.key']}}
 
     - name: Create Custom CTlog Public Key
-      when: KeyVar != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0
+      when: keyVar != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0
       changed_when: false
-      ansible.builtin.shell:
-        cmd: >-
-          echo -n '{{ KeyVar }}' > '/etc/rhtas/certs/ctlog{{ keyNum }}.pub'
+      ansible.builtin.copy:
+        content: "{{ keyVar }}"
+        dest: "{{ tas_single_node_certs_dir}}/ctlog{{ keyNum }}.pub"
+        mode: 0600
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
-        loop_var: KeyVar
+        loop_var: keyVar
         index_var: keyNum
 
     - name: Track CTlog Public Keys
-      when: KeyVar != "" and tas_single_node_custom_ctlog_public_keys | length > 0
+      when: keyVar != "" and tas_single_node_ctlog.public_keys | length > 0
       changed_when: false
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
         index_var: keyNum
-        loop_var: KeyVar
+        loop_var: keyVar
       ansible.builtin.set_fact:
         tas_single_node_custom_ctlog_public_key_names: >
           {{ tas_single_node_custom_ctlog_public_key_names + [tas_single_node_certs_dir ~'/ctlog' ~ keyNum ~ '.pub']}}
@@ -309,7 +312,7 @@
   when: >
     ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
     and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0 )
-    and tas_single_node_custom_ctlog_private_keys is not defined and tas_single_node_custom_ctlog_public_keys is not defined
+    and tas_single_node_ctlog.private_keys is not defined and tas_single_node_ctlog.public_keys is not defined
   block:
     - name: Create CTLog private key
       ansible.builtin.shell:
