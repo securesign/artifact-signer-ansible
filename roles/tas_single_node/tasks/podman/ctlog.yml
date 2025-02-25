@@ -22,12 +22,8 @@
 
 - name: Load ctlog config content
   block:
-    - name: Use Custom Config
-      when: tas_single_node_custom_ctlog_sharded_config == ""
-      ansible.builtin.set_fact:
-        ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config.j2') }}"
     - name: Use Template Ctlog Config
-      when: tas_single_node_custom_ctlog_sharded_config != ""
+      when: tas_single_node_ctlog.sharded_config != ""
       ansible.builtin.set_fact:
         ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config-template.j2') }}"
 
