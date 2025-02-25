@@ -85,21 +85,22 @@ tas_single_node_tsa:
   ntp_config: ""
   trusted_ca: ""
 
-tas_single_node_custom_ctlog_sharded_config: ""
-  # - config:
-  #  treeid:
-  #  prefix: ""
-  #  root_pem_file: "/ctfe-keys/fulcio-0"
-  #  password: "rhtas"
-  #  private_key: "private-0"
-  # - config:
-  # - treeid: 5086357704360519244
-  #  prefix: "TAS-Tertiary"
-  #  root_pem_file: "/ctfe-keys/fulcio-0"
-  #  private_key_name: "private-1"
-  #  password: "passphrase"
+tas_single_node_custom_ctlog_public_key_names: []
+tas_single_node_custom_ctlog_private_key_names: []
+tas_single_node_ctlog:
+  sharded_config:
+    - config:
+      treeid:
+      prefix: ""
+      root_pem_file: ""
+      password: ""
+      private_key: ""
+  private_keys:
+    - >-
 
-
+  public_keys:
+    - >-
+      
 
 tas_single_node_skip_os_install: false
 
@@ -111,7 +112,6 @@ tas_single_node_ctlog_ca_passphrase: rhtas
 
 tas_single_node_custom_ctlog_config: ""
 
-tas_single_node_custom_ctlog_ca_passphrase: ""
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
 
