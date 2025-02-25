@@ -66,7 +66,7 @@ argument_specs:
         description: "Configuration options for the backfill redis job."
         type: "dict"
         required: false
-        version_added: "1.1.1"
+        version_added: "1.2.0"
         default:
           enabled: true
           schedule: "*-*-* 00:00:00"
@@ -75,12 +75,12 @@ argument_specs:
             description: "Enable or disable the backfill redis job."
             type: "bool"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
           schedule:
             description: "Schedule the backfill redis job should follow."
             type: "str"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
       tas_single_node_trillian:
         description: "Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance."
         type: "dict"
@@ -264,7 +264,7 @@ argument_specs:
           the user-provided private key for signing the root certificate, and the user-provided root certificate itself."
         type: "dict"
         required: false
-        version_added: "1.1.1"
+        version_added: "1.2.0"
         default:
           certificate:
             organization_name: ""
@@ -277,34 +277,34 @@ argument_specs:
             description: "Details on the certificate attributes for Fulcio."
             type: "dict"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
             options:
               organization_name:
                 description: "The name of the organization."
                 type: "str"
                 required: false
-                version_added: "1.1.1"
+                version_added: "1.2.0"
               organization_email:
                 description: "The email address of the organization."
                 type: "str"
                 required: false
-                version_added: "1.1.1"
+                version_added: "1.2.0"
               common_name:
                 description: "The common name (e.g., hostname) for the certificate."
                 type: "str"
                 required: false
-                version_added: "1.1.1"
+                version_added: "1.2.0"
           private_key:
             description: "The user-provided private key for Fulcio,
               used for signing root certificate (only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported)."
             type: "str"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
           root_ca:
             description: "The user-provided root certificate for Fulcio. This field is mutually exclusive with the certificate field."
             type: "str"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
 
       tas_single_node_rekor_public_key_retries:
         description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
@@ -510,7 +510,7 @@ argument_specs:
           Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider.
         type: "str"
         required: false
-        version_added: "1.1.1"
+        version_added: "1.2.0"
         default: ""
       tas_single_node_trillian_trusted_ca:
         description: >
@@ -518,7 +518,7 @@ argument_specs:
           This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges.
         type: "str"
         required: false
-        version_added: "1.1.1"
+        version_added: "1.2.0"
         default: ""
       tas_single_node_fulcio_server_image:
         description: "Fulcio image"
@@ -596,7 +596,7 @@ argument_specs:
         description: "Configuration options for Podman."
         type: "dict"
         required: false
-        version_added: "1.1.1"
+        version_added: "1.2.0"
         options:
           policy:
             description: >
@@ -604,7 +604,7 @@ argument_specs:
               Replaces the default policy, allowing you to enforce specific rules for image trust and verification in Podman.
             type: "str"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
           registry:
             description: >
               A list of registries and their corresponding mirrors. Each item in the list should specify
@@ -612,23 +612,23 @@ argument_specs:
             type: "list"
             elements: "dict"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
             options:
               location:
                 description: "The primary registry location for the image."
                 type: "str"
                 required: true
-                version_added: "1.1.1"
+                version_added: "1.2.0"
               mirror:
                 description: "The mirror registry to use for pulling images from the primary registry location."
                 type: "str"
                 required: true
-                version_added: "1.1.1"
+                version_added: "1.2.0"
       tas_single_node_cockpit:
         description: "Configuration options for Cockpit."
         type: "dict"
         required: false
-        version_added: "1.1.1"
+        version_added: "1.2.0"
         default:
           enabled: false
           user:
@@ -639,25 +639,25 @@ argument_specs:
             description: "Whether or not to install Cockpit."
             type: "bool"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
           user:
             description: "Configuration for the cockpit user."
             type: "dict"
             required: false
-            version_added: "1.1.1"
+            version_added: "1.2.0"
             options:
               create:
                 description: "Whether or not to create the cockpit user."
                 type: "bool"
                 required: false
-                version_added: "1.1.1"
+                version_added: "1.2.0"
               username:
                 description: "Username for the cockpit user."
                 type: "str"
                 required: false
-                version_added: "1.1.1"
+                version_added: "1.2.0"
               password:
                 description: "Password for the cockpit user."
                 type: "str"
                 required: true
-                version_added: "1.1.1"
+                version_added: "1.2.0"
