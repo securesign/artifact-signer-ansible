@@ -1,6 +1,6 @@
 backends:{backend:{name:"trillian"  backend_spec:"{{ tas_single_node_trillian_logserver_pod }}-pod:{{ tas_single_node_trillian_logserver_port_rpc }}"}}  
 log_configs:{
-{% for log in tas_single_node_ctlog.sharded_config %}
+{% for log in tas_single_node_ctlog.sharding_config %}
     config:{
         log_id:{% if log.treeid == None %} {{ trillian_tree_id }} {% else %} {{ log.treeid }} {% endif %} 
         prefix:{% if log.prefix == "" %} "{{ tas_single_node_ct_logprefix }}" {% else %} "{{ log.prefix }}" {% endif %} 

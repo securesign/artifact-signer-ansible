@@ -380,7 +380,7 @@ argument_specs:
         version_added: "1.2.0"
         required: false
         default:
-          sharded_config:
+          sharding_config:
             - config:
               treeid:
               prefix: ""
@@ -394,7 +394,7 @@ argument_specs:
             - >-
 
         options:
-          sharded_config:
+          sharding_config:
             description: "Configuration for each log in ctlog"
             required: true
             version_added: "1.2.0"
@@ -647,7 +647,7 @@ argument_specs:
         version_added: "1.1.0"
         default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae"
       tas_single_node_ct_server_image:
-        description: "CTLog image"
+        description: "ctlog image"
         type: "str"
         required: false
         version_added: "1.1.0"
