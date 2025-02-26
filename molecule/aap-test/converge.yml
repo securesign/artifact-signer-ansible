@@ -150,7 +150,7 @@
 
     - name: Upload redhat.artifact_signer to the private AAP
       delegate_to: localhost
-      retries: 3
+      retries: 10
       delay: 10
       infra.ah_configuration.ah_collection_upload:
         path: "{{ collection_build_path }}"
