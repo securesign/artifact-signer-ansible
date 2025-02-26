@@ -266,8 +266,8 @@
       changed_when: false
       ansible.builtin.copy:
         content: "{{ keyVar }}"
-        dest: "{{ tas_single_node_certs_dir}}/ctlog{{ keyNum }}.key"
-        mode: 0600
+        dest: "{{ tas_single_node_certs_dir }}/ctlog{{ keyNum }}.key"
+        mode: '0600'
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
         loop_var: keyVar
@@ -289,8 +289,8 @@
       changed_when: false
       ansible.builtin.copy:
         content: "{{ keyVar }}"
-        dest: "{{ tas_single_node_certs_dir}}/ctlog{{ keyNum }}.pub"
-        mode: 0600
+        dest: "{{ tas_single_node_certs_dir }}/ctlog{{ keyNum }}.pub"
+        mode: '0600'
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
         loop_var: keyVar
