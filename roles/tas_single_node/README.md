@@ -45,6 +45,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_search_image | Rekor search UI image | str |  `registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b`  |
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
+| tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -236,6 +237,12 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | create | Whether or not to create the cockpit user. | bool | no |  |
 | username | Username for the cockpit user. | str | no |  |
 | password | Password for the cockpit user. | str | yes |  |
+
+#### Options for main > tas_single_node_trust_root
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| full_archive | Base64-encoded gzipped tarball of the Trust Root. This must contain a single directory `repository/` with the contents of the TUF repository (e.g. `1.root.json`). Note: switching from providing to not providing this value will not reset the Trust Root content. In this case, all files in the `tuf-repository` podman volume must be removed manually to reset the Trust Root content. | str | no |  |
 
 ## Example Playbook
 

@@ -31,6 +31,7 @@ tas_single_node_config_dir: /etc/rhtas
 tas_single_node_certs_dir: "{{ tas_single_node_config_dir }}/certs"
 tas_single_node_kube_manifest_dir: "{{ tas_single_node_config_dir }}/manifests"
 tas_single_node_kube_configmap_dir: "{{ tas_single_node_config_dir }}/configs"
+tas_single_node_tuf_repo_dir: "{{ tas_single_node_config_dir }}/tuf-repo"
 
 # Infrastructure Certs
 tas_single_node_remote_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_private_key_filename }}"
