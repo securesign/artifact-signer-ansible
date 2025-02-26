@@ -379,14 +379,14 @@ argument_specs:
         type: "dict"
         version_added: "1.2.0"
         required: false
-        default: 
+        default:
           sharded_config:
-          - config:
-            treeid:
-            prefix: ""
-            root_pem_file: ""
-            password: ""
-            private_key: ""
+            - config:
+              treeid:
+              prefix: ""
+              root_pem_file: ""
+              password: ""
+              private_key: ""
           private_keys:
             - >-
 
@@ -431,13 +431,13 @@ argument_specs:
           private_keys:
             description: "List of private keys for use within ctlog"
             type: "list"
-            elements:  "str"
+            elements: "str"
             required: false
             version_added: "1.2.0"
           public_keys:
             description: "List of public keys for use within ctlog"
             type: "list"
-            elements:  "str"
+            elements: "str"
             required: false
             version_added: "1.2.0"
 

@@ -100,7 +100,6 @@ tas_single_node_ctlog:
 
   public_keys:
     - >-
-      
 
 tas_single_node_skip_os_install: false
 
