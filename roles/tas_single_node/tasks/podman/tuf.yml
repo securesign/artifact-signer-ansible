@@ -14,10 +14,10 @@
     - "{{ tas_single_node_tsa_certificate_chain }}"
     - >
       {%- if tas_single_node_custom_ctlog_public_key_names | length > 0 -%}
-      {{ tas_single_node_custom_ctlog_public_key_names }} 
-      {%- else -%}
-      {{ tas_single_node_remote_ctlog_public_key }} 
-      {%- endif -%}
+      {{ tas_single_node_custom_ctlog_public_key_names }}
+      {% else -%}
+      {{ tas_single_node_remote_ctlog_public_key }}
+      {% endif -%}
   register: remote_tuf_certificates
 
 - name: Retrieve Rekor Public Key
