@@ -26,6 +26,8 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible'}`  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
+| tas_single_node_ctlog | Configuration and specification of Ctlog Custom Configuration as well as custom keys. | dict of 'tas_single_node_ctlog' options |  `{'sharded_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [''], 'public_keys': ['']}`  |
+| tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': ''}`  |
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later. | bool |  `False`  |
 | tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  `[]`  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
@@ -163,6 +165,24 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | yes |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
+#### Options for main > tas_single_node_ctlog
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| sharded_config | Configuration for each log in ctlog | str | yes |  |
+| private_keys | List of private keys for use within ctlog | list of 'str' | no |  |
+| public_keys | List of public keys for use within ctlog | list of 'str' | no |  |
+
+#### Options for main > tas_single_node_ctlog > sharded_config
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| config | Individual Log Configs | str | yes |  |
+| treeid | Trillian Tree Id ctlog use. | int | no |  |
+| prefix | Ctlog log Prefix | str | no |  |
+| root_pem_file | File path to root Pem file | str | no |  |
+| password | Password for private key used by ctlog | str | no |  |
+| private_key | Name of the private key in the system | str | no |  |
 
 #### Options for main > tas_single_node_tsa
 
