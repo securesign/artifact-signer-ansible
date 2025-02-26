@@ -11,16 +11,16 @@
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
     - >-
       {%- if tas_single_node_custom_ctlog_private_key_names | length > 0 -%}
-      {{ tas_single_node_custom_ctlog_private_key_names }} 
-      {%- else -%}
-      {{ tas_single_node_remote_ctlog_private_key }} 
-      {%- endif -%}
+      {{ tas_single_node_custom_ctlog_private_key_names }}
+      {% else -%}
+      {{ tas_single_node_remote_ctlog_private_key }}
+      {% endif -%}
     - >-
       {%- if tas_single_node_custom_ctlog_public_key_names | length > 0  -%}
       {{ tas_single_node_custom_ctlog_public_key_names }} 
-      {%- else -%}
-      {{ tas_single_node_remote_ctlog_public_key }} 
-      {%- endif -%}
+      {% else -%}
+      {{ tas_single_node_remote_ctlog_public_key }}
+      {% endif -%}
   register: remote_ctlog_certificates
 
 - name: Load ctlog config content
