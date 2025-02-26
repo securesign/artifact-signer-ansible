@@ -40,10 +40,10 @@ spec:
               --ctlog-key /var/run/tuf-secrets/ctfe-pubkey
 {% endif %}
 {% if tas_single_node_fulcio_enabled %}
-              --fulcio-cert /var/run/tuf-secrets/fulcio-cert
+              --fulcio-cert /var/run/tuf-secrets/fulcio_v1.crt.pem
 {% endif %}
 {% if tas_single_node_tsa_enabled %}
-              --tsa-cert /var/run/tuf-secrets/tsa-cert
+              --tsa-cert /var/run/tuf-secrets/tsa.certchain.pem
 {% endif %}
               /var/run/target
           image: "{{ tas_single_node_tuf_image }}"
