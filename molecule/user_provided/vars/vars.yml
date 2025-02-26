@@ -31,7 +31,7 @@ tas_single_node_tsa:
   certificate_chain: "{{ lookup('file', molecule_scenario_directory + '/test_creds/cert-chain.pem') }}"
 
 tas_single_node_ctlog:
-  sharded_config:
+  sharding_config:
     - config:
       treeid:
       prefix: "rhtasansible"
