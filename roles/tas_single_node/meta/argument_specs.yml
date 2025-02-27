@@ -356,6 +356,7 @@ argument_specs:
           signer_passphrase: rhtas
           ca_passphrase: rhtas
           ntp_config: ""
+          trusted_ca: ""
         options:
           signer_type:
             description: "The signer type for TSA. Options include `file`, `kms`, `tink`."
@@ -443,6 +444,13 @@ argument_specs:
             description: >
               NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more.
               Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml).
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          trusted_ca:
+            description: >
+              Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections.
+              Used to ensure authenticity and trusted data exchange.
             type: "str"
             required: false
             version_added: "1.2.0"

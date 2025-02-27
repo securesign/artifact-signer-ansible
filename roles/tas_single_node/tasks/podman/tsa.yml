@@ -62,6 +62,9 @@
       data:
         ntpsync.yaml: |
           {{ tas_single_node_tsa.ntp_config }}
+
+        tsa-trusted-ca.pem: |
+          {{ tas_single_node_tsa.trusted_ca }}
   register: configmap_result
 
 - name: Deploy TSA Pod

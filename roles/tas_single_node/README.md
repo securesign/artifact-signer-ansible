@@ -26,7 +26,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int |  `5`  |
 | tas_single_node_rekor_public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int |  `10`  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
-| tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': ''}`  |
+| tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later. | bool |  `False`  |
 | tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  `[]`  |
 | tas_single_node_fulcio_trusted_oidc_ca | Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider. | str |  |
@@ -168,6 +168,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | signer_passphrase | Passphrase used to access signer private key. | str | no |  |
 | ca_passphrase | Passphrase used to access certificate authority. | str | no |  |
 | ntp_config | NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more. Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml). | str | no |  |
+| trusted_ca | Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections. Used to ensure authenticity and trusted data exchange. | str | no |  |
 
 #### Options for main > tas_single_node_tsa > certificate
 
