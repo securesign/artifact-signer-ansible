@@ -242,7 +242,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| full_archive | Base64-encoded gzipped tarball of the Trust Root. This must contain a single directory `repository/` with the contents of the TUF repository (e.g. `1.root.json`). Note: switching from providing to not providing this value will not reset the Trust Root content. In this case, all files in the `tuf-repository` podman volume must be removed manually to reset the Trust Root content. | str | no |  |
+| full_archive | Base64-encoded gzipped tarball of the Trust Root. This must contain a single directory `tuf-repo/` with the contents of the TUF repository (e.g. `1.root.json`). Note: switching from providing to not providing this value will not reset the Trust Root content. In this case, all files in the `tuf-repository` podman volume must be removed manually to reset the Trust Root content. | str | no |  |
 
 ## Example Playbook
 

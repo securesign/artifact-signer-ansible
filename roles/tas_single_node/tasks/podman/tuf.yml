@@ -39,7 +39,7 @@
       data:
         ctfe-pubkey: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
-        fulcio-cert: |
+        fulcio_v1.crt.pem: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
           {{ rekor_public_key_result.stdout | b64encode }}
@@ -97,15 +97,15 @@
       ansible.builtin.fail:
         msg: "Incorrect TUF repository provided, missing '{{ item }}' in the archive"
       loop:
-        - "repository/1.root.json"
-        - "repository/1.snapshot.json"
-        - "repository/1.targets.json"
-        - "repository/timestamp.json"
+        - "tuf-repo/1.root.json"
+        - "tuf-repo/1.snapshot.json"
+        - "tuf-repo/1.targets.json"
+        - "tuf-repo/timestamp.json"
       when: item not in unarchive_result.files
 
     - name: Synchronize contents of the provided archive to the volume
       ansible.posix.synchronize:
-        src: "{{ tas_single_node_tuf_repo_dir }}/repository/"
+        src: "{{ tas_single_node_tuf_repo_dir }}/tuf-repo/"
         dest: "{{ volume_mount_result.stdout }}"
         delete: true
         # make sure owner/group/perms get set automatically so httpd can read
