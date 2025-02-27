@@ -669,3 +669,20 @@ argument_specs:
                 type: "str"
                 required: true
                 version_added: "1.2.0"
+      tas_single_node_trust_root:
+        description: "Configuration options for the Trust Root."
+        type: "dict"
+        required: false
+        version_added: "1.2.0"
+        default:
+          full_archive: ""
+        options:
+          full_archive:
+            description: >
+              Base64-encoded gzipped tarball of the Trust Root. This must contain a single directory `tuf-repo/` with the contents
+              of the TUF repository (e.g. `1.root.json`). Note: switching from providing to not providing this value will not reset
+              the Trust Root content. In this case, all files in the `tuf-repository` podman volume must be removed manually to reset
+              the Trust Root content.
+            type: str
+            required: false
+            version_added: "1.2.0"
