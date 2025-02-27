@@ -61,6 +61,7 @@ tas_single_node_fulcio:
   root_ca: ""
   ca_passphrase: rhtas
   trusted_ca: ""
+  ct_log_prefix: rhtasansible
 
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
@@ -89,9 +90,7 @@ tas_single_node_oidc_issuers: []
 
 tas_single_node_meta_issuers: []
 
-# Leaving for Tommy to do in his Ctlog PR (https://github.com/securesign/artifact-signer-ansible/pull/90) since not ctlog dict obj created yet.
 tas_single_node_ctlog_ca_passphrase: rhtas
-tas_single_node_ct_logprefix: rhtasansible
 
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
