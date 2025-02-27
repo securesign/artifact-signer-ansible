@@ -85,8 +85,6 @@ tas_single_node_tsa:
   ntp_config: ""
   trusted_ca: ""
 
-tas_single_node_custom_ctlog_public_key_names: []
-tas_single_node_custom_ctlog_private_key_names: []
 tas_single_node_ctlog:
   sharding_config:
     - config:
