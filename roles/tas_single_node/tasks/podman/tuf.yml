@@ -19,8 +19,8 @@
   ansible.builtin.command:
     cmd: >-
       podman exec {{ tas_single_node_rekor_server_pod }}-pod-rekor-server
-      curl -k --fail --retry {{ tas_single_node_rekor_public_key_retries }}
-      --retry-delay {{ tas_single_node_rekor_public_key_delay }} http://localhost:{{ tas_single_node_rekor_server_port_http }}/api/v1/log/publicKey
+      curl -k --fail --retry {{ tas_single_node_rekor.public_key_retries }}
+      --retry-delay {{ tas_single_node_rekor.public_key_delay }} http://localhost:{{ tas_single_node_rekor_server_port_http }}/api/v1/log/publicKey
   register: rekor_public_key_result
   changed_when: false
 

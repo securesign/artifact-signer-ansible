@@ -17,6 +17,7 @@ tas_single_node_trillian:
     database: trillian
     host: "{{ ansible_default_ipv4.address }}"
     port: 3306
+  trusted_ca: "{{ ca_cert_content.content | b64decode }}"
 tas_single_node_rekor_redis:
   database_deploy: false
   redis:

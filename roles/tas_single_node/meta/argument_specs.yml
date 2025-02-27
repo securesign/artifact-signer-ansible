@@ -82,7 +82,9 @@ argument_specs:
             required: false
             version_added: "1.2.0"
       tas_single_node_trillian:
-        description: "Details on the database connection for Trillian. You can set this to a custom MySQL or MariaDB instance."
+        description: >
+          Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority.
+          You can set this to a custom MySQL or MariaDB instance.
         type: "dict"
         required: false
         version_added: "1.1.0"
@@ -95,6 +97,7 @@ argument_specs:
             database: trillian
             host: trillian-mysql-pod
             port: 3306
+          trusted_ca: ""
         options:
           database_deploy:
             description: "Whether or not to deploy the database."
@@ -137,6 +140,13 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.1.0"
+          trusted_ca:
+            description: >
+              Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database.
+              This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_ingress_certificates:
         description: "Details on the certificate settings for various services in the ingress layer.
           Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server."
@@ -272,6 +282,9 @@ argument_specs:
             common_name: ""
           private_key: ""
           root_ca: ""
+          trusted_ca: ""
+          ca_passphrase: rhtas
+          ct_log_prefix: rhtasansible
         options:
           certificate:
             description: "Details on the certificate attributes for Fulcio."
@@ -305,19 +318,47 @@ argument_specs:
             type: "str"
             required: false
             version_added: "1.2.0"
-
-      tas_single_node_rekor_public_key_retries:
-        description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
-        type: "int"
-        required: false
-        version_added: "1.1.0"
-        default: 5
-      tas_single_node_rekor_public_key_delay:
-        description: "The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root."
-        type: "int"
-        required: false
-        version_added: "1.1.0"
-        default: 10
+          trusted_ca:
+            description: >
+              Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          ca_passphrase:
+            description: >
+              Passphrase for Certificate Authority.
+            type: "str"
+            required: true
+            version_added: "1.2.0"
+          ct_log_prefix:
+            description: >
+              The Prefix for the Certificate Transparency Log that is accessed by Fulcio.
+            type: "str"
+            required: true
+            version_added: "1.1.0"
+      tas_single_node_rekor:
+        description: >
+          Details on the Rekor server configuration options. Includes Certificate Authority Passphrase,
+          public key retries, public key delay and more.
+        type: dict
+        required: true
+        version_added: "1.2.0"
+        options:
+          ca_passphrase:
+            description: "Passphrase used for Certificate Authority cert."
+            type: "str"
+            required: true
+            version_added: "1.1.0"
+          public_key_retries:
+            description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
+            type: "int"
+            required: false
+            version_added: "1.1.0"
+          public_key_delay:
+            description: "The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root."
+            type: "int"
+            required: false
+            version_added: "1.1.0"
       tas_single_node_setup_host_dns:
         description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"
@@ -513,21 +554,6 @@ argument_specs:
             type: "str"
             required: true
             version_added: "1.1.0"
-      tas_single_node_fulcio_trusted_oidc_ca:
-        description: >
-          Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider.
-        type: "str"
-        required: false
-        version_added: "1.2.0"
-        default: ""
-      tas_single_node_trillian_trusted_ca:
-        description: >
-          Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database.
-          This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges.
-        type: "str"
-        required: false
-        version_added: "1.2.0"
-        default: ""
       tas_single_node_fulcio_server_image:
         description: "Fulcio image"
         type: "str"
