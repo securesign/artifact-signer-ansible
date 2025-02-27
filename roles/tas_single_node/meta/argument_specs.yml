@@ -284,6 +284,7 @@ argument_specs:
           root_ca: ""
           trusted_ca: ""
           ca_passphrase: rhtas
+          ct_log_prefix: rhtasansible
         options:
           certificate:
             description: "Details on the certificate attributes for Fulcio."
@@ -329,6 +330,12 @@ argument_specs:
             type: "str"
             required: true
             version_added: "1.2.0"
+          ct_log_prefix:
+            description: >
+              The Prefix for the Certificate Transparency Log that is accessed by Fulcio.
+            type: "str"
+            required: true
+            version_added: "1.1.0"
       tas_single_node_rekor:
         description: >
           Details on the Rekor server configuration options. Includes Certificate Authority Passphrase,
