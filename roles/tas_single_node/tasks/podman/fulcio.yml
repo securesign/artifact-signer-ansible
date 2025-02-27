@@ -36,7 +36,7 @@
           {{ fulcio_config_content }}
 
         fulcio-trusted-ca.pem: |
-          {{ tas_single_node_fulcio_trusted_oidc_ca }}
+          {{ tas_single_node_fulcio.trusted_ca }}
   register: configmap_result
 
 - name: Create Fulcio Secret
@@ -58,7 +58,7 @@
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         public: |
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key) | list | first).content }}
-        password: "{{ tas_single_node_fulcio_ca_passphrase | b64encode }}"
+        password: "{{ tas_single_node_fulcio.ca_passphrase | b64encode }}"
   register: secret_result
 
 - name: Deploy Fulcio Pod

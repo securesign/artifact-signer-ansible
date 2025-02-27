@@ -56,7 +56,7 @@ spec:
             - --fileca-cert
             - /var/run/fulcio-secrets/cert.pem
             - --fileca-key-passwd
-            - "{{ tas_single_node_fulcio_ca_passphrase }}"
+            - "{{ tas_single_node_fulcio.ca_passphrase }}"
             - "--ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_ct_logprefix }}"
           env:
             - name: SSL_CERT_DIR
@@ -72,7 +72,7 @@ spec:
               protocol: TCP
           resources: {}
           volumeMounts:
-{% if tas_single_node_fulcio_trusted_oidc_ca != "" %}
+{% if tas_single_node_fulcio.trusted_ca != "" %}
             - mountPath: /certs/fulcio-trusted-ca.pem
               name: fulcio-oidc-ca
               subPath: fulcio-trusted-ca.pem
@@ -110,7 +110,7 @@ spec:
             items:
             - key: config.yaml
               path: config.yaml
-{% if tas_single_node_fulcio_trusted_oidc_ca != "" %}
+{% if tas_single_node_fulcio.trusted_ca != "" %}
         - name: fulcio-oidc-ca
           configMap:
             name: fulcio-config

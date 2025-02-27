@@ -28,7 +28,7 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-{% if tas_single_node_trillian_trusted_ca != "" %}
+{% if tas_single_node_trillian.trusted_ca != "" %}
       volumes:
         - name: ca-trust
           configMap:
@@ -36,7 +36,7 @@ spec:
 {% endif %}
       containers:
         - name: trillian-trillian-logsigner
-{% if tas_single_node_trillian_trusted_ca != "" %}
+{% if tas_single_node_trillian.trusted_ca != "" %}
           volumeMounts:
             - name: ca-trust
               mountPath: /var/run/configs/tas/ca-trust
@@ -56,7 +56,7 @@ spec:
             - --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_metrics }}
             - --force_master=true
             - --alsologtostderr
-{% if tas_single_node_trillian_trusted_ca != "" and not tas_single_node_trillian.database_deploy %}
+{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %}
             - --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem
             - --mysql_server_name={{ tas_single_node_trillian.mysql.host }}
 {% endif %}
@@ -80,7 +80,7 @@ spec:
               value: "{{ tas_single_node_trillian.mysql.host }}"
             - name: MYSQL_PORT
               value: "{{ tas_single_node_trillian.mysql.port | quote }}"
-{% if tas_single_node_trillian_trusted_ca != "" %}
+{% if tas_single_node_trillian.trusted_ca != "" %}
             - name: SSL_CERT_DIR
               value: "/var/run/configs/tas/ca-trust"
 {% endif %}

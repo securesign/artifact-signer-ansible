@@ -5,6 +5,11 @@ tas_single_node_registry_password: ""
 
 tas_single_node_podman_network: rhtas
 
+tas_single_node_rekor:
+  ca_passphrase: rhtas
+  public_key_retries: 5
+  public_key_delay: 10
+
 tas_single_node_rekor_redis:
   database_deploy: true
   redis:
@@ -25,6 +30,7 @@ tas_single_node_trillian:
     database: trillian
     host: trillian-mysql-pod
     port: 3306
+  trusted_ca: ""
 
 tas_single_node_ingress_certificates:
   fulcio:
@@ -53,9 +59,8 @@ tas_single_node_fulcio:
     common_name: ""
   private_key: ""
   root_ca: ""
-
-tas_single_node_rekor_public_key_retries: 5
-tas_single_node_rekor_public_key_delay: 10
+  ca_passphrase: rhtas
+  trusted_ca: ""
 
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
@@ -84,13 +89,8 @@ tas_single_node_oidc_issuers: []
 
 tas_single_node_meta_issuers: []
 
-tas_single_node_trillian_trusted_ca: ""
-tas_single_node_fulcio_trusted_oidc_ca: ""
-
-# Cert Passphrases
-tas_single_node_fulcio_ca_passphrase: rhtas
+# Leaving for Tommy to do in his Ctlog PR (https://github.com/securesign/artifact-signer-ansible/pull/90) since not ctlog dict obj created yet.
 tas_single_node_ctlog_ca_passphrase: rhtas
-tas_single_node_rekor_ca_passphrase: rhtas
 tas_single_node_ct_logprefix: rhtasansible
 
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
