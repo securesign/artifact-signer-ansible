@@ -43,6 +43,11 @@ spec:
             failureThreshold: 3
           image: {{ tas_single_node_timestamp_authority_image }}
           imagePullPolicy: IfNotPresent
+{% if tas_single_node_tsa.trusted_ca != '' %}
+          env:
+            - name: SSL_CERT_DIR
+              value: "/var/run/configs/tas/ca-trust"
+{% endif %}
           command:
             - "timestamp-server"
           args:
@@ -71,6 +76,11 @@ spec:
               protocol: TCP
           resources: {}
           volumeMounts:
+{% if tas_single_node_tsa.trusted_ca != '' %}
+            - name: ca-trust
+              mountPath: /var/run/configs/tas/ca-trust/tsa-trusted-ca.pem
+              subPath: tsa-trusted-ca.pem
+{% endif %}
 {% if tas_single_node_tsa.ntp_config != '' %}
             - name: tsa-ntp-config
               mountPath: /etc/config/ntpsync.yaml
@@ -106,6 +116,14 @@ spec:
           operator: Exists
           tolerationSeconds: 300
       volumes:
+{% if tas_single_node_tsa.trusted_ca != '' %}
+        - name: ca-trust
+          configMap:
+            name: tsa-config
+            items:
+              - key: tsa-trusted-ca.pem
+                path: tsa-trusted-ca.pem
+{% endif %}
 {% if tas_single_node_tsa.ntp_config != '' %}
         - name: tsa-ntp-config
           configMap:
