@@ -42,8 +42,8 @@ tas_single_node_remote_fulcio_public_key: "{{ tas_single_node_certs_dir }}/{{ ta
 tas_single_node_remote_fulcio_root_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_root_ca_filename }}"
 tas_single_node_remote_ctlog_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_private_key_filename }}"
 tas_single_node_remote_ctlog_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_public_key_filename }}"
-tas_single_node_remote_rekor_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"
-tas_single_node_remote_rekor_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"
+tas_single_node_remote_rekor_private_key: ["{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"]
+tas_single_node_remote_rekor_public_key: ["{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"]
 
 # Functional Keys
 tas_single_node_private_key_filename: rhtas.key
@@ -55,8 +55,8 @@ tas_single_node_fulcio_public_key_filename: fulcio.pub
 tas_single_node_fulcio_root_ca_filename: fulcio.pem
 tas_single_node_ctlog_private_key_filename: ctlog.key
 tas_single_node_ctlog_public_key_filename: ctlog.pub
-tas_single_node_rekor_signer_filename: rekor-signer.key
-tas_single_node_rekor_public_key_filename: rekor-pub-key.pub
+tas_single_node_rekor_signer_filename: rekor-signer0.key
+tas_single_node_rekor_public_key_filename: rekor-pub-key0.pub
 tas_single_node_tsa_private_key_filename: tsa.key
 tas_single_node_tsa_leaf_certificate_filename: tsa-leaf-certificate.pem
 tas_single_node_tsa_signer_private_key_filename: tsa-signer-private-key.pem

@@ -23,7 +23,7 @@
 - name: Slurp Rekor keys
   ansible.builtin.slurp:
     src: "{{ item }}"
-  loop:
+  with_items:
     - "{{ tas_single_node_remote_rekor_private_key }}"
     - "{{ tas_single_node_remote_rekor_public_key }}"
   register: remote_rekor_keys
