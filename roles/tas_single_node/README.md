@@ -179,7 +179,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | config | Individual Log Configs | str | yes |  |
 | treeid | Trillian Tree Id ctlog use. | int | no |  |
-| prefix | Ctlog log Prefix | str | no |  |
+| prefix | ctlog log Prefix | str | no |  |
 | root_pem_file | File path to root Pem file | str | no |  |
 | password | Password for private key used by ctlog | str | no |  |
 | private_key | Name of the private key in the system | str | no |  |

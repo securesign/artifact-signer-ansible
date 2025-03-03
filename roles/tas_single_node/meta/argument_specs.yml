@@ -375,7 +375,7 @@ argument_specs:
         # we provide no default value here intentionally
       tas_single_node_ctlog:
         description: >
-          Configuration and specification of Ctlog Custom Configuration as well as custom keys.
+          Configuration and specification of ctlog Custom Configuration as well as custom keys.
         type: "dict"
         version_added: "1.2.0"
         required: false
@@ -409,7 +409,7 @@ argument_specs:
                 required: false
                 version_added: "1.2.0"
               prefix:
-                description: "Ctlog log Prefix"
+                description: "ctlog log Prefix"
                 type: "str"
                 required: false
                 version_added: "1.2.0"

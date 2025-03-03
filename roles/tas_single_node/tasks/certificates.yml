@@ -257,12 +257,11 @@
 
 - name: Create Custom ctlog Root
   when: >
-    tas_single_node_ctlog.private_keys is defined and tas_single_node_ctlog.public_keys is defined and
-    (tas_single_node_ctlog.private_keys | length > 0 ) and (tas_single_node_ctlog.public_keys | length > 0 )
-  no_log: true
+    (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
+  #no_log: true
   block:
-    - name: Create Custom CTlog Private Key
-      when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
+    - name: Create Custom ctlog Private Key
+      when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key[0]) | list | length) == 0
       changed_when: false
       ansible.builtin.copy:
         content: "{{ key_var }}"
@@ -272,20 +271,24 @@
       loop_control:
         loop_var: key_var
         index_var: key_num
+    
+    - name: "Reset ctlog Private Key path"
+      ansible.builtin.set_fact:
+        tas_single_node_remote_ctlog_private_key: []
 
-    - name: Track CTlog Private Keys
-      when: key_var != "" and tas_single_node_ctlog.private_keys | length > 0
+    - name: Track ctlog Private Keys
+      when: key_var != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
         index_var: key_num
         loop_var: key_var
       ansible.builtin.set_fact:
-        tas_single_node_custom_ctlog_private_key_names: >
-          {{ tas_single_node_custom_ctlog_private_key_names + [tas_single_node_certs_dir ~'/ctlog' ~ key_num ~ '.key']}}
+        tas_single_node_remote_ctlog_private_key: >
+          {{ tas_single_node_remote_ctlog_private_key + [tas_single_node_certs_dir ~'/ctlog' ~ key_num ~ '.key'] }}
 
-    - name: Create Custom CTlog Public Key
-      when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0
+    - name: Create Custom ctlog Public Key
+      when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key[0]) | list | length) == 0 
       changed_when: false
       ansible.builtin.copy:
         content: "{{ key_var }}"
@@ -296,22 +299,28 @@
         loop_var: key_var
         index_var: key_num
 
-    - name: Track CTlog Public Keys
-      when: key_var != "" and tas_single_node_ctlog.public_keys | length > 0
+    - name: "Reset ctlog Public Key path"
+      ansible.builtin.set_fact:
+        tas_single_node_remote_ctlog_public_key: []
+
+    - name: Track ctlog Public Keys
+      when: key_var != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
         index_var: key_num
         loop_var: key_var
       ansible.builtin.set_fact:
-        tas_single_node_custom_ctlog_public_key_names: >
-          {{ tas_single_node_custom_ctlog_public_key_names + [tas_single_node_certs_dir ~'/ctlog' ~ key_num ~ '.pub']}}
+        tas_single_node_remote_ctlog_public_key: >
+          {{ tas_single_node_remote_ctlog_public_key + [tas_single_node_certs_dir ~'/ctlog' ~ key_num ~ '.pub']}}
+        
 
 
 - name: Generate ctlog root
   when: >
-    ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key) | list | length) == 0
-    and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key) | list | length) == 0 )
+    ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_private_key.0) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ctlog_public_key.0) | list | length) == 0)
+    and ( tas_single_node_ctlog.public_keys | length == 0 ) and (tas_single_node_ctlog.private_keys | length == 0 )
   block:
     - name: Create ctlog private key
       ansible.builtin.shell:
@@ -319,17 +328,17 @@
           set -o pipefail &&
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
-          -out '{{ tas_single_node_remote_ctlog_private_key }}'
+          -out '{{ tas_single_node_remote_ctlog_private_key.0 }}'
           -passout 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_ctlog_private_key }}"
+        creates: "{{ tas_single_node_remote_ctlog_private_key.0 }}"
     - name: Create ctlog public key
       ansible.builtin.command:
         cmd: >-
           openssl ec -pubout
-          -in '{{ tas_single_node_remote_ctlog_private_key }}'
-          -out '{{ tas_single_node_remote_ctlog_public_key }}'
+          -in '{{ tas_single_node_remote_ctlog_private_key.0 }}'
+          -out '{{ tas_single_node_remote_ctlog_public_key.0 }}'
           -passin 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_ctlog_public_key }}"
+        creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
 - name: Create Rekor signing key
   when: >

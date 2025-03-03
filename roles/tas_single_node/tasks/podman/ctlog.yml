@@ -9,19 +9,13 @@
     src: "{{ item }}"
   with_items:
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
-    - >-
-      {% if tas_single_node_custom_ctlog_private_key_names | length > 0 -%}
-      {{ tas_single_node_custom_ctlog_private_key_names }} {%- else -%}
-      {{ tas_single_node_remote_ctlog_private_key }} {%- endif %}
-    - >-
-      {% if tas_single_node_custom_ctlog_public_key_names | length > 0 -%}
-      {{ tas_single_node_custom_ctlog_public_key_names }} {%- else -%}
-      {{ tas_single_node_remote_ctlog_public_key }} {%- endif %}
+    - "{{ tas_single_node_remote_ctlog_private_key }}"
+    - "{{ tas_single_node_remote_ctlog_public_key }}"
   register: remote_ctlog_certificates
 
 - name: Load ctlog config content
   block:
-    - name: Use Template Ctlog Config
+    - name: Use Template ctlog Config
       when: tas_single_node_ctlog.sharding_config != ""
       ansible.builtin.set_fact:
         ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config-template.j2') }}"
@@ -42,32 +36,15 @@
         config: "{{ ctlog_config_content }}"
   register: configmap_result
 
-- name: Create Ctlog Secret
-  block:
-    - name: Set Keys
-      ansible.builtin.set_fact:
-        ctlog_pub_keys: >-
-          {% if tas_single_node_custom_ctlog_public_key_names | length == 0 -%}
-          {{ tas_single_node_remote_ctlog_public_key }}
-          {%- else -%}
-          {{ tas_single_node_custom_ctlog_public_key_names }}
-          {%- endif %}
-        ctlog_priv_keys: >-
-          {% if tas_single_node_custom_ctlog_private_key_names | length == 0 -%}
-          {{ tas_single_node_remote_ctlog_private_key }}
-          {%- else -%}
-          {{ tas_single_node_custom_ctlog_private_key_names }}
-          {%- endif %}
-
-    - name: Create the Secret Content
-      ansible.builtin.set_fact:
-        ctlog_secret_content: "{{ lookup('ansible.builtin.template', 'configs/certs-secret-template.j2') }}"
-      vars:
-        secret_name: ctlog-secret
-        secret_namespace: ctlog-system
-        keyname: [private, public, fulcio]
-        keylists: ['{{ ctlog_priv_keys }}', '{{ ctlog_pub_keys }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
-        slurpedcerts: '{{ remote_ctlog_certificates }}'
+- name: Create ctlog Secret
+  ansible.builtin.set_fact:
+    ctlog_secret_content: "{{ lookup('ansible.builtin.template', 'configs/certs-secret-template.j2') }}"
+  vars:
+    secret_name: ctlog-secret
+    secret_namespace: ctlog-system
+    keyname: [private, public, fulcio]
+    keylists: ['{{ tas_single_node_remote_ctlog_private_key }}', '{{ tas_single_node_remote_ctlog_public_key }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
+    slurpedcerts: '{{ remote_ctlog_certificates }}'
 
 - name: Create Custom ctlog Secret
   ansible.builtin.copy:

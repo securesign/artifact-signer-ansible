@@ -12,10 +12,7 @@
   with_items:
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
     - "{{ tas_single_node_tsa_certificate_chain }}"
-    - >-
-      {% if tas_single_node_custom_ctlog_public_key_names | length > 0 -%}
-      {{ tas_single_node_custom_ctlog_public_key_names }} {%- else -%}
-      {{ tas_single_node_remote_ctlog_public_key }} {%- endif %}
+    - "{{ tas_single_node_remote_ctlog_public_key }}"
   register: remote_tuf_certificates
 
 - name: Retrieve Rekor Public Key
@@ -26,6 +23,10 @@
       --retry-delay {{ tas_single_node_rekor.public_key_delay }} http://localhost:{{ tas_single_node_rekor_server_port_http }}/api/v1/log/publicKey
   register: rekor_public_key_result
   changed_when: false
+
+- name: Ansible
+  ansible.builtin.debug:
+    msg: "{{tas_single_node_remote_ctlog_public_key}}"
 
 - name: Create tuf Secret
   ansible.builtin.copy:
@@ -41,7 +42,7 @@
         namespace: tuf-system
       data:
         ctfe-pubkey: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key.0) | list | first).content }}
         fulcio-cert: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
