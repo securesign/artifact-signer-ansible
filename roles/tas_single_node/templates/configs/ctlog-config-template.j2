@@ -3,7 +3,7 @@ log_configs:{
 {% for log in tas_single_node_ctlog.sharding_config %}
     config:{
         log_id:{% if log.treeid == None %} {{ trillian_tree_id }} {% else %} {{ log.treeid }} {% endif %} 
-        prefix:{% if log.prefix == "" %} "{{ tas_single_node_ct_logprefix }}" {% else %} "{{ log.prefix }}" {% endif %} 
+        prefix:{% if log.prefix == "" %} "{{ tas_single_node_fulcio.ct_log_prefix }}" {% else %} "{{ log.prefix }}" {% endif %} 
         roots_pem_file:{% if log.roots_pem_file is not defined %} "/ctfe-keys/fulcio-0" {% else %} "{{ log.roots_pem_file }}" {% endif %} 
         private_key:{
             [type.googleapis.com/keyspb.PEMKeyFile]:{ 
