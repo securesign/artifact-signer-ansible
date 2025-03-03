@@ -24,10 +24,6 @@
   register: rekor_public_key_result
   changed_when: false
 
-- name: Ansible
-  ansible.builtin.debug:
-    msg: "{{tas_single_node_remote_ctlog_public_key}}"
-
 - name: Create tuf Secret
   ansible.builtin.copy:
     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
