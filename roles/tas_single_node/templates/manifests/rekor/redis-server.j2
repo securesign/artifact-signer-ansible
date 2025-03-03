@@ -23,6 +23,12 @@ spec:
       containers:
         - name: rekor-redis
           image: "{{ tas_single_node_rekor_redis_image }}"
+          volumeMounts:
+            - mountPath: /var/lib/redis/data
+              name: rekor-redis-storage
+      volumes:
+        - name: rekor-redis-storage
+          emptyDir: {}
 {% if tas_single_node_rekor_redis.redis.password != "" %}
           env:
             - name: REDIS_PASSWORD
