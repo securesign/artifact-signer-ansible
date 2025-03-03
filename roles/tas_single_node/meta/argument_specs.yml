@@ -373,6 +373,71 @@ argument_specs:
         required: true
         version_added: "1.1.0"
         # we provide no default value here intentionally
+      tas_single_node_ctlog:
+        description: >
+          Configuration and specification of ctlog Custom Configuration as well as custom keys.
+        type: "dict"
+        version_added: "1.2.0"
+        required: false
+        default:
+          sharding_config:
+            - config:
+              treeid:
+              prefix: ""
+              root_pem_file: ""
+              password: ""
+              private_key: ""
+          private_keys: []
+          public_keys: []
+
+        options:
+          sharding_config:
+            description: "Configuration for each log in ctlog"
+            required: true
+            version_added: "1.2.0"
+            options:
+              config:
+                description: "Individual Log Configs"
+                required: true
+                version_added: "1.2.0"
+              treeid:
+                description: "Trillian Tree Id ctlog use."
+                type: "int"
+                required: false
+                version_added: "1.2.0"
+              prefix:
+                description: "ctlog log Prefix"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              root_pem_file:
+                description: "File path to root Pem file"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              password:
+                description: "Password for private key used by ctlog"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              private_key:
+                description: "Name of the private key in the system"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          private_keys:
+            description: "List of private keys for use within ctlog"
+            type: "list"
+            elements: "str"
+            required: false
+            version_added: "1.2.0"
+          public_keys:
+            description: "List of public keys for use within ctlog"
+            type: "list"
+            elements: "str"
+            required: false
+            version_added: "1.2.0"
+
       tas_single_node_tsa:
         description: >
           Details on the certificate and configuration options for Timestamp Authority. Includes organizational details,
@@ -579,7 +644,7 @@ argument_specs:
         version_added: "1.1.0"
         default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae"
       tas_single_node_ct_server_image:
-        description: "CTLog image"
+        description: "ctlog image"
         type: "str"
         required: false
         version_added: "1.1.0"

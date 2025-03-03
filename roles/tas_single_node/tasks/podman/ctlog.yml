@@ -7,15 +7,18 @@
 - name: Slurp ctlog Certificates
   ansible.builtin.slurp:
     src: "{{ item }}"
-  loop:
+  with_items:
+    - "{{ tas_single_node_remote_fulcio_root_ca }}"
     - "{{ tas_single_node_remote_ctlog_private_key }}"
     - "{{ tas_single_node_remote_ctlog_public_key }}"
-    - "{{ tas_single_node_remote_fulcio_root_ca }}"
   register: remote_ctlog_certificates
 
 - name: Load ctlog config content
-  ansible.builtin.set_fact:
-    ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config.j2') }}"
+  block:
+    - name: Use Template ctlog Config
+      when: tas_single_node_ctlog.sharding_config != ""
+      ansible.builtin.set_fact:
+        ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config-template.j2') }}"
 
 - name: Create ctlog configmap
   ansible.builtin.copy:
@@ -34,24 +37,20 @@
   register: configmap_result
 
 - name: Create ctlog Secret
+  ansible.builtin.set_fact:
+    ctlog_secret_content: "{{ lookup('ansible.builtin.template', 'configs/certs-secret-template.j2') }}"
+  vars:
+    secret_name: ctlog-secret
+    secret_namespace: ctlog-system
+    keyname: [private, public, fulcio]
+    keylists: ['{{ tas_single_node_remote_ctlog_private_key }}', '{{ tas_single_node_remote_ctlog_public_key }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
+    slurpedcerts: '{{ remote_ctlog_certificates }}'
+
+- name: Create Custom ctlog Secret
   ansible.builtin.copy:
-    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
+    content: "{{ ctlog_secret_content }}"
     dest: "{{ tas_single_node_ctlog_secret }}"
     mode: "0600"
-  vars:
-    secret_content:
-      kind: Secret
-      apiVersion: v1
-      metadata:
-        name: ctlog-secret
-        namespace: ctlog-system
-      data:
-        private: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_private_key) | list | first).content }}
-        public: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
-        fulcio-0: |
-          {{ (remote_ctlog_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
   register: secret_result
 
 - name: Deploy ctlog Pod

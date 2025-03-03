@@ -31,3 +31,18 @@ tas_single_node_tsa:
   signer_private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/private-key.pem') }}"
   certificate_chain: "{{ lookup('file', molecule_scenario_directory + '/test_creds/cert-chain.pem') }}"
   trusted_ca: ""
+
+tas_single_node_ctlog:
+  sharding_config:
+    - config:
+      treeid:
+      prefix: "rhtasansible"
+      root_pem_file: "/ctfe-keys/fulcio-0"
+      password: "password"
+      private_key: "private-0"
+  private_keys:
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.key') }}
+  public_keys:
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}

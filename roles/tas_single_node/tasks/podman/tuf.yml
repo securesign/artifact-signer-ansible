@@ -9,10 +9,10 @@
 - name: Slurp tuf Certificates
   ansible.builtin.slurp:
     src: "{{ item }}"
-  loop:
-    - "{{ tas_single_node_remote_ctlog_public_key }}"
+  with_items:
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
     - "{{ tas_single_node_tsa_certificate_chain }}"
+    - "{{ tas_single_node_remote_ctlog_public_key }}"
   register: remote_tuf_certificates
 
 - name: Retrieve Rekor Public Key
@@ -38,7 +38,7 @@
         namespace: tuf-system
       data:
         ctfe-pubkey: |
-          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key) | list | first).content }}
+          {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key.0) | list | first).content }}
         fulcio-cert: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
