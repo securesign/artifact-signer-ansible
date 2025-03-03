@@ -387,11 +387,8 @@ argument_specs:
               root_pem_file: ""
               password: ""
               private_key: ""
-          private_keys:
-            - >-
-
-          public_keys:
-            - >-
+          private_keys: []
+          public_keys: []
 
         options:
           sharding_config:
