@@ -433,9 +433,6 @@
           -passin 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
-        
-
-
 - name: Create Custom Rekor Keys
   when: (tas_single_node_rekor.public_keys | length > 0) and (tas_single_node_rekor.private_keys | length > 0)
   block:
@@ -450,6 +447,10 @@
       loop_control:
         loop_var: key_var
         index_var: key_num
+
+    - name: Reset rekor private key path
+      ansible.builtin.set_fact:
+        tas_single_node_remote_rekor_private_key: []
 
     - name: Add Created Custom Keys
       when: key_var != ""
@@ -473,6 +474,10 @@
       loop_control:
         loop_var: key_var
         index_var: key_num
+
+    - name: Reset rekor public key path
+      ansible.builtin.set_fact:
+        tas_single_node_remote_rekor_public_key: []
 
     - name: Add Created Custom Keys
       when: key_var != ""
