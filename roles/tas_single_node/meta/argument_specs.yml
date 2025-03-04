@@ -365,6 +365,18 @@ argument_specs:
             type: "int"
             required: false
             version_added: "1.1.0"
+          private_keys:
+            description: "List of private keys for use within ctlog"
+            type: "list"
+            elements: "str"
+            required: false
+            version_added: "1.2.0"
+          public_keys:
+            description: "List of public keys for use within ctlog"
+            type: "list"
+            elements: "str"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_setup_host_dns:
         description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"
