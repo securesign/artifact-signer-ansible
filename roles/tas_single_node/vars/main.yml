@@ -1,6 +1,5 @@
 ---
 # vars file for tas_single_node
-<<<<<<< HEAD
 _tas_single_node_rekor:
   ca_passphrase: rhtas
   public_key_retries: 5
@@ -27,33 +26,6 @@ _tas_single_node_trillian:
     host: trillian-mysql-pod
     port: 3306
   trusted_ca: ""
-=======
-_tas_single_node_tsa: 
-  signer_type: file
-  certificate:
-    organization_name: ""
-    organization_email: ""
-    common_name: ""
-  kms:
-    key_resource: ""
-  tink:
-    key_resource: ""
-    keyset: ""
-    hcvault_token: ""
-  signer_private_key: ""
-  certificate_chain: ""
-  signer_passphrase: rhtas
-  ca_passphrase: rhtas
-  ntp_config: ""
-
-_tas_single_node_fulcio: 
-  certificate:
-    organization_name: ""
-    organization_email: ""
-    common_name: ""
-  private_key: ""
-  root_ca: ""
->>>>>>> 93e605b (Fix handling of default values in nested variables)
 
 _tas_single_node_ingress_certificates:
   fulcio:
@@ -75,7 +47,6 @@ _tas_single_node_ingress_certificates:
     certificate: ""
     private_key: ""
 
-<<<<<<< HEAD
 _tas_single_node_fulcio:
   certificate:
     organization_name: ""
@@ -123,8 +94,6 @@ _tas_single_node_cockpit:
     create: false
     username: cockpit-user
     password: ""
-=======
->>>>>>> 93e605b (Fix handling of default values in nested variables)
 
 # vars file for sigstore_scaffolding
 tas_single_node_system_packages:
