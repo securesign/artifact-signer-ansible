@@ -1,5 +1,6 @@
 ---
-- import_tasks: set_defaults.yml
+- name: Importing default values
+  ansible.builtin.import_tasks: set_defaults.yml
 
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
