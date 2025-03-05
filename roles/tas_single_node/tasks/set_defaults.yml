@@ -5,4 +5,3 @@
     tas_single_node_fulcio: "{{ _tas_single_node_fulcio | combine(tas_single_node_fulcio | default({}, true), recursive=true) }}"
     tas_single_node_ingress_certificates: >-
       {{ _tas_single_node_ingress_certificates | combine(tas_single_node_ingress_certificates | default({}, true), recursive=true) }}
-      
