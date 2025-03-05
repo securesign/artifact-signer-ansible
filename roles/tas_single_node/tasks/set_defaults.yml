@@ -1,0 +1,8 @@
+---
+- name: Set default values for _tas_single_node variables
+  ansible.builtin.set_fact:
+    tas_single_node_tsa: "{{ _tas_single_node_tsa | combine(tas_single_node_tsa | default({}, true), recursive=true) }}"
+    tas_single_node_fulcio: "{{ _tas_single_node_fulcio | combine(tas_single_node_fulcio | default({}, true), recursive=true) }}"
+    tas_single_node_ingress_certificates: "{{ _tas_single_node_ingress_certificates | combine(tas_single_node_ingress_certificates | default({}, true), recursive=true) }}"
+
+
