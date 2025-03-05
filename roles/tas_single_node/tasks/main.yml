@@ -1,10 +1,6 @@
 ---
-<<<<<<< HEAD
 - name: Importing default values
   ansible.builtin.import_tasks: set_defaults.yml
-=======
-- import_tasks: set_defaults.yml
->>>>>>> 93e605b (Fix handling of default values in nested variables)
 
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
