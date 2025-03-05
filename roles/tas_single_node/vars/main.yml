@@ -1,6 +1,6 @@
 ---
 # vars file for tas_single_node
-_tas_single_node_tsa: 
+_tas_single_node_tsa:
   signer_type: file
   certificate:
     organization_name: ""
@@ -18,7 +18,7 @@ _tas_single_node_tsa:
   ca_passphrase: rhtas
   ntp_config: ""
 
-_tas_single_node_fulcio: 
+_tas_single_node_fulcio:
   certificate:
     organization_name: ""
     organization_email: ""
