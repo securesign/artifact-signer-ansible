@@ -2,7 +2,7 @@
 Description= Run Backup Oneshot Job
 
 [Timer]
-OnCalendar={{ tas_single_node_data_protection.backup.schedule }}
+OnCalendar={{ tas_single_node_backup_restore.backup.schedule }}
 Persistent=true
 Unit=tas_backup.service
 
