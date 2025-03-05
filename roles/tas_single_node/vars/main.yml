@@ -1,4 +1,52 @@
 ---
+# vars file for tas_single_node
+_tas_single_node_tsa: 
+  signer_type: file
+  certificate:
+    organization_name: ""
+    organization_email: ""
+    common_name: ""
+  kms:
+    key_resource: ""
+  tink:
+    key_resource: ""
+    keyset: ""
+    hcvault_token: ""
+  signer_private_key: ""
+  certificate_chain: ""
+  signer_passphrase: rhtas
+  ca_passphrase: rhtas
+  ntp_config: ""
+
+_tas_single_node_fulcio: 
+  certificate:
+    organization_name: ""
+    organization_email: ""
+    common_name: ""
+  private_key: ""
+  root_ca: ""
+
+_tas_single_node_ingress_certificates:
+  fulcio:
+    certificate: ""
+    private_key: ""
+  rekor:
+    certificate: ""
+    private_key: ""
+  tuf:
+    certificate: ""
+    private_key: ""
+  tsa:
+    certificate: ""
+    private_key: ""
+  rekor-search:
+    certificate: ""
+    private_key: ""
+  cli-server:
+    certificate: ""
+    private_key: ""
+
+
 # vars file for sigstore_scaffolding
 tas_single_node_system_packages:
   - podman
