@@ -5,6 +5,30 @@ tas_single_node_registry_password: ""
 
 tas_single_node_podman_network: rhtas
 
+<<<<<<< HEAD
+=======
+tas_single_node_rekor_redis:
+  database_deploy: true
+  redis:
+    host: rekor-redis-pod
+    port: 6379
+    password: password
+
+tas_single_node_backfill_redis:
+  enabled: true
+  schedule: "*-*-* 00:00:00"
+
+tas_single_node_trillian:
+  database_deploy: true
+  mysql:
+    user: mysql
+    root_password: rootpassword
+    password: password
+    database: trillian
+    host: trillian-mysql-pod
+    port: 3306
+
+>>>>>>> 93e605b (Fix handling of default values in nested variables)
 tas_single_node_rekor_public_key_retries: 5
 tas_single_node_rekor_public_key_delay: 10
 
