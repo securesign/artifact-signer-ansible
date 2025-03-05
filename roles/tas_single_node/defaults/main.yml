@@ -32,36 +32,8 @@ tas_single_node_trillian:
     port: 3306
   trusted_ca: ""
 
-tas_single_node_ingress_certificates:
-  fulcio:
-    certificate: ""
-    private_key: ""
-  rekor:
-    certificate: ""
-    private_key: ""
-  tuf:
-    certificate: ""
-    private_key: ""
-  tsa:
-    certificate: ""
-    private_key: ""
-  rekor-search:
-    certificate: ""
-    private_key: ""
-  cli-server:
-    certificate: ""
-    private_key: ""
-
-tas_single_node_fulcio:
-  certificate:
-    organization_name: ""
-    organization_email: ""
-    common_name: ""
-  private_key: ""
-  root_ca: ""
-  ca_passphrase: rhtas
-  trusted_ca: ""
-  ct_log_prefix: rhtasansible
+tas_single_node_rekor_public_key_retries: 5
+tas_single_node_rekor_public_key_delay: 10
 
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
