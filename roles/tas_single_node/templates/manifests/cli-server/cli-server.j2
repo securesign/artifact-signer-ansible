@@ -53,6 +53,6 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: apache-config
-          configMap:
-            name: apache-config
-            defaultMode: 0644
+          hostPath:
+            path: {{ apache_config_mountpoint.stdout }}
+            type: Directory
