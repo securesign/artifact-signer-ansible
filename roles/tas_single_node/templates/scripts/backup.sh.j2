@@ -1,0 +1,74 @@
+#!/bin/bash -eu
+
+umask 077
+
+# Config Vars
+BACKUP_DIR="{{ tas_single_node_backup_restore.backup.directory }}" # Main backup directory
+CONFIG_DIR="{{ tas_single_node_config_dir }}"
+PASSPHRASE="{{ tas_single_node_backup_restore.backup.passphrase }}"
+
+# Logging Messages
+log() {
+  echo "INFO: $1"
+}
+
+# Error Handling
+error_exit() {
+  echo "ERROR: $1" >&2
+  exit 1
+}
+
+# Create Backup Directory
+TIMESTAMP=$(date -u +BACKUP-%Y-%m-%d-%H-%M-UTC)
+BACKUP_TIMESTAMP_DIR="$BACKUP_DIR/$TIMESTAMP"
+
+mkdir -p "$BACKUP_TIMESTAMP_DIR/volumes"
+touch "$BACKUP_DIR/backup_mode_active"
+
+# Copy Config Files
+cp -r "$CONFIG_DIR" "$BACKUP_TIMESTAMP_DIR/" || error_exit "Failed to copy configuration files."
+log "Copied configuration files."
+
+# Stop Podman Containers
+podman stop $(podman ps -aq --format "{{ '{{' }}.Names{{ '}}' }}") >&2
+log "Stopped Podman containers."
+
+VOLUMES=$(podman volume ls --format "{{ '{{' }}.Name{{ '}}' }}")
+
+for VOLUME in $VOLUMES; do
+    MOUNT_PATH=$(podman volume mount "$VOLUME")
+
+    if [ -z "$MOUNT_PATH" ]; then
+        echo "WARNING: Failed to mount volume: $VOLUME" >&2
+        continue
+    fi
+
+# Copy the entire volume
+    cp -r "$(dirname "$MOUNT_PATH")" "$BACKUP_TIMESTAMP_DIR/volumes/" || echo "WARNING: Failed to copy volume $VOLUME" >&2
+
+    podman volume unmount "$VOLUME"  # Unmount
+done
+log "Copied Podman volumes."
+
+podman start $(podman ps -aq --filter "status=exited")
+
+# Create Compressed Backup Tarball
+cd "$(dirname "$BACKUP_TIMESTAMP_DIR")" && tar -czvf "$(basename "$BACKUP_TIMESTAMP_DIR").tar.gz" "$(basename "$BACKUP_TIMESTAMP_DIR")" >&2 || error_exit "Failed to create compressed tarball."
+log "Created compressed tarball: $BACKUP_TIMESTAMP_DIR.tar.gz"
+
+# Delete Uncompressed Backup Directory
+rm -rf "$BACKUP_TIMESTAMP_DIR" || echo "WARNING: Failed to delete uncompressed backup directory." >&2
+log "Deleted uncompressed backup directory."
+
+# Encrypt Backup Tarball
+openssl enc -aes-256-cbc -salt -pbkdf2 -iter 600000 -in "$BACKUP_TIMESTAMP_DIR.tar.gz" -out "$BACKUP_TIMESTAMP_DIR.tar.gz.enc" -pass pass:"$PASSPHRASE" >&2 || error_exit "Failed to encrypt tarball."
+log "Encrypted tarball: $BACKUP_TIMESTAMP_DIR.tar.gz.enc"
+
+# Delete Unencrypted Backup Tarball
+rm -f "$BACKUP_TIMESTAMP_DIR.tar.gz" || echo "WARNING: Failed to delete unencrypted tarball." >&2
+log "Deleted unencrypted tarball."
+
+rm "$BACKUP_DIR/backup_mode_active"
+
+log "Backup completed successfully."
+exit 0
