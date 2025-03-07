@@ -102,6 +102,9 @@ tas_single_node_oidc_issuers: []
 
 tas_single_node_meta_issuers: []
 
+tas_single_node_trust_root:
+  full_archive: ""
+
 tas_single_node_ctlog_ca_passphrase: rhtas
 
 
