@@ -90,6 +90,10 @@ _tas_single_node_ingress_certificates:
     certificate: ""
     private_key: ""
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 11426e43099397704a742aecc6f1572af61ba8bf
 # vars file for sigstore_scaffolding
 tas_single_node_system_packages:
   - podman
