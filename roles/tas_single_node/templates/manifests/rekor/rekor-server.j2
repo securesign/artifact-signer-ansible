@@ -57,7 +57,7 @@ spec:
 {% endif %}
             - --rekor_server.address=0.0.0.0
 {% if tas_single_node_rekor_signer_type == "file" %}
-            - --rekor_server.signer=/rekor-keys/private
+            - --rekor_server.signer=/rekor-keys/private-0
             - --rekor_server.signer-passwd={{ tas_single_node_rekor.ca_passphrase }}
 {% endif %}
             - --enable_retrieve_api=true
