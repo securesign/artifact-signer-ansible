@@ -43,10 +43,10 @@ tas_single_node_ctlog:
       private_key: "private-0"
   private_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.key') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.key') }}
   public_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
 
 tas_single_node_fulcio:
   private_key: |
@@ -54,3 +54,27 @@ tas_single_node_fulcio:
   root_ca: |
     {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.pem') }}
   ca_passphrase: password
+
+tas_single_node_rekor:
+  ca_passphrase: password
+  public_key_retries: 5
+  public_key_delay: 10
+  private_keys:
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.key') }}
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.key') }}
+  public_keys:
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.pub') }}
+  sharding_config:
+  - treeID: 290394966304647762
+    treeLength: 0
+    signingConfig:
+    signer: private-0
+  - treeID: 7903366785562594023
+    treeLength: 0
+    signingConfig:
+    signer: private-1
