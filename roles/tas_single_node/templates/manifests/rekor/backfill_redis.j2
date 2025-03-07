@@ -32,10 +32,10 @@ spec:
             - |
               set +x
               echo "info: Querying Rekor for current log size..."
-              endIndex=$(curl -sS http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}/api/v1/log | sed -E 's/.*"treeSize":([0-9]+).*/\1/')
-              endIndex=$((endIndex-1))
-              echo "info: Fetched endIndex from Rekor; endIndex = ${endIndex}"
+              treeSize=$(curl -sS http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}/api/v1/log | sed -E 's/.*"treeSize":([0-9]+).*/\1/')
+              echo "info: Fetched treeSize from Rekor; treeSize = ${treeSize}"
 
+              endIndex=$((treeSize-1))
               if [ "${endIndex}" -lt 0 ]; then
                 echo "info: no rekor entries found"
                 exit 0
@@ -52,7 +52,20 @@ spec:
 
               if [ -z "$startIndex" ]; then
                 startIndex=0
+                firstRun=true
+              else
+                firstRun=false
               fi
+
+              if [ "$firstRun" = "false" ] && [ "$startIndex" -eq "$endIndex" ]; then
+                echo "info: Start index is equal to end index, nothing to do, exiting...."
+                exit 0
+              fi
+
+              if [ "$firstRun" = "false" ]; then
+                startIndex=$((startIndex+1))
+              fi
+
               echo "info: Retrieved startIndex from Redis; startIndex = ${startIndex}"
 
               echo "info: Executing backfill-redis from ${startIndex} to ${endIndex}"
@@ -65,14 +78,14 @@ spec:
                 --rekor-address=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} \
                 --start="${startIndex}" --end="${endIndex}"
 
-              echo "info: Updating last_filled_index in Redis to $((endIndex + 1))"
+              echo "info: Updating last_filled_index in Redis to $((endIndex))"
               redis-cli \
                 -h {{ tas_single_node_rekor_redis.redis.host }} \
                 -p {{ tas_single_node_rekor_redis.redis.port }} \
 {% if tas_single_node_rekor_redis.redis.password != "" %}
                 -a "{{ tas_single_node_rekor_redis.redis.password }}" \
 {% endif %}
-                SET last_filled_index "$((endIndex + 1))"
+                SET last_filled_index "$((endIndex))"
           volumeMounts:
             - mountPath: /var/lib/redis/data
               name: redis-backfill-storage
