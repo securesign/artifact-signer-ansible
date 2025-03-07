@@ -17,6 +17,18 @@ _tas_single_node_tsa:
   signer_passphrase: rhtas
   ca_passphrase: rhtas
   ntp_config: ""
+  trusted_ca: ""
+
+_tas_single_node_ctlog:
+  sharding_config:
+    - config:
+      treeid:
+      prefix: ""
+      root_pem_file: ""
+      password: ""
+      private_key: ""
+  private_keys: []
+  public_keys: []
 
 _tas_single_node_fulcio:
   certificate:
@@ -25,6 +37,38 @@ _tas_single_node_fulcio:
     common_name: ""
   private_key: ""
   root_ca: ""
+  ca_passphrase: rhtas
+  trusted_ca: ""
+  ct_log_prefix: rhtasansible
+
+_tas_single_node_cockpit:
+  enabled: false # install redhat.rhel_system_roles before enabling
+  user:
+    create: false
+    username: cockpit-user
+    password: ""
+
+_tas_single_node_rekor_redis:
+  database_deploy: true
+  redis:
+    host: rekor-redis-pod
+    port: 6379
+    password: password
+
+_tas_single_node_backfill_redis:
+  enabled: true
+  schedule: "*-*-* 00:00:00"
+
+_tas_single_node_trillian:
+  database_deploy: true
+  mysql:
+    user: mysql
+    root_password: rootpassword
+    password: password
+    database: trillian
+    host: trillian-mysql-pod
+    port: 3306
+  trusted_ca: ""
 
 _tas_single_node_ingress_certificates:
   fulcio:
@@ -46,13 +90,11 @@ _tas_single_node_ingress_certificates:
     certificate: ""
     private_key: ""
 
-
 # vars file for sigstore_scaffolding
 tas_single_node_system_packages:
   - podman
   - podman-plugins
   - firewalld
-
 
 tas_single_node_rekor_signer_type: file # to be exposed to users later on
 tas_single_node_rekor_templates:
