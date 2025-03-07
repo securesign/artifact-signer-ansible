@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rekor-server-config
+  namespace: rekor-system
+data:
+  sharding-config.yaml: |
+{% for tree in tas_single_node_rekor.sharding_config %}
+    - treeID: {% if tree.treeID == None %}{{ trillian_tree_id }}{% else %}{{ tree.treeID }}{% endif %}
+      
+      treeLength: {{ tree.treeLength }}
+      signingConfig: {{ tree.signingConfig}}
+      signer: {{ tree.signer }}
+{% endfor %}
