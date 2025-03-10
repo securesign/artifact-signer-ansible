@@ -19,6 +19,11 @@ _tas_single_node_tsa:
   ntp_config: ""
   trusted_ca: ""
 
+_tas_single_node_rekor:
+  ca_passphrase: rhtas
+  public_key_retries: 5
+  public_key_delay: 10
+
 _tas_single_node_ctlog:
   sharding_config:
     - config:
