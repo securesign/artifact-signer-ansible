@@ -1,13 +1,13 @@
 ---
 - name: Set default values for _tas_single_node variables
   ansible.builtin.set_fact:
-    tas_single_node_tsa: "{{ _tas_single_node_tsa | combine(tas_single_node_tsa | default({}, true), recursive=true) }}"
-    tas_single_node_ctlog: "{{ _tas_single_node_ctlog | combine(tas_single_node_ctlog | default({}, true), recursive=true) }}"
     tas_single_node_rekor: "{{ _tas_single_node_rekor | combine(tas_single_node_rekor | default({}, true), recursive=true) }}"
-    tas_single_node_fulcio: "{{ _tas_single_node_fulcio | combine(tas_single_node_fulcio | default({}, true), recursive=true) }}"
-    tas_single_node_cockpit: "{{ _tas_single_node_cockpit | combine(tas_single_node_cockpit | default({}, true), recursive=true) }}"
-    tas_single_node_trillian: "{{ _tas_single_node_trillian | combine(tas_single_node_trillian | default({}, true), recursive=true) }}"
     tas_single_node_rekor_redis: "{{ _tas_single_node_rekor_redis | combine(tas_single_node_rekor_redis | default({}, true), recursive=true) }}"
     tas_single_node_backfill_redis: "{{ _tas_single_node_backfill_redis | combine(tas_single_node_backfill_redis | default({}, true), recursive=true) }}"
+    tas_single_node_trillian: "{{ _tas_single_node_trillian | combine(tas_single_node_trillian | default({}, true), recursive=true) }}"
     tas_single_node_ingress_certificates: >-
       {{ _tas_single_node_ingress_certificates | combine(tas_single_node_ingress_certificates | default({}, true), recursive=true) }}
+    tas_single_node_fulcio: "{{ _tas_single_node_fulcio | combine(tas_single_node_fulcio | default({}, true), recursive=true) }}"
+    tas_single_node_tsa: "{{ _tas_single_node_tsa | combine(tas_single_node_tsa | default({}, true), recursive=true) }}"
+    tas_single_node_ctlog: "{{ _tas_single_node_ctlog | combine(tas_single_node_ctlog | default({}, true), recursive=true) }}"
+    tas_single_node_cockpit: "{{ _tas_single_node_cockpit | combine(tas_single_node_cockpit | default({}, true), recursive=true) }}"
