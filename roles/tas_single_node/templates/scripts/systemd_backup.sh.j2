@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+
+KUBE_FILE_PLAY=$1
+
+if [[ -f "{{ tas_single_node_backup_restore.backup.directory }}/backup_mode_active" || -f /var/lib/tas_restore/restore_mode_active ]]; then
+    exit 0
+else
+    /usr/bin/podman kube down "$KUBE_FILE_PLAY"
+    exit $?
+fi

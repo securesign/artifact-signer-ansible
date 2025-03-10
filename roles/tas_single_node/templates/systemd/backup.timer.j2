@@ -1,0 +1,10 @@
+[Unit]
+Description= Run Backup Oneshot Job
+
+[Timer]
+OnCalendar={{ tas_single_node_backup_restore.backup.schedule }}
+Persistent=true
+Unit=tas_backup.service
+
+[Install]
+WantedBy=timers.target

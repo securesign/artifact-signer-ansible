@@ -1,0 +1,10 @@
+[Unit]
+Description=Backup Service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "/usr/local/bin/tas_backup.sh"
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

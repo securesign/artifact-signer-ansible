@@ -43,6 +43,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_search_image | Rekor search UI image | str |  `registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b`  |
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
+| tas_single_node_backup_restore | Configuration options for the Backup and Restore of Trusted Artifact Signer. | dict of 'tas_single_node_backup_restore' options |  `{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}`  |
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -266,6 +267,31 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | create | Whether or not to create the cockpit user. | bool | no |  |
 | username | Username for the cockpit user. | str | no |  |
 | password | Password for the cockpit user. | str | yes |  |
+
+#### Options for main > tas_single_node_backup_restore
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| backup | Configuration options for the backup. | dict of 'backup' options | no |  |
+| restore | Configuration options for the restore. | dict of 'restore' options | no |  |
+
+#### Options for main > tas_single_node_backup_restore > backup
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| enabled | Option to deploy the backup oneshot job and timer. | bool | no |  |
+| schedule | The schedule for the backup oneshot job. By default runs daily at midnight. | str | no |  |
+| force_run | Forcefully runs a manual backup. | bool | no |  |
+| passphrase | The passphrase used to encrypt the compressed backup file. | str | no |  |
+| directory | The directory used to store the backups on the remote server. Stored in /root/tas_backups by default. | str | no |  |
+
+#### Options for main > tas_single_node_backup_restore > restore
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| enabled | Option to restore a full TAS instance. If configured, needs to return to 'false' after a successful run. | bool | no |  |
+| source | The filepath leading the to compressed and encrypted backup file that will be used for the full restore. | str | no |  |
+| passphrase | The passphrase used to decrypt the compressed backup file. | str | no |  |
 
 ## Example Playbook
 
