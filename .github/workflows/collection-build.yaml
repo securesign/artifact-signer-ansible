@@ -5,7 +5,7 @@ on:
       - '*'
 
 jobs:
-  ansible-lint:
+  build-collection:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout code
