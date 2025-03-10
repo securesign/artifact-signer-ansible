@@ -98,6 +98,8 @@ tas_single_node_cockpit:
     password: password
 ```
 
+Note: If you create a dedicated user for Cockpit, you may need to grant that user administrative access in order to view and interact with the pods. To do this, click the Limited Access button in the top-right corner of the Cockpit UI and switch to administrative access.
+
 ## Downloading CLI tools
    To Download tools to interact with Red Hat Trusted Artifact Signer, you can visit `https://cli-server.<base_hostname>`
 
