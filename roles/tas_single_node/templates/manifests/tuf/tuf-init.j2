@@ -70,8 +70,8 @@ spec:
           persistentVolumeClaim:
             claimName: "{{ tas_single_node_tuf_repository_volume_name }}"
         - name: tuf-secrets
-          secret:
-            secretName: tuf-secret
+          persistentVolumeClaim:
+            claimName: tuf-secret
         - name: "{{ tas_single_node_tuf_signing_keys_volume_name }}"
           persistentVolumeClaim:
             claimName: "{{ tas_single_node_tuf_signing_keys_volume_name }}"

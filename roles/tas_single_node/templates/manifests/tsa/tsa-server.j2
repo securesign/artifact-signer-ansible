@@ -118,40 +118,24 @@ spec:
       volumes:
 {% if tas_single_node_tsa.trusted_ca != '' %}
         - name: ca-trust
-          configMap:
-            name: tsa-config
-            items:
-              - key: tsa-trusted-ca.pem
-                path: tsa-trusted-ca.pem
+          persistentVolumeClaim:
+            claimName: tsa-config
 {% endif %}
 {% if tas_single_node_tsa.ntp_config != '' %}
         - name: tsa-ntp-config
-          configMap:
-            defaultMode: 420
-            name: tsa-config
-            items:
-              - key: ntpsync.yaml
-                path: ntpsync.yaml
+          persistentVolumeClaim:
+            claimName: tsa-config
 {% endif %}
         - name: tsa-cert-chain
-          secret:
-            secretName: tsa-server-secret
-            items:
-              - key: certificate-chain.pem
-                path: certificate-chain.pem
+          persistentVolumeClaim:
+            claimName: tsa-server-secret
 {% if tas_single_node_tsa.signer_type == 'file' %}
         - name: tsa-file-signer-config
-          secret:
-            secretName: tsa-server-secret
-            items:
-              - key: private_key.pem
-                path: private_key.pem
+          persistentVolumeClaim:
+            claimName: tsa-server-secret
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'tink' %}
         - name: tsa-file-signer-config
-          secret:
-            secretName: tsa-server-secret
-            items:
-              - key: encrypted_key_set
-                path: encrypted_key_set
+          persistentVolumeClaim:
+            claimName: tsa-server-secret
 {% endif %}

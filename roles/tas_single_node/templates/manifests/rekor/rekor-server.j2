@@ -91,12 +91,11 @@ spec:
       restartPolicy: Always
       volumes:
         - name: keys
-          secret:
-            secretName: rekor-secret
+          persistentVolumeClaim:
+            claimName: rekor-secret
         - name: rekor-server-config
-          configMap:
-            defaultMode: 420
-            name: rekor-server-config
+          persistentVolumeClaim:
+            claimName: rekor-server-config
         - name: storage
           persistentVolumeClaim:
             claimName: rekor-server

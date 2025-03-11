@@ -21,8 +21,8 @@ spec:
 {% if tas_single_node_trillian.trusted_ca != "" %}
       volumes:
         - name: ca-trust
-          configMap:
-            name: {{ tas_single_node_trillian_trusted_ca_configmap_name }}
+          persistentVolumeClaim:
+            claimName: {{ tas_single_node_trillian_trusted_ca_configmap_name }}
 {% endif %}
       containers:
         - name: trillian-trillian-logserver

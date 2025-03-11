@@ -19,47 +19,81 @@
   ansible.builtin.set_fact:
     fulcio_config_content: "{{ lookup('ansible.builtin.template', 'configs/fulcio-oidc.conf.j2') | trim }}"
 
-- name: Create Fulcio Config ConfigMap
-  ansible.builtin.copy:
-    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ tas_single_node_fulcio_server_config }}"
-    mode: "0600"
-  vars:
-    configmap_content:
-      kind: ConfigMap
-      apiVersion: v1
-      metadata:
-        name: fulcio-config
-        namespace: fulcio-system
-      data:
-        config.yaml: |
-          {{ fulcio_config_content }}
+- name: Mount fulcio files to the volumes
+  no_log: true
+  block:
+    - name: Create pod with volumes mounted
+      ansible.builtin.shell: |
+        podman pod rm -f mount-pod || true && \
+        podman pod create --name mount-pod -v fulcio-cert:/cert -v fulcio-config:/config
+      register: pod_create_result
+      changed_when: false
+      ignore_errors: yes
 
-        fulcio-trusted-ca.pem: |
-          {{ tas_single_node_fulcio.trusted_ca }}
-  register: configmap_result
+    - name: Start persistent container in mount-pod
+      ansible.builtin.shell: |
+        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
+      changed_when: false
+      when: pod_create_result.rc == 0
 
-- name: Create Fulcio Secret
-  ansible.builtin.copy:
-    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ tas_single_node_fulcio_server_secret_config }}"
-    mode: "0600"
-  vars:
-    secret_content:
-      kind: Secret
-      apiVersion: v1
-      metadata:
-        name: fulcio-server-secret
-        namespace: fulcio-system
-      data:
-        key.pem: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_private_key) | list | first).content }}
-        cert.pem: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
-        public: |
-          {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key) | list | first).content }}
-        password: "{{ tas_single_node_fulcio.ca_passphrase | b64encode }}"
-  register: secret_result
+    - name: Get fulcio-cert volume mountpoint
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          podman volume inspect fulcio-cert | jq -r '.[0].Mountpoint'
+      register: fulcio_cert_mountpoint
+      changed_when: false
+
+    - name: Mount fulcio cert files to fulcio-cert volume
+      ansible.builtin.copy:
+        dest: "{{ fulcio_cert_mountpoint.stdout }}/{{ item.key }}"
+        content: "{{ item.value }}"
+        mode: '0644'
+      loop: "{{ data | dict2items }}"
+      when: fulcio_cert_mountpoint.stdout is defined
+      vars:
+        data:
+          key.pem: >-
+            {{ (remote_fulcio_certificates.results
+            | selectattr('source', 'equalto', tas_single_node_remote_fulcio_private_key)
+            | list | first).content | b64decode }}
+          cert.pem: >-
+            {{ (remote_fulcio_certificates.results
+            | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca)
+            | list | first).content | b64decode }}
+          public: >-
+            {{ (remote_fulcio_certificates.results
+            | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key)
+            | list | first).content | b64decode }}
+          password: "{{ tas_single_node_fulcio.ca_passphrase }}"
+
+    - name: Get fulcio-config volume mountpoint
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          podman volume inspect fulcio-config | jq -r '.[0].Mountpoint'
+      register: fulcio_config_mountpoint
+      changed_when: false
+
+    - name: Mount fulcio config files to fulcio-config volume
+      ansible.builtin.copy:
+        dest: "{{ fulcio_config_mountpoint.stdout }}/{{ item.key }}"
+        content: "{{ item.value }}"
+        mode: '0644'
+      loop: "{{ data | dict2items }}"
+      when: fulcio_config_mountpoint.stdout is defined
+      vars:
+        data:
+          config.yaml: |
+            {{ fulcio_config_content }}
+          fulcio-trusted-ca.pem: |
+            {{ tas_single_node_fulcio.trusted_ca }}
+
+    - name: Remove the pod after files are copied
+      ansible.builtin.shell: |
+        podman pod rm -f mount-pod
+      changed_when: false
+      ignore_errors: yes
 
 - name: Deploy Fulcio Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -69,7 +103,3 @@
       systemd_file: fulcio
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/fulcio/fulcio-server.j2') | from_yaml }}"
-      configmap: "{{ tas_single_node_fulcio_server_config }}"
-      configmap_changed: "{{ configmap_result.changed }}"
-      secret: "{{ tas_single_node_fulcio_server_secret_config }}"
-      secret_changed: "{{ secret_result.changed }}"

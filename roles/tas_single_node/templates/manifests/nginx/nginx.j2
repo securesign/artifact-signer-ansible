@@ -43,9 +43,8 @@ spec:
       restartPolicy: Always
       volumes:
         - name: nginx-certs
-          secret:
-            secretName: nginx-certs
+          persistentVolumeClaim:
+            claimName: nginx-certs
         - name: nginx-config
-          configMap:
-            defaultMode: 420
-            name: nginx-config
+          persistentVolumeClaim:
+            claimName: nginx-config

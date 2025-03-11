@@ -53,6 +53,5 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: apache-config
-          hostPath:
-            path: {{ apache_config_mountpoint.stdout }}
-            type: Directory
+          persistentVolumeClaim:
+            claimName: apache-config

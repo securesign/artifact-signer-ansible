@@ -18,22 +18,48 @@
         mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
   register: secret_result
 
-- name: Create Trillian CA certificate ConfigMap (with default empty value if not provided)
-  ansible.builtin.copy:
-    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-    dest: "{{ tas_single_node_trillian_trusted_ca_configmap }}"
-    mode: "0600"
-  vars:
-    configmap_content:
-      kind: ConfigMap
-      apiVersion: v1
-      metadata:
-        name: "{{ tas_single_node_trillian_trusted_ca_configmap_name }}"
-        namespace: trillian-system
-      data:
-        trillian-trusted-ca.pem: |
-          {{ tas_single_node_trillian.trusted_ca }}
-  register: configmap_result
+- name: Mount certificate to Trillian trusted CA volume
+  no_log: true
+  when: tas_single_node_trillian.trusted_ca != ""
+  block:
+    - name: Create pod with volume mounted
+      ansible.builtin.shell: |
+        podman pod create --name mount-pod -v {{ tas_single_node_trillian_trusted_ca_configmap_name }}:/cert
+      register: pod_create_result
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Start persistent container in mount-pod
+      ansible.builtin.shell: |
+        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
+      changed_when: false
+      when: pod_create_result.rc == 0
+
+    - name: Get Trillian trusted CA volume mountpoint
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          podman volume inspect {{ tas_single_node_trillian_trusted_ca_configmap_name }} | jq -r '.[0].Mountpoint'
+      register: trillian_trusted_ca_mountpoint
+      changed_when: false
+
+    - name: Mount cert to Trillian trusted CA volume
+      ansible.builtin.copy:
+        dest: "{{ trillian_trusted_ca_mountpoint.stdout }}/{{ item.key }}"
+        content: "{{ item.value }}"
+        mode: '0644'
+      loop: "{{ data | dict2items }}"
+      when: trillian_trusted_ca_mountpoint.stdout is defined
+      vars:
+        data:
+          trillian-trusted-ca.pem: |
+            {{ tas_single_node_trillian.trusted_ca }}
+
+    - name: Remove the pod after files are copied
+      ansible.builtin.shell: |
+        podman pod rm -f mount-pod
+      changed_when: false
+      ignore_errors: yes
 
 - name: Build Trillian Database Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -57,8 +83,6 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logsigner.j2') | from_yaml }}"
       secret: "{{ tas_single_node_trillian_secret }}"
       secret_changed: "{{ secret_result.changed }}"
-      configmap: "{{ tas_single_node_trillian_trusted_ca_configmap }}"
-      configmap_changed: "{{ configmap_result.changed | default('false') }}"
 
 - name: Build Trillian Log Server Manifest specs
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -70,5 +94,3 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/trillian/trillian-logserver.j2') | from_yaml }}"
       secret: "{{ tas_single_node_trillian_secret }}"
       secret_changed: "{{ secret_result.changed }}"
-      configmap: "{{ tas_single_node_trillian_trusted_ca_configmap }}"
-      configmap_changed: "{{ configmap_result.changed | default('false') }}"

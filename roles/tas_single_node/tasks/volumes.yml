@@ -1,0 +1,69 @@
+---
+- name: Create volume list variable
+  ansible.builtin.set_fact:
+    volume_list:
+      - nginx-certs
+      - nginx-config
+      - apache-config
+      - ctlog-config
+      - ctlog-secret
+      - trillian-mysql
+      - rekor-server-config
+      - rekor-secret
+      - rekor-server
+      - rekor-redis-storage
+      - redis-backfill-storage
+      - fulcio-config
+      - fulcio-cert
+      - tuf-secret
+      - "{{ tas_single_node_tuf_repository_volume_name }}"
+      - "{{ tas_single_node_tuf_signing_keys_volume_name }}"
+      - tsa-server-secret
+      - tsa-config
+
+- name: Add Trillian trusted CA volume if needed
+  ansible.builtin.set_fact:
+    volume_list: "{{ volume_list + [tas_single_node_trillian_trusted_ca_configmap_name] }}"
+  when: tas_single_node_trillian.trusted_ca != ""
+
+- name: Check if volume exists
+  ansible.builtin.command: podman volume ls -q -f name={{ item }}
+  register: volume_check
+  changed_when: false
+  failed_when: false
+  loop: "{{ volume_list }}"
+  loop_control:
+    label: "{{ item }}"
+
+- name: Create volume if it does not exist
+  ansible.builtin.command: podman volume create {{ tas_single_node_podman_volume_create_extra_args }} {{ item }}
+  changed_when: false
+  when: volume_check.results | selectattr('item', 'equalto', item) | map(attribute='stdout') | first == ""
+  loop: "{{ volume_list }}"
+  loop_control:
+    label: "{{ item }}"
+
+# Required: Ensure the specified volumes are writable.
+# If the volume has a device option, apply the correct SELinux context (container_file_t)
+# to prevent permission issues.
+- name: Ensure required volumes are writable with correct SELinux context
+  block:
+    - name: Check if volumes have a device option
+      ansible.builtin.shell: |
+        podman volume inspect {{ item }} --format '{% raw %}{{ .Options.device }}{% endraw %}'
+      register: volume_device_checks
+      loop:
+        - trillian-mysql
+        - rekor-redis-storage
+        - redis-backfill-storage
+      changed_when: false
+      failed_when: volume_device_checks.rc != 0 and volume_device_checks.stdout != ""
+
+    - name: Apply SELinux context if volume has a device option
+      ansible.builtin.shell: |
+        chcon -R -t container_file_t {{ item.stdout }}
+      changed_when: false
+      loop: "{{ volume_device_checks.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.stdout | default('') | length > 0 and item.stdout != "<no value>"

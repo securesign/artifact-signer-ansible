@@ -3,45 +3,47 @@
   ansible.builtin.set_fact:
     index_html_content: "{{ lookup('ansible.builtin.template', 'configs/index.html.j2') }}"
 
-# - name: Create Apache config ConfigMap
-#   ansible.builtin.copy:
-#     content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
-#     dest: "{{ tas_single_node_apache_config }}"
-#     mode: "0600"
-#   vars:
-#     configmap_content:
-#       kind: ConfigMap
-#       apiVersion: v1
-#       metadata:
-#         name: apache-config
-#         namespace: cli-server
-#       data:
-#         index.html: "{{ index_html_content }}"
-#   register: apache_configmap_result
+- name: Mount apache files to the volume
+  no_log: true
+  block:
+    - name: Create pod with volume mounted
+      ansible.builtin.shell: |
+        podman pod create --name mount-pod -v apache-config:/config
+      register: pod_create_result
+      changed_when: false
+      ignore_errors: yes
 
-- name: Check if apache-config volume exists
-  ansible.builtin.command: podman volume ls -q -f name=apache-config
-  register: volume_check
-  changed_when: false
-  failed_when: false
+    - name: Start persistent container in mount-pod
+      ansible.builtin.shell: |
+        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
+      changed_when: false
+      when: pod_create_result.rc == 0
 
-- name: Create Apache config volume
-  ansible.builtin.command: podman volume create apache-config
-  when: volume_check.stdout == ""
+    - name: Get apache-config volume mountpoint
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          podman volume inspect apache-config | jq -r '.[0].Mountpoint'
+      register: apache_config_mountpoint
+      changed_when: false
 
-- name: Get Apache config volume mountpoint
-  ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail &&
-      podman volume inspect apache-config | jq -r '.[0].Mountpoint'
-  register: apache_config_mountpoint
-  changed_when: false
+    - name: Mount index.html to apache-config volume
+      ansible.builtin.copy:
+        dest: "{{ apache_config_mountpoint.stdout }}/{{ item.key }}"
+        content: "{{ item.value }}"
+        mode: '0644'
+      loop: "{{ data | dict2items }}"
+      when: apache_config_mountpoint.stdout is defined
+      vars:
+        data:
+          index.html: |
+            {{ index_html_content }}
 
-- name: Mount files to the volume
-  ansible.builtin.copy:
-    dest: "{{ apache_config_mountpoint.stdout }}/index.html"
-    content: "{{ index_html_content }}"
-    mode: '0644'
+    - name: Remove the pod after files are copied
+      ansible.builtin.shell: |
+        podman pod rm -f mount-pod
+      changed_when: false
+      ignore_errors: yes
 
 - name: Deploy CLI server pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -51,5 +53,3 @@
       systemd_file: cli-server
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/cli-server/cli-server.j2') | from_yaml }}"
-      # configmap: "{{ tas_single_node_apache_config }}"
-      # configmap_changed: "{{ apache_configmap_result.changed }}"

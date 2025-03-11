@@ -54,7 +54,12 @@ spec:
       restartPolicy: Always
       volumes:
         - name: rekor-redis-storage
+<<<<<<< HEAD
           emptyDir: {}
+=======
+          persistentVolumeClaim:
+            claimName: rekor-redis-storage
+>>>>>>> ddd903f (Add podman volume management)
       enableServiceLinks: true
       securityContext:
         capabilities:

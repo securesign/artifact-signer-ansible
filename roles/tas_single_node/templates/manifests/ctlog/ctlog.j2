@@ -87,9 +87,8 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: keys
-          secret:
-            secretName: ctlog-secret
-            defaultMode: 420
+          persistentVolumeClaim:
+            claimName: ctlog-secret
         - name: config
-          configMap:
-            name: ctlog-config
+          persistentVolumeClaim:
+            claimName: ctlog-config
