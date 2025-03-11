@@ -3,7 +3,7 @@
   gather_facts: true
   become: true
   vars:
-    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../../vm-testing/test"
+    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
   vars_files:
     - vars/vars.yml
   tasks:
