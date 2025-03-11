@@ -91,7 +91,6 @@
         podman pod create --name mount-pod -v nginx-certs:/certs -v nginx-config:/config
       register: pod_create_result
       changed_when: false
-      ignore_errors: yes
 
     - name: Start persistent container in mount-pod
       ansible.builtin.shell: |
@@ -166,7 +165,6 @@
       ansible.builtin.shell: |
         podman pod rm -f mount-pod
       changed_when: false
-      ignore_errors: yes
 
 - name: Deploy nginx Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
