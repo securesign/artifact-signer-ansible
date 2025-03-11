@@ -7,7 +7,7 @@
     - vars/podman.yml
   tasks:
     - name: Ensure Registry credentials are set
-      ansible.builtin.include_tasks: ../check_creds.yml
+      ansible.builtin.include_tasks: ../common/check_creds.yml
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:

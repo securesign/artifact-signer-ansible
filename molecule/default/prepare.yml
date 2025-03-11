@@ -26,7 +26,7 @@
         cmd: "dnf versionlock add 'podman-4:4.9.4-16.el9_4.x86_64'"
 
     - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../dex-config.yaml
+      ansible.builtin.include_tasks: ../common/dex-setup.yaml
 
       #- name: Setup a non-root sudoer to replicate a user environment
       #ansible.builtin.include_tasks: ../testing_user_setup.yaml

@@ -14,7 +14,7 @@
 
 - name: Copy Dex config over
   ansible.builtin.copy:
-    src: "../../vm-testing/dex-config.yaml"
+    src: "dex-config.yaml"
     dest: "/etc/dex/config/dex.yaml"
     mode: "0644"
 

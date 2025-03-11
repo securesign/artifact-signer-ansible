@@ -1,5 +1,5 @@
 tas_single_node_podman:
-  policy: "{{ lookup('ansible.builtin.file', lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') + '/../../vm-testing/containers/policy.json') }}"
+  policy: "{{ lookup('ansible.builtin.file', lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') + '/../common/policy.json') }}"
   registry:
     - location: registry.redhat.io/rhtas/fulcio-rhel9
       mirror: quay.io/securesign/fulcio-server
