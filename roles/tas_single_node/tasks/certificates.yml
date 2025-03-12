@@ -78,7 +78,17 @@
 
 - name: Create Fulcio root
   block:
-    - name: Verify if the passphrase matches the existing private key
+    - name: Verify if the passphrase matches the user-provided private key
+      ansible.builtin.shell:
+        cmd: >-
+          openssl ec -in '{{ tas_single_node_fulcio.private_key }}' -check \
+          -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
+      register: check_key_passphrase
+      changed_when: false
+      failed_when: check_key_passphrase.stdout == "failed"
+      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
+
+    - name: Verify if the passphrase matches the auto_generated private key
       ansible.builtin.shell:
         cmd: >-
           openssl ec -in '{{ tas_single_node_remote_fulcio_auto_generated_private_key }}' -check \
@@ -218,6 +228,38 @@
       register: ec_key_cert_match_check
       changed_when: false
 
+    - name: Set default value for cert_changed
+      ansible.builtin.set_fact:
+        cert_changed: false
+
+    - name: Check if fulcio certificate needs to be regenerated
+      when: tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == ""
+      block:
+        - name: Compute certificate attributes hash
+          ansible.builtin.set_fact:
+            cert_attr_hash: "{{ (tas_single_node_fulcio.certificate | to_json) | hash('sha256') }}"
+
+        - name: Check if the previous certificate attribute hash exists
+          ansible.builtin.stat:
+            path: "{{ tas_single_node_config_dir }}/fulcio_cert_attr_hash"
+          register: cert_hash_file
+
+        - name: Read the previous certificate attribute hash
+          ansible.builtin.slurp:
+            src: "{{ tas_single_node_config_dir }}/fulcio_cert_attr_hash"
+          register: previous_cert_attr_hash
+          when: cert_hash_file.stat.exists
+
+        - name: Determine if certificate attributes have changed
+          ansible.builtin.set_fact:
+            cert_changed: "{{ previous_cert_attr_hash['content'] | b64decode != cert_attr_hash if cert_hash_file.stat.exists else true }}"
+
+        - name: Store the new certificate attributes hash
+          ansible.builtin.copy:
+            content: "{{ cert_attr_hash }}"
+            dest: "{{ tas_single_node_config_dir }}/fulcio_cert_attr_hash"
+            mode: '0644'
+
     - name: Create certificate signing request (CSR) for Fulcio root certificate
       ansible.builtin.command:
         cmd: >-
@@ -233,6 +275,7 @@
       register: fulcio_root_csr
       changed_when: false
       when: >
+        cert_changed or
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or (
@@ -254,6 +297,7 @@
           -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}'
           -out '{{ tas_single_node_remote_fulcio_root_ca }}'
       changed_when: >
+        cert_changed or
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or (
@@ -263,6 +307,7 @@
             (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
         )
       when: >
+        cert_changed or
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or (
