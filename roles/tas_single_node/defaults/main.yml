@@ -55,3 +55,5 @@ tas_single_node_client_server_image:
   "registry.redhat.io/rhtas/client-server-rhel9@sha256:ce30450e9e3aee7368bd9ba7f756d7af0f7c0e052cd57951256adaa9c78fb562"
 
 tas_single_node_podman: {}
+
+tas_single_node_podman_volume_create_extra_args: ""
