@@ -271,7 +271,9 @@ argument_specs:
                 version_added: "1.2.0"
       tas_single_node_fulcio:
         description: "Details on the certificate settings for Fulcio. Includes organizational details,
-          the user-provided private key for signing the root certificate, and the user-provided root certificate itself."
+          the user-provided private key for signing the root certificate, and the user-provided root certificate itself.
+          **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`)
+          will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root."
         type: "dict"
         required: false
         version_added: "1.2.0"
@@ -287,7 +289,8 @@ argument_specs:
           ct_log_prefix: rhtasansible
         options:
           certificate:
-            description: "Details on the certificate attributes for Fulcio."
+            description: "Details on the certificate attributes for Fulcio.
+              **Note**: Updating any of these values will regenerate the Fulcio certificate, and a manual update in the trust root is required."
             type: "dict"
             required: false
             version_added: "1.2.0"
