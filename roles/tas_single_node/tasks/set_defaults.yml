@@ -11,3 +11,8 @@
     tas_single_node_tsa: "{{ _tas_single_node_tsa | combine(tas_single_node_tsa | default({}, true), recursive=true) }}"
     tas_single_node_ctlog: "{{ _tas_single_node_ctlog | combine(tas_single_node_ctlog | default({}, true), recursive=true) }}"
     tas_single_node_cockpit: "{{ _tas_single_node_cockpit | combine(tas_single_node_cockpit | default({}, true), recursive=true) }}"
+    trillian_tree_id: "{{ trillian_tree_id | default (0) }}"
+    tas_single_node_fulcio_ct_log_prefix: ":{{ tas_single_node_fulcio.ct_log_prefix | default ('default-prefix') }}"
+    ctlog_roots_pem_file: "{{ ctlog_roots_pem_file | default ('/ctfe-keys/fulcio-0') }}"
+    ctlog_private_key_path: "{{ ctlog_private_key_path | default ('/ctfe-keys/fulcio-0') }}"
+    tas_single_node_fulcio_ca_passphrase: "{{ tas_single_node_fulcio.ca_passphrase | default('rhtas') }}"

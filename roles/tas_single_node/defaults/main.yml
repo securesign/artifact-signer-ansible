@@ -5,9 +5,6 @@ tas_single_node_registry_password: ""
 
 tas_single_node_podman_network: rhtas
 
-tas_single_node_rekor_public_key_retries: 5
-tas_single_node_rekor_public_key_delay: 10
-
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
 
