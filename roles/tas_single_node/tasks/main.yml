@@ -34,5 +34,5 @@
 - name: Create Certificates
   ansible.builtin.include_tasks: certificates.yml
 
-- name: Execute Podman Actions
-  ansible.builtin.include_tasks: podman.yml
+# - name: Execute Podman Actions
+#   ansible.builtin.include_tasks: podman.yml

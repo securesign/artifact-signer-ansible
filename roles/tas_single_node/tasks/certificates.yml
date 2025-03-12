@@ -267,7 +267,7 @@
 
         - name: Determine if certificate attributes have changed
           ansible.builtin.set_fact:
-            cert_changed: "{{ previous_cert_attr_hash['content'] | b64decode != cert_attr_hash if cert_hash_file.stat.exists else true }}"
+            cert_changed: "{{ previous_cert_attr_hash['content'] | b64decode != cert_attr_hash if cert_hash_file.stat.exists }}"
 
         - name: Store the new certificate attributes hash
           ansible.builtin.copy:
