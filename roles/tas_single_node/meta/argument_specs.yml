@@ -476,7 +476,9 @@ argument_specs:
             required: false
             version_added: "1.2.0"
           certificate:
-            description: "Details on the certificate attributes for TSA."
+            description: "Details on the certificate attributes for TSA. **Note**: Updating any of the certificate attributes (such as `organization_name`,
+                          `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the TSA
+                          certificate, which requires a corresponding manual update in the trust root."
             type: "dict"
             required: false
             version_added: "1.2.0"
