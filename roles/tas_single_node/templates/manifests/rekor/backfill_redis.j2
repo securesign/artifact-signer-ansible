@@ -91,4 +91,5 @@ spec:
               name: redis-backfill-storage
       volumes:
         - name: redis-backfill-storage
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: redis-backfill-storage

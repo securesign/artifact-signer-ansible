@@ -760,3 +760,11 @@ argument_specs:
                 type: "str"
                 required: true
                 version_added: "1.2.0"
+      tas_single_node_podman_volume_create_extra_args:
+        description: >
+          Additional arguments to pass to the `podman volume create` command.
+          This can be used to specify extra options when creating Podman volumes.
+        type: "str"
+        required: false
+        version_added: "1.2.0"
+        default: ""
