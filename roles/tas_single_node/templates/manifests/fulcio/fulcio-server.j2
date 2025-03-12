@@ -74,7 +74,7 @@ spec:
           volumeMounts:
 {% if tas_single_node_fulcio.trusted_ca != "" %}
             - mountPath: /certs/fulcio-trusted-ca.pem
-              name: fulcio-config
+              name: fulcio-oidc-ca
               subPath: fulcio-trusted-ca.pem
 {% endif %}
             - mountPath: /etc/fulcio-config
@@ -104,11 +104,23 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: fulcio-config
-          persistentVolumeClaim:
-            claimName: fulcio-config
+          configMap:
+            defaultMode: 420
+            name: fulcio-config
+            items:
+            - key: config.yaml
+              path: config.yaml
+{% if tas_single_node_fulcio.trusted_ca != "" %}
+        - name: fulcio-oidc-ca
+          configMap:
+            name: fulcio-config
+            items:
+            - key: fulcio-trusted-ca.pem
+              path: fulcio-trusted-ca.pem
+{% endif %}
         - name: fulcio-cert
-          persistentVolumeClaim:
-            claimName: fulcio-cert
-        - name: nginx-certs
-          persistentVolumeClaim:
-            claimName: nginx-certs
+          secret:
+            secretName: fulcio-server-secret
+        - secret:
+            secretName: nginx-certs
+          name: nginx-certs

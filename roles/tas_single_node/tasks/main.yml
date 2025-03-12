@@ -9,6 +9,9 @@
   ansible.builtin.include_tasks: os.yml
   when: not tas_single_node_skip_os_install
 
+- name: Create Podman Volumes
+  ansible.builtin.include_tasks: volumes.yml
+
 - name: Create cockpit-user
   ansible.builtin.user:
     name: "{{ tas_single_node_cockpit.user.username }}"
@@ -33,9 +36,6 @@
 
 - name: Create Certificates
   ansible.builtin.include_tasks: certificates.yml
-
-- name: Create Podman Volumes
-  ansible.builtin.include_tasks: volumes.yml
 
 - name: Execute Podman Actions
   ansible.builtin.include_tasks: podman.yml

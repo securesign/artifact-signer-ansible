@@ -78,93 +78,67 @@
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
 
+- name: Create nginx certs Secret
+  ansible.builtin.copy:
+    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_nginx_certs_config }}"
+    mode: "0600"
+  vars:
+    secret_content:
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: nginx-certs
+        namespace: nginx-system
+      data:
+        ingress-rekor.pem: |
+          {{ rekor_ingress_base64 | b64encode }}
+        ingress-rekor-search.pem: |
+          {{ rekor_search_ingress_base64 | b64encode }}
+        ingress-tuf.pem: |
+          {{ tuf_ingress_base64 | b64encode }}
+        ingress-fulcio.pem: |
+          {{ fulcio_ingress_base64 | b64encode }}
+        ingress-tsa.pem: |
+          {{ tsa_ingress_base64 | b64encode }}
+        ingress-cli-server.pem: |
+          {{ cli_server_ingress_base64 | b64encode }}
+        ingress-rekor.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key') | list | first).content }}
+        ingress-rekor-search.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
+          + '/ingress-rekor-search.key') | list | first).content }}
+        ingress-tuf.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key') | list | first).content }}
+        ingress-fulcio.key: >-
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
+          + '/ingress-fulcio.key') | list | first).content }}
+        ingress-tsa.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tsa.key') | list | first).content }}
+        ingress-cli-server.key: |
+          {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
+          + '/ingress-cli-server.key') | list | first).content }}
+  register: secret_result
+
 - name: Load nginx config content
   ansible.builtin.set_fact:
     nginx_config_content: "{{ lookup('ansible.builtin.template', 'configs/nginx.conf.j2') }}"
 
-- name: Mount nginx files to the volumes
-  no_log: true
-  block:
-    - name: Create pod with volumes mounted
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod || true && \
-        podman pod create --name mount-pod -v nginx-certs:/certs -v nginx-config:/config
-      register: pod_create_result
-      changed_when: false
-
-    - name: Start persistent container in mount-pod
-      ansible.builtin.shell: |
-        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
-      changed_when: false
-      when: pod_create_result.rc == 0
-
-    - name: Get nginx-certs volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect nginx-certs | jq -r '.[0].Mountpoint'
-      register: nginx_certs_mountpoint
-      changed_when: false
-
-    - name: Mount certs to nginx-certs volume
-      ansible.builtin.copy:
-        dest: "{{ nginx_certs_mountpoint.stdout }}/{{ item.key }}"
-        content: "{{ item.value }}"
-        mode: '0644'
-      loop: "{{ certs_content | dict2items }}"
-      when: nginx_certs_mountpoint.stdout is defined
-      vars:
-        certs_content:
-          ingress-rekor.pem: "{{ rekor_ingress_base64 }}"
-          ingress-rekor-search.pem: "{{ rekor_search_ingress_base64 }}"
-          ingress-tuf.pem: "{{ tuf_ingress_base64 }}"
-          ingress-fulcio.pem: "{{ fulcio_ingress_base64 }}"
-          ingress-tsa.pem: "{{ tsa_ingress_base64 }}"
-          ingress-cli-server.pem: "{{ cli_server_ingress_base64 }}"
-          ingress-rekor.key: >-
-            {{ (remote_ingress_certificates.results
-            | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.key')
-            | list | first).content | b64decode }}
-          ingress-rekor-search.key: >-
-            {{ (remote_ingress_certificates.results
-            | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor-search.key')
-            | list | first).content | b64decode }}
-          ingress-tuf.key: >-
-            {{ (remote_ingress_certificates.results
-            | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.key')
-            | list | first).content | b64decode }}
-          ingress-fulcio.key: >-
-            {{ (remote_ingress_certificates.results
-            | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.key')
-            | list | first).content | b64decode }}
-          ingress-tsa.key: >-
-            {{ (remote_ingress_certificates.results
-            | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tsa.key')
-            | list | first).content | b64decode }}
-          ingress-cli-server.key: >-
-            {{ (remote_ingress_certificates.results
-            | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-cli-server.key')
-            | list | first).content | b64decode }}
-
-    - name: Get nginx-config volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect nginx-config | jq -r '.[0].Mountpoint'
-      register: nginx_config_mountpoint
-      changed_when: false
-
-    - name: Mount nginx.conf to nginx-config volume
-      ansible.builtin.copy:
-        dest: "{{ nginx_config_mountpoint.stdout }}/nginx.conf"
-        content: "{{ nginx_config_content }}"
-        mode: '0644'
-      when: nginx_config_mountpoint.stdout is defined
-
-    - name: Remove the pod after files are copied
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod
-      changed_when: false
+- name: Create nginx config ConfigMap
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_nginx_config }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: nginx-config
+        namespace: nginx-system
+      data:
+        nginx.conf: "{{ nginx_config_content }}"
+  register: configmap_result
 
 - name: Deploy nginx Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -174,3 +148,7 @@
       network: "{{ tas_single_node_podman_network }}"
       systemd_file: nginx
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/nginx/nginx.j2') | from_yaml }}"
+      configmap: "{{ tas_single_node_nginx_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
+      secret: "{{ tas_single_node_nginx_certs_config }}"
+      secret_changed: "{{ secret_result.changed }}"

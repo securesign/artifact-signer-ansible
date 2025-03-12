@@ -2,29 +2,12 @@
 - name: Create volume list variable
   ansible.builtin.set_fact:
     volume_list:
-      - nginx-certs
-      - nginx-config
-      - apache-config
-      - ctlog-config
-      - ctlog-secret
       - trillian-mysql
-      - rekor-server-config
-      - rekor-secret
       - rekor-server
       - rekor-redis-storage
       - redis-backfill-storage
-      - fulcio-config
-      - fulcio-cert
-      - tuf-secret
       - "{{ tas_single_node_tuf_repository_volume_name }}"
       - "{{ tas_single_node_tuf_signing_keys_volume_name }}"
-      - tsa-server-secret
-      - tsa-config
-
-- name: Add Trillian trusted CA volume if needed
-  ansible.builtin.set_fact:
-    volume_list: "{{ volume_list + [tas_single_node_trillian_trusted_ca_configmap_name] }}"
-  when: tas_single_node_trillian.trusted_ca != ""
 
 - name: Check if volume exists
   ansible.builtin.command: podman volume ls -q -f name={{ item }}
@@ -52,10 +35,7 @@
       ansible.builtin.shell: |
         podman volume inspect {{ item }} --format '{% raw %}{{ .Options.device }}{% endraw %}'
       register: volume_device_checks
-      loop:
-        - trillian-mysql
-        - rekor-redis-storage
-        - redis-backfill-storage
+      loop: "{{ volume_list }}"
       changed_when: false
       failed_when: volume_device_checks.rc != 0 and volume_device_checks.stdout != ""
 

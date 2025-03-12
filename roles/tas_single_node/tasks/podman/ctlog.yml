@@ -20,78 +20,38 @@
       ansible.builtin.set_fact:
         ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config-template.j2') }}"
 
-- name: Mount ctlog files to the volumes
-  no_log: true
-  block:
-    - name: Create pod with volumes mounted
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod || true && \
-        podman pod create --name mount-pod -v ctlog-secret:/secret -v ctlog-config:/config
-      register: pod_create_result
-      changed_when: false
+- name: Create ctlog configmap
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_ctlog_configmap_config }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: ctlog-config
+        namespace: ctlog-system
+      data:
+        config: "{{ ctlog_config_content }}"
+  register: configmap_result
 
-    - name: Start persistent container in mount-pod
-      ansible.builtin.shell: |
-        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
-      changed_when: false
-      when: pod_create_result.rc == 0
+- name: Create ctlog Secret
+  ansible.builtin.set_fact:
+    ctlog_secret_content: "{{ lookup('ansible.builtin.template', 'configs/certs-secret-template.j2') }}"
+  vars:
+    secret_name: ctlog-secret
+    secret_namespace: ctlog-system
+    keyname: [private, public, fulcio]
+    keylists: ['{{ tas_single_node_remote_ctlog_private_key }}', '{{ tas_single_node_remote_ctlog_public_key }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
+    slurpedcerts: '{{ remote_ctlog_certificates }}'
 
-    - name: Get ctlog-secret volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect ctlog-secret | jq -r '.[0].Mountpoint'
-      register: ctlog_secret_mountpoint
-      changed_when: false
-
-    - name: Mount key files to ctlog-secret volume
-      ansible.builtin.copy:
-        dest: "{{ ctlog_secret_mountpoint.stdout }}/{{ item.filename }}"
-        content: "{{ item.content | b64decode }}"
-        mode: '0644'
-      loop:
-        - filename: 'fulcio-0'
-          content: >-
-            {{ (remote_ctlog_certificates.results
-              | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca)
-              | list | first).content }}
-
-        - filename: 'private-0'
-          content: >-
-            {{ (remote_ctlog_certificates.results
-              | selectattr('source', 'equalto', tas_single_node_remote_ctlog_private_key[0])
-              | list | first).content }}
-
-        - filename: 'public-0'
-          content: >-
-            {{ (remote_ctlog_certificates.results
-              | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key[0])
-              | list | first).content }}
-
-    - name: Get ctlog-config volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect ctlog-config | jq -r '.[0].Mountpoint'
-      register: ctlog_config_mountpoint
-      changed_when: false
-
-    - name: Mount config file to ctlog-config volume
-      ansible.builtin.copy:
-        dest: "{{ ctlog_config_mountpoint.stdout }}/{{ item.key }}"
-        content: "{{ item.value }}"
-        mode: '0644'
-      loop: "{{ data | dict2items }}"
-      when: ctlog_config_mountpoint.stdout is defined
-      vars:
-        data:
-          config: |
-            {{ ctlog_config_content }}
-
-    - name: Remove the pod after files are copied
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod
-      changed_when: false
+- name: Create Custom ctlog Secret
+  ansible.builtin.copy:
+    content: "{{ ctlog_secret_content }}"
+    dest: "{{ tas_single_node_ctlog_secret }}"
+    mode: "0600"
+  register: secret_result
 
 - name: Deploy ctlog Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -101,3 +61,7 @@
       systemd_file: ctlog
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog.j2') | from_yaml }}"
+      configmap: "{{ tas_single_node_ctlog_configmap_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
+      secret: "{{ tas_single_node_ctlog_secret }}"
+      secret_changed: "{{ secret_result.changed }}"

@@ -53,5 +53,6 @@ spec:
           tolerationSeconds: 300
       volumes:
         - name: apache-config
-          persistentVolumeClaim:
-            claimName: apache-config
+          configMap:
+            name: apache-config
+            defaultMode: 0644

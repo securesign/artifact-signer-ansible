@@ -4,6 +4,22 @@
   vars:
     tas_single_node_treeid_config: "{{ tas_single_node_rekor_treeid_config }}"
 
+- name: Create Rekor Sharding ConfigMap
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_rekor_server_config }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: rekor-server-config
+        namespace: rekor-system
+      data:
+        sharding-config.yaml: ""
+  register: configmap_result
+
 - name: Slurp Rekor keys
   ansible.builtin.slurp:
     src: "{{ item }}"
@@ -12,71 +28,24 @@
     - "{{ tas_single_node_remote_rekor_public_key }}"
   register: remote_rekor_keys
 
-- name: Mount rekor files to the volumes
-  no_log: true
-  block:
-    - name: Create pod with volumes mounted
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod || true && \
-        podman pod create --name mount-pod -v rekor-secret:/secret -v rekor-server-config:/config
-      register: pod_create_result
-      changed_when: false
-
-    - name: Start persistent container in mount-pod
-      ansible.builtin.shell: |
-        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
-      changed_when: false
-      when: pod_create_result.rc == 0
-
-    - name: Get rekor-secret volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect rekor-secret | jq -r '.[0].Mountpoint'
-      register: rekor_secret_mountpoint
-      changed_when: false
-
-    - name: Mount key files to rekor-secret volume
-      ansible.builtin.copy:
-        dest: "{{ rekor_secret_mountpoint.stdout }}/{{ item.key }}"
-        content: "{{ item.value }}"
-        mode: '0644'
-      loop: "{{ data | dict2items }}"
-      when: rekor_secret_mountpoint.stdout is defined
-      vars:
-        data:
-          private: >-
-            {{ (remote_rekor_keys.results
-            | selectattr('source', 'equalto', tas_single_node_remote_rekor_private_key)
-            | list | first).content | b64decode }}
-          public: >-
-            {{ (remote_rekor_keys.results
-            | selectattr('source', 'equalto', tas_single_node_remote_rekor_public_key)
-            | list | first).content | b64decode }}
-
-    - name: Get rekor-server-config volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect rekor-server-config | jq -r '.[0].Mountpoint'
-      register: rekor_server_config_mountpoint
-      changed_when: false
-
-    - name: Mount files to rekor-server-config volume
-      ansible.builtin.copy:
-        dest: "{{ rekor_server_config_mountpoint.stdout }}/{{ item.key }}"
-        content: "{{ item.value }}"
-        mode: '0644'
-      loop: "{{ data | dict2items }}"
-      when: rekor_server_config_mountpoint.stdout is defined
-      vars:
-        data:
-          sharding-config.yaml: ""
-
-    - name: Remove the pod after files are copied
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod
-      changed_when: false
+- name: Create Rekor secret
+  ansible.builtin.copy:
+    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_rekor_secret }}"
+    mode: "0600"
+  vars:
+    secret_content:
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: rekor-secret
+        namespace: rekor-system
+      data:
+        private: |
+          {{ (remote_rekor_keys.results | selectattr('source', 'equalto', tas_single_node_remote_rekor_private_key) | list | first).content }}
+        public: |
+          {{ (remote_rekor_keys.results | selectattr('source', 'equalto', tas_single_node_remote_rekor_public_key) | list | first).content }}
+  register: secret_result
 
 - name: Deploy Rekor Redis Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -96,6 +65,10 @@
       systemd_file: rekor
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/rekor-server.j2') | from_yaml }}"
+      configmap: "{{ tas_single_node_rekor_server_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
+      secret: "{{ tas_single_node_rekor_secret }}"
+      secret_changed: "{{ secret_result.changed }}"
 
 - name: Deploy backfill Redis job
   ansible.builtin.include_tasks: podman/install_manifest.yml

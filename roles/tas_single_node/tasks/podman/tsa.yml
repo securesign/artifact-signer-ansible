@@ -32,66 +32,40 @@
     secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa.tink.keyset | b64encode}) }}"
   when: tas_single_node_tsa.signer_type == 'tink'
 
+- name: Create TSA Secret
+  ansible.builtin.copy:
+    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_tsa_secret }}"
+    mode: "0600"
+  vars:
+    secret_content:
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: tsa-server-secret
+        namespace: tsa-system
+      data: "{{ secret_data }}"
+  register: tsa_secret_result
 
-- name: Mount TSA files to the volumes
-  no_log: true
-  block:
-    - name: Create pod with volumes mounted
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod || true && \
-        podman pod create --name mount-pod -v tsa-server-secret:/secret -v tsa-config:/config
-      register: pod_create_result
-      changed_when: false
+- name: Create TSA ConfigMap
+  ansible.builtin.copy:
+    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    dest: "{{ tas_single_node_tsa_config }}"
+    mode: "0600"
+  vars:
+    configmap_content:
+      kind: ConfigMap
+      apiVersion: v1
+      metadata:
+        name: tsa-config
+        namespace: tsa-system
+      data:
+        ntpsync.yaml: |
+          {{ tas_single_node_tsa.ntp_config }}
 
-    - name: Start persistent container in mount-pod
-      ansible.builtin.shell: |
-        podman run -d --pod mount-pod quay.io/libpod/busybox:latest sleep infinity
-      changed_when: false
-      when: pod_create_result.rc == 0
-
-    - name: Get tsa-server-secret volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect tsa-server-secret | jq -r '.[0].Mountpoint'
-      register: tsa_secrets_mountpoint
-      changed_when: false
-
-    - name: Mount TSA secrets to tsa-server-secret volume
-      ansible.builtin.copy:
-        dest: "{{ tsa_secrets_mountpoint.stdout }}/{{ item.key }}"
-        content: "{{ item.value | b64decode }}"
-        mode: '0644'
-      loop: "{{ secret_data | dict2items }}"
-      when: tsa_secrets_mountpoint.stdout is defined
-
-    - name: Get tsa-config volume mountpoint
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail &&
-          podman volume inspect tsa-config | jq -r '.[0].Mountpoint'
-      register: tsa_config_mountpoint
-      changed_when: false
-
-    - name: Mount config file to tsa-config volume
-      ansible.builtin.copy:
-        dest: "{{ tsa_config_mountpoint.stdout }}/{{ item.key }}"
-        content: "{{ item.value }}"
-        mode: '0644'
-      loop: "{{ data | dict2items }}"
-      when: tsa_config_mountpoint.stdout is defined
-      vars:
-        data:
-          ntpsync.yaml: |
-            {{ tas_single_node_tsa.ntp_config }}
-
-          tsa-trusted-ca.pem: |
-            {{ tas_single_node_tsa.trusted_ca }}
-
-    - name: Remove the pod after files are copied
-      ansible.builtin.shell: |
-        podman pod rm -f mount-pod
-      changed_when: false
+        tsa-trusted-ca.pem: |
+          {{ tas_single_node_tsa.trusted_ca }}
+  register: configmap_result
 
 - name: Deploy TSA Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -101,3 +75,7 @@
       systemd_file: tsa
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tsa/tsa-server.j2') | from_yaml }}"
+      configmap: "{{ tas_single_node_tsa_config }}"
+      configmap_changed: "{{ configmap_result.changed }}"
+      secret: "{{ tas_single_node_tsa_secret }}"
+      secret_changed: "{{ tsa_secret_result.changed }}"
