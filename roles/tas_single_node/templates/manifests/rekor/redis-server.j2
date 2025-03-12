@@ -54,7 +54,8 @@ spec:
       restartPolicy: Always
       volumes:
         - name: rekor-redis-storage
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: rekor-redis-storage
       enableServiceLinks: true
       securityContext:
         capabilities:
