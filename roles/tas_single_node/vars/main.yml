@@ -78,6 +78,7 @@ _tas_single_node_tsa:
   trusted_ca: ""
 
 _tas_single_node_ctlog:
+  ca_passphrase: rhtas
   sharding_config:
     - config:
       treeid:

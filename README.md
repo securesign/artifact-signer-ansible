@@ -202,12 +202,16 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
            url: TODO # your OIDC provider (e.g. keycloak) URL
            type: email
        # create secure unique passphrases
-       tas_single_node_fulcio_ca_passphrase: TODO
-       tas_single_node_ctlog_ca_passphrase: TODO
-       tas_single_node_rekor_ca_passphrase: TODO
-       tas_single_node_tsa_ca_passphrase: TODO
-       tas_single_node_tsa_signer_passphrase: TODO
-       tas_single_node_ct_logprefix: TODO
+       tas_single_node_fulcio:
+         ca_passphrase: TODO
+         ct_log_prefix: TODO
+       tas_single_node_ctlog:
+         ca_passphrase: TODO
+       tas_single_node_rekor:
+         ca_passphrase: TODO
+       tas_single_node_tsa:
+         ca_passphrase: TODO
+         signer_passphrase: TODO
      tasks:
        - name: Include TAS single node role
          ansible.builtin.include_role:
@@ -326,7 +330,7 @@ ansible-test sanity
 ### Testing Deployment on a virtual machine
 
 The [molecule/README.md](molecule/README.md) file has instructions on testing the deployment on a virtual machine (VM).
-By default, the VM provider is [testing-farm.io](https://docs.testing-farm.io/).
+By default, the VM provider is [Amazon Web Services](https://aws.amazon.com/).
 
 ## Contributing
 

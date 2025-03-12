@@ -386,6 +386,7 @@ argument_specs:
         version_added: "1.2.0"
         required: false
         default:
+          ca_passphrase: rhtas
           sharding_config:
             - config:
               treeid:
@@ -395,8 +396,11 @@ argument_specs:
               private_key: ""
           private_keys: []
           public_keys: []
-
         options:
+          ca_passphrase:
+            description: "Passphrase used for Certificate Authority."
+            required: false
+            version_added: "1.2.0"
           sharding_config:
             description: "Configuration for each log in ctlog"
             required: true

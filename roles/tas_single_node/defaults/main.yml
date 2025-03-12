@@ -17,8 +17,6 @@ tas_single_node_meta_issuers: []
 tas_single_node_trust_root:
   full_archive: ""
 
-tas_single_node_ctlog_ca_passphrase: rhtas
-
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
 

@@ -423,7 +423,7 @@
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_remote_ctlog_private_key.0 }}'
-          -passout 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
+          -passout 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_private_key.0 }}"
     - name: Create ctlog public key
       ansible.builtin.command:
@@ -431,7 +431,7 @@
           openssl ec -pubout
           -in '{{ tas_single_node_remote_ctlog_private_key.0 }}'
           -out '{{ tas_single_node_remote_ctlog_public_key.0 }}'
-          -passin 'pass:{{ tas_single_node_ctlog_ca_passphrase }}'
+          -passin 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
 - name: Create Rekor signing key
