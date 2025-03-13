@@ -81,8 +81,9 @@
     - name: Verify if the passphrase matches the user-provided private key
       ansible.builtin.shell:
         cmd: >-
-          openssl ec -in '{{ tas_single_node_fulcio.private_key }}' -check \
-          -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
+          tmpfile=$(mktemp) && echo "{{ tas_single_node_fulcio.private_key }}" > "$tmpfile" &&
+          openssl ec -in "$tmpfile" -check -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}' > /dev/null 2>&1 || echo "failed";
+          rm -f "$tmpfile"
       register: check_key_passphrase
       changed_when: false
       failed_when: check_key_passphrase.stdout == "failed"
