@@ -273,7 +273,7 @@ argument_specs:
         description: "Details on the certificate settings for Fulcio. Includes organizational details,
           the user-provided private key for signing the root certificate, and the user-provided root certificate itself.
           **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`)
-          will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root."
+          or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root."
         type: "dict"
         required: false
         version_added: "1.2.0"
@@ -329,7 +329,9 @@ argument_specs:
             version_added: "1.2.0"
           ca_passphrase:
             description: >
-              Passphrase for Certificate Authority.
+              "Passphrase for Certificate Authority.
+              **Note**: Updating the passphrase will regenerate the auto-generated private key and the Fulcio certificate as a consequence,
+              and a manual update in the trust root is required."
             type: "str"
             required: true
             version_added: "1.2.0"
