@@ -280,10 +280,9 @@
         cmd: >-
           openssl req -new -batch
           -key '{{ tas_single_node_remote_fulcio_private_key }}'
-          -subj
-          "/O={{ tas_single_node_fulcio.certificate.organization_name | default('') == "" }}
-           /CN={{ tas_single_node_fulcio.certificate.common_name | default('') == "" }}
-           /emailAddress={{ tas_single_node_fulcio.certificate.organization_email | default('') == "" }}"
+          {{ " -subj '/O=" ~ tas_single_node_fulcio.certificate.organization_name ~
+            "/CN=" ~ tas_single_node_fulcio.certificate.common_name ~
+            "/emailAddress=" ~ tas_single_node_fulcio.certificate.organization_email ~ "'" }}
           -addext 'basicConstraints=critical,CA:TRUE'
           -addext 'keyUsage = critical,keyCertSign'
           -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}'
@@ -537,10 +536,9 @@
         cmd: >-
           openssl req -new -batch
           -key '{{ tas_single_node_remote_tsa_private_key }}'
-          -subj
-          "/O={{ tas_single_node_tsa.certificate.organization_name | default('') == "" }}
-           /CN={{ tas_single_node_tsa.certificate.common_name | default('') == "" }}
-           /emailAddress={{ tas_single_node_tsa.certificate.organization_email | default('') == "" }}"
+          {{ " -subj '/O=" ~ tas_single_node_tsa.certificate.organization_name ~
+            "/CN=" ~ tas_single_node_tsa.certificate.common_name ~
+            "/emailAddress=" ~ tas_single_node_tsa.certificate.organization_email ~ "'" }}
           -addext 'basicConstraints=critical,CA:TRUE'
           -addext 'keyUsage = keyCertSign'
           -passin 'pass:{{ tas_single_node_tsa.ca_passphrase }}'
