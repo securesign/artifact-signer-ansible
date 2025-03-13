@@ -44,11 +44,8 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
 | tas_single_node_podman_volume_create_extra_args | Additional arguments to pass to the `podman volume create` command. This can be used to specify extra options when creating Podman volumes. | str |  |
-<<<<<<< HEAD
 | tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
-=======
 | tas_single_node_backup_restore | Configuration options for the Backup and Restore of Trusted Artifact Signer. | dict of 'tas_single_node_backup_restore' options |  `{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}`  |
->>>>>>> 8c6f8a6 (Adding backup/restore release feature)
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -274,13 +271,12 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | username | Username for the cockpit user. | str | no |  |
 | password | Password for the cockpit user. | str | yes |  |
 
-<<<<<<< HEAD
 #### Options for main > tas_single_node_trust_root
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | full_archive | A compressed base64-encoded .tgz file of the trust root. This archive file has a single directory named `repository/`, containing the contents of the TUF repository, for example `1.root.json`. The default value is an empty string. Using the default value generates the trust root content, unless a trust root already exists. Specifying a `full_archive` string removes any earlier configured trust root content, and starts to use the new specified content. If changing this value back to an empty string after setting the `full_archive` option, then we continue serving the previous value for the trust root content. To reset the trust root content, you must remove all files in the volume associated with the `tuf-repository` pod. | str | no |  |
-=======
+
 #### Options for main > tas_single_node_backup_restore
 
 |Option|Description|Type|Required|Default|
@@ -305,7 +301,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | enabled | Option to restore a full TAS instance. If configured, needs to return to 'false' after a successful run. | bool | no |  |
 | source | The filepath leading the to compressed and encrypted backup file that will be used for the full restore. | str | no |  |
 | passphrase | The passphrase used to decrypt the compressed backup file. | str | no |  |
->>>>>>> 8c6f8a6 (Adding backup/restore release feature)
 
 ## Example Playbook
 

@@ -782,6 +782,10 @@ argument_specs:
         default: ""
       tas_single_node_trust_root:
         description: "Configuration options for the Trust Root."
+        type: "dict"
+        required: false
+        version_added: "1.2.0"
+        default:
           full_archive: ""
         options:
           full_archive:
