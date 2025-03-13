@@ -39,13 +39,89 @@
       data:
         ctfe-pubkey: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key.0) | list | first).content }}
-        fulcio-cert: |
+        fulcio_v1.crt.pem: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}
         rekor-pubkey: |
           {{ rekor_public_key_result.stdout | b64encode }}
-        tsa-cert: |
+        tsa.certchain.pem: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_tsa_certificate_chain) | list | first).content }}
+        # If user switches back from providing to not providing the full_archive, we have to trigger
+        # the rerun of the init job somehow; we do this by triggering a change in this secret.
+        __change_detection: "{% if 'full_archive' in tas_single_node_trust_root %}{{ 1 | b64encode }}{% else %}{{ 0 | b64encode }}{% endif %}"
   register: secret_result
+
+- name: Create the TUF repository volume
+  ansible.builtin.command:
+    cmd: "podman volume create --ignore {{ tas_single_node_tuf_repository_volume_name }}"
+  changed_when: false
+
+- name: Set TUF repository content to the provided trusted root archive
+  when: '"full_archive" in tas_single_node_trust_root and tas_single_node_trust_root.full_archive != ""'
+  block:
+    - name: Mount the TUF repository volume
+      ansible.builtin.command:
+        cmd: "podman volume mount {{ tas_single_node_tuf_repository_volume_name }}"
+      register: volume_mount_result
+      changed_when: false
+
+    - name: Create the directory to extract provided archive to
+      ansible.builtin.file:
+        state: directory
+        dest: "{{ tas_single_node_tuf_repo_dir }}"
+        mode: "0700"
+
+    - name: Create the archive file
+      ansible.builtin.file:
+        state: touch
+        access_time: preserve
+        modification_time: preserve
+        dest: "{{ tas_single_node_tuf_repo_dir }}/repository.tar.gz"
+        mode: "0600"
+
+    # Believe it or not, this is the only way to write binary data to file with Ansible
+    - name: Write the archive to a file
+      ansible.builtin.shell:
+        cmd: "set -o pipefail && echo '{{ tas_single_node_trust_root.full_archive }}' | base64 -d > '{{ tas_single_node_tuf_repo_dir }}/repository.tar.gz'"
+      changed_when: false
+
+    - name: Extract the archive
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: "{{ tas_single_node_tuf_repo_dir }}/repository.tar.gz"
+        dest: "{{ tas_single_node_tuf_repo_dir }}"
+        mode: "0744"
+        list_files: true
+      register: unarchive_result
+
+    - name: Validate archive contents
+      ansible.builtin.fail:
+        msg: "Incorrect TUF repository provided, missing '{{ item }}' in the archive"
+      loop:
+        - "tuf-repo/root.json"
+        - "tuf-repo/1.root.json"
+        - "tuf-repo/1.snapshot.json"
+        - "tuf-repo/1.targets.json"
+        - "tuf-repo/timestamp.json"
+      when: item not in unarchive_result.files
+
+    - name: Synchronize contents of the provided archive to the volume
+      ansible.posix.synchronize:
+        src: "{{ tas_single_node_tuf_repo_dir }}/tuf-repo/"
+        dest: "{{ volume_mount_result.stdout }}"
+        delete: true
+        group: false
+        owner: false
+        recursive: true
+        times: true
+        rsync_opts:
+          - "--chmod=F0644"
+          - "--chmod=D0755"
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Unmount the TUF repository volume
+      ansible.builtin.command:
+        cmd: "podman volume unmount {{ tas_single_node_tuf_repository_volume_name }}"
+      changed_when: false
 
 - name: Initialize trust root
   ansible.builtin.include_tasks: podman/install_manifest.yml
@@ -58,6 +134,7 @@
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/tuf/tuf-init.j2') | from_yaml }}"
       secret: "{{ tas_single_node_tuf_secret_config }}"
       secret_changed: "{{ secret_result.changed }}"
+  when: '"full_archive" not in tas_single_node_trust_root or tas_single_node_trust_root.full_archive == ""'
 
 - name: Deploy TUF server pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

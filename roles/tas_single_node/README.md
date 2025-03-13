@@ -44,6 +44,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
 | tas_single_node_podman_volume_create_extra_args | Additional arguments to pass to the `podman volume create` command. This can be used to specify extra options when creating Podman volumes. | str |  |
+| tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -267,6 +268,12 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | create | Whether or not to create the cockpit user. | bool | no |  |
 | username | Username for the cockpit user. | str | no |  |
 | password | Password for the cockpit user. | str | yes |  |
+
+#### Options for main > tas_single_node_trust_root
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| full_archive | A compressed base64-encoded .tgz file of the trust root. This archive file has a single directory named `repository/`, containing the contents of the TUF repository, for example `1.root.json`. The default value is an empty string. Using the default value generates the trust root content, unless a trust root already exists. Specifying a `full_archive` string removes any earlier configured trust root content, and starts to use the new specified content. If changing this value back to an empty string after setting the `full_archive` option, then we continue serving the previous value for the trust root content. To reset the trust root content, you must remove all files in the volume associated with the `tuf-repository` pod. | str | no |  |
 
 ## Example Playbook
 
