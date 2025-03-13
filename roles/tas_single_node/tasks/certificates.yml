@@ -465,6 +465,60 @@
     and tas_single_node_tsa.certificate_chain == ''
     and tas_single_node_tsa.signer_type == 'file'
   block:
+    - name: Verify if the passphrase matches the existing private key
+      ansible.builtin.shell:
+        cmd: >-
+          openssl ec -in '{{ tas_single_node_remote_tsa_private_key }}' -check \
+           -passin 'pass:{{ tas_single_node_tsa.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
+      register: tsa_key_passphrase
+      changed_when: false
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) != 0
+
+    - name: Get current certificate subject details
+      ansible.builtin.command:
+        cmd: openssl x509 -in '{{ tas_single_node_tsa_certificate_chain }}' -noout -text
+      register: current_cert_subject
+      changed_when: false
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
+
+    - name: Check if organization details have changed
+      ansible.builtin.set_fact:
+        cert_needs_regeneration: >-
+          "{{ current_cert_subject.stdout | default('') | regex_search('/O=([^/]+)') != tas_single_node_tsa.certificate.organization_name
+            or current_cert_subject.stdout | default('') | regex_search('/CN=([^/]+)') != tas_single_node_tsa.certificate.common_name
+            or current_cert_subject.stdout | default('') | regex_search('/emailAddress=([^/]+)') != tas_single_node_tsa.certificate.organization_email }}"
+
+    - name: Back-up and Clean up generated keys and certs
+      when: (cert_needs_regeneration or ((tsa_key_passphrase | default({})).stdout is defined and tsa_key_passphrase.stdout == "failed")) and
+            (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0 and
+            (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) != 0
+      block:
+        - name: Back-up old generated private key
+          ansible.builtin.copy:
+            src: "{{ item }}"
+            dest: "{{ item + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          with_items:
+            - "{{ tas_single_node_tsa_certificate_chain }}"
+            - "{{ tas_single_node_tsa_signer_private_key }}"
+            - "{{ tas_single_node_remote_tsa_private_key }}"
+
+        - name: Delete old certificates if configuration has changed
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          with_items:
+            - "{{ tas_single_node_tsa_certificate_chain }}"
+            - "{{ tas_single_node_tsa_signer_private_key }}"
+            - "{{ tas_single_node_remote_tsa_private_key }}"
+
+    - name: Refresh list of files in certs directory
+      ansible.builtin.find:
+        file_type: file
+        paths: "{{ tas_single_node_certs_dir }}"
+      register: certs_dir_files
+
     - name: Create TSA root private key
       ansible.builtin.shell:
         cmd: >-
@@ -518,7 +572,7 @@
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_tsa_signer_private_key }}'
-          -passout 'pass:{{ tas_single_node_tsa.ca_passphrase }}'
+          -passout 'pass:{{ tas_single_node_tsa.signer_passphrase }}'
         creates: "{{ tas_single_node_tsa_signer_private_key }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
@@ -610,3 +664,13 @@
       when: >
         tas_single_node_tsa.signer_private_key != ''
         and tas_single_node_tsa.signer_type == 'file'
+
+    - name: Verify if the passphrase matches the existing private key
+      ansible.builtin.shell:
+        cmd: >-
+          openssl ec -in '{{ tas_single_node_tsa_signer_private_key }}' -check \
+           -passin 'pass:{{ tas_single_node_tsa.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
+      register: tsa_key_passphrase
+      changed_when: false
+      failed_when: tsa_key_passphrase.stdout == "failed"
+      when: tas_single_node_tsa.signer_private_key is defined and tas_single_node_tsa.signer_private_key != ""

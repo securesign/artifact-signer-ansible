@@ -192,7 +192,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | signer_type | The signer type for TSA. Options include `file`, `kms`, `tink`. | str | no |  |
-| certificate | Details on the certificate attributes for TSA. | dict of 'certificate' options | no |  |
+| certificate | Details on the certificate attributes for TSA. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the TSA certificate, which requires a corresponding manual update in the trust root. | dict of 'certificate' options | no |  |
 | kms | The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str | no |  |
 | tink | Tink file signer type configuration for TSA. | str | no |  |
 | signer_private_key | Signer private key used in conjuction with the certificate chain for signing and verifying. | str | no |  |
