@@ -143,11 +143,11 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| certificate | Details on the certificate attributes for Fulcio. | dict of 'certificate' options | no |  |
+| certificate | Details on the certificate attributes for Fulcio. **Note**: Updating any of these values will regenerate the Fulcio certificate, and a manual update in the trust root is required. | dict of 'certificate' options | no |  |
 | private_key | The user-provided private key for Fulcio, used for signing root certificate (only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported). | str | no |  |
 | root_ca | The user-provided root certificate for Fulcio. This field is mutually exclusive with the certificate field. | str | no |  |
 | trusted_ca | Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider. | str | no |  |
-| ca_passphrase | Passphrase for Certificate Authority. | str | yes |  |
+| ca_passphrase | "Passphrase for Certificate Authority. **Note**: Updating the passphrase will regenerate the auto-generated private key and the Fulcio certificate as a consequence, and a manual update in the trust root is required." | str | yes |  |
 | ct_log_prefix | The Prefix for the Certificate Transparency Log that is accessed by Fulcio. | str | yes |  |
 
 #### Options for main > tas_single_node_fulcio > certificate
