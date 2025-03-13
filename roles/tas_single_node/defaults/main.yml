@@ -5,96 +5,8 @@ tas_single_node_registry_password: ""
 
 tas_single_node_podman_network: rhtas
 
-tas_single_node_rekor:
-  ca_passphrase: rhtas
-  public_key_retries: 5
-  public_key_delay: 10
-
-tas_single_node_rekor_redis:
-  database_deploy: true
-  redis:
-    host: rekor-redis-pod
-    port: 6379
-    password: password
-
-tas_single_node_backfill_redis:
-  enabled: true
-  schedule: "*-*-* 00:00:00"
-
-tas_single_node_trillian:
-  database_deploy: true
-  mysql:
-    user: mysql
-    root_password: rootpassword
-    password: password
-    database: trillian
-    host: trillian-mysql-pod
-    port: 3306
-  trusted_ca: ""
-
-tas_single_node_ingress_certificates:
-  fulcio:
-    certificate: ""
-    private_key: ""
-  rekor:
-    certificate: ""
-    private_key: ""
-  tuf:
-    certificate: ""
-    private_key: ""
-  tsa:
-    certificate: ""
-    private_key: ""
-  rekor-search:
-    certificate: ""
-    private_key: ""
-  cli-server:
-    certificate: ""
-    private_key: ""
-
-tas_single_node_fulcio:
-  certificate:
-    organization_name: ""
-    organization_email: ""
-    common_name: ""
-  private_key: ""
-  root_ca: ""
-  ca_passphrase: rhtas
-  trusted_ca: ""
-  ct_log_prefix: rhtasansible
-
 tas_single_node_setup_host_dns: true
 tas_single_node_base_hostname: ""
-
-tas_single_node_tsa:
-  signer_type: file
-  certificate:
-    organization_name: ""
-    organization_email: ""
-    common_name: ""
-  kms:
-    key_resource: ""
-  tink:
-    key_resource: ""
-    keyset: ""
-    hcvault_token: ""
-  signer_private_key: ""
-  certificate_chain: ""
-  signer_passphrase: rhtas
-  ca_passphrase: rhtas
-  ntp_config: ""
-  trusted_ca: ""
-
-tas_single_node_ctlog:
-  sharding_config:
-    - config:
-      treeid:
-      prefix: ""
-      root_pem_file: ""
-      password: ""
-      private_key: ""
-  private_keys: []
-  public_keys: []
 
 tas_single_node_skip_os_install: false
 
@@ -103,7 +15,6 @@ tas_single_node_oidc_issuers: []
 tas_single_node_meta_issuers: []
 
 tas_single_node_ctlog_ca_passphrase: rhtas
-
 
 # When adding or altering names for our images, consult the mapping in https://github.com/securesign/structural-tests
 # To avoid breaking our structural tests
@@ -144,12 +55,5 @@ tas_single_node_client_server_image:
   "registry.redhat.io/rhtas/client-server-rhel9@sha256:ce30450e9e3aee7368bd9ba7f756d7af0f7c0e052cd57951256adaa9c78fb562"
 
 tas_single_node_podman: {}
-
-tas_single_node_cockpit:
-  enabled: false # install redhat.rhel_system_roles before enabling
-  user:
-    create: false
-    username: cockpit-user
-    password: ""
 
 tas_single_node_podman_volume_create_extra_args: ""

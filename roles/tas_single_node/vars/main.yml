@@ -1,10 +1,105 @@
 ---
+# vars file for tas_single_node
+_tas_single_node_rekor:
+  ca_passphrase: rhtas
+  public_key_retries: 5
+  public_key_delay: 10
+
+_tas_single_node_rekor_redis:
+  database_deploy: true
+  redis:
+    host: rekor-redis-pod
+    port: 6379
+    password: password
+
+_tas_single_node_backfill_redis:
+  enabled: true
+  schedule: "*-*-* 00:00:00"
+
+_tas_single_node_trillian:
+  database_deploy: true
+  mysql:
+    user: mysql
+    root_password: rootpassword
+    password: password
+    database: trillian
+    host: trillian-mysql-pod
+    port: 3306
+  trusted_ca: ""
+
+_tas_single_node_ingress_certificates:
+  fulcio:
+    certificate: ""
+    private_key: ""
+  rekor:
+    certificate: ""
+    private_key: ""
+  tuf:
+    certificate: ""
+    private_key: ""
+  tsa:
+    certificate: ""
+    private_key: ""
+  rekor-search:
+    certificate: ""
+    private_key: ""
+  cli-server:
+    certificate: ""
+    private_key: ""
+
+_tas_single_node_fulcio:
+  certificate:
+    organization_name: ""
+    organization_email: ""
+    common_name: ""
+  private_key: ""
+  root_ca: ""
+  ca_passphrase: rhtas
+  trusted_ca: ""
+  ct_log_prefix: rhtasansible
+
+_tas_single_node_tsa:
+  signer_type: file
+  certificate:
+    organization_name: ""
+    organization_email: ""
+    common_name: ""
+  kms:
+    key_resource: ""
+  tink:
+    key_resource: ""
+    keyset: ""
+    hcvault_token: ""
+  signer_private_key: ""
+  certificate_chain: ""
+  signer_passphrase: rhtas
+  ca_passphrase: rhtas
+  ntp_config: ""
+  trusted_ca: ""
+
+_tas_single_node_ctlog:
+  sharding_config:
+    - config:
+      treeid:
+      prefix: "rhtasansible"
+      root_pem_file: "/ctfe-keys/fulcio-0"
+      password: "rhtas"
+      private_key: "private-0"
+  private_keys: []
+  public_keys: []
+
+_tas_single_node_cockpit:
+  enabled: false # install redhat.rhel_system_roles before enabling
+  user:
+    create: false
+    username: cockpit-user
+    password: ""
+
 # vars file for sigstore_scaffolding
 tas_single_node_system_packages:
   - podman
   - podman-plugins
   - firewalld
-
 
 tas_single_node_rekor_signer_type: file # to be exposed to users later on
 tas_single_node_rekor_templates:

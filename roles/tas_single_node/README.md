@@ -11,7 +11,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|
 | tas_single_node_registry_username | The user name logging in to the registry to pull images. | str |  |
 | tas_single_node_registry_password | The user's password to log in to the registry. | str |  |
-| tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
 | tas_single_node_base_hostname | The base host name of the managed node. This generates self-signed certificates for the individual HTTPS endpoints. | str |  |
 | tas_single_node_oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_oidc_issuers' options |  |
 
@@ -24,6 +23,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
 | tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
 | tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible'}`  |
+| tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_ctlog | Configuration and specification of ctlog Custom Configuration as well as custom keys. | dict of 'tas_single_node_ctlog' options |  `{'sharding_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [], 'public_keys': []}`  |
 | tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
@@ -275,7 +275,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
   vars:
     tas_single_node_registry_username: # TODO: required, type: str
     tas_single_node_registry_password: # TODO: required, type: str
-    tas_single_node_rekor: # TODO: required, type: dict
     tas_single_node_base_hostname: # TODO: required, type: str
     tas_single_node_oidc_issuers: # TODO: required, type: list
     
