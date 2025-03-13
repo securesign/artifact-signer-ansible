@@ -572,7 +572,7 @@
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
           -out '{{ tas_single_node_tsa_signer_private_key }}'
-          -passout 'pass:{{ tas_single_node_tsa.ca_passphrase }}'
+          -passout 'pass:{{ tas_single_node_tsa.signer_passphrase }}'
         creates: "{{ tas_single_node_tsa_signer_private_key }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
@@ -587,7 +587,7 @@
           -addext 'basicConstraints=critical,CA:FALSE'
           -addext 'keyUsage = critical,digitalSignature'
           -addext 'extendedKeyUsage = critical,timeStamping'
-          -passin 'pass:{{ tas_single_node_tsa.ca_passphrase }}'
+          -passin 'pass:{{ tas_single_node_tsa.signer_passphrase }}'
       register: tsa_leaf_csr
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
@@ -633,16 +633,6 @@
 
 - name: Handle user provided TSA cert chain and private key
   block:
-    - name: Verify if the passphrase matches the existing private key
-      ansible.builtin.shell:
-        cmd: >-
-          openssl ec -in '{{ tas_single_node_tsa.signer_private_key }}' -check \
-           -passin 'pass:{{ tas_single_node_tsa.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
-      register: tsa_key_passphrase
-      changed_when: false
-      failed_when: tsa_key_passphrase.stdout == "failed"
-      when: tas_single_node_tsa.signer_private_key is defined and tas_single_node_tsa.signer_private_key != ""
-
     - name: Fail if certificate chain is provided, but private signer key is not
       ansible.builtin.fail:
         msg: "For signer type 'file', if certificate_chain is provide then the signer_private_key must also be provided."
@@ -674,3 +664,13 @@
       when: >
         tas_single_node_tsa.signer_private_key != ''
         and tas_single_node_tsa.signer_type == 'file'
+
+    - name: Verify if the passphrase matches the existing private key
+      ansible.builtin.shell:
+        cmd: >-
+          openssl ec -in '{{ tas_single_node_tsa_signer_private_key }}' -check \
+           -passin 'pass:{{ tas_single_node_tsa.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
+      register: tsa_key_passphrase
+      changed_when: false
+      failed_when: tsa_key_passphrase.stdout == "failed"
+      when: tas_single_node_tsa.signer_private_key is defined and tas_single_node_tsa.signer_private_key != ""
