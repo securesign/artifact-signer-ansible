@@ -23,7 +23,7 @@ tas_single_node_podman:
       mirror: quay.io/securesign/timestamp-authority
     - location: registry.redhat.io/rhtas/rekor-search-ui-rhel9
       mirror: quay.io/securesign/rekor-search-ui
-    - location: registry.redhat.io/rhtas/trillian-createtree-rhel9
+    - location: registry.redhat.io/rhtas/createtree-rhel9
       mirror: quay.io/securesign/trillian-createtree
     - location: registry.redhat.io/rhtas/client-server-rhel9
       mirror: quay.io/securesign/client-server
