@@ -72,3 +72,7 @@
 
 - name: Execute Podman Actions
   ansible.builtin.include_tasks: podman.yml
+
+- name: Configure/Deploy Backup
+  ansible.builtin.include_tasks: podman/backup_restore/backup.yml
+  when: tas_single_node_backup_restore.backup.enabled | bool

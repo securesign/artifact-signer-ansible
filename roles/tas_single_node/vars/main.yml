@@ -3,10 +3,10 @@
 
 _tas_single_node_backup_restore:
   backup:
-    enabled: false
+    enabled: true
     schedule: "*-*-* 00:00:00"
     force_run: false
-    passphrase: ""
+    passphrase: "rhtas123"
     directory: /root/tas_backups
   restore:
     enabled: false

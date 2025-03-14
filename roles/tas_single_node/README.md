@@ -298,8 +298,8 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| enabled | Option to restore a full TAS instance. If configured, needs to return to 'false' after a successful run. | bool | no |  |
-| source | The filepath leading the to compressed and encrypted backup file that will be used for the full restore. | str | no |  |
+| enabled | Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true. Should only be set to true on a single Ansible execution and then reverted back to false | bool | no |  |
+| source | The filepath leading the to compressed and encrypted backup file that will be used for the full restore. Needs to be located on the Ansible Control Node. | str | no |  |
 | passphrase | The passphrase used to decrypt the compressed backup file. | str | no |  |
 
 ## Example Playbook

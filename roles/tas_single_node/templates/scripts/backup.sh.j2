@@ -7,9 +7,21 @@ BACKUP_DIR="{{ tas_single_node_backup_restore.backup.directory }}"
 CONFIG_DIR="{{ tas_single_node_config_dir }}"
 PASSPHRASE="{{ tas_single_node_backup_restore.backup.passphrase }}"
 
-VOLUME_LIST=("trillian-mysql" "rekor-server" "rekor-redis-storage" "redis-backfill-storage" "tuf-repository" "tuf-signing-keys")
+SERVICES=(
+{% if tas_single_node_trillian.database_deploy %}
+  "trillian-mysql.service"
+{% endif %}
+  "rekor.service"
+  "redis.service"
+  "backfill_redis.service"
+  "tuf.service"
+)
 
-SERVICES=("trillian-mysql.service" "rekor.service" "redis.service" "backfill_redis.service" "tuf.service")
+VOLUME_LIST=(
+{% for volume in volume_list %}
+  "{{ volume }}"
+{% endfor %}
+)
 
 log() { echo "INFO: $1"; }
 
@@ -55,8 +67,8 @@ tar -czvf "$BACKUP_TIMESTAMP_DIR.tar.gz" -C "$(dirname "$BACKUP_TIMESTAMP_DIR")"
 log "Created compressed tarball: $BACKUP_TIMESTAMP_DIR.tar.gz"
 
 # Remove Uncompressed Backup Directory
-rm -rf "$BACKUP_TIMESTAMP_DIR"
-log "Deleted uncompressed backup directory."
+#rm -rf "$BACKUP_TIMESTAMP_DIR"
+#log "Deleted uncompressed backup directory."
 
 # Encrypt the Tarball
 openssl enc -aes-256-cbc -salt -pbkdf2 -iter 600000 -in "$BACKUP_TIMESTAMP_DIR.tar.gz" -out "$BACKUP_TIMESTAMP_DIR.tar.gz.enc" -pass pass:"$PASSPHRASE" || error_exit "Failed to encrypt tarball."

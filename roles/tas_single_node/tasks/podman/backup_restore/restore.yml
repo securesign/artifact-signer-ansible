@@ -37,16 +37,6 @@
     dest: "{{ restore_dir }}/"
     remote_src: true
 
-- name: Define List of Volumes to Restore
-  ansible.builtin.set_fact:
-    volume_list:
-      - trillian-mysql
-      - rekor-server
-      - rekor-redis-storage
-      - redis-backfill-storage
-      - tuf-repository
-      - tuf-signing-keys
-
 - name: Restore Podman Volumes
   ansible.builtin.include_tasks: restore_volumes.yml
   loop: "{{ volume_list }}"
