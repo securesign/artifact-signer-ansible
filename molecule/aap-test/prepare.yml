@@ -35,4 +35,4 @@
       changed_when: false
 
     - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../dex-config.yaml
+      ansible.builtin.include_tasks: ../common/dex-setup.yaml
