@@ -770,7 +770,7 @@ argument_specs:
               password:
                 description: "Password for the cockpit user."
                 type: "str"
-                required: true
+                required: false
                 version_added: "1.2.0"
       tas_single_node_podman_volume_create_extra_args:
         description: >
