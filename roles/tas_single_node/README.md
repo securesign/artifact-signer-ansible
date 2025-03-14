@@ -274,7 +274,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| full_archive | A compressed base64-encoded .tgz file of the trust root. This archive file has a single directory named `repository/`, containing the contents of the TUF repository, for example `1.root.json`. The default value is an empty string. Using the default value generates the trust root content, unless a trust root already exists. Specifying a `full_archive` string removes any earlier configured trust root content, and starts to use the new specified content. If changing this value back to an empty string after setting the `full_archive` option, then we continue serving the previous value for the trust root content. To reset the trust root content, you must remove all files in the volume associated with the `tuf-repository` pod. | str | no |  |
+| full_archive | A compressed base64-encoded .tgz file of the trust root. This archive file has a single directory named `tuf-repo/`, containing the contents of the TUF repository, for example `1.root.json`. The default value is an empty string. Using the default value generates the trust root content, unless a trust root already exists. Specifying a `full_archive` string removes any earlier configured trust root content, and starts to use the new specified content. If changing this value back to an empty string after setting the `full_archive` option, then we continue serving the previous value for the trust root content. To reset the trust root content, you must remove all files in the volume associated with the `tuf-repository` pod. | str | no |  |
 
 ## Example Playbook
 
