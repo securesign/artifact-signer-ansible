@@ -1,0 +1,57 @@
+- name: Extract Basename from File
+  ansible.builtin.set_fact:
+    restore_file: "{{ tas_single_node_backup_restore.restore.source | basename | regex_replace('.tar.gz.enc$', '') }}"
+
+- name: Set tas_restore dir location
+  ansible.builtin.set_fact:
+    restore_dir: "/var/lib/tas_restore"
+
+- name: Ensure restore directory exists
+  ansible.builtin.file:
+    path: "{{ restore_dir }}"
+    state: directory
+    mode: "0700"
+
+- name: Push Encrypted Backup Tarball to Remote Server
+  ansible.builtin.copy:
+    src: "{{ tas_single_node_backup_restore.restore.source }}"
+    dest: "{{ restore_dir }}/{{ restore_file }}.tar.gz.enc"
+    remote_src: false
+    mode: "0600"
+
+- name: Decrypt Backup Tarball
+  ansible.builtin.shell: |
+    openssl enc -d -aes-256-cbc -salt -pbkdf2 -iter 600000 \
+    -in "{{ restore_file }}.tar.gz.enc" \
+    -out "{{ restore_file }}.tar.gz" \
+    -pass pass:"{{ tas_single_node_backup_restore.restore.passphrase }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ restore_dir }}/"
+  register: tarball
+  changed_when: true
+
+- name: Extract Compressed Backup Tarball
+  ansible.builtin.unarchive:
+    src: "{{ restore_dir }}/{{ restore_file }}.tar.gz"
+    dest: "{{ restore_dir }}/"
+    remote_src: true
+
+- name: Restore Podman Volumes
+  ansible.builtin.include_tasks: restore_volumes.yml
+  loop: "{{ volume_list }}"
+  loop_control:
+    loop_var: item
+
+- name: Restore Configuration Files
+  ansible.builtin.copy:
+    src: "{{ restore_dir }}/{{ restore_file }}/rhtas/"
+    dest: /etc/rhtas/
+    remote_src: true
+    force: true
+    mode: "0755"
+
+- name: Clean Up Restore Directory After Completion
+  ansible.builtin.file:
+    path: "{{ restore_dir }}"
+    state: absent
