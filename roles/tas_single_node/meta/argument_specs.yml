@@ -849,12 +849,15 @@ argument_specs:
             version_added: "1.2.0"
             options:
               enabled:
-                description: "Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true. 
-                              Should only be set to true on a single Ansible execution and then reverted back to false"
+                description: >
+                  Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true.
+                  Should only be set to true on a single Ansible execution and then reverted back to false.
                 type: "bool"
                 version_added: "1.2.0"
               source:
-                description: "The filepath leading the to compressed and encrypted backup file that will be used for the full restore. Needs to be located on the Ansible Control Node."
+                description: >
+                  The filepath leading the to compressed and encrypted backup file that will be used for the full restore.
+                  Needs to be located on the Ansible Control Node.
                 type: "str"
                 version_added: "1.2.0"
               passphrase:
