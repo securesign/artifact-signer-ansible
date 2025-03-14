@@ -1,0 +1,162 @@
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars:
+    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
+  vars_files:
+    - vars/vars.yml
+  tasks:
+
+    - name: Identify fulcio-server-secret volume path
+      ansible.builtin.command:
+        cmd: "podman volume mount fulcio-server-secret"
+      register: fulcio_secret_path
+
+    - name: Slurp Fulcio mounted cert
+      ansible.builtin.slurp:
+        src: "{{ fulcio_secret_path.stdout + '/cert.pem' }}"
+      register: ca_cert_in_use
+
+#    - name: Assert that fulcio uses user-provided cert
+#      assert:
+#        that:
+#          - "{{ ca_cert_in_use.content | b64decode == lookup('file', molecule_scenario_directory + '/test_creds/fulcio-root-0.pem') }}"
+#        fail_msg: "Fulcio does not use provided cert"
+
+    - name: Load fulcio root cert content into variable
+      ansible.builtin.set_fact:
+        ca_cert_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio-root-1.pem') }}"
+
+    - name: Load fulcio private key
+      ansible.builtin.set_fact:
+        ca_cert_private: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio_ca_key-1.pem') }}"
+
+    - name: Set private key password
+      ansible.builtin.set_fact:
+        ca_passphrase: "password1"
+
+    - name: Get IP of the ansible node
+      ansible.builtin.set_fact:
+        node_ip: "{{ ansible_ssh_host }}"
+
+    - name: Install tuftool
+      delegate_to: localhost
+      become: false
+      block:
+        - name: install tuftool
+          ansible.builtin.command:
+            #workaround - ansible modules does not support TLS-SNI
+            cmd: "{{ 'curl -k --resolve cli-server.myrhtas:443:' + node_ip + ' https://cli-server.myrhtas/clients/linux/tuftool-amd64.gz -o '+ molecule_ephemeral_directory + '/tuftool.gz'}}"
+            creates: "{{ molecule_ephemeral_directory + '/tuftool.gz' }}"
+
+        - name: Extract tuftool
+          ansible.builtin.shell:
+            # ansible.builtin.unarchive does not support gunzip (without tar)
+            cmd: "{{ 'gunzip -c ' + molecule_ephemeral_directory + '/tuftool.gz > ' + molecule_ephemeral_directory + '/tuftool' }}"
+            creates: "{{ molecule_ephemeral_directory + '/tuftool' }}"
+
+        - name: Change permissions to make the file executable
+          ansible.builtin.file:
+            path: "{{ molecule_ephemeral_directory + '/tuftool' }}"
+            mode: '+x'
+
+        - name: tuftool path
+          ansible.builtin.set_fact:
+            tuftool: "{{ molecule_ephemeral_directory + '/tuftool' }}"
+
+    - name: Add new cert to the TUF repository
+      block:
+        - name: Identify tuf-keys volume path
+          ansible.builtin.command:
+            cmd: "podman volume mount tuf-signing-keys"
+          register: tuf_keys_path
+
+        - name: Synchronize keys remote directory to local
+          ansible.builtin.synchronize:
+            src: "{{ tuf_keys_path.stdout + '/'}}"
+            dest: "{{ molecule_ephemeral_directory + '/keys' }}"
+            recursive: yes
+            mode: pull
+
+        - name: Identify tuf-repository volume path
+          ansible.builtin.command:
+            cmd: "podman volume mount tuf-repository"
+          register: tuf_repo_path
+
+        - name: Synchronize repository remote directory to local
+          ansible.builtin.synchronize:
+            src: "{{ tuf_repo_path.stdout + '/'}}"
+            dest: "{{ molecule_ephemeral_directory + '/tuf-repo' }}"
+            recursive: yes
+            mode: pull
+
+        - name: Prepare fulcio-target
+          delegate_to: localhost
+          become: false
+          ansible.builtin.copy:
+            src: "{{ molecule_scenario_directory + '/test_creds/fulcio-root-0.pem' }}"
+            dest: "{{ molecule_ephemeral_directory + '/fulcio-cert' }}"
+            mode: '0600'
+
+        - name: Expire old cert
+          delegate_to: localhost
+          become: false
+          ansible.builtin.command:
+            cmd: |
+              {{ tuftool + ' rhtas 
+              --root ' + molecule_ephemeral_directory + '/tuf-repo/root.json 
+              --key ' + molecule_ephemeral_directory + '/keys/snapshot.pem 
+              --key ' + molecule_ephemeral_directory + '/keys/targets.pem 
+              --key ' + molecule_ephemeral_directory + '/keys/timestamp.pem 
+              --set-fulcio-target ' + molecule_ephemeral_directory + '/fulcio-cert
+              --fulcio-uri "https://fulcio.myrhtas" 
+              --fulcio-status Expired 
+              --outdir ' + molecule_ephemeral_directory + '/tuf-repo
+              --metadata-url file://' + molecule_ephemeral_directory + '/tuf-repo' }}
+
+        - name: Add new cert
+          delegate_to: localhost
+          become: false
+          ansible.builtin.command:
+            cmd: |
+              {{ tuftool + ' rhtas 
+              --root ' + molecule_ephemeral_directory + '/tuf-repo/root.json 
+              --key ' + molecule_ephemeral_directory + '/keys/snapshot.pem 
+              --key ' + molecule_ephemeral_directory + '/keys/targets.pem 
+              --key ' + molecule_ephemeral_directory + '/keys/timestamp.pem 
+              --set-fulcio-target ' + molecule_scenario_directory + '/test_creds/fulcio-root-0.pem
+              --fulcio-uri "https://fulcio.myrhtas" 
+              --outdir ' + molecule_ephemeral_directory + '/tuf-repo
+              --metadata-url file://' + molecule_ephemeral_directory + '/tuf-repo' }}
+
+        - name: Archive repository
+          delegate_to: localhost
+          become: false
+          ansible.builtin.archive:
+            path: "{{ molecule_ephemeral_directory + '/tuf-repo' }}"
+            dest: "{{ molecule_ephemeral_directory + '/repository.tgz' }}"
+            format: gz
+    - name: Set tas_single_node_trust_root
+      ansible.builtin.set_fact:
+        tas_single_node_trust_root:
+          full_archive: "{{ lookup('file',molecule_ephemeral_directory + '/repository.tgz') | b64encode }}"
+          
+    - name: Re-apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
+
+    - name: Load fulcio root cert content into variable
+      ansible.builtin.slurp:
+        src: "{{ fulcio_secret_path.stdout + '/cert.pem' }}"
+      register: ca_cert_in_use
+
+    - name: Assert that fulcio uses the new cert
+      assert:
+        that:
+          - "{{ ca_cert_in_use.content | b64decode == lookup('file', molecule_scenario_directory + '/test_creds/fulcio-root-1.pem') }}"
+        fail_msg: "Fulcio does not use the new cert"
+
+    - name: Verify installation with new cert
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml

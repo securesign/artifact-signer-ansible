@@ -1,0 +1,26 @@
+---
+- name: Converge
+  hosts: molecule
+  gather_facts: true
+  vars_files:
+    - vars/vars.yml
+    - vars/podman.yml
+  tasks:
+    - name: Ensure Registry credentials are set
+      ansible.builtin.include_tasks: ../common/check_creds.yml
+
+    - name: Load fulcio root cert content into variable
+      ansible.builtin.set_fact:
+        ca_cert_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio-root-0.pem') }}"
+
+    - name: Load fulcio private key
+      ansible.builtin.set_fact:
+        ca_cert_private: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio_ca_key-0.pem') }}"
+
+    - name: Set private key password
+      ansible.builtin.set_fact:
+        ca_passphrase: "password"
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
