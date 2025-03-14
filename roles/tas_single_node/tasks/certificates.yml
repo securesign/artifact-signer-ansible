@@ -78,11 +78,18 @@
 
 - name: Create Fulcio root
   block:
+    - name: Load user-provided Fulcio private key
+      ansible.builtin.copy:
+        content: "{{ tas_single_node_fulcio.private_key }}"
+        dest: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
+        mode: '0644'
+      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
+
     - name: Verify if the passphrase matches the user-provided private key
       ansible.builtin.shell:
         cmd: >-
-          openssl ec -in '{{ tas_single_node_fulcio.private_key }}' -check \
-          -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
+          openssl ec -in '{{ tas_single_node_remote_fulcio_user_provided_private_key }}' -check \
+           -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
       register: check_key_passphrase
       changed_when: false
       failed_when: check_key_passphrase.stdout == "failed"
@@ -134,13 +141,6 @@
         tas_single_node_fulcio.private_key is not defined
         or tas_single_node_fulcio.private_key == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0
-
-    - name: Load user-provided Fulcio private key
-      ansible.builtin.copy:
-        content: "{{ tas_single_node_fulcio.private_key }}"
-        dest: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
-        mode: '0600'
-      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
 
     - name: Clean-up old tas_single_node_remote_fulcio_user_provided_private_key
       ansible.builtin.file:
