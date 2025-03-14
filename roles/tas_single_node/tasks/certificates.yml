@@ -482,9 +482,9 @@
 
     - name: Check if organization details have changed
       ansible.builtin.set_fact:
-        current_org: "{{ (current_cert_subject.stdout | regex_search('O = ([^,]+)', '\\1'))[0] | default('') }}"
-        current_cn: "{{ (current_cert_subject.stdout | regex_search('^.*Issuer:.*$', multiline=True) | regex_search('CN = ([^,]+)', '\\1'))[0] | default('')  }}"
-        current_email: "{{ (current_cert_subject.stdout | regex_search('emailAddress = ([^\"\n]+)', '\\1'))[0] | default('') }}"
+        curr_org: "{{ (current_cert_subject.stdout | regex_search('O = ([^,]+)', '\\1'))[0] | default('') }}"
+        curr_cn: "{{ (current_cert_subject.stdout | regex_search('^.*Issuer:.*$', multiline=True) | regex_search('CN = ([^,]+)', '\\1'))[0] | default('') }}"
+        curr_email: "{{ (current_cert_subject.stdout | regex_search('emailAddress = ([^\"\n]+)', '\\1'))[0] | default('') }}"
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
 
     - name: Set default cert_needs_regeneration flag
@@ -494,9 +494,9 @@
     - name: Set cert_needs_regeneration flag
       ansible.builtin.set_fact:
         cert_needs_regeneration: >-
-          {{ current_org != tas_single_node_tsa.certificate.organization_name or
-            current_cn != tas_single_node_tsa.certificate.common_name or
-            current_email != tas_single_node_tsa.certificate.organization_email }}
+          {{ curr_org != tas_single_node_tsa.certificate.organization_name or
+            curr_cn != tas_single_node_tsa.certificate.common_name or
+            curr_email != tas_single_node_tsa.certificate.organization_email }}
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
 
     - name: Back-up and Clean up generated keys and certs
