@@ -59,22 +59,31 @@ tas_single_node_rekor:
   ca_passphrase: password
   public_key_retries: 5
   public_key_delay: 10
-  private_keys:
+  active_signer_type: file
+  env:
+    - name: AWS_ACCESS_KEY_ID
+      value: ""
+    - name: AWS_SECRET_ACCESS_KEY 
+      value: ""
+    - name: AWS_REGION
+      value: ""
+  kms:
+    kms_resource: ""
+  tink:
+    tink_kek_uri: ""
+    tink_keyset_path: ""
+  private_keys: 
     - |
       {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.key') }}
     - |
       {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.key') }}
-  public_keys:
+  public_keys: 
     - |
       {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}
     - |
       {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.pub') }}
   sharding_config:
-  - treeID: 290394966304647762
-    treeLength: 0
+  - treeID:
+    treeLength:
     signingConfig:
     signer: private-0
-  - treeID: 7903366785562594023
-    treeLength: 0
-    signingConfig:
-    signer: private-1
