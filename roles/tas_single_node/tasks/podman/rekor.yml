@@ -37,7 +37,7 @@
     keylists: ['{{ tas_single_node_remote_rekor_private_key }}', '{{ tas_single_node_remote_rekor_public_key }}']
     slurpedcerts: '{{ remote_rekor_keys }}'
 
-- name: Create Custom ctlog Secret
+- name: Create Custom rekor Secret
   ansible.builtin.copy:
     content: "{{ rekor_secret_content }}"
     dest: "{{ tas_single_node_rekor_secret }}"
