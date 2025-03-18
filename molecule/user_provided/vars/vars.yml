@@ -43,7 +43,40 @@ tas_single_node_ctlog:
       private_key: "private-0"
   private_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.key') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.key') }}
   public_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
+
+tas_single_node_rekor:
+  ca_passphrase: password
+  public_key_retries: 5
+  public_key_delay: 10
+  active_signer_type: file
+  env:
+    - name: AWS_ACCESS_KEY_ID
+      value: ""
+    - name: AWS_SECRET_ACCESS_KEY 
+      value: ""
+    - name: AWS_REGION
+      value: ""
+  kms:
+    kms_resource: ""
+  tink:
+    tink_kek_uri: ""
+    tink_keyset_path: ""
+  private_keys: 
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.key') }}
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.key') }}
+  public_keys: 
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}
+    - |
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.pub') }}
+  sharding_config:
+  - treeID:
+    treeLength:
+    signingConfig:
+    signer: private-0
