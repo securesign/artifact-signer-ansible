@@ -654,7 +654,7 @@
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
 - name: Create Custom Rekor Keys
-  when: (tas_single_node_rekor.public_keys | length > 0) and (tas_single_node_rekor.private_keys | length > 0)
+  when: (tas_single_node_rekor.public_keys | length > 0) and (tas_single_node_rekor.private_keys | length > 0) and tas_single_node_rekor.active_signer_type != 'kms'
   block:
     - name: Create Custom Rekor Private Keys
       when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key[0]) | list | length == 0)
@@ -715,7 +715,8 @@
   when: >
     ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key) | list | length) == 0
     or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_public_key) | list | length) == 0)
-    and tas_single_node_rekor_signer_type == 'file' and ( tas_single_node_rekor.public_keys | length == 0 ) and (tas_single_node_rekor.private_keys | length == 0 )
+    and ( tas_single_node_rekor.public_keys | length == 0 ) and (tas_single_node_rekor.private_keys | length == 0 )
+    
   block:
     - name: Create Rekor private key
       ansible.builtin.shell:
@@ -723,17 +724,17 @@
           set -o pipefail &&
           openssl ecparam -genkey -name prime256v1 |
           openssl ec -des3
-          -out '{{ tas_single_node_remote_rekor_private_key }}'
+          -out '{{ tas_single_node_remote_rekor_private_key.0 }}'
           -passout 'pass:{{ tas_single_node_rekor.ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_rekor_private_key }}"
+        creates: "{{ tas_single_node_remote_rekor_private_key.0 }}"
     - name: Create Rekor public key
       ansible.builtin.command:
         cmd: >-
           openssl ec -pubout
-          -in '{{ tas_single_node_remote_rekor_private_key }}'
-          -out '{{ tas_single_node_remote_rekor_public_key }}'
+          -in '{{ tas_single_node_remote_rekor_private_key.0 }}'
+          -out '{{ tas_single_node_remote_rekor_public_key.0 }}'
           -passin 'pass:{{ tas_single_node_rekor.ca_passphrase }}'
-        creates: "{{ tas_single_node_remote_rekor_public_key }}"
+        creates: "{{ tas_single_node_remote_rekor_public_key.0 }}"
 
 - name: Handle TSA certificate chain
   when: >
