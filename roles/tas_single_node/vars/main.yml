@@ -1,5 +1,18 @@
 ---
 # vars file for tas_single_node
+
+_tas_single_node_backup_restore:
+  backup:
+    enabled: false
+    schedule: "*-*-* 00:00:00"
+    force_run: false
+    passphrase: ""
+    directory: /root/tas_backups
+  restore:
+    enabled: false
+    source: ""
+    passphrase: ""
+
 _tas_single_node_rekor:
   ca_passphrase: rhtas
   public_key_retries: 5

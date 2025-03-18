@@ -801,3 +801,66 @@ argument_specs:
             type: str
             required: false
             version_added: "1.2.0"
+      tas_single_node_backup_restore:
+        description: "Configuration options for the Backup and Restore of Trusted Artifact Signer."
+        type: "dict"
+        required: false
+        version_added: "1.2.0"
+        default:
+          backup:
+            enabled: false
+            schedule: "*-*-* 00:00:00"
+            force_run: false
+            passphrase: ""
+            directory: /root/tas_backups
+          restore:
+            enabled: false
+            source: ""
+            passphrase: ""
+        options:
+          backup:
+            description: "Configuration options for the backup."
+            type: "dict"
+            version_added: "1.2.0"
+            options:
+              enabled:
+                description: "Option to deploy the backup oneshot job and timer."
+                type: "bool"
+                version_added: "1.2.0"
+              schedule:
+                description: "The schedule for the backup oneshot job. By default runs daily at midnight."
+                type: "str"
+                version_added: "1.2.0"
+              force_run:
+                description: "Forcefully runs a manual backup."
+                type: "bool"
+                version_added: "1.2.0"
+              passphrase:
+                description: "The passphrase used to encrypt the compressed backup file."
+                type: "str"
+                version_added: "1.2.0"
+              directory:
+                description: "The directory used to store the backups on the remote server. Stored in /root/tas_backups by default."
+                type: "str"
+                version_added: "1.2.0"
+          restore:
+            description: "Configuration options for the restore."
+            type: "dict"
+            version_added: "1.2.0"
+            options:
+              enabled:
+                description: >
+                  Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true.
+                  Should only be set to true on a single Ansible execution and then reverted back to false.
+                type: "bool"
+                version_added: "1.2.0"
+              source:
+                description: >
+                  The filepath leading the to compressed and encrypted backup file that will be used for the full restore.
+                  Needs to be located on the Ansible Control Node.
+                type: "str"
+                version_added: "1.2.0"
+              passphrase:
+                description: "The passphrase used to decrypt the compressed backup file."
+                type: "str"
+                version_added: "1.2.0"

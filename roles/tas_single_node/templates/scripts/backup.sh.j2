@@ -1,0 +1,86 @@
+#!/bin/bash -eu
+
+umask 077
+
+# Config Vars
+BACKUP_DIR="{{ tas_single_node_backup_restore.backup.directory }}"
+CONFIG_DIR="{{ tas_single_node_config_dir }}"
+PASSPHRASE="{{ tas_single_node_backup_restore.backup.passphrase }}"
+
+SERVICES=(
+{% if tas_single_node_trillian.database_deploy %}
+  "trillian-mysql.service"
+{% endif %}
+  "rekor.service"
+{% if tas_single_node_rekor_redis.database_deploy %}
+  "redis.service"
+{% endif %}
+{% if tas_single_node_backfill_redis.enabled %}
+  "backfill_redis.service"
+{% endif %}
+  "tuf.service"
+)
+
+VOLUME_LIST=(
+{% for volume in volume_list %}
+  "{{ volume }}"
+{% endfor %}
+)
+
+log() { echo "INFO: $1"; }
+
+error_exit() { echo "ERROR: $1" >&2; exit 1; }
+
+# Backup Directory Setup
+TIMESTAMP=$(date -u +"BACKUP-%Y-%m-%d-%H-%M-UTC")
+BACKUP_TIMESTAMP_DIR="$BACKUP_DIR/$TIMESTAMP"
+mkdir -p "$BACKUP_TIMESTAMP_DIR/volumes"
+
+# Stop Services to Prevent Runtime Artifacts
+log "Stopping services: ${SERVICES[*]}"
+for SERVICE in "${SERVICES[@]}"; do
+    systemctl stop "$SERVICE" || echo "WARNING: Failed to stop $SERVICE" >&2
+done
+
+# Copy Config Files
+cp -a "$CONFIG_DIR" "$BACKUP_TIMESTAMP_DIR/" || error_exit "Failed to copy configuration files."
+log "Copied configuration files."
+
+# Backup Volumes
+log "Backing up specified volumes: ${VOLUME_LIST[*]}"
+for VOLUME in "${VOLUME_LIST[@]}"; do
+    MOUNT_PATH=$(podman volume mount "$VOLUME") || { echo "WARNING: Failed to mount volume $VOLUME" >&2; continue; }
+    
+    DEST_PATH="$BACKUP_TIMESTAMP_DIR/volumes/$VOLUME/_data"
+    mkdir -p "$DEST_PATH"
+    cp -a "$MOUNT_PATH/." "$DEST_PATH/" || echo "WARNING: Failed to copy volume $VOLUME" >&2
+
+    podman volume unmount "$VOLUME"
+done
+
+log "Finished backing up volumes."
+
+# Restart Services
+log "Restarting services: ${SERVICES[*]}"
+for SERVICE in "${SERVICES[@]}"; do
+    systemctl start "$SERVICE" || echo "WARNING: Failed to start $SERVICE" >&2
+done
+
+# Create Compressed Tarball
+tar -czvf "$BACKUP_TIMESTAMP_DIR.tar.gz" -C "$(dirname "$BACKUP_TIMESTAMP_DIR")" "$(basename "$BACKUP_TIMESTAMP_DIR")" || error_exit "Failed to create compressed tarball."
+log "Created compressed tarball: $BACKUP_TIMESTAMP_DIR.tar.gz"
+
+# Remove Uncompressed Backup Directory
+rm -rf "$BACKUP_TIMESTAMP_DIR"
+log "Deleted uncompressed backup directory."
+
+# Encrypt the Tarball
+openssl enc -aes-256-cbc -salt -pbkdf2 -iter 600000 -in "$BACKUP_TIMESTAMP_DIR.tar.gz" -out "$BACKUP_TIMESTAMP_DIR.tar.gz.enc" -pass pass:"$PASSPHRASE" || error_exit "Failed to encrypt tarball."
+log "Encrypted tarball: $BACKUP_TIMESTAMP_DIR.tar.gz.enc"
+
+# Remove Unencrypted Tarball
+rm -f "$BACKUP_TIMESTAMP_DIR.tar.gz"
+log "Deleted unencrypted tarball."
+
+log "Backup completed successfully."
+exit 0

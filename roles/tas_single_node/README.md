@@ -45,6 +45,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
 | tas_single_node_podman_volume_create_extra_args | Additional arguments to pass to the `podman volume create` command. This can be used to specify extra options when creating Podman volumes. | str |  |
 | tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
+| tas_single_node_backup_restore | Configuration options for the Backup and Restore of Trusted Artifact Signer. | dict of 'tas_single_node_backup_restore' options |  `{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}`  |
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -275,6 +276,31 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | full_archive | A compressed base64-encoded .tgz file of the trust root. This archive file has a single directory named `tuf-repo/`, containing the contents of the TUF repository, for example `1.root.json`. The default value is an empty string. Using the default value generates the trust root content, unless a trust root already exists. Specifying a `full_archive` string removes any earlier configured trust root content, and starts to use the new specified content. If changing this value back to an empty string after setting the `full_archive` option, then we continue serving the previous value for the trust root content. To reset the trust root content, you must remove all files in the volume associated with the `tuf-repository` pod. | str | no |  |
+
+#### Options for main > tas_single_node_backup_restore
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| backup | Configuration options for the backup. | dict of 'backup' options | no |  |
+| restore | Configuration options for the restore. | dict of 'restore' options | no |  |
+
+#### Options for main > tas_single_node_backup_restore > backup
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| enabled | Option to deploy the backup oneshot job and timer. | bool | no |  |
+| schedule | The schedule for the backup oneshot job. By default runs daily at midnight. | str | no |  |
+| force_run | Forcefully runs a manual backup. | bool | no |  |
+| passphrase | The passphrase used to encrypt the compressed backup file. | str | no |  |
+| directory | The directory used to store the backups on the remote server. Stored in /root/tas_backups by default. | str | no |  |
+
+#### Options for main > tas_single_node_backup_restore > restore
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| enabled | Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true. Should only be set to true on a single Ansible execution and then reverted back to false. | bool | no |  |
+| source | The filepath leading the to compressed and encrypted backup file that will be used for the full restore. Needs to be located on the Ansible Control Node. | str | no |  |
+| passphrase | The passphrase used to decrypt the compressed backup file. | str | no |  |
 
 ## Example Playbook
 
