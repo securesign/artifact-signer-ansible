@@ -6,12 +6,14 @@
   changed_when: false
 
 - name: Copy backup data to mounted volume
-  ansible.builtin.copy:
+  ansible.posix.synchronize:
     src: "{{ restore_dir }}/{{ restore_file }}/volumes/{{ item }}/"
     dest: "{{ mount_path.stdout | dirname }}/"
-    remote_src: true
-    mode: "0700"
+    archive: true
+    recursive: true
+    delete: true
   when: mount_path.stdout | length > 0
+  delegate_to: "{{ inventory_hostname }}"
 
 - name: Unmount the volume after copying
   ansible.builtin.command:

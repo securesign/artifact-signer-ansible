@@ -39,11 +39,11 @@ mkdir -p "$BACKUP_TIMESTAMP_DIR/volumes"
 # Stop Services to Prevent Runtime Artifacts
 log "Stopping services: ${SERVICES[*]}"
 for SERVICE in "${SERVICES[@]}"; do
-    sudo systemctl stop "$SERVICE" || echo "WARNING: Failed to stop $SERVICE" >&2
+    systemctl stop "$SERVICE" || echo "WARNING: Failed to stop $SERVICE" >&2
 done
 
 # Copy Config Files
-cp -r "$CONFIG_DIR" "$BACKUP_TIMESTAMP_DIR/" || error_exit "Failed to copy configuration files."
+cp -a "$CONFIG_DIR" "$BACKUP_TIMESTAMP_DIR/" || error_exit "Failed to copy configuration files."
 log "Copied configuration files."
 
 # Backup Volumes
@@ -63,7 +63,7 @@ log "Finished backing up volumes."
 # Restart Services
 log "Restarting services: ${SERVICES[*]}"
 for SERVICE in "${SERVICES[@]}"; do
-    sudo systemctl start "$SERVICE" || echo "WARNING: Failed to start $SERVICE" >&2
+    systemctl start "$SERVICE" || echo "WARNING: Failed to start $SERVICE" >&2
 done
 
 # Create Compressed Tarball
@@ -71,7 +71,7 @@ tar -czvf "$BACKUP_TIMESTAMP_DIR.tar.gz" -C "$(dirname "$BACKUP_TIMESTAMP_DIR")"
 log "Created compressed tarball: $BACKUP_TIMESTAMP_DIR.tar.gz"
 
 # Remove Uncompressed Backup Directory
-rm -rf "$BACKUP_TIMESTAMP_DIR"
+#rm -rf "$BACKUP_TIMESTAMP_DIR"
 log "Deleted uncompressed backup directory."
 
 # Encrypt the Tarball
