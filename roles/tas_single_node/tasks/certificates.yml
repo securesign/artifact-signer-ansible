@@ -216,6 +216,12 @@
         mode: '0644'
       when: tas_single_node_fulcio.root_ca is defined and tas_single_node_fulcio.root_ca != ""
 
+    - name: Refresh list of files in certs directory
+      ansible.builtin.find:
+        file_type: file
+        paths: "{{ tas_single_node_certs_dir }}"
+      register: certs_dir_files
+
     - name: Verify if RSA private key matches the certificate
       ansible.builtin.shell:
         cmd: >-
@@ -242,6 +248,27 @@
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
       register: ec_key_cert_match_check
       changed_when: false
+
+    - name: Set default value for key_cert_mismatch
+      ansible.builtin.set_fact:
+        key_cert_mismatch: false
+
+    - name: Verify if private key and certificate mismatch
+      ansible.builtin.set_fact:
+        key_cert_mismatch: >-
+          {{
+            (key_type_check.stdout == "RSA Key" and
+            rsa_key_cert_match_check is defined and
+            rsa_key_cert_match_check.stdout_lines is defined and
+            rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
+            or
+            (key_type_check.stdout == "EC Key" and
+            ec_key_cert_match_check is defined and
+            ec_key_cert_match_check.stdout_lines is defined and
+            ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
+          }}
+      failed_when: key_cert_mismatch and tas_single_node_fulcio.root_ca != ""
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
 
     - name: Set default value for cert_changed
       ansible.builtin.set_fact:
@@ -284,12 +311,7 @@
         cert_changed or
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
-        or (
-            key_type_check.stdout == "RSA Key" and
-            (rsa_key_cert_match_check.stdout_lines and rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
-            or key_type_check.stdout == "EC Key" and
-            (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
-        )
+        or key_cert_mismatch
 
     - name: Backup and clean-up old Fulcio root
       when: cert_changed
@@ -326,21 +348,11 @@
       changed_when: >
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
-        or (
-            key_type_check.stdout == "RSA Key" and
-            (rsa_key_cert_match_check.stdout_lines and rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
-            or key_type_check.stdout == "EC Key" and
-            (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
-        )
+        or key_cert_mismatch
       when: >
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
-        or (
-            key_type_check.stdout == "RSA Key" and
-            (rsa_key_cert_match_check.stdout_lines and rsa_key_cert_match_check.stdout_lines[0].strip() != rsa_key_cert_match_check.stdout_lines[1].strip())
-            or key_type_check.stdout == "EC Key" and
-            (ec_key_cert_match_check.stdout_lines and ec_key_cert_match_check.stdout_lines[0].strip() != ec_key_cert_match_check.stdout_lines[1].strip())
-        )
+        or key_cert_mismatch
 
 - name: Create Custom ctlog Root
   when: >
