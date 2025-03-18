@@ -350,6 +350,40 @@ argument_specs:
         required: false
         version_added: "1.2.0"
         options:
+          active_signer_type:
+            description: "active logs signer type can be either file or kms"
+            type: "str"
+            required: true
+            version_added: "1.2.0"
+          kms:
+            description: "details for kms configuration of rekor cli-server."
+            type: "dict"
+            options:
+                kms_resource:
+                  description: "Kms resource access"
+                  type: "str"
+                  required: false
+                  version_added: "1.2.0"
+          tink:
+            description: "details for kms configuration of rekor cli-server."
+            type: "dict"
+            options:
+                tink_kek_uri:
+                  description: "Kms resource access"
+                  type: "str"
+                  required: false
+                  version_added: "1.2.0"
+                tink_keyset_path:
+                  description: "Kms resource access"
+                  type: "str"
+                  required: false
+                  version_added: "1.2.0"
+          env:
+            description: "Key resource used to access signer private key from AWS/GCP/Azure."
+            type: "list"
+            elements: "dict"
+            required: false
+            version_added: "1.2.0"
           ca_passphrase:
             description: "Passphrase used for Certificate Authority cert."
             type: "str"
