@@ -269,7 +269,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | create | Whether or not to create the cockpit user. | bool | no |  |
 | username | Username for the cockpit user. | str | no |  |
-| password | Password for the cockpit user. | str | yes |  |
+| password | Password for the cockpit user. | str | no |  |
 
 #### Options for main > tas_single_node_trust_root
 
