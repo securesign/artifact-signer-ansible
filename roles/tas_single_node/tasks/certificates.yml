@@ -472,19 +472,25 @@
       changed_when: false
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
 
-    - name: Check if organization details have changed
+    - name: Set cert_needs_regeneration flag
       ansible.builtin.set_fact:
-        cert_needs_regeneration: >-
-          "{{ current_cert_subject.stdout | default('') | regex_search('/O=([^/]+)') != tas_single_node_tsa.certificate.organization_name
-            or current_cert_subject.stdout | default('') | regex_search('/CN=([^/]+)') != tas_single_node_tsa.certificate.common_name
-            or current_cert_subject.stdout | default('') | regex_search('/emailAddress=([^/]+)') != tas_single_node_tsa.certificate.organization_email }}"
+        cert_needs_regeneration: "{{
+          (current_cert_subject.stdout | regex_search('O = ([^,\n]+)', '\\1'))[0] | default('')
+          != tas_single_node_tsa.certificate.organization_name
+          or
+          (current_cert_subject.stdout | regex_search('^.*Issuer:.*$', multiline=True) | regex_search('CN = ([^,\n]+)', '\\1'))[0] | default('')
+          != tas_single_node_tsa.certificate.common_name
+          or
+          (current_cert_subject.stdout | regex_search('emailAddress = ([^\"\n]+)', '\\1'))[0] | default('')
+          != tas_single_node_tsa.certificate.organization_email }}"
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
 
     - name: Back-up and Clean up generated keys and certs
-      when: (cert_needs_regeneration or ((tsa_key_passphrase | default({})).stdout is defined and tsa_key_passphrase.stdout == "failed")) and
-            (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0 and
-            (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) != 0
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0 and
+            (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) != 0 and
+            (cert_needs_regeneration or ((tsa_key_passphrase | default({})).stdout is defined and tsa_key_passphrase.stdout == "failed"))
       block:
-        - name: Back-up old generated private key
+        - name: Back-up old generated certs and keys
           ansible.builtin.copy:
             src: "{{ item }}"
             dest: "{{ item + '.' + ansible_date_time.iso8601_basic }}"
@@ -494,6 +500,7 @@
             - "{{ tas_single_node_tsa_certificate_chain }}"
             - "{{ tas_single_node_tsa_signer_private_key }}"
             - "{{ tas_single_node_remote_tsa_private_key }}"
+            - "{{ tas_single_node_remote_tsa_leaf_certificate }}"
 
         - name: Delete old certificates if configuration has changed
           ansible.builtin.file:
@@ -503,6 +510,7 @@
             - "{{ tas_single_node_tsa_certificate_chain }}"
             - "{{ tas_single_node_tsa_signer_private_key }}"
             - "{{ tas_single_node_remote_tsa_private_key }}"
+            - "{{ tas_single_node_remote_tsa_leaf_certificate }}"
 
     - name: Refresh list of files in certs directory
       ansible.builtin.find:
