@@ -71,7 +71,7 @@ tar -czvf "$BACKUP_TIMESTAMP_DIR.tar.gz" -C "$(dirname "$BACKUP_TIMESTAMP_DIR")"
 log "Created compressed tarball: $BACKUP_TIMESTAMP_DIR.tar.gz"
 
 # Remove Uncompressed Backup Directory
-#rm -rf "$BACKUP_TIMESTAMP_DIR"
+rm -rf "$BACKUP_TIMESTAMP_DIR"
 log "Deleted uncompressed backup directory."
 
 # Encrypt the Tarball
