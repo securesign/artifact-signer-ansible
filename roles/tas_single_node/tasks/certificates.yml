@@ -247,33 +247,25 @@
       ansible.builtin.set_fact:
         cert_changed: false
 
+    - name: Get current certificate subject details
+      ansible.builtin.command:
+        cmd: openssl x509 -in '{{ tas_single_node_remote_fulcio_root_ca }}' -noout -text
+      register: current_cert_subject
+      changed_when: false
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
+
     - name: Check if fulcio certificate needs to be regenerated
+      ansible.builtin.set_fact:
+        cert_changed: "{{
+          (current_cert_subject.stdout | default('') | regex_search('Subject: O = ([^\\n]+)', '\\1') or ['']) | first
+          != tas_single_node_fulcio.certificate.organization_name
+          or
+          (current_cert_subject.stdout | default('') | regex_search('Subject: CN = ([^\\n]+)', '\\1') or ['']) | first
+          != tas_single_node_fulcio.certificate.common_name
+          or
+          (current_cert_subject.stdout | default('') | regex_search('Subject: emailAddress = ([^\\n]+)', '\\1') or ['']) | first
+          != tas_single_node_fulcio.certificate.organization_email }}"
       when: tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == ""
-      block:
-        - name: Compute certificate attributes hash
-          ansible.builtin.set_fact:
-            cert_attr_hash: "{{ (tas_single_node_fulcio.certificate | to_json) | hash('sha256') }}"
-
-        - name: Check if the previous certificate attribute hash exists
-          ansible.builtin.stat:
-            path: "{{ tas_single_node_config_dir }}/fulcio_cert_attr_hash"
-          register: cert_hash_file
-
-        - name: Read the previous certificate attribute hash
-          ansible.builtin.slurp:
-            src: "{{ tas_single_node_config_dir }}/fulcio_cert_attr_hash"
-          register: previous_cert_attr_hash
-          when: cert_hash_file.stat.exists
-
-        - name: Determine if certificate attributes have changed
-          ansible.builtin.set_fact:
-            cert_changed: "{{ previous_cert_attr_hash['content'] | b64decode != cert_attr_hash if cert_hash_file.stat.exists }}"
-
-        - name: Store the new certificate attributes hash
-          ansible.builtin.copy:
-            content: "{{ cert_attr_hash }}"
-            dest: "{{ tas_single_node_config_dir }}/fulcio_cert_attr_hash"
-            mode: '0644'
 
     - name: Create certificate signing request (CSR) for Fulcio root certificate
       ansible.builtin.command:
