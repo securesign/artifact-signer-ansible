@@ -54,5 +54,3 @@ tas_single_node_fulcio:
   root_ca: |
     {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.pem') }}
   ca_passphrase: password
-  trusted_ca: ""
-  ct_log_prefix: rhtasansible
