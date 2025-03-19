@@ -76,6 +76,7 @@
     podman_spec:
       state: started
       systemd_file: backfill_redis
+      systemd_type: oneshot
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('template', 'manifests/rekor/backfill_redis.j2') | from_yaml }}"
   when: tas_single_node_backfill_redis.enabled
