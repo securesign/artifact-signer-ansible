@@ -334,7 +334,7 @@ argument_specs:
               **Note**: Updating the passphrase will regenerate the auto-generated private key and the Fulcio certificate as a consequence,
               and a manual update in the trust root is required."
             type: "str"
-            required: true
+            required: false
             version_added: "1.2.0"
           ct_log_prefix:
             description: >
@@ -353,7 +353,7 @@ argument_specs:
           ca_passphrase:
             description: "Passphrase used for Certificate Authority cert."
             type: "str"
-            required: true
+            required: false
             version_added: "1.1.0"
           public_key_retries:
             description: "The number of attempts to retrieve the Rekor public key when constructing the trust root."
