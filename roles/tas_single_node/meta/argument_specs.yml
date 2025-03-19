@@ -340,7 +340,7 @@ argument_specs:
             description: >
               The Prefix for the Certificate Transparency Log that is accessed by Fulcio.
             type: "str"
-            required: true
+            required: false
             version_added: "1.1.0"
       tas_single_node_rekor:
         description: >
