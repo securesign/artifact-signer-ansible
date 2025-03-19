@@ -23,8 +23,8 @@
         src: "{{ item.system_path }}"
       register: fulcio_configs
       loop:
-        - { msg: "fulcio.key", system_path: "{{ tas_single_node_remote_fulcio_private_key }}" }
-        - { msg: "fulcio.pem", system_path: "{{ tas_single_node_remote_fulcio_root_ca }}" }
+        - { msg: "fulcio.key", system_path: "/etc/rhtas/certs/fulcio.key" }
+        - { msg: "fulcio.pem", system_path: "/etc/rhtas/certs/fulcio.pem" }
       loop_control:
         label: "{{ item.msg }}"
 
