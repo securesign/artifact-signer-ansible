@@ -16,19 +16,17 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r testing-requirements.txt
             make readme-preview
-        - uses: actions/upload-artifact@v4
-          id: collection-readme
-          with:
-            name: collection-readme
-            path: README.html
-        - uses: actions/upload-artifact@v4
-          id: role-readme
-          with:
-            name: role-readme
-            path: roles/tas_single_node/README.html
+#        - uses: actions/upload-artifact@v4
+#          id: collection-readme
+#          with:
+#            name: collection-readme
+#            path: README.html
+#        - uses: actions/upload-artifact@v4
+#          id: role-readme
+#          with:
+#            name: role-readme
+#            path: roles/tas_single_node/README.html
         - uses: mshick/add-pr-comment@v2
           with:
-            message: |
-              Collection README html preview is available at ${{ steps.collection-readme.outputs.artifact-id }}
-              Role README html preview is available at ${{ steps.role-readme.outputs.artifact-id }}
-
+            message-path: |
+              README.html
