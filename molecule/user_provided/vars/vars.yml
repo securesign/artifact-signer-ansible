@@ -47,3 +47,10 @@ tas_single_node_ctlog:
   public_keys:
     - |
       {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}
+
+tas_single_node_fulcio:
+  private_key: |
+    {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.key') }}
+  root_ca: |
+    {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.pem') }}
+  ca_passphrase: password

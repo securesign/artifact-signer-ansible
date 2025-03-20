@@ -17,3 +17,25 @@
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
         name: tas_single_node
+
+    - name: Read fulcio config on molecule
+      ansible.builtin.slurp:
+        src: "{{ item.system_path }}"
+      register: fulcio_configs
+      loop:
+        - { msg: "fulcio.key", system_path: "/etc/rhtas/certs/fulcio.key" }
+        - { msg: "fulcio.pem", system_path: "/etc/rhtas/certs/fulcio.pem" }
+      loop_control:
+        label: "{{ item.msg }}"
+
+    - name: Assert that user-provided fulcio key and certificate were taken by TAS
+      ansible.builtin.assert:
+        that:
+          - "{{ item.test_content | b64encode == item.fulcio_config['content'] }}"
+        fail_msg: "{{ item.msg }} was not taken by TAS"
+        success_msg: "{{ item.msg }} was taken by TAS"
+      loop:
+        - { msg: "fulcio.key", test_content: "{{ tas_single_node_fulcio.private_key }}", fulcio_config: "{{ fulcio_configs.results[0] }}" }
+        - { msg: "fulcio.pem", test_content: "{{ tas_single_node_fulcio.root_ca }}", fulcio_config: "{{ fulcio_configs.results[1] }}" }
+      loop_control:
+        label: "{{ item.msg }}"
