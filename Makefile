@@ -14,3 +14,7 @@ role-readme: galaxy.yml roles/tas_single_node/README.j2 roles/tas_single_node/me
 		pip install "aar_doc~=2.0" --no-deps; \
 	fi
 	aar-doc --output-template roles/tas_single_node/README.j2 --output-mode replace roles/tas_single_node/ markdown
+
+readme-preview: role-readme README.md
+	python -c "import galaxy_importer.utils.markup; print(galaxy_importer.utils.markup._render_from_markdown(galaxy_importer.utils.markup.get_readme_doc_file('.')))" > README.html
+	python -c "import galaxy_importer.utils.markup; print(galaxy_importer.utils.markup._render_from_markdown(galaxy_importer.utils.markup.get_readme_doc_file('roles/tas_single_node/')))" > roles/tas_single_node/README.html
