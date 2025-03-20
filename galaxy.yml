@@ -16,7 +16,8 @@ description: Install and configure RHTAS, a downstream redistribution of the Sig
 license_file: LICENSE
 tags: [sigstore, tas, rhtas, security, cosign]
 # NOTE: when updating, also update dependencies in requirements.yml
-dependencies: {}
+dependencies:
+  ansible.posix: ">=1.5.4"
 repository: https://github.com/securesign/artifact-signer-ansible/
 documentation: https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer
 homepage: https://github.com/securesign/artifact-signer-ansible#rhtas-ansible-collection
