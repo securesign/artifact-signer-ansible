@@ -1,7 +1,7 @@
 ---
 - name: Checking RHTAS network for Dex instance
   ansible.builtin.shell: |
-    podman inspect dex-idp | rhtas
+    podman inspect dex-idp | grep '"rhtas":'
   register: rhtas_check
   ignore_errors: true
 

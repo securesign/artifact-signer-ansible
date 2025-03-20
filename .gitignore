@@ -15,5 +15,6 @@ context/
 *+00:00.json
 *.swp
 .vscode/
+.idea/
 importer_result.json
 redhat-artifact_signer-*.tar.gz
