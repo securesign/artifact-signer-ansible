@@ -1,7 +1,7 @@
 name: Preview readme files on PRs
 on:
   pull_request:
-    paths: **/README.md
+    paths: '**/README.md'
 
 jobs:
   preview-readme:
