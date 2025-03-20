@@ -1,5 +1,7 @@
 # Red Hat Trusted Artifact Signer Ansible collection
 
+test
+
 The purpose of this Ansible collection is to automate the deployment of the Red Hat Trusted Artifact Signer (RHTAS) service on Red Hat Enterprise Linux (RHEL).
 
 > [!IMPORTANT]
