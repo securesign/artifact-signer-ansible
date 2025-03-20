@@ -102,7 +102,9 @@
            -passin 'pass:{{ tas_single_node_fulcio.ca_passphrase }}' > /dev/null 2>&1 || echo "failed"
       register: check_key_passphrase
       changed_when: false
-      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) != 0
+      when: >
+        tas_single_node_fulcio.private_key == ""
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) != 0
 
     - name: Backup and clean-up old private key
       when: >
@@ -127,6 +129,47 @@
         paths: "{{ tas_single_node_certs_dir }}"
       register: certs_dir_files
 
+    - name: Read the old private key content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_remote_fulcio_private_key }}"
+      register: old_key_content
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) != 0
+
+    - name: Read the old root content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_remote_fulcio_root_ca }}"
+      register: old_root_content
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
+
+    - name: Backup old fulcio private key and root
+      when: >
+          (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) != 0
+          and
+          (old_key_content.content | b64decode != tas_single_node_fulcio.private_key
+            or old_root_content != tas_single_node_fulcio.root_ca)
+      block:
+        - name: Back-up old provided private key
+          ansible.builtin.copy:
+            src: "{{ tas_single_node_remote_fulcio_private_key }}"
+            dest: "{{ tas_single_node_remote_fulcio_private_key + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          when: >
+            old_key_content.content | b64decode != tas_single_node_fulcio.private_key
+            and (tas_single_node_fulcio.private_key != ""
+              or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0)
+
+        - name: Back-up old root
+          ansible.builtin.copy:
+            src: "{{ tas_single_node_remote_fulcio_root_ca }}"
+            dest: "{{ tas_single_node_remote_fulcio_root_ca + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          when: >
+            old_root_content != tas_single_node_fulcio.root_ca
+            and (tas_single_node_fulcio.private_key != ""
+              or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0)
+
     - name: Create Fulcio private key
       # NOTE: As of cosign 2.3.0, only RSA with > 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported
       ansible.builtin.shell:
@@ -146,13 +189,17 @@
       ansible.builtin.file:
         path: "{{ tas_single_node_remote_fulcio_user_provided_private_key }}"
         state: absent
-      when: tas_single_node_fulcio.private_key is not defined or tas_single_node_fulcio.private_key == ""
+      when: >
+        tas_single_node_fulcio.private_key is not defined or tas_single_node_fulcio.private_key == ""
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_user_provided_private_key) | list | length) != 0
 
     - name: Clean-up old tas_single_node_remote_fulcio_auto_generated_private_key
       ansible.builtin.file:
         path: "{{ tas_single_node_remote_fulcio_auto_generated_private_key }}"
         state: absent
-      when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
+      when: >
+        tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) != 0
 
     - name: Copy auto-generated Fulcio private key into tas_single_node_remote_fulcio_private_key
       ansible.builtin.copy:
