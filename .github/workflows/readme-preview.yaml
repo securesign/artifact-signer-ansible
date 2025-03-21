@@ -33,9 +33,6 @@ jobs:
             if [ -z "$(git show --format='')" ]; then exit 0; fi
             echo "changed=true" >> $GITHUB_OUTPUT
             git push --set-upstream origin ${BRANCH}
-        - name: Debug previous output
-          run: |
-            echo "x${{ steps.push_readmes.outputs.changed }}x"
         - uses: mshick/add-pr-comment@v2
           if: steps.push_readmes.outputs.changed == 'true'
           with:
