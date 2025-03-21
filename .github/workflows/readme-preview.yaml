@@ -22,6 +22,7 @@ jobs:
         - name: Push readmes to a separate branch
           id: push-readmes
           run: |
+            git fetch origin
             git config user.name github-actions
             git config user.email github-actions@github.com
             git switch --orphan ${BRANCH} || git checkout ${BRANCH}
