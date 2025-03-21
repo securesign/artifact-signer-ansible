@@ -6,6 +6,7 @@ on:
 jobs:
   preview-readme:
     permissions:
+      contents: write
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
@@ -16,6 +17,18 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r testing-requirements.txt
             make readme-preview
+        - name: Push readmes to a separate branch
+          run: |
+            export BRANCH="docspreview/pr-${{ github.event.pull_request.number }}"
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git switch --orphan ${BRANCH} || git checkout ${BRANCH}
+            mv README.html collection-readme.html
+            mv roles/tas_single_node/README.html role-readme.html
+            git add collection-readme.html role-readme.html
+            git commit -m "Update generated docs"
+            echo git push --set-upstream origin ${BRANCH}
+
 #        - uses: actions/upload-artifact@v4
 #          id: collection-readme
 #          with:
@@ -26,7 +39,7 @@ jobs:
 #          with:
 #            name: role-readme
 #            path: roles/tas_single_node/README.html
-        - uses: mshick/add-pr-comment@v2
-          with:
-            message-path: |
-              README.html
+#        - uses: mshick/add-pr-comment@v2
+#          with:
+#            message-path: |
+#              README.html
