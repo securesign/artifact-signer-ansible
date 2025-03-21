@@ -27,9 +27,9 @@ tas_single_node_trillian_log_server_image:
 tas_single_node_trillian_log_signer_image:
   "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:c499438e52f4c6bf09dcb28761cbd1a1d08ca0c3c07f66c205e316f36bf54e2d"
 tas_single_node_rekor_server_image:
-  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:20002736dd2620dc901449acf680b6f6e7f47f0422cdade5de4c8564274e060e"
+  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:cb1ac1f5e18376762a7974957500ce493fcde074eb4ef5b9f7b8e6e8738430df"
 tas_single_node_ctlog_image:
-  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:47948b7852bcca09015e5fd264c7c30d5c79bce0e365cd69438ef0b9a1d52a9f"
+  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:3159240fc4f2e300a4b47462c62a77a939cef171f6eac5ec1e1093e34cf013be"
 tas_single_node_rekor_redis_image:
   "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:02b4b7af366c6cda6b0ae0a9559936b65141c4e866ec7953b46f24afb737a6a7"
 tas_single_node_backfill_redis_image:
@@ -45,9 +45,9 @@ tas_single_node_trillian_netcat_image:
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe"
 tas_single_node_timestamp_authority_image:
-  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:916d130bee192a029e09ebdc2546ba3acd28879b6f7c3c69c5c804de3d65d60a"
+  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:95c85f8ef635045bcf5b91d63a79fb7c0f9856ce18b58ffb062947dd6c8289e5"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:20cc688c02d78c44e6706836179b6d6c9ddc9811d1d6315fcd5c900b65d48fd8"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8be457b21855880581a36552e9ae9ace03770b9c1ec0264340d1baf2ebddbc7d"
 # Create Tree
 tas_single_node_createtree_image:
   "registry.redhat.io/rhtas/createtree-rhel9@sha256:777243778cc202d317b9350773b1faff33e99325b837b69e398f80e9479dae13"
