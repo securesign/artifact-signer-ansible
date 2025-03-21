@@ -27,13 +27,13 @@ jobs:
             git switch --orphan ${BRANCH} || git checkout ${BRANCH}
             mv README.html collection-readme.html
             mv roles/tas_single_node/README.html role-readme.html
-            git diff >> $GITHUB_OUTPUT
-            if [ -z "$(cat $GITHUB_OUTPUT)" ]; then exit 0; fi
             git add collection-readme.html role-readme.html
-            git commit -m "Update generated docs"
+            git commit --allow-empty -m "Update generated docs"
+            if [ -z "$(git show --format='')" ]; exit 0; fi
+            echo "true" >> $GITHUB_OUTPUT
             git push --set-upstream origin ${BRANCH}
         - uses: mshick/add-pr-comment@v2
-          if: steps.push-readmes.output != ''
+          if: steps.push-readmes.output == 'true'
           with:
             message: |
               Hi :wave: here are your HTML README previews:
