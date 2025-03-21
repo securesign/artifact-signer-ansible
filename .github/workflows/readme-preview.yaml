@@ -36,6 +36,7 @@ jobs:
         - uses: mshick/add-pr-comment@v2
           if: steps.push_readmes.outputs.changed == 'true'
           with:
+            allow-repeats: true
             message: |
               Hi :wave: here are your HTML README previews:
               * [Collection readme preview](https://html-preview.github.io/?url=https://raw.githubusercontent.com/securesign/artifact-signer-ansible/refs/heads/${{ env.BRANCH }}/collection-readme.html)
