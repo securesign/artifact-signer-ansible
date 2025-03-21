@@ -27,9 +27,9 @@ jobs:
             git switch --orphan ${BRANCH} || git checkout ${BRANCH}
             mv README.html collection-readme.html
             mv roles/tas_single_node/README.html role-readme.html
-            git add collection-readme.html role-readme.html
             git diff >> $GITHUB_OUTPUT
             if [ -z "$(cat $GITHUB_OUTPUT)" ]; then exit 0; fi
+            git add collection-readme.html role-readme.html
             git commit -m "Update generated docs"
             git push --set-upstream origin ${BRANCH}
         - uses: mshick/add-pr-comment@v2
