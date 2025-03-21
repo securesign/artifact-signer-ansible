@@ -9,6 +9,8 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
+    env:
+      BRANCH: docspreview/pr-${{ github.event.pull_request.number }}
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -19,7 +21,6 @@ jobs:
             make readme-preview
         - name: Push readmes to a separate branch
           run: |
-            export BRANCH="docspreview/pr-${{ github.event.pull_request.number }}"
             git config user.name github-actions
             git config user.email github-actions@github.com
             git switch --orphan ${BRANCH} || git checkout ${BRANCH}
@@ -27,19 +28,10 @@ jobs:
             mv roles/tas_single_node/README.html role-readme.html
             git add collection-readme.html role-readme.html
             git commit -m "Update generated docs"
-            git push --set-upstream origin ${BRANCH}
-
-#        - uses: actions/upload-artifact@v4
-#          id: collection-readme
-#          with:
-#            name: collection-readme
-#            path: README.html
-#        - uses: actions/upload-artifact@v4
-#          id: role-readme
-#          with:
-#            name: role-readme
-#            path: roles/tas_single_node/README.html
-#        - uses: mshick/add-pr-comment@v2
-#          with:
-#            message-path: |
-#              README.html
+            echo git push --set-upstream origin ${BRANCH}
+        - uses: mshick/add-pr-comment@v2
+          with:
+            message-path: |
+              Hi :wave: here are your HTML README previews:
+              * [Collection readme preview](https://html-preview.github.io/?url=https://raw.githubusercontent.com/securesign/artifact-signer-ansible/refs/heads/${{ env.BRANCH }}/collection-readme.html)
+              * [Role readme preview](https://html-preview.github.io/?url=https://raw.githubusercontent.com/securesign/artifact-signer-ansible/refs/heads/${{ env.BRANCH }}/role-readme.html)
