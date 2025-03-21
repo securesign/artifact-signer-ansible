@@ -27,7 +27,7 @@ jobs:
             mv roles/tas_single_node/README.html role-readme.html
             git add collection-readme.html role-readme.html
             git commit -m "Update generated docs"
-            echo git push --set-upstream origin ${BRANCH}
+            git push --set-upstream origin ${BRANCH}
 
 #        - uses: actions/upload-artifact@v4
 #          id: collection-readme
