@@ -29,7 +29,7 @@ jobs:
             mv roles/tas_single_node/README.html role-readme.html
             git add collection-readme.html role-readme.html
             git commit --allow-empty -m "Update generated docs"
-            if [ -z "$(git show --format='')" ]; exit 0; fi
+            if [ -z "$(git show --format='')" ]; then exit 0; fi
             echo "true" >> $GITHUB_OUTPUT
             git push --set-upstream origin ${BRANCH}
         - uses: mshick/add-pr-comment@v2
