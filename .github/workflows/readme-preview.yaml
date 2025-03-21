@@ -20,7 +20,7 @@ jobs:
             pip install -r testing-requirements.txt
             make readme-preview
         - name: Push readmes to a separate branch
-          id: push-readmes
+          id: push_readmes
           run: |
             git fetch origin
             git config user.name github-actions
@@ -34,7 +34,7 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
             git push --set-upstream origin ${BRANCH}
         - uses: mshick/add-pr-comment@v2
-          if: steps.push-readmes.output.changed == 'true'
+          if: steps.push_readmes.output.changed == 'true'
           with:
             message: |
               Hi :wave: here are your HTML README previews:
