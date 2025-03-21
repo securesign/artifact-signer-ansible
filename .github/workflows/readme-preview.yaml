@@ -31,7 +31,7 @@ jobs:
             echo git push --set-upstream origin ${BRANCH}
         - uses: mshick/add-pr-comment@v2
           with:
-            message-path: |
+            message: |
               Hi :wave: here are your HTML README previews:
               * [Collection readme preview](https://html-preview.github.io/?url=https://raw.githubusercontent.com/securesign/artifact-signer-ansible/refs/heads/${{ env.BRANCH }}/collection-readme.html)
               * [Role readme preview](https://html-preview.github.io/?url=https://raw.githubusercontent.com/securesign/artifact-signer-ansible/refs/heads/${{ env.BRANCH }}/role-readme.html)
