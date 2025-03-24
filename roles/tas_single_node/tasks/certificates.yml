@@ -501,12 +501,6 @@
         state: absent
       loop: "{{ keys_to_backup }}"
 
-- name: Refresh list of files in certs directory
-  ansible.builtin.find:
-    file_type: file
-    paths: "{{ tas_single_node_certs_dir }}"
-  register: certs_dir_files
-
 - name: Create Custom ctlog Root
   when: >
     (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
