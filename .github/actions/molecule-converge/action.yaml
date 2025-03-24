@@ -44,4 +44,4 @@ runs:
       run: |
         source venv/bin/activate
         molecule reset
-        molecule -v converge --scenario-name ${{ inputs.scenario }}
+        molecule -v test --scenario-name ${{ inputs.scenario }} --destroy=never

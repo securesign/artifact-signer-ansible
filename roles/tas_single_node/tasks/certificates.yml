@@ -146,7 +146,7 @@
           (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) != 0
           and
           (old_key_content.content | b64decode != tas_single_node_fulcio.private_key
-            or old_root_content != tas_single_node_fulcio.root_ca)
+            or old_root_content.content | b64decode != tas_single_node_fulcio.root_ca)
       block:
         - name: Back-up old provided private key
           ansible.builtin.copy:
@@ -166,7 +166,7 @@
             remote_src: true
             mode: '0600'
           when: >
-            old_root_content != tas_single_node_fulcio.root_ca
+            old_root_content.content | b64decode != tas_single_node_fulcio.root_ca
             and (tas_single_node_fulcio.private_key != ""
               or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0)
 
