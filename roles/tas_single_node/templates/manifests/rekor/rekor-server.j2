@@ -64,7 +64,7 @@ spec:
 {% endif %}
             - --rekor_server.address=0.0.0.0
 {% if tas_single_node_rekor.active_signer_type == "file" %}
-            - --rekor_server.signer=/rekor-keys/private-0
+            - --rekor_server.signer=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
             - --rekor_server.signer-passwd={{ tas_single_node_rekor.ca_passphrase }}
 {% endif %}
 {% if tas_single_node_rekor.active_signer_type == "kms" %}
@@ -72,7 +72,7 @@ spec:
 {% endif %}
 {% if tas_single_node_rekor.active_signer_type == "tink" %}
             - --rekor_server.tink_kek_uri=aws-kms:///{{ tas_single_node_rekor.tink.tink_kek_uri }}
-            - --rekor_server.tink_keyset_path=/rekor-keys/rekor-signer0.key
+            - --rekor_server.tink_keyset_path=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
 {% endif %}
             - --enable_retrieve_api=true
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
