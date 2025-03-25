@@ -654,10 +654,13 @@
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
 - name: Create Custom Rekor Keys
-  when: tas_single_node_rekor.active_signer_type != 'kms' and (tas_single_node_rekor.private_keys | length >= 1) and (tas_single_node_rekor.public_keys | length >= 1)
+  when: >
+    tas_single_node_rekor.active_signer_type != 'kms' and
+    (tas_single_node_rekor.private_keys | length >= 1) and
+    (tas_single_node_rekor.public_keys | length >= 1)
   block:
     - name: Create Custom Rekor Private Keys
-      when: key_var.key != "" 
+      when: key_var.key != ""
       changed_when: false
       ansible.builtin.copy:
         content: "{{ key_var.key }}"
@@ -720,7 +723,7 @@
   when: >
     ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key.0) | list | length) == 0
     or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_public_key.0) | list | length) == 0)
-    
+
   block:
     - name: Create Rekor private key
       ansible.builtin.shell:
