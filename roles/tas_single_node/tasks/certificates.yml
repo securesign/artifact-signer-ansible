@@ -419,13 +419,14 @@
 - name: Set ctlog_private_keys_changed
   ansible.builtin.set_fact:
     ctlog_private_keys_changed: >-
-      {{ existing_keys.results | length != tas_single_node_ctlog.private_keys | length
-      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.private_keys }}
+      {{ (existing_keys.results | length != tas_single_node_ctlog.private_keys | length
+      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.private_keys)
+      and tas_single_node_ctlog.private_keys | length > 0 }}
 
 - name: Back-up changed ctlog private keys
   when: existing_keys.results | length > 0 and ctlog_private_keys_changed
   block:
-    - name: Identify keys that need back-up
+    - name: Identify private keys that need back-up
       ansible.builtin.set_fact:
         keys_to_backup: >-
           {{ existing_keys.results |
@@ -469,13 +470,14 @@
 - name: Set ctlog_public_keys_changed
   ansible.builtin.set_fact:
     ctlog_public_keys_changed: >-
-      {{ existing_keys.results | length != tas_single_node_ctlog.public_keys | length
-      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.public_keys }}
+      {{ (existing_keys.results | length != tas_single_node_ctlog.public_keys | length
+      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.public_keys)
+      and tas_single_node_ctlog.public_keys | length > 0 }}
 
 - name: Back-up changed ctlog public keys
   when: existing_keys.results | length > 0 and ctlog_public_keys_changed
   block:
-    - name: Identify keys that need back-up
+    - name: Identify public keys that need back-up
       ansible.builtin.set_fact:
         keys_to_backup: >-
           {{ existing_keys.results |
