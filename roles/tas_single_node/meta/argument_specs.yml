@@ -364,25 +364,25 @@ argument_specs:
             description: "details for kms configuration of rekor cli-server."
             type: "dict"
             options:
-                kms_resource:
-                  description: "Kms resource access"
-                  type: "str"
-                  required: false
-                  version_added: "1.2.0"
+              kms_resource:
+                description: "Kms resource access"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
           tink:
             description: "details for kms configuration of rekor cli-server."
             type: "dict"
             options:
-                tink_kek_uri:
-                  description: "Kms resource access"
-                  type: "str"
-                  required: false
-                  version_added: "1.2.0"
-                tink_keyset_path:
-                  description: "Kms resource access"
-                  type: "str"
-                  required: false
-                  version_added: "1.2.0"
+              tink_kek_uri:
+                description: "Kms resource access"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              tink_keyset_path:
+                description: "Kms resource access"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
           env:
             description: "Key resource used to access signer private key from AWS/GCP/Azure."
             type: "list"

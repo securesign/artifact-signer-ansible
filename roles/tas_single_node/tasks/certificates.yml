@@ -715,8 +715,6 @@
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_public_key: >
           {{ tas_single_node_remote_rekor_public_key + [tas_single_node_certs_dir ~'/rekor-pub-key' ~ key_num ~ '.pub']}}
-      
-
 
 - name: Create Rekor signing key
   when: >

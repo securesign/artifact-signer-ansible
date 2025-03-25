@@ -27,14 +27,14 @@
     - "{{ tas_single_node_remote_rekor_public_key }}"
   register: remote_rekor_keys
 
-- name: Create rekor Secret
+- name: Create Rekor Secret
   ansible.builtin.set_fact:
     rekor_secret_content: "{{ lookup('ansible.builtin.template', 'configs/certs-secret-template.j2') }}"
   vars:
     secret_name: rekor-secret
     secret_namespace: rekor-system
     keyname: [private, public]
-    keyIds: ['{{tas_single_node_rekor.private_keys}}','{{tas_single_node_rekor.public_keys}}']
+    keyids: ['{{ tas_single_node_rekor.private_keys }}', '{{ tas_single_node_rekor.public_keys }}']
     keylists: ['{{ tas_single_node_remote_rekor_private_key }}', '{{ tas_single_node_remote_rekor_public_key }}']
     slurpedcerts: '{{ remote_rekor_keys }}'
 
