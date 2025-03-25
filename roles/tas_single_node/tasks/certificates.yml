@@ -654,26 +654,29 @@
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
 - name: Create Custom Rekor Keys
-  when: (tas_single_node_rekor.public_keys | length > 0) and (tas_single_node_rekor.private_keys | length > 0) and tas_single_node_rekor.active_signer_type != 'kms'
+  when: tas_single_node_rekor.active_signer_type != 'kms' and (tas_single_node_rekor.private_keys | length >= 1) and (tas_single_node_rekor.public_keys | length >= 1)
   block:
     - name: Create Custom Rekor Private Keys
-      when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key[0]) | list | length == 0)
+      when: key_var.key != "" 
       changed_when: false
       ansible.builtin.copy:
-        content: "{{ key_var }}"
-        dest: "{{ tas_single_node_certs_dir }}/rekor-signer{{ key_num }}.key"
+        content: "{{ key_var.key }}"
+        dest: '{{ tas_single_node_certs_dir }}/rekor-signer{{ key_num }}.key'
         mode: '0600'
+        backup: true
       loop: '{{ tas_single_node_rekor.private_keys | list }}'
       loop_control:
         loop_var: key_var
         index_var: key_num
+      register: custom_rekor_private_keys
 
     - name: Reset rekor private key path
+      when: custom_rekor_private_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: []
 
     - name: Add Created Custom Keys
-      when: key_var != ""
+      when: key_var.key != "" and custom_rekor_private_keys is not skipped
       changed_when: false
       loop: '{{ tas_single_node_rekor.private_keys | list }}'
       loop_control:
@@ -681,26 +684,29 @@
         loop_var: key_var
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: >
-          {{ tas_single_node_remote_rekor_private_key + [tas_single_node_certs_dir ~'/rekor-signer' ~ key_num ~ '.key']}}  
+          {{ tas_single_node_remote_rekor_private_key + [tas_single_node_certs_dir ~'/rekor-signer' ~ key_num ~ '.key']}}
 
     - name: Create Custom Rekor Public Keys
-      when: key_var != "" and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_public_key[0]) | list | length == 0 )
+      when: key_var.key != ""
       changed_when: false
       ansible.builtin.copy:
-        content: "{{ key_var }}"
-        dest: "{{ tas_single_node_certs_dir }}/rekor-pub-key{{ key_num }}.pub"
+        content: "{{ key_var.key }}"
+        dest: '{{ tas_single_node_certs_dir }}/rekor-pub-key{{ key_num }}.pub'
         mode: '0600'
+        backup: true
       loop: '{{ tas_single_node_rekor.public_keys | list }}'
       loop_control:
         loop_var: key_var
         index_var: key_num
+      register: custom_rekor_pub_keys
 
     - name: Reset rekor public key path
+      when: custom_rekor_pub_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_public_key: []
 
     - name: Add Created Custom Keys
-      when: key_var != ""
+      when: key_var.key != "" and custom_rekor_pub_keys is not skipped
       changed_when: false
       loop: '{{ tas_single_node_rekor.public_keys | list }}'
       loop_control:
@@ -709,13 +715,13 @@
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_public_key: >
           {{ tas_single_node_remote_rekor_public_key + [tas_single_node_certs_dir ~'/rekor-pub-key' ~ key_num ~ '.pub']}}
+      
 
 
 - name: Create Rekor signing key
   when: >
-    ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key) | list | length) == 0
-    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_public_key) | list | length) == 0)
-    and ( tas_single_node_rekor.public_keys | length == 0 ) and (tas_single_node_rekor.private_keys | length == 0 )
+    ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key.0) | list | length) == 0
+    or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_public_key.0) | list | length) == 0)
     
   block:
     - name: Create Rekor private key
