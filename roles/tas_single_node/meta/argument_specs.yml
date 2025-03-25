@@ -355,6 +355,11 @@ argument_specs:
             type: "str"
             required: true
             version_added: "1.2.0"
+          active_signer_id:
+            description: "active logs signer type can be either file or kms"
+            type: "str"
+            required: true
+            version_added: "1.2.0"
           kms:
             description: "details for kms configuration of rekor cli-server."
             type: "dict"
