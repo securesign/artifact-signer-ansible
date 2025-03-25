@@ -658,6 +658,7 @@
     tas_single_node_rekor.active_signer_type != 'kms' and
     (tas_single_node_rekor.private_keys | length >= 1) and
     (tas_single_node_rekor.public_keys | length >= 1)
+  no_log: true
   block:
     - name: Create Custom Rekor Private Keys
       when: key_var.key != ""
