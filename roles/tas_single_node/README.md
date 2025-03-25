@@ -164,9 +164,30 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
+| active_signer_type | active logs signer type can be either file or kms | str | yes |  |
+| active_signer_id | active logs signer type can be either file or kms | str | yes |  |
+| kms | details for kms configuration of rekor cli-server. | dict of 'kms' options | no |  |
+| tink | details for kms configuration of rekor cli-server. | dict of 'tink' options | no |  |
+| env | Key resource used to access signer private key from AWS/GCP/Azure. | list of 'dict' | no |  |
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | no |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
+| private_keys | List of private keys for use within ctlog | list of 'str' | no |  |
+| public_keys | List of public keys for use within ctlog | list of 'str' | no |  |
+| sharding_config | Sharding configuration for rekor | list of '' | no |  |
+
+#### Options for main > tas_single_node_rekor > kms
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| kms_resource | Kms resource access | str | no |  |
+
+#### Options for main > tas_single_node_rekor > tink
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| tink_kek_uri | Kms resource access | str | no |  |
+| tink_keyset_path | Kms resource access | str | no |  |
 
 #### Options for main > tas_single_node_ctlog
 
