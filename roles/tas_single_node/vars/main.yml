@@ -203,6 +203,9 @@ tas_single_node_tsa_ntp_config_file: "{{ tas_single_node_config_dir }}/{{ tas_si
 # NOTE: Do not change this value, it's referred to from docs
 tas_single_node_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_cert_chain_filename }}"
 
+# Certificate Transparency Log provided Root Marker
+tas_single_node_ctlog_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_ctlog_use_provided_root"
+
 # Secrets,Certs and Configuration names
 tas_single_node_trillian_trusted_ca_configmap_name: "trillian-trusted-ca"
 
