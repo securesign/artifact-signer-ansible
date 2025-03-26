@@ -11,4 +11,10 @@ data:
       treeLength: {{ tree.treeLength }}
       signingConfig: {{ tree.signingConfig}}
       signer: {{ tree.signer }}
+{% if tree.pemPubKey is defined %}
+      pemPubKey: {{ tree.pemPubKey }}
+{% endif %}
+{% if tree.logID is defined %}
+      logID: {{ tree.logID }}
+{% endif %}
 {% endfor %}
