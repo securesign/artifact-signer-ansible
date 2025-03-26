@@ -799,7 +799,6 @@
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: >
           {{ tas_single_node_remote_rekor_private_key + [tas_single_node_certs_dir ~'/rekor-signer' ~ key_num ~ '.key']}}
-    
     # Clean-up extra rekor private keys.
     # If tas_single_node_rekor.private_keys shrinks, remove outdated keys.
     # Example: If initial keys were [rekor-signer0, rekor-signer1] and rekor-signer0 is removed,
