@@ -653,6 +653,110 @@
           -passin 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
 
+# Back-up rekor private keys
+- name: Get existing rekor private keys
+  block:
+    - name: Find existing rekor private key files
+      ansible.builtin.find:
+        paths: "{{ tas_single_node_certs_dir }}"
+        patterns: "rekor-signer*.key"
+      register: existing_rekor_keys
+
+    - name: Read existing rekor private key files
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ existing_rekor_keys.files }}"
+      register: existing_keys
+
+- name: Set rekor_private_keys_changed
+  ansible.builtin.set_fact:
+    rekor_private_keys_changed: >-
+      {{ (existing_keys.results | length != tas_single_node_rekor.private_keys | length
+      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_rekor.private_keys)
+      and (tas_single_node_rekor.private_keys | length > 0
+        or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_rekor_use_provided_root') | list | length != 0)) }}
+
+- name: Back-up changed rekor private keys
+  when: existing_keys.results | length > 0 and rekor_private_keys_changed
+  block:
+    - name: Identify private keys that need back-up
+      ansible.builtin.set_fact:
+        keys_to_backup: >-
+          {{ existing_keys.results |
+            selectattr('content', 'defined') |
+            map(attribute='content') |
+            map('b64decode') |
+            zip(existing_keys.results | map(attribute='source')) |
+            rejectattr(0, 'in', tas_single_node_rekor.private_keys) |
+            map(attribute=1) |
+            list }}
+
+    - name: Back-up old rekor private keys
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item + '.' + ansible_date_time.iso8601_basic }}"
+        remote_src: true
+        mode: '0600'
+      loop: "{{ keys_to_backup }}"
+
+    - name: Clean-up old rekor private keys
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ keys_to_backup }}"
+
+# Back-up rekor public keys
+- name: Get existing rekor public keys
+  block:
+    - name: Find existing rekor public key files
+      ansible.builtin.find:
+        paths: "{{ tas_single_node_certs_dir }}"
+        patterns: "rekor-pub-key*.pub"
+      register: existing_rekor_keys
+
+    - name: Read existing rekor public key files
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ existing_rekor_keys.files }}"
+      register: existing_keys
+
+- name: Set ctlog_public_keys_changed
+  ansible.builtin.set_fact:
+    rekor_public_keys_changed: >-
+      {{ (existing_keys.results | length != tas_single_node_rekor.public_keys | length
+      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_rekor.public_keys)
+      and (tas_single_node_ctlog.public_keys | length > 0
+        or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_rekor_use_provided_root') | list | length != 0)) }}
+
+- name: Back-up changed rekor public keys
+  when: existing_keys.results | length > 0 and rekor_public_keys_changed
+  block:
+    - name: Identify public keys that need back-up
+      ansible.builtin.set_fact:
+        keys_to_backup: >-
+          {{ existing_keys.results |
+            selectattr('content', 'defined') |
+            map(attribute='content') |
+            map('b64decode') |
+            zip(existing_keys.results | map(attribute='source')) |
+            rejectattr(0, 'in', tas_single_node_ctlog.public_keys) |
+            map(attribute=1) |
+            list }}
+
+    - name: Back-up old rekor public keys
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item + '.' + ansible_date_time.iso8601_basic }}"
+        remote_src: true
+        mode: '0600'
+      loop: "{{ keys_to_backup }}"
+
+    - name: Clean-up old rekor public keys
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ keys_to_backup }}"
+
 - name: Create Custom Rekor Keys
   when: >
     tas_single_node_rekor.active_signer_type != 'kms' and
@@ -660,14 +764,20 @@
     (tas_single_node_rekor.public_keys | length >= 1)
   no_log: true
   block:
+    - name: Create marker file if keys are provided by the user
+      ansible.builtin.file:
+        path: "{{ tas_single_node_certs_dir }}/_rekor_use_provided_root"
+        state: touch
+        mode: '0644'
+      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_rekor_use_provided_root') | list | length == 0
+
     - name: Create Custom Rekor Private Keys
-      when: key_var.key != ""
+      when: rekor_private_keys_changed
       changed_when: false
       ansible.builtin.copy:
         content: "{{ key_var.key }}"
         dest: '{{ tas_single_node_certs_dir }}/rekor-signer{{ key_num }}.key'
         mode: '0600'
-        backup: true
       loop: '{{ tas_single_node_rekor.private_keys | list }}'
       loop_control:
         loop_var: key_var
@@ -689,15 +799,37 @@
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: >
           {{ tas_single_node_remote_rekor_private_key + [tas_single_node_certs_dir ~'/rekor-signer' ~ key_num ~ '.key']}}
+    
+    # Clean-up extra rekor private keys.
+    # If tas_single_node_rekor.private_keys shrinks, remove outdated keys.
+    # Example: If initial keys were [rekor-signer0, rekor-signer1] and rekor-signer0 is removed,
+    # rekor-signer0 is backed up, rekor-signer1 becomes the new rekor-signer0, and old rekor-signer1 is deleted.
+    - name: Find all existing rekor private key files
+      ansible.builtin.find:
+        paths: "{{ tas_single_node_certs_dir }}"
+        patterns: "rekor-signer*.key"
+      register: remaining_rekor_keys
+
+    - name: Identify extra rekor private keys to remove
+      ansible.builtin.set_fact:
+        extra_keys_to_remove: >-
+          {{ remaining_rekor_keys.files |
+             map(attribute='path') |
+             difference(tas_single_node_remote_rekor_private_key) }}
+    - name: Remove extra rekor private keys
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ extra_keys_to_remove }}"
+      when: extra_keys_to_remove | length > 0
 
     - name: Create Custom Rekor Public Keys
-      when: key_var.key != ""
+      when: rekor_public_keys_changed
       changed_when: false
       ansible.builtin.copy:
         content: "{{ key_var.key }}"
         dest: '{{ tas_single_node_certs_dir }}/rekor-pub-key{{ key_num }}.pub'
         mode: '0600'
-        backup: true
       loop: '{{ tas_single_node_rekor.public_keys | list }}'
       loop_control:
         loop_var: key_var
@@ -720,12 +852,43 @@
         tas_single_node_remote_rekor_public_key: >
           {{ tas_single_node_remote_rekor_public_key + [tas_single_node_certs_dir ~'/rekor-pub-key' ~ key_num ~ '.pub']}}
 
+    # Clean-up extra rekor public keys.
+    - name: Find all existing rekor public key files
+      ansible.builtin.find:
+        paths: "{{ tas_single_node_certs_dir }}"
+        patterns: "rekor-pub-key*.pub"
+      register: remaining_rekor_keys
+
+    - name: Identify extra rekor public keys to remove
+      ansible.builtin.set_fact:
+        extra_keys_to_remove: >-
+          {{ remaining_rekor_keys.files |
+             map(attribute='path') |
+             difference(tas_single_node_remote_rekor_public_key) }}
+    - name: Remove extra rekor public keys
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ extra_keys_to_remove }}"
+      when: extra_keys_to_remove | length > 0
+
+- name: Refresh list of files in certs directory
+  ansible.builtin.find:
+    file_type: file
+    paths: "{{ tas_single_node_certs_dir }}"
+  register: certs_dir_files
+
 - name: Create Rekor signing key
   when: >
     ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_private_key.0) | list | length) == 0
     or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_rekor_public_key.0) | list | length) == 0)
 
   block:
+    - name: Remove marker file if no keys are provided by the user
+      ansible.builtin.file:
+        path: "{{ tas_single_node_certs_dir }}/_rekor_use_provided_root"
+        state: absent
+      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_rekor_use_provided_root') | list | length != 0
     - name: Create Rekor private key
       ansible.builtin.shell:
         cmd: >-
