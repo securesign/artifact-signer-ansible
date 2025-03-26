@@ -422,7 +422,7 @@
       {{ (existing_keys.results | length != tas_single_node_ctlog.private_keys | length
       or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.private_keys)
       and (tas_single_node_ctlog.private_keys | length > 0
-        or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_ctlog_use_provided_root') | list | length != 0)) }}
+        or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_ctlog_use_provided_root_marker_file) | list | length != 0)) }}
 
 - name: Back-up changed ctlog private keys
   when: existing_keys.results | length > 0 and ctlog_private_keys_changed
@@ -474,7 +474,7 @@
       {{ (existing_keys.results | length != tas_single_node_ctlog.public_keys | length
       or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.public_keys)
       and (tas_single_node_ctlog.public_keys | length > 0
-        or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_ctlog_use_provided_root') | list | length != 0)) }}
+        or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_ctlog_use_provided_root_marker_file) | list | length != 0)) }}
 
 - name: Back-up changed ctlog public keys
   when: existing_keys.results | length > 0 and ctlog_public_keys_changed
@@ -512,10 +512,10 @@
   block:
     - name: Create marker file if keys are provided by the user
       ansible.builtin.file:
-        path: "{{ tas_single_node_certs_dir }}/_ctlog_use_provided_root"
+        path: "{{ tas_single_node_ctlog_use_provided_root_marker_file }}"
         state: touch
         mode: '0644'
-      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_ctlog_use_provided_root') | list | length == 0
+      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_ctlog_use_provided_root_marker_file) | list | length == 0
 
     - name: Create custom ctlog private keys
       when: ctlog_private_keys_changed
@@ -630,9 +630,9 @@
   block:
     - name: Remove marker file if no keys are provided by the user
       ansible.builtin.file:
-        path: "{{ tas_single_node_certs_dir }}/_ctlog_use_provided_root"
+        path: "{{ tas_single_node_ctlog_use_provided_root_marker_file }}"
         state: absent
-      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_certs_dir + '/_ctlog_use_provided_root') | list | length != 0
+      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_ctlog_use_provided_root_marker_file) | list | length != 0
 
     - name: Create ctlog private key
       ansible.builtin.shell:
