@@ -968,7 +968,6 @@
             - "{{ tas_single_node_tsa_signer_private_key }}"
             - "{{ tas_single_node_remote_tsa_private_key }}"
             - "{{ tas_single_node_remote_tsa_leaf_certificate }}"
-
     - name: Refresh list of files in certs directory
       ansible.builtin.find:
         file_type: file
