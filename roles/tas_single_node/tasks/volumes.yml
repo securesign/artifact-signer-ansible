@@ -23,7 +23,7 @@
     label: "{{ item }}"
 
 - name: Create volume if it does not exist
-  ansible.builtin.command: podman volume create {{ tas_single_node_podman_volume_create_extra_args }} {{ item }}
+  ansible.builtin.command: podman volume create {{ lookup('vars', 'tas_single_node_' + item | replace('-', '_') + '_create_args', default='') }} {{ item }}
   changed_when: false
   when: volume_check.results | selectattr('item', 'equalto', item) | map(attribute='stdout') | first == ""
   loop: "{{ volume_list }}"

@@ -772,10 +772,56 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.2.0"
-      tas_single_node_podman_volume_create_extra_args:
+      tas_single_node_rekor_server_create_args:
         description: >
-          Additional arguments to pass to the `podman volume create` command.
-          This can be used to specify extra options when creating Podman volumes.
+          Additional arguments to pass to the `podman volume create` command
+          specifically for the "rekor-server" volume. This can be used to
+          customize the options when creating the "rekor-server" volume.
+        type: "str"
+        required: false
+        version_added: "1.2.0"
+        default: ""
+      tas_single_node_trillian_mysql_create_args:
+        description: >
+          Additional arguments to pass to the `podman volume create` command
+          specifically for the "trillian-mysql" volume. This can be used to
+          customize the options when creating the "trillian-mysql" volume.
+        type: "str"
+        required: false
+        version_added: "1.2.0"
+        default: ""
+      tas_single_node_rekor_redis_storage_create_args:
+        description: >
+          Additional arguments to pass to the `podman volume create` command
+          specifically for the "rekor-redis-storage" volume. This can be used to
+          customize the options when creating the "rekor-redis-storage" volume.
+        type: "str"
+        required: false
+        version_added: "1.2.0"
+        default: ""
+      tas_single_node_redis_backfill_storage_create_args:
+        description: >
+          Additional arguments to pass to the `podman volume create` command
+          specifically for the "redis-backfill-storage" volume. This can be used to
+          customize the options when creating the "redis-backfill-storage" volume.
+        type: "str"
+        required: false
+        version_added: "1.2.0"
+        default: ""
+      tas_single_node_tuf_repository_create_args:
+        description: >
+          Additional arguments to pass to the `podman volume create` command
+          specifically for the "tuf-repository" volume. This can be used to
+          customize the options when creating the "tuf-repository" volume.
+        type: "str"
+        required: false
+        version_added: "1.2.0"
+        default: ""
+      tas_single_node_tuf_signing_keys_create_args:
+        description: >
+          Additional arguments to pass to the `podman volume create` command
+          specifically for the "tuf-signing-keys" volume. This can be used to
+          customize the options when creating the "tuf-signing-keys" volume.
         type: "str"
         required: false
         version_added: "1.2.0"
