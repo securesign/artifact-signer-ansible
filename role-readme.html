@@ -210,9 +210,9 @@
 </tr>
 <tr>
 <td>tas_single_node_podman_volume_create_extra_args</td>
-<td>Additional arguments to pass to the <code>podman volume create</code> command. This can be used to specify extra options when creating Podman volumes.</td>
-<td>str</td>
-<td></td>
+<td>A dictionary of additional arguments to pass to the <code>podman volume create</code> command for each volume. This allows customization of options when creating specific volumes. Each key in the dictionary corresponds to a volume name with hyphens replaced by underscores.</td>
+<td>dict of 'tas_single_node_podman_volume_create_extra_args' options</td>
+<td><code>{'trillian_mysql': '', 'rekor_redis_storage': '', 'redis_backfill_storage': '', 'rekor_server': '', 'tuf_repository': '', 'tuf_signing_keys': ''}</code></td>
 </tr>
 <tr>
 <td>tas_single_node_trust_root</td>
@@ -1328,6 +1328,62 @@
 <tr>
 <td>password</td>
 <td>Password for the cockpit user.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_podman_volume_create_extra_args</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>trillian_mysql</td>
+<td>Additional arguments to pass when creating the "trillian-mysql" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>rekor_redis_storage</td>
+<td>Additional arguments to pass when creating the "rekor-redis-storage" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>redis_backfill_storage</td>
+<td>Additional arguments to pass when creating the "redis-backfill-storage" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>rekor_server</td>
+<td>Additional arguments to pass when creating the "rekor-server" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tuf_repository</td>
+<td>Additional arguments to pass when creating the "tuf-repository" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tuf_signing_keys</td>
+<td>Additional arguments to pass when creating the "tuf-signing-keys" volume.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
