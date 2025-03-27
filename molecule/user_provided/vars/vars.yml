@@ -61,18 +61,6 @@ tas_single_node_rekor:
   public_key_delay: 10
   active_signer_type: file
   active_signer_id: rekor-private-key1
-  env:
-    - name: AWS_ACCESS_KEY_ID
-      value: ""
-    - name: AWS_SECRET_ACCESS_KEY 
-      value: ""
-    - name: AWS_REGION
-      value: ""
-  kms:
-    kms_resource: ""
-  tink:
-    tink_kek_uri: ""
-    tink_keyset_path: ""
   private_keys: 
     - id: "rekor-private-key1"
       key: |
