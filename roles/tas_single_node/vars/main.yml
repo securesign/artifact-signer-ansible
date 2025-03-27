@@ -196,12 +196,13 @@ tas_single_node_tuf_repository_volume_name: "tuf-repository"
 tas_single_node_tuf_signing_keys_volume_name: "tuf-signing-keys"
 
 # Volumes create options
-tas_single_node_rekor_server_create_args: ""
-tas_single_node_trillian_mysql_create_args: ""
-tas_single_node_rekor_redis_storage_create_args: ""
-tas_single_node_redis_backfill_storage_create_args: ""
-tas_single_node_tuf_repository_create_args: ""
-tas_single_node_tuf_signing_keys_create_args: ""
+tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: ""
+  rekor_redis_storage: ""
+  redis_backfill_storage: ""
+  rekor_server: ""
+  tuf_repository: ""
+  tuf_signing_keys: ""
 
 # Timestamp Authority Config
 tas_single_node_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
