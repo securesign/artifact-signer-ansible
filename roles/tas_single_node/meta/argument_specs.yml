@@ -351,40 +351,40 @@ argument_specs:
         version_added: "1.2.0"
         options:
           active_signer_type:
-            description: "active logs signer type can be either file or kms"
+            description: "Active logs signer type can be either file, KMS or tink"
             type: "str"
             required: true
             version_added: "1.2.0"
           active_signer_id:
-            description: "active logs signer type can be either file or kms"
+            description: "Active logs signer type can be either file or KMS"
             type: "str"
             required: true
             version_added: "1.2.0"
           kms:
-            description: "details for kms configuration of rekor cli-server."
+            description: "Details for KMS configuration of rekor cli-server."
             type: "dict"
             options:
               kms_resource:
-                description: "Kms resource access"
+                description: "KMS resource access"
                 type: "str"
                 required: false
                 version_added: "1.2.0"
           tink:
-            description: "details for kms configuration of rekor cli-server."
+            description: "Details for tink configuration within rekor-server."
             type: "dict"
             options:
               tink_kek_uri:
-                description: "Kms resource access"
+                description: "URI for tink resource."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               tink_keyset_path:
-                description: "Kms resource access"
+                description: "Keyset to be unencrypted by tink."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
           env:
-            description: "Key resource used to access signer private key from AWS/GCP/Azure."
+            description: "Env vars to be specified to access AWS/ Cloud keys."
             type: "list"
             elements: "dict"
             required: false
@@ -405,13 +405,13 @@ argument_specs:
             required: false
             version_added: "1.1.0"
           private_keys:
-            description: "List of private keys for use within ctlog"
+            description: "List of private keys for use within rekor."
             type: "list"
             elements: "str"
             required: false
             version_added: "1.2.0"
           public_keys:
-            description: "List of public keys for use within ctlog"
+            description: "List of public keys for use within rekor."
             type: "list"
             elements: "str"
             required: false

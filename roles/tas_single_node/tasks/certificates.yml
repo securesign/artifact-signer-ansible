@@ -761,7 +761,7 @@
         state: absent
       loop: "{{ keys_to_backup }}"
 
-- name: Create Custom Rekor Keys
+- name: Create Custom Rekor Key files
   when: >
     tas_single_node_rekor.active_signer_type != 'kms' and
     (tas_single_node_rekor.private_keys | length >= 1) and
