@@ -195,6 +195,15 @@ tas_single_node_systemd_directory: /etc/systemd/system
 tas_single_node_tuf_repository_volume_name: "tuf-repository"
 tas_single_node_tuf_signing_keys_volume_name: "tuf-signing-keys"
 
+# Volumes create options
+tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: ""
+  rekor_redis_storage: ""
+  redis_backfill_storage: ""
+  rekor_server: ""
+  tuf_repository: ""
+  tuf_signing_keys: ""
+
 # Timestamp Authority Config
 tas_single_node_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
 tas_single_node_remote_tsa_leaf_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_leaf_certificate_filename }}"

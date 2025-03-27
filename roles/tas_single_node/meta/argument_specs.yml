@@ -774,12 +774,57 @@ argument_specs:
                 version_added: "1.2.0"
       tas_single_node_podman_volume_create_extra_args:
         description: >
-          Additional arguments to pass to the `podman volume create` command.
-          This can be used to specify extra options when creating Podman volumes.
-        type: "str"
+          A dictionary of additional arguments to pass to the `podman volume create`
+          command for each volume. This allows customization of options when creating
+          specific volumes. Each key in the dictionary corresponds to a volume name
+          with hyphens replaced by underscores.
+        type: "dict"
         required: false
         version_added: "1.2.0"
-        default: ""
+        default:
+          trillian_mysql: ""
+          rekor_redis_storage: ""
+          redis_backfill_storage: ""
+          rekor_server: ""
+          tuf_repository: ""
+          tuf_signing_keys: ""
+        options:
+          trillian_mysql:
+            description: >
+              Additional arguments to pass when creating the "trillian-mysql" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          rekor_redis_storage:
+            description: >
+              Additional arguments to pass when creating the "rekor-redis-storage" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          redis_backfill_storage:
+            description: >
+              Additional arguments to pass when creating the "redis-backfill-storage" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          rekor_server:
+            description: >
+              Additional arguments to pass when creating the "rekor-server" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          tuf_repository:
+            description: >
+              Additional arguments to pass when creating the "tuf-repository" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          tuf_signing_keys:
+            description: >
+              Additional arguments to pass when creating the "tuf-signing-keys" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_trust_root:
         description: "Configuration options for the Trust Root."
         type: "dict"

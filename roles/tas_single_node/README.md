@@ -43,7 +43,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_search_image | Rekor search UI image | str |  `registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b`  |
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
-| tas_single_node_podman_volume_create_extra_args | Additional arguments to pass to the `podman volume create` command. This can be used to specify extra options when creating Podman volumes. | str |  |
+| tas_single_node_podman_volume_create_extra_args | A dictionary of additional arguments to pass to the `podman volume create` command for each volume. This allows customization of options when creating specific volumes. Each key in the dictionary corresponds to a volume name with hyphens replaced by underscores. | dict of 'tas_single_node_podman_volume_create_extra_args' options |  `{'trillian_mysql': '', 'rekor_redis_storage': '', 'redis_backfill_storage': '', 'rekor_server': '', 'tuf_repository': '', 'tuf_signing_keys': ''}`  |
 | tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
 | tas_single_node_backup_restore | Configuration options for the Backup and Restore of Trusted Artifact Signer. | dict of 'tas_single_node_backup_restore' options |  `{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}`  |
 
@@ -270,6 +270,17 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | create | Whether or not to create the cockpit user. | bool | no |  |
 | username | Username for the cockpit user. | str | no |  |
 | password | Password for the cockpit user. | str | no |  |
+
+#### Options for main > tas_single_node_podman_volume_create_extra_args
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| trillian_mysql | Additional arguments to pass when creating the "trillian-mysql" volume. | str | no |  |
+| rekor_redis_storage | Additional arguments to pass when creating the "rekor-redis-storage" volume. | str | no |  |
+| redis_backfill_storage | Additional arguments to pass when creating the "redis-backfill-storage" volume. | str | no |  |
+| rekor_server | Additional arguments to pass when creating the "rekor-server" volume. | str | no |  |
+| tuf_repository | Additional arguments to pass when creating the "tuf-repository" volume. | str | no |  |
+| tuf_signing_keys | Additional arguments to pass when creating the "tuf-signing-keys" volume. | str | no |  |
 
 #### Options for main > tas_single_node_trust_root
 
