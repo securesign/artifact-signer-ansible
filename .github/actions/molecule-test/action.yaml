@@ -39,7 +39,7 @@ runs:
         echo "$AWS_SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
 
-    - name: Run molecule converge
+    - name: Run molecule test
       shell: bash
       run: |
         source venv/bin/activate
