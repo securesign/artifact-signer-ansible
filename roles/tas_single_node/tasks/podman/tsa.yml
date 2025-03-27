@@ -8,19 +8,22 @@
 
 - name: Slurp TSA certs
   ansible.builtin.slurp:
-    src: "{{ item }}"
-  loop:
-    - "{{ tas_single_node_tsa_certificate_chain }}"
-    - "{{ tas_single_node_tsa_signer_private_key }}"
-  register: tsa_certs
+    src: "{{ tas_single_node_tsa_certificate_chain }}"
+  register: tsa_cert_chain
+
+- name: Slurp TSA private key (if applicable)
+  ansible.builtin.slurp:
+    src: "{{ tas_single_node_tsa_signer_private_key }}"
+  register: tsa_private_key
+  when: tas_single_node_tsa.signer_type == 'file'
 
 - name: Set TSA Secret data
   ansible.builtin.set_fact:
     secret_data:
       private_key.pem: |
-        {{ (tsa_certs.results | selectattr('source', 'equalto', tas_single_node_tsa_signer_private_key) | list | first).content }}
+        {{ tsa_private_key.content | default('') }}
       certificate-chain.pem: |
-        {{ (tsa_certs.results | selectattr('source', 'equalto', tas_single_node_tsa_certificate_chain) | list | first).content }}
+        {{ tsa_cert_chain.content }}
 
 - name: Add TSA secret password (if applicable)
   ansible.builtin.set_fact:
