@@ -20,12 +20,8 @@ _tas_single_node_rekor:
   active_signer_type: file
   active_signer_id: "private-0"
   env:
-  private_keys:
-    - id: ""
-      key: ""
-  public_keys:
-    - id: ""
-      key: ""
+  private_keys: []
+  public_keys: []
   sharding_config:
     - treeID:
       treeLength:
@@ -228,6 +224,7 @@ tas_single_node_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_s
 
 # Certificate Transparency Log provided Root Marker
 tas_single_node_ctlog_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_ctlog_use_provided_root"
+tas_single_node_rekor_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_rekor_use_provided_root"
 
 # Secrets,Certs and Configuration names
 tas_single_node_trillian_trusted_ca_configmap_name: "trillian-trusted-ca"
