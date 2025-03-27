@@ -27,15 +27,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install TAS using molecule converge
-        uses: ./.github/actions/molecule-converge
+      - name: Install TAS using molecule test
+        uses: ./.github/actions/molecule-test
         with:
           scenario: ${{ matrix.scenario }}
-
-      - name: Molecule verify
-        run: |
-          source venv/bin/activate
-          molecule -v verify --scenario-name ${{ matrix.scenario }}
 
       - name: Extract TAS IP address
         run: |
