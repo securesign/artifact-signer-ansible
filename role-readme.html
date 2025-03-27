@@ -739,35 +739,35 @@
 
 <tr>
 <td>active_signer_type</td>
-<td>active logs signer type can be either file or kms</td>
+<td>Active logs signer type can be either file, KMS or tink</td>
 <td>str</td>
 <td>yes</td>
 <td></td>
 </tr>
 <tr>
 <td>active_signer_id</td>
-<td>active logs signer type can be either file or kms</td>
+<td>Active logs signer type can be either file or KMS</td>
 <td>str</td>
 <td>yes</td>
 <td></td>
 </tr>
 <tr>
 <td>kms</td>
-<td>details for kms configuration of rekor cli-server.</td>
+<td>Details for KMS configuration of rekor cli-server.</td>
 <td>dict of 'kms' options</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
 <td>tink</td>
-<td>details for kms configuration of rekor cli-server.</td>
+<td>Details for tink configuration within rekor-server.</td>
 <td>dict of 'tink' options</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
 <td>env</td>
-<td>Key resource used to access signer private key from AWS/GCP/Azure.</td>
+<td>Env vars to be specified to access AWS/ Cloud keys.</td>
 <td>list of 'dict'</td>
 <td>no</td>
 <td></td>
@@ -795,14 +795,14 @@
 </tr>
 <tr>
 <td>private_keys</td>
-<td>List of private keys for use within ctlog</td>
+<td>List of private keys for use within rekor.</td>
 <td>list of 'str'</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
 <td>public_keys</td>
-<td>List of public keys for use within ctlog</td>
+<td>List of public keys for use within rekor.</td>
 <td>list of 'str'</td>
 <td>no</td>
 <td></td>
@@ -830,7 +830,7 @@
 
 <tr>
 <td>kms_resource</td>
-<td>Kms resource access</td>
+<td>KMS resource access</td>
 <td>str</td>
 <td>no</td>
 <td></td>
@@ -851,14 +851,14 @@
 
 <tr>
 <td>tink_kek_uri</td>
-<td>Kms resource access</td>
+<td>URI for tink resource.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
 <td>tink_keyset_path</td>
-<td>Kms resource access</td>
+<td>Keyset to be unencrypted by tink.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
