@@ -23,7 +23,6 @@ _tas_single_node_rekor:
   private_keys: []
   public_keys: []
 
-
 _tas_single_node_rekor_redis:
   database_deploy: true
   redis:
