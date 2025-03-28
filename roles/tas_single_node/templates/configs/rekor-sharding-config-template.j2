@@ -9,9 +9,10 @@ data:
 {% for tree in tas_single_node_rekor.sharding_config %}
 {% if tree.treeID is defined %}
     - treeID: {% if tree.treeID == None %}{{ trillian_tree_id }}{% else %}{{ tree.treeID }}{% endif %}
+    
 {% if tree.treeLength is defined %}
       treeLength: {{ tree.treeLength }}
-{% endfor %}
+{% endif %}
 {% if tree.signingConfig is defined %}
       signingConfig: {{ tree.signingConfig }}
 {% endif %}
