@@ -7,14 +7,10 @@ data:
   sharding-config.yaml: |
 {% for tree in tas_single_node_rekor.sharding_config %}
     - treeID: {% if tree.treeID == None %}{{ trillian_tree_id }}{% else %}{{ tree.treeID }}{% endif %}
-      
+{% if tree.treeLength is defined %}
       treeLength: {{ tree.treeLength }}
-      signingConfig: {{ tree.signingConfig}}
-      signer: {{ tree.signer }}
-{% if tree.pemPubKey is defined %}
-      pemPubKey: {{ tree.pemPubKey }}
-{% endif %}
-{% if tree.logID is defined %}
-      logID: {{ tree.logID }}
+{% endfor %}
+{% if tree.signingConfig is defined %}
+      signingConfig: {{ tree.signingConfig }}
 {% endif %}
 {% endfor %}
