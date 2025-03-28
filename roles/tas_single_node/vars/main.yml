@@ -24,9 +24,6 @@ _tas_single_node_rekor:
   public_keys: []
   sharding_config:
     - treeID:
-      treeLength:
-      signingConfig:
-      signer: "private-0"
 
 _tas_single_node_rekor_redis:
   database_deploy: true
