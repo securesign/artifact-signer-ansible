@@ -10,6 +10,53 @@ log_configs:{
                 path: "/ctfe-keys/{{ log.private_key }}"
                 password: "{{ log.password }}"
                 }}
-        ext_key_usages:"CodeSigning"  log_backend_name:"trillian"}
+        ext_key_usages: "CodeSigning"  
+        log_backend_name: "trillian"
+        {% if log.get('not_after_limit') -%}
+        not_after_limit: {{ log.not_after_limit | to_json | regex_replace('"([^"]+)":', '\\1:') | regex_replace('"(\d+)"', '\\1') }}
+        {% endif -%}
+        {% if log.get('public_key') -%}
+        public_key: {der:"{{ log.public_key }}"}
+        {% endif -%}
+        {% if log.get('override_handler_prefix') -%}
+        override_handler_prefix: "{{ log.override_handler_prefix }}"
+        {% endif -%}
+        {% if log.get('reject_expired') -%}
+        reject_expired: {{ log.reject_expired }}
+        {% endif -%}
+        {% if log.get('reject_unexpired') -%}
+        reject_unexpired: {{ log.reject_unexpired }}
+        {% endif -%}
+        {% if log.get('not_after_start') -%}
+        not_after_start: {{ log.not_after_start | to_json | regex_replace('"([^"]+)":', '\\1:') | regex_replace('"(\d+)"', '\\1') }}
+        {% endif -%}
+        {% if log.get('accept_only_ca') -%}
+        accept_only_ca: {{ log.accept_only_ca }}
+        {% endif -%}
+        {% if log.get('is_mirror') -%}
+        is_mirror: {{ log.is_mirror }}
+        {% endif -%}
+        {% if log.get('is_readonly') -%}
+        is_readonly: {{ log.is_readonly }}
+        {% endif -%}
+        {% if log.get('max_merge_delay_sec') -%}
+        max_merge_delay_sec: {{ log.max_merge_delay_sec }}
+        {% endif -%}
+        {% if log.get('expected_merge_delay_sec') -%}
+        expected_merge_delay_sec: {{ log.expected_merge_delay_sec }}
+        {% endif -%}
+        {% if log.get('frozen_sth') -%}
+        frozen_sth: {{ log.frozen_sth | to_json | regex_replace('"([^"]+)":', '\\1:') | regex_replace('"(\d+)"', '\\1') }}
+        {% endif -%}
+        {% if log.get('reject_extensions') -%}
+        reject_extensions: "{{ log.reject_extensions }}"
+        {% endif -%}
+        {% if log.get('ctfe_storage_connection_string') -%}
+        ctfe_storage_connection_string: "{{ log.ctfe_storage_connection_string }}"
+        {% endif -%}
+        {% if log.get('extra_data_issuance_chain_storage_backend') -%}
+        extra_data_issuance_chain_storage_backend: {{ log.extra_data_issuance_chain_storage_backend }}
+        {% endif -%}
+    }
 {% endfor %}
 }
