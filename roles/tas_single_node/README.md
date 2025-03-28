@@ -187,7 +187,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | password | Password for private key used by ctlog | str | no |  |
 | private_key | Name of the private key in the system | str | no |  |
 | override_handler_prefix | Overrides the handler prefix for this log | str | no |  |
-| public_key | Public key used for verification | str | no |  |
+| public_key | Public key used for verification (must be in DER format) | str | no |  |
 | reject_expired | Reject certificates that are expired | bool | no |  |
 | reject_unexpired | Reject certificates that are not expired | bool | no |  |
 | not_after_start | Starting timestamp for valid 'NotAfter' dates | dict of 'not_after_start' options | no |  |
