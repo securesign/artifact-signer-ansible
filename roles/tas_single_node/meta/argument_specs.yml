@@ -384,7 +384,7 @@ argument_specs:
                 required: false
                 version_added: "1.2.0"
           env:
-            description: "Env vars to be specified to access AWS/ Cloud keys."
+            description: "Env vars to be specified to access AWS Cloud keys."
             type: "list"
             elements: "dict"
             required: false

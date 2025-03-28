@@ -168,7 +168,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | active_signer_id | Active logs signer type can be either file or KMS | str | yes |  |
 | kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
 | tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
-| env | Env vars to be specified to access AWS/ Cloud keys. | list of 'dict' | no |  |
+| env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | no |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
