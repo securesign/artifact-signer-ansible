@@ -37,7 +37,7 @@
         name: tuf-secret
         namespace: tuf-system
       data:
-        ctfe-pubkey: |
+        ctfe0.pub: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ctlog_public_key.0) | list | first).content }}
         fulcio_v1.crt.pem: |
           {{ (remote_tuf_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | first).content }}

@@ -37,7 +37,7 @@ spec:
               --rekor-key /var/run/tuf-secrets/rekor-pubkey
 {% endif %}
 {% if tas_single_node_ctlog_enabled %}
-              --ctlog-key /var/run/tuf-secrets/ctfe-pubkey
+              --ctlog-key /var/run/tuf-secrets/ctfe0.pub
 {% endif %}
 {% if tas_single_node_fulcio_enabled %}
               --fulcio-cert /var/run/tuf-secrets/fulcio_v1.crt.pem
