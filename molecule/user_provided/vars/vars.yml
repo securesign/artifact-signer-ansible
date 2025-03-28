@@ -71,6 +71,3 @@ tas_single_node_rekor:
         {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}
   sharding_config:
   - treeID:
-    treeLength:
-    signingConfig:
-    signer: rekor-private-key1
