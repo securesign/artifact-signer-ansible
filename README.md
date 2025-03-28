@@ -2,12 +2,6 @@
 
 The purpose of this Ansible collection is to automate the deployment of the Red Hat Trusted Artifact Signer (RHTAS) service on Red Hat Enterprise Linux (RHEL).
 
-**IMPORTANT:**
-Deploying RHTAS by using Ansible is a Technology Preview feature only.
-Technology Preview features are not supported with Red Hat production service level agreements (SLAs), might not be functionally complete, and Red Hat does not recommend to use them for production.
-These features gives early access to upcoming product features, enabling customers to test functionality and gives feedback during the development process.
-See the support scope for [Red Hat Technology Preview](https://access.redhat.com/support/offerings/techpreview/) features for more details.
-
 ## Description
 
 The RHTAS service is the downstream redistribution of the [Sigstore](https://sigstore.dev) project.
@@ -46,12 +40,12 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 * Python 3.9.0 or greater
 * RHEL x86\_64 9.4 or greater.
 * All client nodes using `cosign`, `gitsign`, and `ec` need the following:
-  * Command-line access to the node with a user that has `sudo` privileges.
-  * Updated DNS records or `/etc/hosts` entries with the ingress host names and IP addresses.
+    * Command-line access to the node with a user that has `sudo` privileges.
+    * Updated DNS records or `/etc/hosts` entries with the ingress host names and IP addresses.
 * Installation and configuration of Ansible on a control node to perform the automation.
 * Installation of the Ansible collections on the control node.
-  * If installing from the Ansible Automation Hub, then run `ansible-galaxy install redhat.artifact_signer`.
-  * If installing from this Git repository, then clone it locally, and run `ansible-galaxy collection install -r requirements.yml`.
+    * If installing from the Ansible Automation Hub, then run `ansible-galaxy install redhat.artifact_signer`.
+    * If installing from this Git repository, then clone it locally, and run `ansible-galaxy collection install -r requirements.yml`.
 * An OpenID Connect (OIDC) provider, such as [Keycloak](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/sso/).
 * The ability to resolve the ingress host names, by using the Domain Name System (DNS) or the `/etc/hosts` file.
 * Optional:
