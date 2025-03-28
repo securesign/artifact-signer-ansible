@@ -4,47 +4,45 @@
   vars:
     tas_single_node_treeid_config: "{{ tas_single_node_rekor_treeid_config }}"
 
-- name: Create Rekor Sharding ConfigMap
+
+- name: Load rekor sharding content
+  block:
+    - name: Generate Rekor Sharding Config
+      when: tas_single_node_rekor.sharding_config != ""
+      ansible.builtin.set_fact:
+        rekor_sharding_content: "{{ lookup('ansible.builtin.template', 'configs/rekor-sharding-config-template.j2') }}"
+
+- name: Create Rekor Sharding Config
   ansible.builtin.copy:
-    content: "{{ configmap_content | to_nice_yaml(indent=2) }}"
+    content: "{{ rekor_sharding_content }}"
     dest: "{{ tas_single_node_rekor_server_config }}"
     mode: "0600"
-  vars:
-    configmap_content:
-      kind: ConfigMap
-      apiVersion: v1
-      metadata:
-        name: rekor-server-config
-        namespace: rekor-system
-      data:
-        sharding-config.yaml: ""
   register: configmap_result
 
 - name: Slurp Rekor keys
   ansible.builtin.slurp:
     src: "{{ item }}"
-  loop:
+  with_items:
     - "{{ tas_single_node_remote_rekor_private_key }}"
     - "{{ tas_single_node_remote_rekor_public_key }}"
   register: remote_rekor_keys
 
-- name: Create Rekor secret
+- name: Create Rekor Secret
+  ansible.builtin.set_fact:
+    rekor_secret_content: "{{ lookup('ansible.builtin.template', 'configs/certs-secret-template.j2') }}"
+  vars:
+    secret_name: rekor-secret
+    secret_namespace: rekor-system
+    keyname: [private, public]
+    keyids: ['{{ tas_single_node_rekor.private_keys }}', '{{ tas_single_node_rekor.public_keys }}']
+    keylists: ['{{ tas_single_node_remote_rekor_private_key }}', '{{ tas_single_node_remote_rekor_public_key }}']
+    slurpedcerts: '{{ remote_rekor_keys }}'
+
+- name: Create Custom rekor Secret
   ansible.builtin.copy:
-    content: "{{ secret_content | to_nice_yaml(indent=2) }}"
+    content: "{{ rekor_secret_content }}"
     dest: "{{ tas_single_node_rekor_secret }}"
     mode: "0600"
-  vars:
-    secret_content:
-      kind: Secret
-      apiVersion: v1
-      metadata:
-        name: rekor-secret
-        namespace: rekor-system
-      data:
-        private: |
-          {{ (remote_rekor_keys.results | selectattr('source', 'equalto', tas_single_node_remote_rekor_private_key) | list | first).content }}
-        public: |
-          {{ (remote_rekor_keys.results | selectattr('source', 'equalto', tas_single_node_remote_rekor_public_key) | list | first).content }}
   register: secret_result
 
 - name: Deploy Rekor Redis Pod

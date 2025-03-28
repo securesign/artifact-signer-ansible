@@ -25,6 +25,13 @@ spec:
     spec:
       containers:
         - name: rekor-server
+{% if tas_single_node_rekor.active_signer_type == 'kms' or tas_single_node_rekor.active_signer_type == 'tink'%}
+          env:
+{% for var in tas_single_node_rekor.env %}
+          - name: {{ var.name }}
+            value: {{ var.value }}
+{% endfor %}
+{% endif %}
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -56,9 +63,16 @@ spec:
             - --redis_server.password={{ tas_single_node_rekor_redis.redis.password }}
 {% endif %}
             - --rekor_server.address=0.0.0.0
-{% if tas_single_node_rekor_signer_type == "file" %}
-            - --rekor_server.signer=/rekor-keys/private
+{% if tas_single_node_rekor.active_signer_type == "file" %}
+            - --rekor_server.signer=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
             - --rekor_server.signer-passwd={{ tas_single_node_rekor.ca_passphrase }}
+{% endif %}
+{% if tas_single_node_rekor.active_signer_type == "kms" %}
+            - --rekor_server.signer=awskms:///{{ tas_single_node_rekor.kms.kms_resource }}
+{% endif %}
+{% if tas_single_node_rekor.active_signer_type == "tink" %}
+            - --rekor_server.tink_kek_uri=aws-kms:///{{ tas_single_node_rekor.tink.tink_kek_uri }}
+            - --rekor_server.tink_keyset_path=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
 {% endif %}
             - --enable_retrieve_api=true
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}

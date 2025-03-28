@@ -350,6 +350,45 @@ argument_specs:
         required: false
         version_added: "1.2.0"
         options:
+          active_signer_type:
+            description: "Active logs signer type can be either file, KMS or tink"
+            type: "str"
+            required: true
+            version_added: "1.2.0"
+          active_signer_id:
+            description: "Active logs signer type can be either file or KMS"
+            type: "str"
+            required: true
+            version_added: "1.2.0"
+          kms:
+            description: "Details for KMS configuration of rekor cli-server."
+            type: "dict"
+            options:
+              kms_resource:
+                description: "KMS resource access"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          tink:
+            description: "Details for tink configuration within rekor-server."
+            type: "dict"
+            options:
+              tink_kek_uri:
+                description: "URI for tink resource."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              tink_keyset_path:
+                description: "Keyset to be unencrypted by tink."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          env:
+            description: "Env vars to be specified to access AWS Cloud keys."
+            type: "list"
+            elements: "dict"
+            required: false
+            version_added: "1.2.0"
           ca_passphrase:
             description: "Passphrase used for Certificate Authority cert."
             type: "str"
@@ -365,6 +404,23 @@ argument_specs:
             type: "int"
             required: false
             version_added: "1.1.0"
+          private_keys:
+            description: "List of private keys for use within rekor."
+            type: "list"
+            elements: "str"
+            required: false
+            version_added: "1.2.0"
+          public_keys:
+            description: "List of public keys for use within rekor."
+            type: "list"
+            elements: "str"
+            required: false
+            version_added: "1.2.0"
+          sharding_config:
+            description: "Sharding configuration for rekor"
+            type: "list"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_setup_host_dns:
         description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"

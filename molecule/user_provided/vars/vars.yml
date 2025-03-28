@@ -43,10 +43,10 @@ tas_single_node_ctlog:
       private_key: "private-0"
   private_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.key') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.key') }}
   public_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
 
 tas_single_node_fulcio:
   private_key: |
@@ -54,3 +54,23 @@ tas_single_node_fulcio:
   root_ca: |
     {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.pem') }}
   ca_passphrase: password
+
+tas_single_node_rekor:
+  ca_passphrase: password
+  public_key_retries: 5
+  public_key_delay: 10
+  active_signer_type: file
+  active_signer_id: rekor-private-key1
+  private_keys: 
+    - id: "rekor-private-key1"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.key') }}
+  public_keys: 
+    - id: "rekor-public-key1"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}
+  sharding_config:
+  - treeID:
+    treeLength:
+    signingConfig:
+    signer: rekor-private-key1
