@@ -77,7 +77,7 @@ Use the following syntax to install version 1.1.0:
 **NOTE:** If you think you are experiencing a bug during installation, then open a GitHub [issue](https://github.com/securesign/artifact-signer-ansible/issues) for this project.
 
 ## Downloading CLI tools
-To Download tools to interact with the Trusted Artifact Signer service, you can go to `https://cli-server.<base_hostname>`, where `<base_hostname>` is your deployment's base hostname.
+To download the command-line tools for interacting with the Trusted Artifact Signer service, you can go to `https://cli-server.<base_hostname>`, where `<base_hostname>` is your deployment's base hostname.
 
 ## Verifying the deployment by signing a test container
 
@@ -310,7 +310,7 @@ You can open a support ticket for Red Hat Trusted Artifact Signer [here](https:/
 
 ## Release notes and Roadmap
 
-Release notes can be found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1.1/html/release_notes/index).
+You can read the latest release notes [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/release_notes/index).
 
 ## Related Information
 
