@@ -406,7 +406,7 @@ argument_specs:
             version_added: "1.1.0"
           private_keys:
             description: "List of private keys for use within rekor."
-            type: "dict"
+            type: "list"
             options:
               ID:
                 description: "Custom rekor secret ID."
@@ -422,7 +422,7 @@ argument_specs:
             version_added: "1.2.0"
           public_keys:
             description: "List of public keys for use within rekor."
-            type: "dict"
+            type: "list"
             options:
               ID:
                 description: "Custom rekor secret ID."

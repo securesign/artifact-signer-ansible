@@ -172,8 +172,8 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | no |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
-| private_keys | List of private keys for use within rekor. | dict of 'private_keys' options | no |  |
-| public_keys | List of public keys for use within rekor. | dict of 'public_keys' options | no |  |
+| private_keys | List of private keys for use within rekor. | list of '' | no |  |
+| public_keys | List of public keys for use within rekor. | list of '' | no |  |
 | sharding_config | Sharding configuration for rekor | dict of 'sharding_config' options | no |  |
 
 #### Options for main > tas_single_node_rekor > kms
