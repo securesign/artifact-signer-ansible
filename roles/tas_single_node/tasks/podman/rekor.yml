@@ -8,7 +8,6 @@
 - name: Load rekor sharding content
   block:
     - name: Generate Rekor Sharding Config
-      when: tas_single_node_rekor.sharding_config != ""
       ansible.builtin.set_fact:
         rekor_sharding_content: "{{ lookup('ansible.builtin.template', 'configs/rekor-sharding-config-template.j2') }}"
 

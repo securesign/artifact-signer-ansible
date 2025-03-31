@@ -165,16 +165,16 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | active_signer_type | Active logs signer type can be either file, KMS or tink | str | yes |  |
-| active_signer_id | Active logs signer type can be either file or KMS | str | yes |  |
+| active_signer_id | ID of the key name containing the active signer key for rekor to use. | str | yes |  |
 | kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
 | tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
 | env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | no |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
-| private_keys | List of private keys for use within rekor. | list of 'str' | no |  |
-| public_keys | List of public keys for use within rekor. | list of 'str' | no |  |
-| sharding_config | Sharding configuration for rekor | list of '' | no |  |
+| private_keys | List of private keys for use within rekor. | list of '' | no |  |
+| public_keys | List of public keys for use within rekor. | list of '' | no |  |
+| sharding_config | Sharding configuration for rekor | dict of 'sharding_config' options | no |  |
 
 #### Options for main > tas_single_node_rekor > kms
 
@@ -188,6 +188,28 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | tink_kek_uri | URI for tink resource. | str | no |  |
 | tink_keyset_path | Keyset to be unencrypted by tink. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > private_keys
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ID | Custom rekor secret ID. | str | no |  |
+| key | Custom Rekor Private key value. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > public_keys
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ID | Custom rekor secret ID. | str | no |  |
+| key | Custom Rekor Public key value. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > sharding_config
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| treeID | Sharding configuration treeID | int | no |  |
+| treeLength | Length of rekor tree. | str | no |  |
+| signingConfig | Signing Configuration or rekor shard. | str | no |  |
 
 #### Options for main > tas_single_node_ctlog
 
