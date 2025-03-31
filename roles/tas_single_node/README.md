@@ -165,7 +165,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | active_signer_type | Active logs signer type can be either file, KMS or tink | str | yes |  |
-| active_signer_id | Active logs signer type can be either file or KMS | str | yes |  |
+| active_signer_id | ID of the key name containing the active signer key for rekor to use. | str | yes |  |
 | kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
 | tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
 | env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
