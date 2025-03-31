@@ -406,19 +406,55 @@ argument_specs:
             version_added: "1.1.0"
           private_keys:
             description: "List of private keys for use within rekor."
-            type: "list"
-            elements: "str"
+            type: "dict"
+            options:
+              ID:
+                description: "Custom rekor secret ID."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              key:
+                description: "Custom Rekor Private key value."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
           public_keys:
             description: "List of public keys for use within rekor."
-            type: "list"
-            elements: "str"
+            type: "dict"
+            options:
+              ID:
+                description: "Custom rekor secret ID."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              key:
+                description: "Custom Rekor Public key value."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
           sharding_config:
             description: "Sharding configuration for rekor"
-            type: "list"
+            type: "dict"
+            options:
+              treeID:
+                description: "Sharding configuration treeID"
+                type: "int"
+                required: false
+                version_added: "1.2.0"
+              treeLength:
+                description: "Length of rekor tree."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              signingConfig:
+                description: "Signing Configuration or rekor shard."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
       tas_single_node_setup_host_dns:
