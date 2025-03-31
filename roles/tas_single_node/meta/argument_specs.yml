@@ -356,7 +356,7 @@ argument_specs:
             required: true
             version_added: "1.2.0"
           active_signer_id:
-            description: "Active logs signer type can be either file or KMS"
+            description: "ID of the key name containing the active signer key for rekor to use."
             type: "str"
             required: true
             version_added: "1.2.0"
