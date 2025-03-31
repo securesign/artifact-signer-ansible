@@ -1,6 +1,6 @@
 - name: Extract Basename from File
   ansible.builtin.set_fact:
-    restore_file: "{{ tas_single_node_backup_restore.restore.source | basename | regex_replace('.tar.gz.enc$', '') }}"
+    restore_file: "{{ tas_single_node_backup_restore.restore.source | basename | regex_replace('\\.(tar\\.gz|tgz)\\.enc$', '') }}"
 
 - name: Set tas_restore dir location
   ansible.builtin.set_fact:
@@ -15,15 +15,15 @@
 - name: Push Encrypted Backup Tarball to Remote Server
   ansible.builtin.copy:
     src: "{{ tas_single_node_backup_restore.restore.source }}"
-    dest: "{{ restore_dir }}/{{ restore_file }}.tar.gz.enc"
+    dest: "{{ restore_dir }}/{{ restore_file }}.tgz.enc"
     remote_src: false
     mode: "0600"
 
 - name: Decrypt Backup Tarball
   ansible.builtin.shell: |
     openssl enc -d -aes-256-cbc -salt -pbkdf2 -iter 600000 \
-    -in "{{ restore_file }}.tar.gz.enc" \
-    -out "{{ restore_file }}.tar.gz" \
+    -in "{{ restore_file }}.tgz.enc" \
+    -out "{{ restore_file }}.tgz" \
     -pass pass:"{{ tas_single_node_backup_restore.restore.passphrase }}"
   args:
     executable: /bin/bash
@@ -33,9 +33,22 @@
 
 - name: Extract Compressed Backup Tarball
   ansible.builtin.unarchive:
-    src: "{{ restore_dir }}/{{ restore_file }}.tar.gz"
+    src: "{{ restore_dir }}/{{ restore_file }}.tgz"
     dest: "{{ restore_dir }}/"
     remote_src: true
+
+# Extracted backup name might be different to tarball name, hence having to find it ourselves
+- name: Find Extracted Backup File
+  ansible.builtin.find:
+    paths: "{{ restore_dir }}"
+    file_type: any
+    patterns: "BACKUP*"
+  register: extracted_contents
+
+- name: Filter Files That Have No Extension
+  ansible.builtin.set_fact:
+    restore_file: "{{ extracted_contents.files | map(attribute='path') | select('search', '^[^.]+$') | list | first | basename }}"
+  when: extracted_contents.matched > 0
 
 - name: Restore Podman Volumes
   ansible.builtin.include_tasks: restore_volumes.yml
