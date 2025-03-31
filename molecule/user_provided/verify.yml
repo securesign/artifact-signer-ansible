@@ -55,6 +55,54 @@
           loop_control:
             label: "{{ item.msg }}"
 
+    - name: Verify Rekor config
+      block:
+        - name: Read Rekor config on molecule
+          ansible.builtin.slurp:
+            src: "{{ item.system_path }}"
+          register: rekor_configs
+          loop:
+            - { msg: "rekor0.key", system_path: "/etc/rhtas/certs/rekor-signer0.key" }
+            - { msg: "rekor0.pub", system_path: "/etc/rhtas/certs/rekor-pub-key0.pub" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+        - name: Assert that user-provided rekor keys were taken by TAS
+          ansible.builtin.assert:
+            that:
+              - "{{ item.test_content | b64encode == item.rekor_config['content'] }}"
+            fail_msg: "{{ item.msg }} was not taken by TAS"
+            success_msg: "{{ item.msg }} was taken by TAS"
+          loop:
+            - { msg: "rekor0.key", test_content: "{{ tas_single_node_rekor.private_keys[0].key }}", rekor_config: "{{ rekor_configs.results[0] }}" }
+            - { msg: "rekor0.pub", test_content: "{{ tas_single_node_rekor.public_keys[0].key }}", rekor_config: "{{ rekor_configs.results[1] }}" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+    - name: Verify TSA config
+      block:
+        - name: Read TSA config on molecule
+          ansible.builtin.slurp:
+            src: "{{ item.system_path }}"
+          register: tsa_configs
+          loop:
+            - { msg: "signer.pem", system_path: "/etc/rhtas/certs/tsa-signer-private-key.pem" }
+            - { msg: "certchain.pem", system_path: "/etc/rhtas/certs/tsa-cert-chain.pem" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+        - name: Assert that user-provided TSA keys were taken by TAS
+          ansible.builtin.assert:
+            that:
+              - "{{ item.test_content | b64encode == item.tsa_config['content'] }}"
+            fail_msg: "{{ item.msg }} was not taken by TAS"
+            success_msg: "{{ item.msg }} was taken by TAS"
+          loop:
+            - { msg: "signer.pem", test_content: "{{ tas_single_node_tsa.signer_private_key }}", tsa_config: "{{ tsa_configs.results[0] }}" }
+            - { msg: "certchain.pem", test_content: "{{ tas_single_node_tsa.certificate_chain }}", tsa_config: "{{ tsa_configs.results[1] }}" }
+          loop_control:
+            label: "{{ item.msg }}"
+
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml
