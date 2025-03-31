@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-# NOTE: this script requires BASE_HOSTNAME and KEYCLOAK_URL to be set
+# NOTE: this script requires BASE_HOSTNAME
 
 # extract the root certificate and make it trusted
 script_dir="$(dirname "$(readlink -f "$0")")"

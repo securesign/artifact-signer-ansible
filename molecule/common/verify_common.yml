@@ -48,7 +48,6 @@
     env:
       BASE_HOSTNAME: "{{ tas_single_node_base_hostname }}"
       EMAIL: "kilgore@kilgore.trout"
-      KEYCLOAK_URL: "https://{{ tas_single_node_oidc_issuers[0].url | urlsplit('hostname') }}"
       OIDC_ISSUER_URL: "http://dex-idp:5556/dex"
     # NOTE: we can't add hosts with the etc_hosts parameter, because we would need to template
     # the dictionary keys for it and Ansible doesn't do that
