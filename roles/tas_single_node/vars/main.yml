@@ -22,8 +22,7 @@ _tas_single_node_rekor:
   env:
   private_keys: []
   public_keys: []
-  sharding_config:
-    - treeID:
+
 
 _tas_single_node_rekor_redis:
   database_deploy: true

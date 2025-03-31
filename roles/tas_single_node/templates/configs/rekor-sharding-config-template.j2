@@ -5,8 +5,11 @@ metadata:
   namespace: rekor-system
 data:
   sharding-config.yaml: |
+{% if tas_single_node_rekor.sharding_config is defined %}
 {% for tree in tas_single_node_rekor.sharding_config %}
+{% if tree.treeID is defined %}
     - treeID: {% if tree.treeID == None %}{{ trillian_tree_id }}{% else %}{{ tree.treeID }}{% endif %}
+{% endif %}
     
 {% if tree.treeLength is defined %}
       treeLength: {{ tree.treeLength }}
@@ -15,3 +18,4 @@ data:
       signingConfig: {{ tree.signingConfig }}
 {% endif %}
 {% endfor %}
+{% endif %}

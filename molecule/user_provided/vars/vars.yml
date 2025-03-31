@@ -69,5 +69,3 @@ tas_single_node_rekor:
     - id: "rekor-public-key1"
       key: |
         {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}
-  sharding_config:
-  - treeID:
