@@ -18,7 +18,11 @@ data:
       signingConfig: {{ tree.signing_config }}
 {% endif %}
 {% if tree.pem_pub_key is defined %}
-      pemPubKey: '{{ tree.pem_pub_key }}'
+      pemPubKey: |
+{% filter indent(width=8) %}
+
+{{ tree.pem_pub_key }}
+{% endfilter %}
 {% endif %}
 {% endfor %}
 {% endif %}
