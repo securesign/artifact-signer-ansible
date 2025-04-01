@@ -17,6 +17,7 @@ _tas_single_node_rekor:
   ca_passphrase: rhtas
   public_key_retries: 5
   public_key_delay: 10
+  active_tree_id: 0
   active_signer_type: file
   active_signer_id: "private-0"
   env:
