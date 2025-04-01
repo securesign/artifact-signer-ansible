@@ -27,7 +27,7 @@
 
 - name: Add TSA secret password (if applicable)
   ansible.builtin.set_fact:
-    secret_data: "{{ secret_data | combine({'password': tas_single_node_tsa.signer_passphrase | b64encode}) }}"
+    secret_data: "{{ secret_data | combine({'password': tas_single_node_tsa.ca_passphrase | b64encode}) }}"
   when: tas_single_node_tsa.signer_type == 'file'
 
 - name: Add TSA secret Tink keyset (if applicable)

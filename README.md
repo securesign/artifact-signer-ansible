@@ -212,7 +212,6 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
          ca_passphrase: TODO
        tas_single_node_tsa:
          ca_passphrase: TODO
-         signer_passphrase: TODO
      tasks:
        - name: Include TAS single node role
          ansible.builtin.include_role:
