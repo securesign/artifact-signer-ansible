@@ -360,6 +360,11 @@ argument_specs:
             type: "str"
             required: true
             version_added: "1.2.0"
+          active_tree_id:
+            description: "Tree Id of active rekor log."
+            type: "int"
+            required: true
+            version_added: "1.2.0"
           kms:
             description: "Details for KMS configuration of rekor cli-server."
             type: "dict"
@@ -440,18 +445,23 @@ argument_specs:
             description: "Sharding configuration for rekor"
             type: "dict"
             options:
-              treeID:
+              tree_id:
                 description: "Sharding configuration treeID"
                 type: "int"
                 required: false
                 version_added: "1.2.0"
-              treeLength:
+              tree_length:
                 description: "Length of rekor tree."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
-              signingConfig:
+              signing_config:
                 description: "Signing Configuration or rekor shard."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              pem_pub_key:
+                description: "PEM-encoded PKIX public key."
                 type: "str"
                 required: false
                 version_added: "1.2.0"

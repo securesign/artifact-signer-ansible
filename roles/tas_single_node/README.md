@@ -166,6 +166,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | active_signer_type | Active logs signer type can be either file, KMS or tink | str | yes |  |
 | active_signer_id | ID of the key name containing the active signer key for rekor to use. | str | yes |  |
+| active_tree_id | Tree Id of active rekor log. | int | yes |  |
 | kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
 | tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
 | env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
@@ -207,9 +208,10 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| treeID | Sharding configuration treeID | int | no |  |
-| treeLength | Length of rekor tree. | str | no |  |
-| signingConfig | Signing Configuration or rekor shard. | str | no |  |
+| tree_id | Sharding configuration treeID | int | no |  |
+| tree_length | Length of rekor tree. | str | no |  |
+| signing_config | Signing Configuration or rekor shard. | str | no |  |
+| pem_pub_key | PEM-encoded PKIX public key. | str | no |  |
 
 #### Options for main > tas_single_node_ctlog
 
