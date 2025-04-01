@@ -33,12 +33,6 @@
 <td>str</td>
 <td></td>
 </tr>
-<tr>
-<td>tas_single_node_oidc</td>
-<td>The list of OpenID Connect (OIDC) issuers and meta issuers to authenticate Fulcio certificate requests.</td>
-<td>dict of 'tas_single_node_oidc' options</td>
-<td></td>
-</tr>
 
 </table>
 <h3>Optional</h3>
@@ -86,7 +80,7 @@
 <td>tas_single_node_fulcio</td>
 <td>Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. <strong>Note</strong>: Updating any of the certificate attributes (such as <code>organization_name</code>, <code>organization_email</code>, or <code>common_name</code>) or the Certificate Authority passphrase (<code>ca_passphrase</code>) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root.</td>
 <td>dict of 'tas_single_node_fulcio' options</td>
-<td><code>{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible'}</code></td>
+<td><code>{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': []}}</code></td>
 </tr>
 <tr>
 <td>tas_single_node_rekor</td>
@@ -682,6 +676,13 @@
 <td>no</td>
 <td></td>
 </tr>
+<tr>
+<td>fulcio_config</td>
+<td>Fulcio configuration for the OIDC issuers and meta issuers.</td>
+<td>dict of 'fulcio_config' options</td>
+<td>yes</td>
+<td></td>
+</tr>
 
 </table>
 <h4>Options for main &gt; tas_single_node_fulcio &gt; certificate</h4>
@@ -719,6 +720,111 @@
 </tr>
 
 </table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>oidc_issuers</td>
+<td>The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests.</td>
+<td>list of dicts of 'oidc_issuers' options</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>meta_issuers</td>
+<td>The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests.</td>
+<td>list of dicts of 'meta_issuers' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config &gt; oidc_issuers</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>issuer</td>
+<td>A unique name of the OIDC issuer.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>url</td>
+<td>The OIDC issuer service URL.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>client_id</td>
+<td>The OIDC client identifier used by the RHTAS service.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>The type of the OIDC token issuer, for example, 'email'.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config &gt; meta_issuers</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>issuer_pattern</td>
+<td>A URL template to match multiple OIDC issuers, for example, <code>'https://oidc.eks.*.amazonaws.com/id/*'</code>.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>client_id</td>
+<td>The OIDC client identifier used by the RHTAS service.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>The type of the OIDC token issuer, for example, 'email'.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+
+</table>
 <h4>Options for main &gt; tas_single_node_rekor</h4>
 <table>
 <thead>
@@ -735,14 +841,21 @@
 <td>active_signer_type</td>
 <td>Active logs signer type can be either file, KMS or tink</td>
 <td>str</td>
-<td>yes</td>
+<td>no</td>
 <td></td>
 </tr>
 <tr>
 <td>active_signer_id</td>
 <td>ID of the key name containing the active signer key for rekor to use.</td>
 <td>str</td>
-<td>yes</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>active_tree_id</td>
+<td>Tree Id of active rekor log.</td>
+<td>int</td>
+<td>no</td>
 <td></td>
 </tr>
 <tr>
@@ -804,7 +917,7 @@
 <tr>
 <td>sharding_config</td>
 <td>Sharding configuration for rekor</td>
-<td>dict of 'sharding_config' options</td>
+<td>list of dicts of 'sharding_config' options</td>
 <td>no</td>
 <td></td>
 </tr>
@@ -928,22 +1041,29 @@
 </thead>
 
 <tr>
-<td>treeID</td>
+<td>tree_id</td>
 <td>Sharding configuration treeID</td>
 <td>int</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
-<td>treeLength</td>
+<td>tree_length</td>
 <td>Length of rekor tree.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
-<td>signingConfig</td>
+<td>signing_config</td>
 <td>Signing Configuration or rekor shard.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>pem_pub_key</td>
+<td>PEM-encoded PKIX public key.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
@@ -1377,111 +1497,6 @@
 </tr>
 
 </table>
-<h4>Options for main &gt; tas_single_node_oidc</h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-</tr>
-</thead>
-
-<tr>
-<td>issuers</td>
-<td>The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests.</td>
-<td>list of dicts of 'issuers' options</td>
-<td>no</td>
-<td></td>
-</tr>
-<tr>
-<td>meta_issuers</td>
-<td>The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests.</td>
-<td>list of dicts of 'meta_issuers' options</td>
-<td>no</td>
-<td><code>[]</code></td>
-</tr>
-
-</table>
-<h4>Options for main &gt; tas_single_node_oidc &gt; issuers</h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-</tr>
-</thead>
-
-<tr>
-<td>issuer</td>
-<td>A unique name of the OIDC issuer.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-<tr>
-<td>url</td>
-<td>The OIDC issuer service URL.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-<tr>
-<td>client_id</td>
-<td>The OIDC client identifier used by the RHTAS service.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-<tr>
-<td>type</td>
-<td>The type of the OIDC token issuer, for example, 'email'.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-
-</table>
-<h4>Options for main &gt; tas_single_node_oidc &gt; meta_issuers</h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-</tr>
-</thead>
-
-<tr>
-<td>issuer_pattern</td>
-<td>A URL template to match multiple OIDC issuers, for example, <code>'https://oidc.eks.*.amazonaws.com/id/*'</code>.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-<tr>
-<td>client_id</td>
-<td>The OIDC client identifier used by the RHTAS service.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-<tr>
-<td>type</td>
-<td>The type of the OIDC token issuer, for example, 'email'.</td>
-<td>str</td>
-<td>yes</td>
-<td></td>
-</tr>
-
-</table>
 <h4>Options for main &gt; tas_single_node_podman</h4>
 <table>
 <thead>
@@ -1796,7 +1811,6 @@
     tas_single_node_registry_username: # TODO: required, type: str
     tas_single_node_registry_password: # TODO: required, type: str
     tas_single_node_base_hostname: # TODO: required, type: str
-    tas_single_node_oidc: # TODO: required, type: dict
 
   tasks:
     - name: Include TAS single node role

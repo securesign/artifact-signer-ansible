@@ -171,6 +171,12 @@ After installing the collection, you can enable and configure Cockpit as shown b
        # create secure unique passphrases
        tas_single_node_fulcio:
          ca_passphrase: TODO
+         fulcio_config:
+           oidc_issuers:
+             - issuer: TODO # your OIDC provider (e.g. keycloak) URL
+               client_id: trusted-artifact-signer
+               url: TODO # your OIDC provider (e.g. keycloak) URL
+               type: email
          ct_log_prefix: TODO
        tas_single_node_ctlog:
          ca_passphrase: TODO
