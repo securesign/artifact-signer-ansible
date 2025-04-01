@@ -741,14 +741,21 @@
 <td>active_signer_type</td>
 <td>Active logs signer type can be either file, KMS or tink</td>
 <td>str</td>
-<td>yes</td>
+<td>no</td>
 <td></td>
 </tr>
 <tr>
 <td>active_signer_id</td>
 <td>ID of the key name containing the active signer key for rekor to use.</td>
 <td>str</td>
-<td>yes</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>active_tree_id</td>
+<td>Tree Id of active rekor log.</td>
+<td>int</td>
+<td>no</td>
 <td></td>
 </tr>
 <tr>
@@ -810,7 +817,7 @@
 <tr>
 <td>sharding_config</td>
 <td>Sharding configuration for rekor</td>
-<td>dict of 'sharding_config' options</td>
+<td>list of dicts of 'sharding_config' options</td>
 <td>no</td>
 <td></td>
 </tr>
@@ -934,22 +941,29 @@
 </thead>
 
 <tr>
-<td>treeID</td>
+<td>tree_id</td>
 <td>Sharding configuration treeID</td>
 <td>int</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
-<td>treeLength</td>
+<td>tree_length</td>
 <td>Length of rekor tree.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
 </tr>
 <tr>
-<td>signingConfig</td>
+<td>signing_config</td>
 <td>Signing Configuration or rekor shard.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>pem_pub_key</td>
+<td>PEM-encoded PKIX public key.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
@@ -1293,7 +1307,7 @@
 <tr>
 <td>env</td>
 <td>Environment vars to be specified to access AWS Cloud keys when using Tink or KMS</td>
-<td>list of ''</td>
+<td>list of 'dict'</td>
 <td>no</td>
 <td></td>
 </tr>
