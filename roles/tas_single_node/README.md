@@ -273,7 +273,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | ca_passphrase | Passphrase used to access certificate authority. | str | no |  |
 | ntp_config | NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more. Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml). | str | no |  |
 | trusted_ca | Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections. Used to ensure authenticity and trusted data exchange. | str | no |  |
-| env | Environment vars to be specified to access AWS Cloud keys when using Tink or KMS | list of '' | no |  |
+| env | Environment vars to be specified to access AWS Cloud keys when using Tink or KMS | list of 'dict' | no |  |
 
 #### Options for main > tas_single_node_tsa > certificate
 
