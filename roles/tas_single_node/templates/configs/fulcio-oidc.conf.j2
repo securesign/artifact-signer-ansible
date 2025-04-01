@@ -1,12 +1,12 @@
 oidc-issuers:
-{% for issuer in tas_single_node_oidc.issuers %}
+{% for issuer in tas_single_node_fulcio.fulcio_config.oidc_issuers %}
   {{ issuer.issuer | quote }}:
     issuer-url: {{ issuer.url | quote }}
     client-id: {{ issuer.client_id | quote }}
     type: {{ issuer.type | quote }}
 {% endfor %}
 meta-issuers:
-{% for meta_issuer in tas_single_node_oidc.meta_issuers %}
+{% for meta_issuer in tas_single_node_fulcio.fulcio_config.meta_issuers %}
   {{ meta_issuer.issuer_pattern | quote }}:
     client-id: {{ meta_issuer.client_id | quote }}
     type: {{ meta_issuer.type | quote }}
