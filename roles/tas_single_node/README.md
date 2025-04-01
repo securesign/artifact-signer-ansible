@@ -164,8 +164,9 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| active_signer_type | Active logs signer type can be either file, KMS or tink | str | yes |  |
-| active_signer_id | ID of the key name containing the active signer key for rekor to use. | str | yes |  |
+| active_signer_type | Active logs signer type can be either file, KMS or tink | str | no |  |
+| active_signer_id | ID of the key name containing the active signer key for rekor to use. | str | no |  |
+| active_tree_id | Tree Id of active rekor log. | int | no |  |
 | kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
 | tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
 | env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
@@ -174,7 +175,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
 | private_keys | List of private keys for use within rekor. | list of '' | no |  |
 | public_keys | List of public keys for use within rekor. | list of '' | no |  |
-| sharding_config | Sharding configuration for rekor | dict of 'sharding_config' options | no |  |
+| sharding_config | Sharding configuration for rekor | list of dicts of 'sharding_config' options | no |  |
 
 #### Options for main > tas_single_node_rekor > kms
 
@@ -207,9 +208,10 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| treeID | Sharding configuration treeID | int | no |  |
-| treeLength | Length of rekor tree. | str | no |  |
-| signingConfig | Signing Configuration or rekor shard. | str | no |  |
+| tree_id | Sharding configuration treeID | int | no |  |
+| tree_length | Length of rekor tree. | str | no |  |
+| signing_config | Signing Configuration or rekor shard. | str | no |  |
+| pem_pub_key | PEM-encoded PKIX public key. | str | no |  |
 
 #### Options for main > tas_single_node_ctlog
 

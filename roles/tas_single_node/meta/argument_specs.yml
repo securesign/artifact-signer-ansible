@@ -353,12 +353,17 @@ argument_specs:
           active_signer_type:
             description: "Active logs signer type can be either file, KMS or tink"
             type: "str"
-            required: true
+            required: false
             version_added: "1.2.0"
           active_signer_id:
             description: "ID of the key name containing the active signer key for rekor to use."
             type: "str"
-            required: true
+            required: false
+            version_added: "1.2.0"
+          active_tree_id:
+            description: "Tree Id of active rekor log."
+            type: "int"
+            required: false
             version_added: "1.2.0"
           kms:
             description: "Details for KMS configuration of rekor cli-server."
@@ -438,20 +443,26 @@ argument_specs:
             version_added: "1.2.0"
           sharding_config:
             description: "Sharding configuration for rekor"
-            type: "dict"
+            type: "list"
+            elements: "dict"
             options:
-              treeID:
+              tree_id:
                 description: "Sharding configuration treeID"
                 type: "int"
                 required: false
                 version_added: "1.2.0"
-              treeLength:
+              tree_length:
                 description: "Length of rekor tree."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
-              signingConfig:
+              signing_config:
                 description: "Signing Configuration or rekor shard."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              pem_pub_key:
+                description: "PEM-encoded PKIX public key."
                 type: "str"
                 required: false
                 version_added: "1.2.0"

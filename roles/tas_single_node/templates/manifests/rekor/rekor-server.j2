@@ -75,7 +75,11 @@ spec:
             - --rekor_server.tink_keyset_path=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
 {% endif %}
             - --enable_retrieve_api=true
+{% if tas_single_node_rekor.active_tree_id is defined and tas_single_node_rekor.active_tree_id != 0 %}
+            - --trillian_log_server.tlog_id={{ tas_single_node_rekor.active_tree_id }}
+{% else %}
             - --trillian_log_server.tlog_id={{ trillian_tree_id }}
+{% endif %}
             - --enable_attestation_storage
             # NOTE: we need to use no_tmp_dir=true with file-based storage to prevent
             # cross-device link error - see https://github.com/google/go-cloud/issues/3314
