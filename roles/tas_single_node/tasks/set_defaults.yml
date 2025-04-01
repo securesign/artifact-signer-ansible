@@ -12,4 +12,5 @@
     tas_single_node_tsa: "{{ _tas_single_node_tsa | combine(tas_single_node_tsa | default({}, true), recursive=true) }}"
     tas_single_node_ctlog: "{{ _tas_single_node_ctlog | combine(tas_single_node_ctlog | default({}, true), recursive=true) }}"
     tas_single_node_cockpit: "{{ _tas_single_node_cockpit | combine(tas_single_node_cockpit | default({}, true), recursive=true) }}"
+    tas_single_node_oidc: "{{ _tas_single_node_oidc | combine(tas_single_node_oidc | default({}, true), recursive=true) }}"
   no_log: true

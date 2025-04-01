@@ -757,57 +757,63 @@ argument_specs:
         required: false
         version_added: "1.1.0"
         default: false
-      tas_single_node_oidc_issuers:
-        description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
-        type: "list"
-        elements: "dict"
+      tas_single_node_oidc:
+        description: The list of OpenID Connect (OIDC) issuers and meta issuers to authenticate Fulcio certificate requests.
+        type: "dict"
         required: true
-        version_added: "1.1.0"
-        # we provide no default here intentionally
+        version_added: "1.2.0"
         options:
-          issuer:
-            description: "A unique name of the OIDC issuer."
-            type: "str"
+          issuers:
+            description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
+            type: "list"
+            elements: "dict"
             required: true
             version_added: "1.1.0"
-          url:
-            description: "The OIDC issuer service URL."
-            type: "str"
-            required: true
+            # we provide no default here intentionally
+            options:
+              issuer:
+                description: "A unique name of the OIDC issuer."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
+              url:
+                description: "The OIDC issuer service URL."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
+              client_id:
+                description: "The OIDC client identifier used by the RHTAS service."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
+              type:
+                description: "The type of the OIDC token issuer, for example, 'email'."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
+          meta_issuers:
+            description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
+            type: "list"
+            elements: "dict"
+            required: false
             version_added: "1.1.0"
-          client_id:
-            description: "The OIDC client identifier used by the RHTAS service."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          type:
-            description: "The type of the OIDC token issuer, for example, 'email'."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-      tas_single_node_meta_issuers:
-        description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
-        type: "list"
-        elements: "dict"
-        required: false
-        version_added: "1.1.0"
-        default: []
-        options:
-          issuer_pattern:
-            description: "A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          client_id:
-            description: "The OIDC client identifier used by the RHTAS service."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          type:
-            description: "The type of the OIDC token issuer, for example, 'email'."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
+            default: []
+            options:
+              issuer_pattern:
+                description: "A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
+              client_id:
+                description: "The OIDC client identifier used by the RHTAS service."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
+              type:
+                description: "The type of the OIDC token issuer, for example, 'email'."
+                type: "str"
+                required: true
+                version_added: "1.1.0"
       tas_single_node_fulcio_server_image:
         description: "Fulcio image"
         type: "str"

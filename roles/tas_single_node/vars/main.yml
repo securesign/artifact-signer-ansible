@@ -1,6 +1,10 @@
 ---
 # vars file for tas_single_node
 
+_tas_single_node_oidc:
+  issuers: []
+  meta_issuers: []
+
 _tas_single_node_backup_restore:
   backup:
     enabled: false

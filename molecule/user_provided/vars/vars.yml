@@ -1,7 +1,8 @@
-tas_single_node_meta_issuers:
-  - issuer_pattern: "http://dex-*:5556/dex"
-    client_id: example-app
-    type: email
+tas_single_node_oidc:
+  meta_issuers:
+    - issuer_pattern: "http://dex-*:5556/dex"
+      client_id: example-app
+      type: email
 tas_single_node_base_hostname: myrhtas
 tas_single_node_cockpit:
   enabled: false

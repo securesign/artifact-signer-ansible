@@ -12,7 +12,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_registry_username | The user name logging in to the registry to pull images. | str |  |
 | tas_single_node_registry_password | The user's password to log in to the registry. | str |  |
 | tas_single_node_base_hostname | The base host name of the managed node. This generates self-signed certificates for the individual HTTPS endpoints. | str |  |
-| tas_single_node_oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_oidc_issuers' options |  |
+| tas_single_node_oidc | The list of OpenID Connect (OIDC) issuers and meta issuers to authenticate Fulcio certificate requests. | dict of 'tas_single_node_oidc' options |  |
 
 ### Optional
 |Option|Description|Type|Default|
@@ -28,7 +28,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_ctlog | Configuration and specification of ctlog Custom Configuration as well as custom keys. | dict of 'tas_single_node_ctlog' options |  `{'ca_passphrase': 'rhtas', 'sharding_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [], 'public_keys': []}`  |
 | tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later. | bool |  `False`  |
-| tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  `[]`  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208`  |
 | tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0`  |
@@ -296,7 +295,14 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str | no |  |
 | hcvault_token | The authentication token for Hashicorp Vault API calls. | str | no |  |
 
-#### Options for main > tas_single_node_oidc_issuers
+#### Options for main > tas_single_node_oidc
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'issuers' options | yes |  |
+| meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'meta_issuers' options | no |  `[]`  |
+
+#### Options for main > tas_single_node_oidc > issuers
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
@@ -305,7 +311,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
 | type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
 
-#### Options for main > tas_single_node_meta_issuers
+#### Options for main > tas_single_node_oidc > meta_issuers
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
@@ -392,7 +398,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
     tas_single_node_registry_username: # TODO: required, type: str
     tas_single_node_registry_password: # TODO: required, type: str
     tas_single_node_base_hostname: # TODO: required, type: str
-    tas_single_node_oidc_issuers: # TODO: required, type: list
+    tas_single_node_oidc: # TODO: required, type: dict
     
   tasks:
     - name: Include TAS single node role
