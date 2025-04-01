@@ -77,6 +77,9 @@ _tas_single_node_fulcio:
   ca_passphrase: rhtas
   trusted_ca: ""
   ct_log_prefix: rhtasansible
+  fulcio_config:
+    oidc_issuers: []
+    meta_issuers: []
 
 _tas_single_node_tsa:
   env: []

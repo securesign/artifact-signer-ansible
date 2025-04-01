@@ -12,7 +12,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_registry_username | The user name logging in to the registry to pull images. | str |  |
 | tas_single_node_registry_password | The user's password to log in to the registry. | str |  |
 | tas_single_node_base_hostname | The base host name of the managed node. This generates self-signed certificates for the individual HTTPS endpoints. | str |  |
-| tas_single_node_oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_oidc_issuers' options |  |
 
 ### Optional
 |Option|Description|Type|Default|
@@ -22,13 +21,12 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
 | tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
 | tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
-| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible'}`  |
+| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': []}}`  |
 | tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_ctlog | Configuration and specification of ctlog Custom Configuration as well as custom keys. | dict of 'tas_single_node_ctlog' options |  `{'ca_passphrase': 'rhtas', 'sharding_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [], 'public_keys': []}`  |
 | tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'env': [], 'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later. | bool |  `False`  |
-| tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  `[]`  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208`  |
 | tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0`  |
@@ -151,6 +149,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | trusted_ca | Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider. | str | no |  |
 | ca_passphrase | "Passphrase for Certificate Authority. **Note**: Updating the passphrase will regenerate the auto-generated private key and the Fulcio certificate as a consequence, and a manual update in the trust root is required." | str | no |  |
 | ct_log_prefix | The Prefix for the Certificate Transparency Log that is accessed by Fulcio. | str | no |  |
+| fulcio_config | Fulcio configuration for the OIDC issuers and meta issuers. | dict of 'fulcio_config' options | yes |  |
 
 #### Options for main > tas_single_node_fulcio > certificate
 
@@ -159,6 +158,30 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | organization_name | The name of the organization. | str | no |  |
 | organization_email | The email address of the organization. | str | no |  |
 | common_name | The common name (e.g., hostname) for the certificate. | str | no |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'oidc_issuers' options | no |  |
+| meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'meta_issuers' options | no |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config > oidc_issuers
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| issuer | A unique name of the OIDC issuer. | str | yes |  |
+| url | The OIDC issuer service URL. | str | yes |  |
+| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
+| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config > meta_issuers
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
+| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
+| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
 
 #### Options for main > tas_single_node_rekor
 
@@ -299,23 +322,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str | no |  |
 | hcvault_token | The authentication token for Hashicorp Vault API calls. | str | no |  |
 
-#### Options for main > tas_single_node_oidc_issuers
-
-|Option|Description|Type|Required|Default|
-|---|---|---|---|---|
-| issuer | A unique name of the OIDC issuer. | str | yes |  |
-| url | The OIDC issuer service URL. | str | yes |  |
-| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
-| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
-
-#### Options for main > tas_single_node_meta_issuers
-
-|Option|Description|Type|Required|Default|
-|---|---|---|---|---|
-| issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
-| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
-| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
-
 #### Options for main > tas_single_node_podman
 
 |Option|Description|Type|Required|Default|
@@ -395,7 +401,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
     tas_single_node_registry_username: # TODO: required, type: str
     tas_single_node_registry_password: # TODO: required, type: str
     tas_single_node_base_hostname: # TODO: required, type: str
-    tas_single_node_oidc_issuers: # TODO: required, type: list
     
   tasks:
     - name: Include TAS single node role

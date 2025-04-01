@@ -1,8 +1,8 @@
 ---
 - name: Check OIDC issuers
   ansible.builtin.fail:
-    msg: "Either tas_single_node_oidc_issuers or tas_single_node_meta_issuers must be specified"
-  when: not tas_single_node_oidc_issuers and not tas_single_node_meta_issuers
+    msg: "Either tas_single_node_fulcio.fulcio_config.oidc_issuers or tas_single_node_fulcio.fulcio_config.meta_issuers must be specified"
+  when: not tas_single_node_fulcio.fulcio_config.oidc_issuers and not tas_single_node_fulcio.fulcio_config.meta_issuers
 
 - name: Prevent usage of memory signer for TSA
   ansible.builtin.fail:

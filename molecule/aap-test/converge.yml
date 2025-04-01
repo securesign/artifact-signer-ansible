@@ -336,11 +336,13 @@
                   tas_single_node_podman: "{{ tas_single_node_podman }}"
                   aap_instance_ip: "{{ aap_instance_ip }}"
                   token: "{{ ah_token.token }}"
-                  tas_single_node_oidc_issuers:
-                    - issuer: "http://dex-idp:5556/dex"
-                      url: "http://dex-idp:5556/dex"
-                      client_id: example-app
-                      type: email
+                  tas_single_node_fulcio:
+                    fulcio_config:
+                      oidc_issuers:
+                        - issuer: "http://dex-idp:5556/dex"
+                          url: "http://dex-idp:5556/dex"
+                          client_id: example-app
+                          type: email
                   tas_single_node_base_hostname: myrhtas
                   tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
                   tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"

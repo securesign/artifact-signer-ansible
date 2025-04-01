@@ -196,14 +196,15 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
        # access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
        tas_single_node_registry_username: TODO
        tas_single_node_registry_password: TODO
-       tas_single_node_oidc_issuers:
-         - issuer: TODO # your OIDC provider (e.g. keycloak) URL
-           client_id: trusted-artifact-signer
-           url: TODO # your OIDC provider (e.g. keycloak) URL
-           type: email
        # create secure unique passphrases
        tas_single_node_fulcio:
          ca_passphrase: TODO
+         fulcio_config:
+           oidc_issuers:
+             - issuer: TODO # your OIDC provider (e.g. keycloak) URL
+               client_id: trusted-artifact-signer
+               url: TODO # your OIDC provider (e.g. keycloak) URL
+               type: email
          ct_log_prefix: TODO
        tas_single_node_ctlog:
          ca_passphrase: TODO
