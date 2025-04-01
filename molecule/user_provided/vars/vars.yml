@@ -58,6 +58,7 @@ tas_single_node_fulcio:
 tas_single_node_rekor:
   ca_passphrase: password
   public_key_retries: 5
+  active_tree_id: 0
   public_key_delay: 10
   active_signer_type: file
   active_signer_id: rekor-private-key1
