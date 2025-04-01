@@ -104,7 +104,7 @@
 <td>tas_single_node_tsa</td>
 <td>Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as <code>file</code>, <code>kms</code>, and <code>tink</code>, NTP monitoring configuration and user provided certificate chain + signer private key.</td>
 <td>dict of 'tas_single_node_tsa' options</td>
-<td><code>{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}</code></td>
+<td><code>{'env': [], 'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}</code></td>
 </tr>
 <tr>
 <td>tas_single_node_skip_os_install</td>
@@ -1401,6 +1401,13 @@
 <td>trusted_ca</td>
 <td>Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections. Used to ensure authenticity and trusted data exchange.</td>
 <td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>env</td>
+<td>Environment vars to be specified to access AWS Cloud keys when using Tink or KMS</td>
+<td>list of 'dict'</td>
 <td>no</td>
 <td></td>
 </tr>
