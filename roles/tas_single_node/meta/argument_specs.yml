@@ -644,6 +644,7 @@ argument_specs:
         version_added: "1.2.0"
         required: false
         default:
+          env: []
           signer_type: file
           certificate:
             organization_name: ""
@@ -758,6 +759,12 @@ argument_specs:
               Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections.
               Used to ensure authenticity and trusted data exchange.
             type: "str"
+            required: false
+            version_added: "1.2.0"
+          env:
+            description: "Environment vars to be specified to access AWS Cloud keys when using Tink or KMS"
+            type: "list"
+            elements: "dict"
             required: false
             version_added: "1.2.0"
       tas_single_node_skip_os_install:

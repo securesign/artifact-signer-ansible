@@ -32,7 +32,7 @@
 
 - name: Add TSA secret Tink keyset (if applicable)
   ansible.builtin.set_fact:
-    secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa.tink.keyset | b64encode}) }}"
+    secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa.tink.keyset | to_json | b64encode}) }}"
   when: tas_single_node_tsa.signer_type == 'tink'
 
 - name: Create TSA Secret

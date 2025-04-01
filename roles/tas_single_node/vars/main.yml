@@ -79,6 +79,7 @@ _tas_single_node_fulcio:
   ct_log_prefix: rhtasansible
 
 _tas_single_node_tsa:
+  env: []
   signer_type: file
   certificate:
     organization_name: ""
