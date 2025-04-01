@@ -767,8 +767,8 @@ argument_specs:
             description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
             type: "list"
             elements: "dict"
-            required: true
             version_added: "1.1.0"
+            required: false
             # we provide no default here intentionally
             options:
               issuer:
