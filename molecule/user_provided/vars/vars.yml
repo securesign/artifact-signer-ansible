@@ -22,7 +22,6 @@ tas_single_node_rekor_redis:
 tas_single_node_tsa:
   ca_passphrase: rhtas
   signer_type: file
-  signer_passphrase: rhtas
   ntp_config: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ntpsync.yaml') }}"
   signer_private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/private-key.pem') }}"
   certificate_chain: "{{ lookup('file', molecule_scenario_directory + '/test_creds/cert-chain.pem') }}"

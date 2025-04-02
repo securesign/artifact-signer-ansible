@@ -69,7 +69,7 @@ spec:
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'file' %}
             - "--file-signer-key-path=/etc/secrets/keys/private_key.pem"
-            - "--file-signer-passwd={{ tas_single_node_tsa.signer_passphrase }}"
+            - "--file-signer-passwd={{ tas_single_node_tsa.ca_passphrase }}"
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'kms' %}
             - "--kms-key-resource={{ tas_single_node_tsa.kms.key_resource }}"

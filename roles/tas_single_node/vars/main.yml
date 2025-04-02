@@ -96,7 +96,6 @@ _tas_single_node_tsa:
     hcvault_token: ""
   signer_private_key: ""
   certificate_chain: ""
-  signer_passphrase: rhtas
   ca_passphrase: rhtas
   ntp_config: ""
   trusted_ca: ""

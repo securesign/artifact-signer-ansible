@@ -718,7 +718,6 @@ argument_specs:
             hcvault_token: ""
           signer_private_key: ""
           certificate_chain: ""
-          signer_passphrase: rhtas
           ca_passphrase: rhtas
           ntp_config: ""
           trusted_ca: ""
@@ -797,13 +796,11 @@ argument_specs:
             type: "str"
             required: false
             version_added: "1.2.0"
-          signer_passphrase:
-            description: "Passphrase used to access signer private key."
-            type: "str"
-            required: false
-            version_added: "1.2.0"
           ca_passphrase:
-            description: "Passphrase used to access certificate authority."
+            description: >
+              Passphrase for Certificate Authority.
+              **Note**: Updating the passphrase will regenerate the auto-generated private key and the TSA certificate as a consequence,
+              and a manual update in the trust root is required."
             type: "str"
             required: false
             version_added: "1.2.0"
