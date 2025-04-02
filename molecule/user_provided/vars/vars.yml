@@ -1,8 +1,3 @@
-tas_single_node_oidc_issuers:
-  - issuer: "http://dex-idp:5556/dex"
-    url: "http://dex-idp:5556/dex"
-    client_id: example-app
-    type: email
 tas_single_node_base_hostname: myrhtas
 tas_single_node_cockpit:
   enabled: false
@@ -27,7 +22,6 @@ tas_single_node_rekor_redis:
 tas_single_node_tsa:
   ca_passphrase: rhtas
   signer_type: file
-  signer_passphrase: rhtas
   ntp_config: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ntpsync.yaml') }}"
   signer_private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/private-key.pem') }}"
   certificate_chain: "{{ lookup('file', molecule_scenario_directory + '/test_creds/cert-chain.pem') }}"
@@ -43,10 +37,10 @@ tas_single_node_ctlog:
       private_key: "private-0"
   private_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.key') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.key') }}
   public_keys:
     - |
-      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog0.pub') }}
+      {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
 
 tas_single_node_fulcio:
   private_key: |
@@ -54,3 +48,24 @@ tas_single_node_fulcio:
   root_ca: |
     {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.pem') }}
   ca_passphrase: password
+  fulcio_config:
+    meta_issuers:
+      - issuer_pattern: "http://dex-*:5556/dex"
+        client_id: example-app
+        type: email
+
+tas_single_node_rekor:
+  ca_passphrase: password
+  public_key_retries: 5
+  active_tree_id: 0
+  public_key_delay: 10
+  active_signer_type: file
+  active_signer_id: rekor-private-key1
+  private_keys: 
+    - id: "rekor-private-key1"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.key') }}
+  public_keys: 
+    - id: "rekor-public-key1"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest.pub') }}

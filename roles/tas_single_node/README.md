@@ -1,6 +1,6 @@
 <!--- to update this file, update files in the role's meta/ directory (and/or its README.j2 template) and run "make role-readme" -->
 # Ansible Role: redhat.artifact_signer.tas_single_node
-Version: 1.2.0+dev.4
+Version: 1.2.0+dev.6
 
 Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service on a single managed node by using the `tas_single_node` role.
  Requires RHEL 9.4 or later.
@@ -12,7 +12,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_registry_username | The user name logging in to the registry to pull images. | str |  |
 | tas_single_node_registry_password | The user's password to log in to the registry. | str |  |
 | tas_single_node_base_hostname | The base host name of the managed node. This generates self-signed certificates for the individual HTTPS endpoints. | str |  |
-| tas_single_node_oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_oidc_issuers' options |  |
 
 ### Optional
 |Option|Description|Type|Default|
@@ -22,13 +21,12 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
 | tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
 | tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
-| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible'}`  |
+| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': []}}`  |
 | tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_ctlog | Configuration and specification of ctlog Custom Configuration as well as custom keys. | dict of 'tas_single_node_ctlog' options |  `{'ca_passphrase': 'rhtas', 'sharding_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [], 'public_keys': []}`  |
-| tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'signer_passphrase': 'rhtas', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
+| tas_single_node_tsa | Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as `file`, `kms`, and `tink`, NTP monitoring configuration and user provided certificate chain + signer private key. | dict of 'tas_single_node_tsa' options |  `{'env': [], 'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}`  |
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later. | bool |  `False`  |
-| tas_single_node_meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'tas_single_node_meta_issuers' options |  `[]`  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208`  |
 | tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0`  |
@@ -43,7 +41,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_search_image | Rekor search UI image | str |  `registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b`  |
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
-| tas_single_node_podman_volume_create_extra_args | Additional arguments to pass to the `podman volume create` command. This can be used to specify extra options when creating Podman volumes. | str |  |
+| tas_single_node_podman_volume_create_extra_args | A dictionary of additional arguments to pass to the `podman volume create` command for each volume. This allows customization of options when creating specific volumes. Each key in the dictionary corresponds to a volume name with hyphens replaced by underscores. | dict of 'tas_single_node_podman_volume_create_extra_args' options |  `{'trillian_mysql': '', 'rekor_redis_storage': '', 'redis_backfill_storage': '', 'rekor_server': '', 'tuf_repository': '', 'tuf_signing_keys': ''}`  |
 | tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
 | tas_single_node_backup_restore | Configuration options for the Backup and Restore of Trusted Artifact Signer. | dict of 'tas_single_node_backup_restore' options |  `{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}`  |
 
@@ -151,6 +149,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | trusted_ca | Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider. | str | no |  |
 | ca_passphrase | "Passphrase for Certificate Authority. **Note**: Updating the passphrase will regenerate the auto-generated private key and the Fulcio certificate as a consequence, and a manual update in the trust root is required." | str | no |  |
 | ct_log_prefix | The Prefix for the Certificate Transparency Log that is accessed by Fulcio. | str | no |  |
+| fulcio_config | Fulcio configuration for the OIDC issuers and meta issuers. | dict of 'fulcio_config' options | yes |  |
 
 #### Options for main > tas_single_node_fulcio > certificate
 
@@ -160,13 +159,82 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | organization_email | The email address of the organization. | str | no |  |
 | common_name | The common name (e.g., hostname) for the certificate. | str | no |  |
 
+#### Options for main > tas_single_node_fulcio > fulcio_config
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'oidc_issuers' options | no |  |
+| meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'meta_issuers' options | no |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config > oidc_issuers
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| issuer | A unique name of the OIDC issuer. | str | yes |  |
+| url | The OIDC issuer service URL. | str | yes |  |
+| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
+| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config > meta_issuers
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
+| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
+| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
+
 #### Options for main > tas_single_node_rekor
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
+| active_signer_type | Active logs signer type can be either file, KMS or tink | str | no |  |
+| active_signer_id | ID of the key name containing the active signer key for rekor to use. | str | no |  |
+| active_tree_id | Tree Id of active rekor log. | int | no |  |
+| kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
+| tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
+| env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | no |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
+| private_keys | List of private keys for use within rekor. | list of '' | no |  |
+| public_keys | List of public keys for use within rekor. | list of '' | no |  |
+| sharding_config | Sharding configuration for rekor | list of dicts of 'sharding_config' options | no |  |
+
+#### Options for main > tas_single_node_rekor > kms
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| kms_resource | KMS resource access | str | no |  |
+
+#### Options for main > tas_single_node_rekor > tink
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| tink_kek_uri | URI for tink resource. | str | no |  |
+| tink_keyset_path | Keyset to be unencrypted by tink. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > private_keys
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ID | Custom rekor secret ID. | str | no |  |
+| key | Custom Rekor Private key value. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > public_keys
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ID | Custom rekor secret ID. | str | no |  |
+| key | Custom Rekor Public key value. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > sharding_config
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| tree_id | Sharding configuration treeID | int | no |  |
+| tree_length | Length of rekor tree. | str | no |  |
+| signing_config | Signing Configuration or rekor shard. | str | no |  |
+| pem_pub_key | PEM-encoded PKIX public key. | str | no |  |
 
 #### Options for main > tas_single_node_ctlog
 
@@ -181,12 +249,40 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| config | Individual Log Configs | str | yes |  |
 | treeid | Trillian Tree Id ctlog use. | int | no |  |
 | prefix | ctlog log Prefix | str | no |  |
 | root_pem_file | File path to root Pem file | str | no |  |
 | password | Password for private key used by ctlog | str | no |  |
 | private_key | Name of the private key in the system | str | no |  |
+| override_handler_prefix | Overrides the handler prefix for this log | str | no |  |
+| public_key | Public key used for verification (must be in DER format). | str | no |  |
+| reject_expired | Reject certificates that are expired | bool | no |  |
+| reject_unexpired | Reject certificates that are not expired | bool | no |  |
+| not_after_start | Starting timestamp for valid 'NotAfter' dates | dict of 'not_after_start' options | no |  |
+| not_after_limit | Ending timestamp for valid 'NotAfter' dates | dict of 'not_after_limit' options | no |  |
+| accept_only_ca | Only accept certificates with CA extension | bool | no |  |
+| is_mirror | Indicates whether the log is a mirror log | bool | no |  |
+| is_readonly | Indicates whether the log is read-only | bool | no |  |
+| max_merge_delay_sec | Maximum merge delay in seconds | int | no |  |
+| expected_merge_delay_sec | Expected merge delay in seconds | int | no |  |
+| frozen_sth | Signed Tree Head (STH) that freezes the log | dict | no |  |
+| reject_extensions | List of rejected certificate extensions | str | no |  |
+| ctfe_storage_connection_string | Storage connection string for CTFE | str | no |  |
+| extra_data_issuance_chain_storage_backend | Storage backend for extra data issuance chain | int | no |  |
+
+#### Options for main > tas_single_node_ctlog > sharding_config > not_after_start
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| seconds | Seconds portion of the timestamp | int | no |  |
+| nanos | Nanoseconds portion of the timestamp | int | no |  |
+
+#### Options for main > tas_single_node_ctlog > sharding_config > not_after_limit
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| seconds | Seconds portion of the timestamp | int | no |  |
+| nanos | Nanoseconds portion of the timestamp | int | no |  |
 
 #### Options for main > tas_single_node_tsa
 
@@ -198,10 +294,10 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tink | Tink file signer type configuration for TSA. | str | no |  |
 | signer_private_key | Signer private key used in conjuction with the certificate chain for signing and verifying. | str | no |  |
 | certificate_chain | Certificate chain used in conjuction with the signer private key for signing and verifying. | str | no |  |
-| signer_passphrase | Passphrase used to access signer private key. | str | no |  |
-| ca_passphrase | Passphrase used to access certificate authority. | str | no |  |
+| ca_passphrase | Passphrase for Certificate Authority. **Note**: Updating the passphrase will regenerate the auto-generated private key and the TSA certificate as a consequence, and a manual update in the trust root is required." | str | no |  |
 | ntp_config | NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more. Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml). | str | no |  |
 | trusted_ca | Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections. Used to ensure authenticity and trusted data exchange. | str | no |  |
+| env | Environment vars to be specified to access AWS Cloud keys when using Tink or KMS | list of 'dict' | no |  |
 
 #### Options for main > tas_single_node_tsa > certificate
 
@@ -224,23 +320,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str | no |  |
 | keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str | no |  |
 | hcvault_token | The authentication token for Hashicorp Vault API calls. | str | no |  |
-
-#### Options for main > tas_single_node_oidc_issuers
-
-|Option|Description|Type|Required|Default|
-|---|---|---|---|---|
-| issuer | A unique name of the OIDC issuer. | str | yes |  |
-| url | The OIDC issuer service URL. | str | yes |  |
-| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
-| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
-
-#### Options for main > tas_single_node_meta_issuers
-
-|Option|Description|Type|Required|Default|
-|---|---|---|---|---|
-| issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
-| client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
-| type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
 
 #### Options for main > tas_single_node_podman
 
@@ -270,6 +349,17 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | create | Whether or not to create the cockpit user. | bool | no |  |
 | username | Username for the cockpit user. | str | no |  |
 | password | Password for the cockpit user. | str | no |  |
+
+#### Options for main > tas_single_node_podman_volume_create_extra_args
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| trillian_mysql | Additional arguments to pass when creating the "trillian-mysql" volume. | str | no |  |
+| rekor_redis_storage | Additional arguments to pass when creating the "rekor-redis-storage" volume. | str | no |  |
+| redis_backfill_storage | Additional arguments to pass when creating the "redis-backfill-storage" volume. | str | no |  |
+| rekor_server | Additional arguments to pass when creating the "rekor-server" volume. | str | no |  |
+| tuf_repository | Additional arguments to pass when creating the "tuf-repository" volume. | str | no |  |
+| tuf_signing_keys | Additional arguments to pass when creating the "tuf-signing-keys" volume. | str | no |  |
 
 #### Options for main > tas_single_node_trust_root
 
@@ -310,7 +400,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
     tas_single_node_registry_username: # TODO: required, type: str
     tas_single_node_registry_password: # TODO: required, type: str
     tas_single_node_base_hostname: # TODO: required, type: str
-    tas_single_node_oidc_issuers: # TODO: required, type: list
     
   tasks:
     - name: Include TAS single node role

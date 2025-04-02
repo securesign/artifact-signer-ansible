@@ -43,10 +43,18 @@ spec:
             failureThreshold: 3
           image: {{ tas_single_node_timestamp_authority_image }}
           imagePullPolicy: IfNotPresent
-{% if tas_single_node_tsa.trusted_ca != '' %}
+{% if tas_single_node_tsa.trusted_ca != '' or tas_single_node_tsa.signer_type in ['kms', 'tink'] or tas_single_node_tsa.env | length > 0 %}
           env:
+{% if tas_single_node_tsa.trusted_ca != '' %}
             - name: SSL_CERT_DIR
               value: "/var/run/configs/tas/ca-trust"
+{% endif %}
+{% if tas_single_node_tsa.signer_type in ['kms', 'tink'] or tas_single_node_tsa.env | length > 0 %}
+{% for var in tas_single_node_tsa.env %}
+            - name: {{ var.name }}
+              value: "{{ var.value }}"
+{% endfor %}
+{% endif %}
 {% endif %}
           command:
             - "timestamp-server"
@@ -61,7 +69,7 @@ spec:
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'file' %}
             - "--file-signer-key-path=/etc/secrets/keys/private_key.pem"
-            - "--file-signer-passwd={{ tas_single_node_tsa.signer_passphrase }}"
+            - "--file-signer-passwd={{ tas_single_node_tsa.ca_passphrase }}"
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'kms' %}
             - "--kms-key-resource={{ tas_single_node_tsa.kms.key_resource }}"

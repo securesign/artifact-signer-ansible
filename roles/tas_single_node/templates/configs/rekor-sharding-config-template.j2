@@ -1,0 +1,28 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rekor-server-config
+  namespace: rekor-system
+data:
+  sharding-config.yaml: |
+{% if tas_single_node_rekor.sharding_config is defined and tas_single_node_rekor.sharding_config | list | length > 0 %}
+{% for tree in tas_single_node_rekor.sharding_config %}
+{% if tree.tree_id is defined %}
+    - treeID: {% if tree.tree_id == None %}{{ trillian_tree_id }}{% else %}{{ tree.tree_id }}{% endif %}
+{% endif %}
+    
+{% if tree.tree_length is defined %}
+      treeLength: {{ tree.tree_length }}
+{% endif %}
+{% if tree.signing_config is defined %}
+      signingConfig: {{ tree.signing_config }}
+{% endif %}
+{% if tree.pem_pub_key is defined %}
+      pemPubKey: |
+{% filter indent(width=8) %}
+
+{{ tree.pem_pub_key }}
+{% endfilter %}
+{% endif %}
+{% endfor %}
+{% endif %}

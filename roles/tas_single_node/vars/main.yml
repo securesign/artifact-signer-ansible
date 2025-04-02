@@ -17,6 +17,13 @@ _tas_single_node_rekor:
   ca_passphrase: rhtas
   public_key_retries: 5
   public_key_delay: 10
+  active_tree_id: 0
+  active_signer_type: file
+  active_signer_id: "private-0"
+  env:
+  private_keys: []
+  public_keys: []
+
 
 _tas_single_node_rekor_redis:
   database_deploy: true
@@ -70,8 +77,12 @@ _tas_single_node_fulcio:
   ca_passphrase: rhtas
   trusted_ca: ""
   ct_log_prefix: rhtasansible
+  fulcio_config:
+    oidc_issuers: []
+    meta_issuers: []
 
 _tas_single_node_tsa:
+  env: []
   signer_type: file
   certificate:
     organization_name: ""
@@ -85,7 +96,6 @@ _tas_single_node_tsa:
     hcvault_token: ""
   signer_private_key: ""
   certificate_chain: ""
-  signer_passphrase: rhtas
   ca_passphrase: rhtas
   ntp_config: ""
   trusted_ca: ""
@@ -93,8 +103,7 @@ _tas_single_node_tsa:
 _tas_single_node_ctlog:
   ca_passphrase: rhtas
   sharding_config:
-    - config:
-      treeid:
+    - treeid:
       prefix: "rhtasansible"
       root_pem_file: "/ctfe-keys/fulcio-0"
       password: "rhtas"
@@ -147,11 +156,11 @@ tas_single_node_remote_fulcio_auto_generated_private_key: "{{ tas_single_node_ce
 tas_single_node_remote_fulcio_user_provided_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_user_provided_private_key_filename }}"
 tas_single_node_remote_fulcio_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_public_key_filename }}"
 tas_single_node_remote_ctlog_private_key: ["{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_private_key_filename }}"]
-tas_single_node_remote_rekor_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"
 # NOTE: Do not change these values, they're referred to from docs
 tas_single_node_remote_fulcio_root_ca: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_fulcio_root_ca_filename }}"
 tas_single_node_remote_ctlog_public_key: ["{{ tas_single_node_certs_dir }}/{{ tas_single_node_ctlog_public_key_filename }}"]
-tas_single_node_remote_rekor_public_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"
+tas_single_node_remote_rekor_private_key: ["{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_signer_filename }}"]
+tas_single_node_remote_rekor_public_key: ["{{ tas_single_node_certs_dir }}/{{ tas_single_node_rekor_public_key_filename }}"]
 
 # Functional Keys
 tas_single_node_private_key_filename: rhtas.key
@@ -160,8 +169,6 @@ tas_single_node_fulcio_private_key_filename: fulcio.key
 tas_single_node_fulcio_auto_generated_private_key_filename: auto_generated_fulcio.key
 tas_single_node_fulcio_user_provided_private_key_filename: user_provided_fulcio.key
 tas_single_node_fulcio_public_key_filename: fulcio.pub
-tas_single_node_ctlog_private_key_filename: ctlog0.key
-tas_single_node_rekor_signer_filename: rekor-signer.key
 tas_single_node_tsa_private_key_filename: tsa.key
 tas_single_node_tsa_leaf_certificate_filename: tsa-leaf-certificate.pem
 tas_single_node_tsa_signer_private_key_filename: tsa-signer-private-key.pem
@@ -170,7 +177,9 @@ tas_single_node_tsa_ntp_config_filename: ntpsync.yaml
 tas_single_node_tsa_cert_chain_filename: tsa-cert-chain.pem
 tas_single_node_fulcio_root_ca_filename: fulcio.pem
 tas_single_node_ctlog_public_key_filename: ctlog0.pub
-tas_single_node_rekor_public_key_filename: rekor-pub-key.pub
+tas_single_node_ctlog_private_key_filename: ctlog0.key
+tas_single_node_rekor_public_key_filename: rekor-pub-key0.pub
+tas_single_node_rekor_signer_filename: rekor-signer0.key
 
 # Secrets,Certs and Configuration locations
 tas_single_node_fulcio_server_config: "{{ tas_single_node_kube_configmap_dir }}/fulcio-config.yaml"
@@ -195,6 +204,15 @@ tas_single_node_systemd_directory: /etc/systemd/system
 tas_single_node_tuf_repository_volume_name: "tuf-repository"
 tas_single_node_tuf_signing_keys_volume_name: "tuf-signing-keys"
 
+# Volumes create options
+tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: ""
+  rekor_redis_storage: ""
+  redis_backfill_storage: ""
+  rekor_server: ""
+  tuf_repository: ""
+  tuf_signing_keys: ""
+
 # Timestamp Authority Config
 tas_single_node_tsa_signer_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_signer_private_key_filename }}"
 tas_single_node_remote_tsa_leaf_certificate: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_leaf_certificate_filename }}"
@@ -202,6 +220,10 @@ tas_single_node_remote_tsa_private_key: "{{ tas_single_node_certs_dir }}/{{ tas_
 tas_single_node_tsa_ntp_config_file: "{{ tas_single_node_config_dir }}/{{ tas_single_node_tsa_ntp_config_filename }}"
 # NOTE: Do not change this value, it's referred to from docs
 tas_single_node_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_single_node_tsa_cert_chain_filename }}"
+
+# Certificate Transparency Log provided Root Marker
+tas_single_node_ctlog_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_ctlog_use_provided_root"
+tas_single_node_rekor_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_rekor_use_provided_root"
 
 # Secrets,Certs and Configuration names
 tas_single_node_trillian_trusted_ca_configmap_name: "trillian-trusted-ca"

@@ -288,6 +288,9 @@ argument_specs:
           trusted_ca: ""
           ca_passphrase: rhtas
           ct_log_prefix: rhtasansible
+          fulcio_config:
+            oidc_issuers: []
+            meta_issuers: []
         options:
           certificate:
             description: "Details on the certificate attributes for Fulcio.
@@ -342,6 +345,63 @@ argument_specs:
             type: "str"
             required: false
             version_added: "1.1.0"
+          fulcio_config:
+            description: >
+              Fulcio configuration for the OIDC issuers and meta issuers.
+            type: "dict"
+            required: true
+            version_added: "1.2.0"
+            options:
+              oidc_issuers:
+                description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
+                type: "list"
+                elements: "dict"
+                required: false
+                version_added: "1.1.0"
+                # we provide no default here intentionally
+                options:
+                  issuer:
+                    description: "A unique name of the OIDC issuer."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
+                  url:
+                    description: "The OIDC issuer service URL."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
+                  client_id:
+                    description: "The OIDC client identifier used by the RHTAS service."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
+                  type:
+                    description: "The type of the OIDC token issuer, for example, 'email'."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
+              meta_issuers:
+                description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
+                type: "list"
+                elements: "dict"
+                required: false
+                version_added: "1.1.0"
+                options:
+                  issuer_pattern:
+                    description: "A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
+                  client_id:
+                    description: "The OIDC client identifier used by the RHTAS service."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
+                  type:
+                    description: "The type of the OIDC token issuer, for example, 'email'."
+                    type: "str"
+                    required: true
+                    version_added: "1.1.0"
       tas_single_node_rekor:
         description: >
           Details on the Rekor server configuration options. Includes Certificate Authority Passphrase,
@@ -350,6 +410,50 @@ argument_specs:
         required: false
         version_added: "1.2.0"
         options:
+          active_signer_type:
+            description: "Active logs signer type can be either file, KMS or tink"
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          active_signer_id:
+            description: "ID of the key name containing the active signer key for rekor to use."
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          active_tree_id:
+            description: "Tree Id of active rekor log."
+            type: "int"
+            required: false
+            version_added: "1.2.0"
+          kms:
+            description: "Details for KMS configuration of rekor cli-server."
+            type: "dict"
+            options:
+              kms_resource:
+                description: "KMS resource access"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          tink:
+            description: "Details for tink configuration within rekor-server."
+            type: "dict"
+            options:
+              tink_kek_uri:
+                description: "URI for tink resource."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              tink_keyset_path:
+                description: "Keyset to be unencrypted by tink."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+          env:
+            description: "Env vars to be specified to access AWS Cloud keys."
+            type: "list"
+            elements: "dict"
+            required: false
+            version_added: "1.2.0"
           ca_passphrase:
             description: "Passphrase used for Certificate Authority cert."
             type: "str"
@@ -365,6 +469,65 @@ argument_specs:
             type: "int"
             required: false
             version_added: "1.1.0"
+          private_keys:
+            description: "List of private keys for use within rekor."
+            type: "list"
+            options:
+              ID:
+                description: "Custom rekor secret ID."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              key:
+                description: "Custom Rekor Private key value."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+            required: false
+            version_added: "1.2.0"
+          public_keys:
+            description: "List of public keys for use within rekor."
+            type: "list"
+            options:
+              ID:
+                description: "Custom rekor secret ID."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              key:
+                description: "Custom Rekor Public key value."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+            required: false
+            version_added: "1.2.0"
+          sharding_config:
+            description: "Sharding configuration for rekor"
+            type: "list"
+            elements: "dict"
+            options:
+              tree_id:
+                description: "Sharding configuration treeID"
+                type: "int"
+                required: false
+                version_added: "1.2.0"
+              tree_length:
+                description: "Length of rekor tree."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              signing_config:
+                description: "Signing Configuration or rekor shard."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              pem_pub_key:
+                description: "PEM-encoded PKIX public key."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_setup_host_dns:
         description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"
@@ -406,10 +569,6 @@ argument_specs:
             required: true
             version_added: "1.2.0"
             options:
-              config:
-                description: "Individual Log Configs"
-                required: true
-                version_added: "1.2.0"
               treeid:
                 description: "Trillian Tree Id ctlog use."
                 type: "int"
@@ -435,6 +594,95 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.2.0"
+              override_handler_prefix:
+                description: "Overrides the handler prefix for this log"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              public_key:
+                description: "Public key used for verification (must be in DER format)."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              reject_expired:
+                description: "Reject certificates that are expired"
+                type: "bool"
+                required: false
+                version_added: "1.2.0"
+              reject_unexpired:
+                description: "Reject certificates that are not expired"
+                type: "bool"
+                required: false
+                version_added: "1.2.0"
+              not_after_start:
+                description: "Starting timestamp for valid 'NotAfter' dates"
+                type: "dict"
+                options:
+                  seconds:
+                    description: "Seconds portion of the timestamp"
+                    type: "int"
+                  nanos:
+                    description: "Nanoseconds portion of the timestamp"
+                    type: "int"
+                required: false
+                version_added: "1.2.0"
+              not_after_limit:
+                description: "Ending timestamp for valid 'NotAfter' dates"
+                type: "dict"
+                options:
+                  seconds:
+                    description: "Seconds portion of the timestamp"
+                    type: "int"
+                  nanos:
+                    description: "Nanoseconds portion of the timestamp"
+                    type: "int"
+                required: false
+                version_added: "1.2.0"
+              accept_only_ca:
+                description: "Only accept certificates with CA extension"
+                type: "bool"
+                required: false
+                version_added: "1.2.0"
+              is_mirror:
+                description: "Indicates whether the log is a mirror log"
+                type: "bool"
+                required: false
+                version_added: "1.2.0"
+              is_readonly:
+                description: "Indicates whether the log is read-only"
+                type: "bool"
+                required: false
+                version_added: "1.2.0"
+              max_merge_delay_sec:
+                description: "Maximum merge delay in seconds"
+                type: "int"
+                required: false
+                version_added: "1.2.0"
+              expected_merge_delay_sec:
+                description: "Expected merge delay in seconds"
+                type: "int"
+                required: false
+                version_added: "1.2.0"
+              frozen_sth:
+                description: "Signed Tree Head (STH) that freezes the log"
+                type: "dict"
+                required: false
+                version_added: "1.2.0"
+              reject_extensions:
+                description: "List of rejected certificate extensions"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              ctfe_storage_connection_string:
+                description: "Storage connection string for CTFE"
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              extra_data_issuance_chain_storage_backend:
+                description: "Storage backend for extra data issuance chain"
+                type: "int"
+                required: false
+                version_added: "1.2.0"
           private_keys:
             description: "List of private keys for use within ctlog"
             type: "list"
@@ -456,6 +704,7 @@ argument_specs:
         version_added: "1.2.0"
         required: false
         default:
+          env: []
           signer_type: file
           certificate:
             organization_name: ""
@@ -469,7 +718,6 @@ argument_specs:
             hcvault_token: ""
           signer_private_key: ""
           certificate_chain: ""
-          signer_passphrase: rhtas
           ca_passphrase: rhtas
           ntp_config: ""
           trusted_ca: ""
@@ -548,13 +796,11 @@ argument_specs:
             type: "str"
             required: false
             version_added: "1.2.0"
-          signer_passphrase:
-            description: "Passphrase used to access signer private key."
-            type: "str"
-            required: false
-            version_added: "1.2.0"
           ca_passphrase:
-            description: "Passphrase used to access certificate authority."
+            description: >
+              Passphrase for Certificate Authority.
+              **Note**: Updating the passphrase will regenerate the auto-generated private key and the TSA certificate as a consequence,
+              and a manual update in the trust root is required."
             type: "str"
             required: false
             version_added: "1.2.0"
@@ -572,6 +818,12 @@ argument_specs:
             type: "str"
             required: false
             version_added: "1.2.0"
+          env:
+            description: "Environment vars to be specified to access AWS Cloud keys when using Tink or KMS"
+            type: "list"
+            elements: "dict"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_skip_os_install:
         description: >
           Whether or not to skip the installation of the required operating system packages.
@@ -580,57 +832,6 @@ argument_specs:
         required: false
         version_added: "1.1.0"
         default: false
-      tas_single_node_oidc_issuers:
-        description: "The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests."
-        type: "list"
-        elements: "dict"
-        required: true
-        version_added: "1.1.0"
-        # we provide no default here intentionally
-        options:
-          issuer:
-            description: "A unique name of the OIDC issuer."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          url:
-            description: "The OIDC issuer service URL."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          client_id:
-            description: "The OIDC client identifier used by the RHTAS service."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          type:
-            description: "The type of the OIDC token issuer, for example, 'email'."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-      tas_single_node_meta_issuers:
-        description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
-        type: "list"
-        elements: "dict"
-        required: false
-        version_added: "1.1.0"
-        default: []
-        options:
-          issuer_pattern:
-            description: "A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          client_id:
-            description: "The OIDC client identifier used by the RHTAS service."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
-          type:
-            description: "The type of the OIDC token issuer, for example, 'email'."
-            type: "str"
-            required: true
-            version_added: "1.1.0"
       tas_single_node_fulcio_server_image:
         description: "Fulcio image"
         type: "str"
@@ -774,12 +975,57 @@ argument_specs:
                 version_added: "1.2.0"
       tas_single_node_podman_volume_create_extra_args:
         description: >
-          Additional arguments to pass to the `podman volume create` command.
-          This can be used to specify extra options when creating Podman volumes.
-        type: "str"
+          A dictionary of additional arguments to pass to the `podman volume create`
+          command for each volume. This allows customization of options when creating
+          specific volumes. Each key in the dictionary corresponds to a volume name
+          with hyphens replaced by underscores.
+        type: "dict"
         required: false
         version_added: "1.2.0"
-        default: ""
+        default:
+          trillian_mysql: ""
+          rekor_redis_storage: ""
+          redis_backfill_storage: ""
+          rekor_server: ""
+          tuf_repository: ""
+          tuf_signing_keys: ""
+        options:
+          trillian_mysql:
+            description: >
+              Additional arguments to pass when creating the "trillian-mysql" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          rekor_redis_storage:
+            description: >
+              Additional arguments to pass when creating the "rekor-redis-storage" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          redis_backfill_storage:
+            description: >
+              Additional arguments to pass when creating the "redis-backfill-storage" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          rekor_server:
+            description: >
+              Additional arguments to pass when creating the "rekor-server" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          tuf_repository:
+            description: >
+              Additional arguments to pass when creating the "tuf-repository" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
+          tuf_signing_keys:
+            description: >
+              Additional arguments to pass when creating the "tuf-signing-keys" volume.
+            type: "str"
+            required: false
+            version_added: "1.2.0"
       tas_single_node_trust_root:
         description: "Configuration options for the Trust Root."
         type: "dict"
