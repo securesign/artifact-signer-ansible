@@ -169,29 +169,29 @@ In the following example, replace `TODO` with your relevant information:
 
 ```yaml
     - hosts: rhtas
-       vars:
-         tas_single_node_base_hostname: TODO # For example, example.com
-         # Access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication)
-         tas_single_node_registry_username: TODO
-         tas_single_node_registry_password: TODO
-         tas_single_node_oidc_issuers:
-           - issuer: TODO # your OIDC provider URL
-             client_id: trusted-artifact-signer
-             url: TODO # your OIDC provider URL
-             type: email
-         # Create secure unique passphrases
-         tas_single_node_fulcio:
-           ca_passphrase: TODO
-           ct_log_prefix: TODO
-         tas_single_node_ctlog:
-           ca_passphrase: TODO
-         tas_single_node_rekor:
-           ca_passphrase: TODO
-         tas_single_node_tsa:
-           ca_passphrase: TODO
-           signer_passphrase: TODO
+      vars:
+        tas_single_node_base_hostname: TODO # e.g. example.com
+        # Access credentials for registry.redhat.io (https://access.redhat.com/RegistryAuthentication).
+        tas_single_node_registry_username: TODO
+        tas_single_node_registry_password: TODO
+        # Create secure unique passphrases.
+        tas_single_node_fulcio:
+          ca_passphrase: TODO
+          fulcio_config:
+            oidc_issuers:
+              - issuer: TODO # Your OIDC provider URL
+                client_id: trusted-artifact-signer
+                url: TODO # Your OIDC provider URL
+                type: email
+          ct_log_prefix: TODO
+        tas_single_node_ctlog:
+          ca_passphrase: TODO
+        tas_single_node_rekor:
+          ca_passphrase: TODO
+        tas_single_node_tsa:
+          ca_passphrase: TODO
       tasks:
-        - name: Include RHTAS single node role
+        - name: Include TAS single node role
           ansible.builtin.include_role:
             name: redhat.artifact_signer.tas_single_node # Use if deploying from Ansible Automation Hub.
           vars:
