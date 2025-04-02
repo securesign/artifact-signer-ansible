@@ -32,10 +32,10 @@
   vars:
     secret_name: rekor-secret
     secret_namespace: rekor-system
-    keyname: [private, public]
-    keyids: ['{{ tas_single_node_rekor.private_keys }}', '{{ tas_single_node_rekor.public_keys }}']
-    keylists: ['{{ tas_single_node_remote_rekor_private_key }}', '{{ tas_single_node_remote_rekor_public_key }}']
-    slurpedcerts: '{{ remote_rekor_keys }}'
+    key_name: [private, public]
+    key_ids: ['{{ tas_single_node_rekor.private_keys }}', '{{ tas_single_node_rekor.public_keys }}']
+    key_lists: ['{{ tas_single_node_remote_rekor_private_key }}', '{{ tas_single_node_remote_rekor_public_key }}']
+    slurped_certs: '{{ remote_rekor_keys }}'
 
 - name: Create Custom rekor Secret
   ansible.builtin.copy:
