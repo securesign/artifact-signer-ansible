@@ -46,7 +46,7 @@
         - name: Assert that user-provided ctlog keys were taken by TAS
           ansible.builtin.assert:
             that:
-              - "{{ item.test_content | b64encode == item.ctlog_config['content'] }}"
+              - "{{ item.test_content.key | b64encode == item.ctlog_config['content'] }}"
             fail_msg: "{{ item.msg }} was not taken by TAS"
             success_msg: "{{ item.msg }} was taken by TAS"
           loop:

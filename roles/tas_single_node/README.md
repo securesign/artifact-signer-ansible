@@ -241,48 +241,62 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | ca_passphrase | Passphrase used for Certificate Authority. | str | no |  |
-| sharding_config | Configuration for each log in ctlog | str | yes |  |
-| private_keys | List of private keys for use within ctlog | list of 'str' | no |  |
-| public_keys | List of public keys for use within ctlog | list of 'str' | no |  |
+| sharding_config | Configuration for each log in ctlog. | str | yes |  |
+| private_keys | List of private keys for use within ctlog. | list of '' | no |  |
+| public_keys | List of public keys for use within ctlog. | list of '' | no |  |
 
 #### Options for main > tas_single_node_ctlog > sharding_config
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | treeid | Trillian Tree Id ctlog use. | int | no |  |
-| prefix | ctlog log Prefix | str | no |  |
-| root_pem_file | File path to root Pem file | str | no |  |
-| password | Password for private key used by ctlog | str | no |  |
-| private_key | Name of the private key in the system | str | no |  |
-| override_handler_prefix | Overrides the handler prefix for this log | str | no |  |
+| prefix | ctlog log Prefix. | str | no |  |
+| root_pem_file | File path to root Pem file. | str | no |  |
+| password | Password for private key used by ctlog. | str | no |  |
+| private_key | Name of the private key in the system. | str | no |  |
+| override_handler_prefix | Overrides the handler prefix for this log. | str | no |  |
 | public_key | Public key used for verification (must be in DER format). | str | no |  |
-| reject_expired | Reject certificates that are expired | bool | no |  |
-| reject_unexpired | Reject certificates that are not expired | bool | no |  |
-| not_after_start | Starting timestamp for valid 'NotAfter' dates | dict of 'not_after_start' options | no |  |
-| not_after_limit | Ending timestamp for valid 'NotAfter' dates | dict of 'not_after_limit' options | no |  |
-| accept_only_ca | Only accept certificates with CA extension | bool | no |  |
-| is_mirror | Indicates whether the log is a mirror log | bool | no |  |
-| is_readonly | Indicates whether the log is read-only | bool | no |  |
-| max_merge_delay_sec | Maximum merge delay in seconds | int | no |  |
-| expected_merge_delay_sec | Expected merge delay in seconds | int | no |  |
-| frozen_sth | Signed Tree Head (STH) that freezes the log | dict | no |  |
-| reject_extensions | List of rejected certificate extensions | str | no |  |
-| ctfe_storage_connection_string | Storage connection string for CTFE | str | no |  |
-| extra_data_issuance_chain_storage_backend | Storage backend for extra data issuance chain | int | no |  |
+| reject_expired | Reject certificates that are expired. | bool | no |  |
+| reject_unexpired | Reject certificates that are not expired. | bool | no |  |
+| not_after_start | Starting timestamp for valid 'NotAfter' dates. | dict of 'not_after_start' options | no |  |
+| not_after_limit | Ending timestamp for valid 'NotAfter' dates. | dict of 'not_after_limit' options | no |  |
+| accept_only_ca | Only accept certificates with CA extension. | bool | no |  |
+| is_mirror | Indicates whether the log is a mirror log. | bool | no |  |
+| is_readonly | Indicates whether the log is read-only. | bool | no |  |
+| max_merge_delay_sec | Maximum merge delay in seconds. | int | no |  |
+| expected_merge_delay_sec | Expected merge delay in seconds. | int | no |  |
+| frozen_sth | Signed Tree Head (STH) that freezes the log. | dict | no |  |
+| reject_extensions | List of rejected certificate extensions. | str | no |  |
+| ctfe_storage_connection_string | Storage connection string for CTFE. | str | no |  |
+| extra_data_issuance_chain_storage_backend | Storage backend for extra data issuance chain. | int | no |  |
 
 #### Options for main > tas_single_node_ctlog > sharding_config > not_after_start
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| seconds | Seconds portion of the timestamp | int | no |  |
-| nanos | Nanoseconds portion of the timestamp | int | no |  |
+| seconds | Seconds portion of the timestamp. | int | no |  |
+| nanos | Nanoseconds portion of the timestamp. | int | no |  |
 
 #### Options for main > tas_single_node_ctlog > sharding_config > not_after_limit
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| seconds | Seconds portion of the timestamp | int | no |  |
-| nanos | Nanoseconds portion of the timestamp | int | no |  |
+| seconds | Seconds portion of the timestamp. | int | no |  |
+| nanos | Nanoseconds portion of the timestamp. | int | no |  |
+
+#### Options for main > tas_single_node_ctlog > private_keys
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ID | Custom ctlog secret ID. | str | no |  |
+| key | Custom ctlog Private key value. | str | no |  |
+
+#### Options for main > tas_single_node_ctlog > public_keys
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ID | Custom ctlog secret ID. | str | no |  |
+| key | Custom ctlog Public key value. | str | no |  |
 
 #### Options for main > tas_single_node_tsa
 
