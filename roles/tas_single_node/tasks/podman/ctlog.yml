@@ -44,7 +44,9 @@
     secret_namespace: ctlog-system
     key_name: [private, public, fulcio]
     key_ids: ['{{ tas_single_node_ctlog.private_keys }}', '{{ tas_single_node_ctlog.public_keys }}']
-    key_lists: ['{{ tas_single_node_remote_ctlog_private_key }}', '{{ tas_single_node_remote_ctlog_public_key }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
+    key_lists: ['{{ tas_single_node_remote_ctlog_private_key }}',
+      '{{ tas_single_node_remote_ctlog_public_key }}', 
+      '{{ tas_single_node_remote_fulcio_root_ca }}']
     slurped_certs: '{{ remote_ctlog_certificates }}'
 
 - name: Create Custom ctlog Secret
