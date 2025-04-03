@@ -509,6 +509,7 @@
 - name: Create Custom ctlog Root
   when: >
     (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
+    
   no_log: true
   block:
     - name: Create marker file if keys are provided by the user
