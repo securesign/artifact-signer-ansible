@@ -27,6 +27,20 @@
     tas_single_node_ingress_certificates[cert_name].certificate | default('') != ''
     and tas_single_node_ingress_certificates[cert_name].private_key | default('') != ''
 
+- name: Set tas_single_node_ingress_use_provided_cert_marker_file for {{ cert_name }}
+  ansible.builtin.set_fact:
+    tas_single_node_ingress_use_provided_cert_marker_file: "{{ tas_single_node_certs_dir }}/_ingress_{{ cert_name }}_use_provided_cert"
+
+- name: Create marker file if key/cert is provided by the user ({{ cert_name }})
+  ansible.builtin.file:
+    path: "{{ tas_single_node_ingress_use_provided_cert_marker_file }}"
+    state: touch
+    mode: '0644'
+  when: >
+    existing_files.files | selectattr('path', 'equalto', tas_single_node_ingress_use_provided_cert_marker_file) | list | length == 0
+    and (tas_single_node_ingress_certificates[cert_name].certificate | default('') != ''
+      and tas_single_node_ingress_certificates[cert_name].private_key | default('') != '')
+
 - name: Create certificate and private key for {{ cert_name }}
   when: >
     ((existing_files.files | selectattr('path', 'equalto', remote_key_path) | list | length) == 0
@@ -34,9 +48,21 @@
     and (
       (tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
        or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''))
+    or (
+      (tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
+        or tas_single_node_ingress_certificates[cert_name].private_key | default('') == '')
+      and (existing_files.files | selectattr('path', 'equalto', tas_single_node_ingress_use_provided_cert_marker_file) | list | length != 0) )
   #   when: ((existing_files.files | selectattr('path', 'equalto', key_path) | list | length) == 0)
   #         and (existing_files.files | selectattr('path', 'equalto', cert_path) | list | length) == 0))
   block:
+    - name: Clean-up existing private key if it exists ({{ cert_name }})
+      ansible.builtin.file:
+        path: "{{ remote_key_path }}"
+        state: absent
+      when: >
+        tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
+        and (existing_files.files | selectattr('path', 'equalto', tas_single_node_ingress_use_provided_cert_marker_file) | list | length != 0)
+
     - name: Create private key for {{ cert_name }}
       ansible.builtin.command:
         cmd: "openssl genrsa -out '{{ remote_key_path }}' 4096"
@@ -60,6 +86,15 @@
         tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
         or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
 
+    - name: Clean-up existing cert if it exists ({{ cert_name }})
+      ansible.builtin.file:
+        path: "{{ remote_cert_path }}"
+        state: absent
+      when: >
+        (tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
+        or tas_single_node_ingress_certificates[cert_name].private_key | default('') == '')
+        and (existing_files.files | selectattr('path', 'equalto', tas_single_node_ingress_use_provided_cert_marker_file) | list | length != 0)
+
     - name: Sign certificate with our CA for {{ cert_name }}
       ansible.builtin.shell:
         # valid for two years
@@ -75,3 +110,9 @@
       when: >
         tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
         or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
+
+    - name: Remove marker file if key/cert is not provided by the user ({{ cert_name }})
+      ansible.builtin.file:
+        path: "{{ tas_single_node_ingress_use_provided_cert_marker_file }}"
+        state: absent
+      when: existing_files.files | selectattr('path', 'equalto', tas_single_node_ingress_use_provided_cert_marker_file) | list | length != 0
