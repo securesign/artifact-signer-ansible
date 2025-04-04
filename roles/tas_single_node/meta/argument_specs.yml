@@ -473,7 +473,7 @@ argument_specs:
             description: "List of private keys for use within rekor."
             type: "list"
             options:
-              ID:
+              id:
                 description: "Custom rekor secret ID."
                 type: "str"
                 required: false
@@ -489,7 +489,7 @@ argument_specs:
             description: "List of public keys for use within rekor."
             type: "list"
             options:
-              ID:
+              id:
                 description: "Custom rekor secret ID."
                 type: "str"
                 required: false
@@ -565,7 +565,7 @@ argument_specs:
             required: false
             version_added: "1.2.0"
           sharding_config:
-            description: "Configuration for each log in ctlog"
+            description: "Configuration for each log in ctlog."
             required: true
             version_added: "1.2.0"
             options:
@@ -575,27 +575,27 @@ argument_specs:
                 required: false
                 version_added: "1.2.0"
               prefix:
-                description: "ctlog log Prefix"
+                description: "ctlog log Prefix."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               root_pem_file:
-                description: "File path to root Pem file"
+                description: "File path to root Pem file."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               password:
-                description: "Password for private key used by ctlog"
+                description: "Password for private key used by ctlog."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               private_key:
-                description: "Name of the private key in the system"
+                description: "Name of the private key in the system."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               override_handler_prefix:
-                description: "Overrides the handler prefix for this log"
+                description: "Overrides the handler prefix for this log."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
@@ -605,96 +605,112 @@ argument_specs:
                 required: false
                 version_added: "1.2.0"
               reject_expired:
-                description: "Reject certificates that are expired"
+                description: "Reject certificates that are expired."
                 type: "bool"
                 required: false
                 version_added: "1.2.0"
               reject_unexpired:
-                description: "Reject certificates that are not expired"
+                description: "Reject certificates that are not expired."
                 type: "bool"
                 required: false
                 version_added: "1.2.0"
               not_after_start:
-                description: "Starting timestamp for valid 'NotAfter' dates"
+                description: "Starting timestamp for valid 'NotAfter' dates."
                 type: "dict"
                 options:
                   seconds:
-                    description: "Seconds portion of the timestamp"
+                    description: "Seconds portion of the timestamp."
                     type: "int"
                   nanos:
-                    description: "Nanoseconds portion of the timestamp"
+                    description: "Nanoseconds portion of the timestamp."
                     type: "int"
                 required: false
                 version_added: "1.2.0"
               not_after_limit:
-                description: "Ending timestamp for valid 'NotAfter' dates"
+                description: "Ending timestamp for valid 'NotAfter' dates."
                 type: "dict"
                 options:
                   seconds:
-                    description: "Seconds portion of the timestamp"
+                    description: "Seconds portion of the timestamp."
                     type: "int"
                   nanos:
-                    description: "Nanoseconds portion of the timestamp"
+                    description: "Nanoseconds portion of the timestamp."
                     type: "int"
                 required: false
                 version_added: "1.2.0"
               accept_only_ca:
-                description: "Only accept certificates with CA extension"
+                description: "Only accept certificates with CA extension."
                 type: "bool"
                 required: false
                 version_added: "1.2.0"
               is_mirror:
-                description: "Indicates whether the log is a mirror log"
+                description: "Indicates whether the log is a mirror log."
                 type: "bool"
                 required: false
                 version_added: "1.2.0"
               is_readonly:
-                description: "Indicates whether the log is read-only"
+                description: "Indicates whether the log is read-only."
                 type: "bool"
                 required: false
                 version_added: "1.2.0"
               max_merge_delay_sec:
-                description: "Maximum merge delay in seconds"
+                description: "Maximum merge delay in seconds."
                 type: "int"
                 required: false
                 version_added: "1.2.0"
               expected_merge_delay_sec:
-                description: "Expected merge delay in seconds"
+                description: "Expected merge delay in seconds."
                 type: "int"
                 required: false
                 version_added: "1.2.0"
               frozen_sth:
-                description: "Signed Tree Head (STH) that freezes the log"
+                description: "Signed Tree Head (STH) that freezes the log."
                 type: "dict"
                 required: false
                 version_added: "1.2.0"
               reject_extensions:
-                description: "List of rejected certificate extensions"
+                description: "List of rejected certificate extensions."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               ctfe_storage_connection_string:
-                description: "Storage connection string for CTFE"
+                description: "Storage connection string for CTFE."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
               extra_data_issuance_chain_storage_backend:
-                description: "Storage backend for extra data issuance chain"
+                description: "Storage backend for extra data issuance chain."
                 type: "int"
                 required: false
                 version_added: "1.2.0"
           private_keys:
-            description: "List of private keys for use within ctlog"
+            description: "List of private keys for use within ctlog."
             type: "list"
-            elements: "str"
-            required: false
-            version_added: "1.2.0"
+            options:
+              id:
+                description: "Custom ctlog secret ID."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              key:
+                description: "Custom ctlog Private key value."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
           public_keys:
-            description: "List of public keys for use within ctlog"
+            description: "List of public keys for use within ctlog."
             type: "list"
-            elements: "str"
-            required: false
-            version_added: "1.2.0"
+            options:
+              id:
+                description: "Custom ctlog secret ID."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
+              key:
+                description: "Custom ctlog Public key value."
+                type: "str"
+                required: false
+                version_added: "1.2.0"
 
       tas_single_node_tsa:
         description: >

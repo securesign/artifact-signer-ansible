@@ -420,8 +420,8 @@
 - name: Set ctlog_private_keys_changed
   ansible.builtin.set_fact:
     ctlog_private_keys_changed: >-
-      {{ (existing_keys.results | length != tas_single_node_ctlog.private_keys | length
-      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.private_keys)
+      {{ (existing_keys.results | length != (tas_single_node_ctlog.private_keys | map(attribute='key') | list | length )
+      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != (tas_single_node_ctlog.private_keys | map(attribute='key') | list))
       and (tas_single_node_ctlog.private_keys | length > 0
         or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_ctlog_use_provided_root_marker_file) | list | length != 0)) }}
 
@@ -436,7 +436,7 @@
             map(attribute='content') |
             map('b64decode') |
             zip(existing_keys.results | map(attribute='source')) |
-            rejectattr(0, 'in', tas_single_node_ctlog.private_keys) |
+            rejectattr(0, 'in', (tas_single_node_ctlog.private_keys | map(attribute='key') | list )) |
             map(attribute=1) |
             list }}
 
@@ -472,8 +472,8 @@
 - name: Set ctlog_public_keys_changed
   ansible.builtin.set_fact:
     ctlog_public_keys_changed: >-
-      {{ (existing_keys.results | length != tas_single_node_ctlog.public_keys | length
-      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != tas_single_node_ctlog.public_keys)
+      {{ (existing_keys.results | length != (tas_single_node_ctlog.public_keys | map(attribute='key') | list | length )
+      or (existing_keys.results | map(attribute='content') | map('b64decode') | list) != (tas_single_node_ctlog.public_keys | map(attribute='key') | list ))
       and (tas_single_node_ctlog.public_keys | length > 0
         or (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_ctlog_use_provided_root_marker_file) | list | length != 0)) }}
 
@@ -488,7 +488,7 @@
             map(attribute='content') |
             map('b64decode') |
             zip(existing_keys.results | map(attribute='source')) |
-            rejectattr(0, 'in', tas_single_node_ctlog.public_keys) |
+            rejectattr(0, 'in', (tas_single_node_ctlog.public_keys | map(attribute='key') | list )) |
             map(attribute=1) |
             list }}
 
@@ -509,6 +509,7 @@
 - name: Create Custom ctlog Root
   when: >
     (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
+
   no_log: true
   block:
     - name: Create marker file if keys are provided by the user
@@ -522,20 +523,21 @@
       when: ctlog_private_keys_changed
       changed_when: false
       ansible.builtin.copy:
-        content: "{{ key_var }}"
+        content: "{{ key_var.key }}"
         dest: "{{ tas_single_node_certs_dir }}/ctlog{{ key_num }}.key"
         mode: '0600'
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
         loop_var: key_var
         index_var: key_num
+      register: custom_ctlog_private_keys
 
     - name: Reset ctlog Private Key path list
       ansible.builtin.set_fact:
         tas_single_node_remote_ctlog_private_key: []
 
     - name: Track ctlog private keys
-      when: key_var != ""
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
@@ -573,20 +575,21 @@
       when: ctlog_public_keys_changed
       changed_when: false
       ansible.builtin.copy:
-        content: "{{ key_var }}"
+        content: "{{ key_var.key }}"
         dest: "{{ tas_single_node_certs_dir }}/ctlog{{ key_num }}.pub"
         mode: '0600'
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
         loop_var: key_var
         index_var: key_num
+      register: custom_ctlog_public_keys
 
     - name: Reset ctlog public key path
       ansible.builtin.set_fact:
         tas_single_node_remote_ctlog_public_key: []
 
     - name: Track ctlog Public Keys
-      when: key_var != ""
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
@@ -785,12 +788,11 @@
       register: custom_rekor_private_keys
 
     - name: Reset rekor private key path
-      when: custom_rekor_private_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: []
 
-    - name: Add Created Custom Keys
-      when: key_var.key != "" and custom_rekor_private_keys is not skipped
+    - name: Add created custom rekor private keys
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_rekor.private_keys | list }}'
       loop_control:
@@ -836,12 +838,11 @@
       register: custom_rekor_pub_keys
 
     - name: Reset rekor public key path
-      when: custom_rekor_pub_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_public_key: []
 
-    - name: Add Created Custom Keys
-      when: key_var.key != "" and custom_rekor_pub_keys is not skipped
+    - name: Add created custom rekor public keys
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_rekor.public_keys | list }}'
       loop_control:

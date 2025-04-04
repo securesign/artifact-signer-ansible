@@ -42,9 +42,12 @@
   vars:
     secret_name: ctlog-secret
     secret_namespace: ctlog-system
-    keyname: [private, public, fulcio]
-    keylists: ['{{ tas_single_node_remote_ctlog_private_key }}', '{{ tas_single_node_remote_ctlog_public_key }}', '{{ tas_single_node_remote_fulcio_root_ca }}']
-    slurpedcerts: '{{ remote_ctlog_certificates }}'
+    key_name: [private, public, fulcio]
+    key_ids: ['{{ tas_single_node_ctlog.private_keys }}', '{{ tas_single_node_ctlog.public_keys }}']
+    key_lists: ['{{ tas_single_node_remote_ctlog_private_key }}',
+                '{{ tas_single_node_remote_ctlog_public_key }}',
+                '{{ tas_single_node_remote_fulcio_root_ca }}']
+    slurped_certs: '{{ remote_ctlog_certificates }}'
 
 - name: Create Custom ctlog Secret
   ansible.builtin.copy:
