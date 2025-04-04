@@ -533,12 +533,11 @@
       register: custom_ctlog_private_keys
 
     - name: Reset ctlog Private Key path list
-      when: custom_ctlog_private_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_ctlog_private_key: []
 
     - name: Track ctlog private keys
-      when: key_var != ""
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
@@ -586,7 +585,6 @@
       register: custom_ctlog_public_keys
 
     - name: Reset ctlog public key path
-      when: custom_ctlog_public_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_ctlog_public_key: []
 
@@ -794,8 +792,8 @@
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: []
 
-    - name: Add Created Custom Keys
-      when: key_var.key != "" and custom_rekor_private_keys is not skipped
+    - name: Add created custom rekor private keys
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_rekor.private_keys | list }}'
       loop_control:
@@ -845,8 +843,8 @@
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_public_key: []
 
-    - name: Add Created Custom Keys
-      when: key_var.key != "" and custom_rekor_pub_keys is not skipped
+    - name: Add created custom rekor public keys
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_rekor.public_keys | list }}'
       loop_control:
