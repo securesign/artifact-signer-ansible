@@ -788,7 +788,6 @@
       register: custom_rekor_private_keys
 
     - name: Reset rekor private key path
-      when: custom_rekor_private_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_private_key: []
 
@@ -839,7 +838,6 @@
       register: custom_rekor_pub_keys
 
     - name: Reset rekor public key path
-      when: custom_rekor_pub_keys is not skipped
       ansible.builtin.set_fact:
         tas_single_node_remote_rekor_public_key: []
 
