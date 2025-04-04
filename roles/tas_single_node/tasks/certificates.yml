@@ -509,7 +509,7 @@
 - name: Create Custom ctlog Root
   when: >
     (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
-    
+
   no_log: true
   block:
     - name: Create marker file if keys are provided by the user
@@ -538,7 +538,7 @@
         tas_single_node_remote_ctlog_private_key: []
 
     - name: Track ctlog private keys
-      when: key_var != "" and custom_ctlog_private_keys is not skipped
+      when: key_var != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.private_keys | list }}'
       loop_control:
@@ -591,7 +591,7 @@
         tas_single_node_remote_ctlog_public_key: []
 
     - name: Track ctlog Public Keys
-      when: key_var.key != "" and custom_ctlog_public_keys is not skipped
+      when: key_var.key != ""
       changed_when: false
       loop: '{{ tas_single_node_ctlog.public_keys | list }}'
       loop_control:
