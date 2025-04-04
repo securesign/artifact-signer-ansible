@@ -13,3 +13,19 @@
   ansible.builtin.fail:
     msg: "'memory' signer can't be used for Rekor"
   when: tas_single_node_rekor_signer_type == "memory"
+
+- name: Check custom rekor key id's are unique.
+  when: (tas_single_node_rekor.public_keys | length > 0) and (tas_single_node_rekor.private_keys | length > 0)
+  ansible.builtin.assert:
+    that: |
+          (((tas_single_node_rekor.private_keys | list) + (tas_single_node_rekor.public_keys| list) )  | map(attribute='id') | list |  unique | length )
+          ==  (((tas_single_node_rekor.private_keys | list) + (tas_single_node_rekor.public_keys| list ))  | map(attribute='id') | list | length )
+    msg: "Custom keys declared within 'tas_single_node_rekor' must have unique ID's."
+
+- name: Check custom ctlog key id's are unique.
+  when: (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
+  ansible.builtin.assert:
+    that: |
+          (((tas_single_node_ctlog.private_keys | list) + (tas_single_node_ctlog.public_keys| list) )  | map(attribute='id') | list |  unique | length )
+          ==  (((tas_single_node_ctlog.private_keys | list) + (tas_single_node_ctlog.public_keys| list ))  | map(attribute='id') | list | length )
+    msg: "Custom keys declared within 'tas_single_node_ctlog' must have unique ID's."
