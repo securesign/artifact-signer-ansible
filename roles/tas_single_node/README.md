@@ -217,14 +217,14 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| ID | Custom rekor secret ID. | str | no |  |
+| id | Custom rekor secret ID. | str | no |  |
 | key | Custom Rekor Private key value. | str | no |  |
 
 #### Options for main > tas_single_node_rekor > public_keys
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| ID | Custom rekor secret ID. | str | no |  |
+| id | Custom rekor secret ID. | str | no |  |
 | key | Custom Rekor Public key value. | str | no |  |
 
 #### Options for main > tas_single_node_rekor > sharding_config
@@ -288,14 +288,14 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| ID | Custom ctlog secret ID. | str | no |  |
+| id | Custom ctlog secret ID. | str | no |  |
 | key | Custom ctlog Private key value. | str | no |  |
 
 #### Options for main > tas_single_node_ctlog > public_keys
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
-| ID | Custom ctlog secret ID. | str | no |  |
+| id | Custom ctlog secret ID. | str | no |  |
 | key | Custom ctlog Public key value. | str | no |  |
 
 #### Options for main > tas_single_node_tsa
