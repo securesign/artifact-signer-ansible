@@ -2,8 +2,8 @@
 - name: Importing default values
   ansible.builtin.import_tasks: set_defaults.yml
 
-- name: Backup Check Tasks
-  ansible.builtin.include_tasks: podman/backup_restore/backup_checks.yml
+- name: Configure/Deploy Backup
+  ansible.builtin.include_tasks: podman/backup_restore/backup.yml
 
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
@@ -50,7 +50,3 @@
 
 - name: Execute Podman Actions
   ansible.builtin.include_tasks: podman.yml
-
-- name: Configure/Deploy Backup
-  ansible.builtin.include_tasks: podman/backup_restore/backup.yml
-  when: tas_single_node_backup_restore.backup.enabled | bool
