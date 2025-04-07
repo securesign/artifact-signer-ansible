@@ -2,9 +2,6 @@
 - name: Importing default values
   ansible.builtin.import_tasks: set_defaults.yml
 
-- name: Configure/Deploy Backup
-  ansible.builtin.include_tasks: podman/backup_restore/backup.yml
-
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
 
@@ -18,10 +15,12 @@
 - name: Create Podman Volumes
   ansible.builtin.include_tasks: volumes.yml
 
+- name: Configure/Deploy Backup
+  ansible.builtin.include_tasks: podman/backup_restore/backup.yml
+
 - name: Run TAS System Restore
   ansible.builtin.include_tasks: podman/backup_restore/restore.yml
-  when: tas_single_node_backup_restore.restore.enabled and
-        not tas_single_node_backup_restore.backup.force_run
+  when: tas_single_node_backup_restore.restore.enabled
 
 - name: Create cockpit-user
   ansible.builtin.user:
