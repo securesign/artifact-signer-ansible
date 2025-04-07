@@ -943,9 +943,10 @@
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
 
     - name: Back-up and Clean up generated keys and certs
-      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0 and
+      when: ((certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0 and
             (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) != 0 and
-            (cert_needs_regeneration or ((tsa_key_passphrase | default({})).stdout is defined and tsa_key_passphrase.stdout == "failed"))
+            (cert_needs_regeneration or ((tsa_key_passphrase | default({})).stdout is defined and tsa_key_passphrase.stdout == "failed")
+            or certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_use_provided_cert_key_marker_file) | list | length != 0 ))
       block:
         - name: Back-up old generated certs and keys
           ansible.builtin.copy:
@@ -973,6 +974,12 @@
         file_type: file
         paths: "{{ tas_single_node_certs_dir }}"
       register: certs_dir_files
+
+    - name: Remove marker file if no certificate chain/private key are provided by the user
+      ansible.builtin.file:
+        path: "{{ tas_single_node_tsa_use_provided_cert_key_marker_file }}"
+        state: absent
+      when: certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_use_provided_cert_key_marker_file) | list | length != 0
 
     - name: Create TSA root private key
       ansible.builtin.shell:
@@ -1102,6 +1109,60 @@
         - tas_single_node_tsa.signer_type == 'file'
         - tas_single_node_tsa.certificate_chain | length == 0
         - tas_single_node_tsa.signer_private_key | length > 0
+
+    - name: Refresh list of files in certs directory
+      ansible.builtin.find:
+        file_type: file
+        paths: "{{ tas_single_node_certs_dir }}"
+      register: certs_dir_files
+
+    - name: Create marker file if certificate chain/private key are provided by the user
+      ansible.builtin.file:
+        path: "{{ tas_single_node_tsa_use_provided_cert_key_marker_file }}"
+        state: touch
+        mode: '0644'
+      when: >
+        (tas_single_node_tsa.certificate_chain != "" or tas_single_node_tsa.signer_private_key != "")
+          and certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_use_provided_cert_key_marker_file) | list | length == 0
+
+    - name: Read the old private key content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_tsa_signer_private_key }}"
+      register: old_key_content
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_signer_private_key) | list | length) != 0
+
+    - name: Read the old cert chain content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_tsa_certificate_chain }}"
+      register: old_cert_chain_content
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
+
+    - name: Backup old TSA private key and cert chain
+      when: >
+          (tas_single_node_tsa.certificate_chain != "" or tas_single_node_tsa.signer_private_key != "")
+          and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_signer_private_key) | list | length) != 0
+          and
+          (old_key_content.content | b64decode != tas_single_node_tsa.signer_private_key
+            or old_cert_chain_content.content | b64decode != tas_single_node_tsa.certificate_chain)
+      block:
+        - name: Back-up old provided private key
+          ansible.builtin.copy:
+            src: "{{ tas_single_node_tsa_signer_private_key }}"
+            dest: "{{ tas_single_node_tsa_signer_private_key + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          when: >
+            old_key_content.content | b64decode != tas_single_node_tsa.signer_private_key
+
+        - name: Back-up old cert chain
+          ansible.builtin.copy:
+            src: "{{ tas_single_node_tsa_certificate_chain }}"
+            dest: "{{ tas_single_node_tsa_certificate_chain + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          when: >
+            (tas_single_node_tsa.certificate_chain != "" and old_cert_chain_content.content | b64decode != tas_single_node_tsa.certificate_chain
+              or old_key_content.content | b64decode != tas_single_node_tsa.signer_private_key)
 
     - name: Set user provided certificate chain
       ansible.builtin.copy:
