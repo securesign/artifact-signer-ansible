@@ -44,7 +44,8 @@
   when: |
     copy_manifest.changed or copy_systemd_file.changed or
     (podman_spec.secret is defined and podman_spec.secret_changed) or
-    (podman_spec.configmap is defined and podman_spec.configmap_changed)
+    (podman_spec.configmap is defined and podman_spec.configmap_changed) or
+    tas_single_node_backup_restore.restore.enabled
   register: podman_service_restart
 
 # We do all this because checking exit status of the container by the systemd unit has only been added in podman 4.6.0
