@@ -17,7 +17,7 @@ ExecStart=/usr/bin/podman kube play --replace --service-container=true "{{ kube_
 * if this is a oneshot job, we want to keep the pod around for possible failure inspection, so we remove it next time we start the job (ExecStartPre)
 * if this is a regular service, we remove the pod when shutting down (ExecPost)
 #}
-Exec{% if "systemd_type" in podman_spec and podman_spec.systemd_type == "oneshot" %}StartPre=-{% else %}Stop={% endif %}/usr/bin/podman stop "{{ podman_spec.kube_file_content.metadata.name }}-pod-{{ podman_spec.kube_file_content.spec.template.spec.containers[0].name }}" && /usr/bin/podman kube down "{{ kube_play_file }}"
+Exec{% if "systemd_type" in podman_spec and podman_spec.systemd_type == "oneshot" %}StartPre=-{% else %}Stop={% endif %}/bin/bash -c "/usr/bin/podman stop {{ podman_spec.kube_file_content.metadata.name }}-pod-{{ podman_spec.kube_file_content.spec.template.spec.containers[0].name }} && /usr/bin/podman kube down {{ kube_play_file }}"
 Type={{ podman_spec.systemd_type | default('notify') }}
 NotifyAccess=all
 
