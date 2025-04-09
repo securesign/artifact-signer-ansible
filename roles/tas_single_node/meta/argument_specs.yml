@@ -524,7 +524,7 @@ argument_specs:
                 required: false
                 version_added: "1.2.0"
               pem_pub_key:
-                description: "PEM-encoded PKIX public key."
+                description: "ID of custom key provided to rekor."
                 type: "str"
                 required: false
                 version_added: "1.2.0"
@@ -568,7 +568,7 @@ argument_specs:
             version_added: "1.2.0"
           sharding_config:
             description: "Configuration for each log in ctlog."
-            required: true
+            required: false
             version_added: "1.2.0"
             options:
               treeid:

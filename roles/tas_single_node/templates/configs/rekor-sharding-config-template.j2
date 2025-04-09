@@ -21,7 +21,7 @@ data:
       pemPubKey: |
 {% filter indent(width=8) %}
 
-{{ tree.pem_pub_key }}
+{{ (tas_single_node_rekor.public_keys | selectattr('id', 'equalto', tree.pem_pub_key) | map(attribute='key') | list )[0] | default(tree.pem_pub_key) }}
 {% endfilter %}
 {% endif %}
 {% endfor %}

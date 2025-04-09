@@ -22,6 +22,14 @@
           ==  (((tas_single_node_rekor.private_keys | list) + (tas_single_node_rekor.public_keys| list ))  | map(attribute='id') | list | length )
     msg: "Custom keys declared within 'tas_single_node_rekor' must have unique ID's."
 
+- name: Check that public key id exists for sharding configuration
+  when: (tas_single_node_rekor.sharding_config | length > 0)
+  ansible.builtin.assert:
+    that: (tas_single_node_rekor.public_keys | selectattr('id', 'equalto', key_var.pem_pub_key) | map(attribute='id') | length ) > 0
+  loop: "{{ tas_single_node_rekor.sharding_config }}"
+  loop_control:
+    loop_var: key_var
+
 - name: Check custom ctlog key id's are unique.
   when: (tas_single_node_ctlog.public_keys | length > 0) and (tas_single_node_ctlog.private_keys | length > 0)
   ansible.builtin.assert:
