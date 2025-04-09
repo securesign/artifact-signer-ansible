@@ -23,6 +23,10 @@ _tas_single_node_rekor:
   env:
   private_keys: []
   public_keys: []
+  sharding_config:
+  - tree_id: 0
+    tree_length: 0
+    pem_pub_key: ""  # <= the important part
 
 
 _tas_single_node_rekor_redis:

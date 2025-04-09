@@ -23,7 +23,7 @@
     msg: "Custom keys declared within 'tas_single_node_rekor' must have unique ID's."
 
 - name: Check that public key id exists for sharding configuration
-  when: (tas_single_node_rekor.sharding_config is defined and tas_single_node_rekor.sharding_config | length > 0)
+  when: (tas_single_node_rekor.sharding_config | length > 0)
   ansible.builtin.assert:
     that: (tas_single_node_rekor.public_keys | selectattr('id', 'equalto', key_var.pem_pub_key) | map(attribute='id') | length ) > 0
   loop: "{{ tas_single_node_rekor.sharding_config }}"
