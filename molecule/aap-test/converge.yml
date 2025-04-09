@@ -337,12 +337,22 @@
                   aap_instance_ip: "{{ aap_instance_ip }}"
                   token: "{{ ah_token.token }}"
                   tas_single_node_fulcio:
+                    certificate:
+                      organization_name: ""
+                      organization_email: ""
+                      common_name: ""
+                    private_key: ""
+                    root_ca: ""
+                    ca_passphrase: rhtas
+                    trusted_ca: ""
+                    ct_log_prefix: rhtasansible
                     fulcio_config:
                       oidc_issuers:
                         - issuer: "http://dex-idp:5556/dex"
                           url: "http://dex-idp:5556/dex"
                           client_id: example-app
                           type: email
+                      meta_issuers: []
                   tas_single_node_base_hostname: myrhtas
                   tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
                   tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
