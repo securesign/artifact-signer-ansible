@@ -472,6 +472,7 @@ argument_specs:
           private_keys:
             description: "List of private keys for use within rekor."
             type: "list"
+            elements: "dict"
             options:
               id:
                 description: "Custom rekor secret ID."
@@ -488,6 +489,7 @@ argument_specs:
           public_keys:
             description: "List of public keys for use within rekor."
             type: "list"
+            elements: "dict"
             options:
               id:
                 description: "Custom rekor secret ID."
@@ -686,6 +688,7 @@ argument_specs:
           private_keys:
             description: "List of private keys for use within ctlog."
             type: "list"
+            elements: "dict"
             options:
               id:
                 description: "Custom ctlog secret ID."
@@ -700,6 +703,7 @@ argument_specs:
           public_keys:
             description: "List of public keys for use within ctlog."
             type: "list"
+            elements: "dict"
             options:
               id:
                 description: "Custom ctlog secret ID."
