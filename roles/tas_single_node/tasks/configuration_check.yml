@@ -25,8 +25,7 @@
 - name: Check
   when: (tas_single_node_rekor.sharding_config | length > 0)
   ansible.builtin.assert:
-    that: (key_var.pem_pub_key != "" and ( "-----BEGIN PUBLIC KEY-----" is in key_var.pem_pub_key ))
-      or (tas_single_node_rekor.public_keys | selectattr('id', 'equalto', key_var.pem_pub_key) | map(attribute='id') | length ) > 0
+    that: (tas_single_node_rekor.public_keys | selectattr('id', 'equalto', key_var.pem_pub_key) | map(attribute='id') | length ) > 0
   loop: "{{ tas_single_node_rekor.sharding_config }}"
   loop_control:
     loop_var: key_var
