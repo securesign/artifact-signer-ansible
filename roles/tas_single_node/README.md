@@ -241,7 +241,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | ca_passphrase | Passphrase used for Certificate Authority. | str | no |  |
-| sharding_config | Configuration for each log in ctlog. | str | yes |  |
+| sharding_config | Configuration for each log in ctlog. | str | no |  |
 | private_keys | List of private keys for use within ctlog. | list of dicts of 'private_keys' options | no |  |
 | public_keys | List of public keys for use within ctlog. | list of dicts of 'public_keys' options | no |  |
 
