@@ -234,7 +234,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tree_id | Sharding configuration treeID | int | no |  |
 | tree_length | Length of rekor tree. | str | no |  |
 | signing_config | Signing Configuration or rekor shard. | str | no |  |
-| pem_pub_key | PEM-encoded PKIX public key. | str | no |  |
+| pem_pub_key | ID of custom key provided to rekor. | str | no |  |
 
 #### Options for main > tas_single_node_ctlog
 
