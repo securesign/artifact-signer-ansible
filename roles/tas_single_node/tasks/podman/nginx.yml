@@ -34,6 +34,7 @@
     - "{{ tas_single_node_certs_dir }}/ingress-cli-server.pem"
     - "{{ tas_single_node_certs_dir }}/ingress-cli-server.key"
   register: remote_ingress_certificates
+  no_log: true
 
 - name: Base64 encode the rekor ingress
   ansible.builtin.set_fact:
@@ -41,6 +42,7 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
+  no_log: true
 
 - name: Base64 encode the rekor ingress
   ansible.builtin.set_fact:
@@ -48,7 +50,7 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-rekor-search.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
-
+  no_log: true
 
 - name: Base64 encode the tuf ingress
   ansible.builtin.set_fact:
@@ -56,6 +58,7 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tuf.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
+  no_log: true
 
 - name: Base 64 encode the fulcio ingress
   ansible.builtin.set_fact:
@@ -63,6 +66,7 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-fulcio.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
+  no_log: true
 
 - name: Base 64 encode the tsa ingress
   ansible.builtin.set_fact:
@@ -70,6 +74,7 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-tsa.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
+  no_log: true
 
 - name: Base 64 encode the cli server ingress
   ansible.builtin.set_fact:
@@ -77,6 +82,7 @@
       {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir + '/ingress-cli-server.pem') | list | first).content
       | b64decode + (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_ca) | list | first).content
       | b64decode }}
+  no_log: true
 
 - name: Create nginx certs Secret
   ansible.builtin.copy:
@@ -119,6 +125,7 @@
           {{ (remote_ingress_certificates.results | selectattr('source', 'equalto', tas_single_node_certs_dir
           + '/ingress-cli-server.key') | list | first).content }}
   register: secret_result
+  no_log: true
 
 - name: Load nginx config content
   ansible.builtin.set_fact:

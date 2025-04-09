@@ -32,6 +32,7 @@
     cmd: "openssl genrsa -out '{{ tas_single_node_remote_private_key }}' 4096"
     creates: "{{ tas_single_node_remote_private_key }}"
   when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) == 0
+  no_log: true
 
 - name: Create root CA
   when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
@@ -46,6 +47,7 @@
           -addext 'keyUsage = critical,keyCertSign'
       register: ca_csr
       changed_when: false
+      no_log: true
 
     - name: Create self-signed CA certificate from CSR
       ansible.builtin.shell:
@@ -58,6 +60,7 @@
           -signkey '{{ tas_single_node_remote_private_key }}'
           -out '{{ tas_single_node_remote_ca }}'
         creates: "{{ tas_single_node_remote_ca }}"
+      no_log: true
 
 - name: Create ingress certificates
   ansible.builtin.include_tasks: create_ingress_cert.yml
@@ -134,12 +137,14 @@
         src: "{{ tas_single_node_remote_fulcio_private_key }}"
       register: old_key_content
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_private_key) | list | length) != 0
+      no_log: true
 
     - name: Read the old root content
       ansible.builtin.slurp:
         src: "{{ tas_single_node_remote_fulcio_root_ca }}"
       register: old_root_content
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
+      no_log: true
 
     - name: Backup old fulcio private key and root
       when: >
@@ -416,6 +421,7 @@
         src: "{{ item.path }}"
       loop: "{{ existing_ctlog_keys.files }}"
       register: existing_keys
+      no_log: true
 
 - name: Set ctlog_private_keys_changed
   ansible.builtin.set_fact:
@@ -468,6 +474,7 @@
         src: "{{ item.path }}"
       loop: "{{ existing_ctlog_keys.files }}"
       register: existing_keys
+      no_log: true
 
 - name: Set ctlog_public_keys_changed
   ansible.builtin.set_fact:
@@ -670,6 +677,7 @@
         src: "{{ item.path }}"
       loop: "{{ existing_rekor_keys.files }}"
       register: existing_keys
+      no_log: true
 
 - name: Set rekor_private_keys_changed
   ansible.builtin.set_fact:
@@ -722,6 +730,7 @@
         src: "{{ item.path }}"
       loop: "{{ existing_rekor_keys.files }}"
       register: existing_keys
+      no_log: true
 
 - name: Set rekor_public_keys_changed
   ansible.builtin.set_fact:
@@ -993,6 +1002,7 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) == 0
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+      no_log: true
 
     - name: Create certificate signing request (CSR) for TSA root certificate
       ansible.builtin.command:
@@ -1038,6 +1048,7 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_signer_private_key) | list | length) == 0
+      no_log: true
 
     - name: Create TSA leaf CSR
       ansible.builtin.command:
@@ -1069,6 +1080,7 @@
         creates: "{{ tas_single_node_remote_tsa_leaf_certificate }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+      no_log: true
 
     - name: Slurp the leaf certificate
       ansible.builtin.slurp:
@@ -1130,12 +1142,14 @@
         src: "{{ tas_single_node_tsa_signer_private_key }}"
       register: old_key_content
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_signer_private_key) | list | length) != 0
+      no_log: true
 
     - name: Read the old cert chain content
       ansible.builtin.slurp:
         src: "{{ tas_single_node_tsa_certificate_chain }}"
       register: old_cert_chain_content
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) != 0
+      no_log: true
 
     - name: Backup old TSA private key and cert chain
       when: >
@@ -1170,6 +1184,7 @@
         dest: "{{ tas_single_node_tsa_certificate_chain }}"
         mode: '0600'
       when: tas_single_node_tsa.certificate_chain != ''
+      no_log: true
 
     - name: Set user provided private key
       ansible.builtin.copy:
@@ -1179,6 +1194,7 @@
       when: >
         tas_single_node_tsa.signer_private_key != ''
         and tas_single_node_tsa.signer_type == 'file'
+      no_log: true
 
     - name: Verify if the passphrase matches the existing private key
       ansible.builtin.shell:
@@ -1189,3 +1205,4 @@
       changed_when: false
       failed_when: tsa_key_passphrase.stdout == "failed"
       when: tas_single_node_tsa.signer_private_key is defined and tas_single_node_tsa.signer_private_key != ""
+      no_log: true

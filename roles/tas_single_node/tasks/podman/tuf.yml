@@ -14,6 +14,7 @@
     - "{{ tas_single_node_tsa_certificate_chain }}"
     - "{{ tas_single_node_remote_ctlog_public_key }}"
   register: remote_tuf_certificates
+  no_log: true
 
 - name: Retrieve Rekor Public Key
   ansible.builtin.command:

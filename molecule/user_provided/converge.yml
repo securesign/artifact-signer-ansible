@@ -13,6 +13,7 @@
       ansible.builtin.slurp:
         src: "/etc/mysql/ssl/ca-cert.pem"
       register: ca_cert_content
+      no_log: true
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
