@@ -94,7 +94,8 @@
         tas_single_node_root.private_key != ""
 
 - name: Create root CA
-  when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
+  when: >
+    (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
   block:
     - name: Create certificate signing request (CSR) for CA certificate
       ansible.builtin.command:
