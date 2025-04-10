@@ -1,6 +1,10 @@
 ---
 # vars file for tas_single_node
 
+_tas_single_node_root:
+  ca_certificate: ""
+  private_key: ""
+
 _tas_single_node_backup_restore:
   backup:
     enabled: false
@@ -217,6 +221,7 @@ tas_single_node_tsa_certificate_chain: "{{ tas_single_node_certs_dir }}/{{ tas_s
 tas_single_node_ctlog_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_ctlog_use_provided_root"
 tas_single_node_rekor_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_rekor_use_provided_root"
 tas_single_node_tsa_use_provided_cert_key_marker_file: "{{ tas_single_node_certs_dir }}/_tsa_use_provided_cert_key"
+tas_single_node_use_provided_root_marker_file: "{{ tas_single_node_certs_dir }}/_use_provided_root"
 
 # Secrets,Certs and Configuration names
 tas_single_node_trillian_trusted_ca_configmap_name: "trillian-trusted-ca"

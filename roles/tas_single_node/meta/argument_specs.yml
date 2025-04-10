@@ -1130,3 +1130,23 @@ argument_specs:
                 description: "The passphrase used to decrypt the compressed backup file."
                 type: "str"
                 version_added: "1.2.0"
+      tas_single_node_root:
+        description: "Configuration options for the Root Certificate Authority used by the Trusted Artifact Signer."
+        type: "dict"
+        required: false
+        version_added: "1.2.0"
+        default:
+          ca_certificate: ""
+          private_key: ""
+        options:
+          ca_certificate:
+            description: >
+              The root certificate used to initialize the Root Certificate Authority (CA).
+              Used for signing and validating certificates within Trusted Artifact Signer system.
+            type: "str"
+            version_added: "1.2.0"
+          private_key:
+            description: >
+              The private key corresponding to the root certificate. It is used to sign new certificates.
+            type: "str"
+            version_added: "1.2.0"

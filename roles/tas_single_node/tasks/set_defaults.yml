@@ -1,6 +1,7 @@
 ---
 - name: Set default values for _tas_single_node variables
   ansible.builtin.set_fact:
+    tas_single_node_root: "{{ _tas_single_node_root | combine(tas_single_node_root | default({}, true), recursive=true) }}"
     tas_single_node_backup_restore: "{{ _tas_single_node_backup_restore | combine(tas_single_node_backup_restore | default({}, true), recursive=true) }}"
     tas_single_node_rekor: "{{ _tas_single_node_rekor | combine(tas_single_node_rekor | default({}, true), recursive=true) }}"
     tas_single_node_rekor_redis: "{{ _tas_single_node_rekor_redis | combine(tas_single_node_rekor_redis | default({}, true), recursive=true) }}"
