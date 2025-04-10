@@ -10,7 +10,6 @@
   ansible.builtin.slurp:
     src: "{{ tas_single_node_tsa_certificate_chain }}"
   register: tsa_cert_chain
-  no_log: true
 
 - name: Slurp TSA private key (if applicable)
   ansible.builtin.slurp:

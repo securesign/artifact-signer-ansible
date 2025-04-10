@@ -27,7 +27,6 @@
   when: >
     tas_single_node_ingress_certificates[cert_name].certificate | default('') != ''
     and tas_single_node_ingress_certificates[cert_name].private_key | default('') != ''
-  no_log: true
 
 - name: Set tas_single_node_ingress_use_provided_cert_marker_file for {{ cert_name }}
   ansible.builtin.set_fact:
@@ -88,7 +87,6 @@
       when: >
         tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
         or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
-      no_log: true
 
     - name: Clean-up existing cert if it exists ({{ cert_name }})
       ansible.builtin.file:
@@ -114,7 +112,6 @@
       when: >
         tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
         or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
-      no_log: true
 
     - name: Remove marker file if key/cert is not provided by the user ({{ cert_name }})
       ansible.builtin.file:
