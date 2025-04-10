@@ -27,12 +27,71 @@
     name: openssl
     state: present
 
-- name: Create private key (RSA, 4096 bits)
-  ansible.builtin.command:
-    cmd: "openssl genrsa -out '{{ tas_single_node_remote_private_key }}' 4096"
-    creates: "{{ tas_single_node_remote_private_key }}"
-  when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) == 0
-  no_log: true
+- name: Handle root generation
+  when: tas_single_node_root.ca_certificate == ""
+  block:
+    - name: Read the old private key content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_remote_private_key }}"
+      register: old_key_content
+      when: >
+        tas_single_node_root.private_key != ""
+        and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
+
+    - name: Back-up and clean up old provided root
+      when: >
+        certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_use_provided_root_marker_file) | list | length != 0
+        or (tas_single_node_root.private_key != ""
+          and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
+          and old_key_content.content | b64decode != tas_single_node_root.private_key)
+      block:
+        - name: Back-up old provided private key & root CA
+          ansible.builtin.copy:
+            src: "{{ item }}"
+            dest: "{{ item + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          with_items:
+            - "{{ tas_single_node_remote_private_key }}"
+            - "{{ tas_single_node_remote_ca }}"
+
+        - name: Clean-up old provided private key & root CA
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          with_items:
+            - "{{ tas_single_node_remote_private_key }}"
+            - "{{ tas_single_node_remote_ca }}"
+
+    - name: Remove marker file if no private key/root cert are provided by the user
+      ansible.builtin.file:
+        path: "{{ tas_single_node_use_provided_root_marker_file }}"
+        state: absent
+      when: >
+        certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_use_provided_root_marker_file) | list | length != 0
+        and tas_single_node_root.private_key == ""
+
+    - name: Refresh list of files in certs directory
+      ansible.builtin.find:
+        file_type: file
+        paths: "{{ tas_single_node_certs_dir }}"
+      register: certs_dir_files
+
+    - name: Create private key (RSA, 4096 bits)
+      ansible.builtin.command:
+        cmd: "openssl genrsa -out '{{ tas_single_node_remote_private_key }}' 4096"
+        creates: "{{ tas_single_node_remote_private_key }}"
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) == 0
+        and tas_single_node_root.private_key == ""
+
+    - name: Set user provided private key, if only private key is provided
+      ansible.builtin.copy:
+        content: "{{ tas_single_node_root.private_key }}"
+        dest: "{{ tas_single_node_remote_private_key }}"
+        mode: '600'
+      when: >
+        tas_single_node_root.private_key != ""
 
 - name: Create root CA
   when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
@@ -47,7 +106,6 @@
           -addext 'keyUsage = critical,keyCertSign'
       register: ca_csr
       changed_when: false
-      no_log: true
 
     - name: Create self-signed CA certificate from CSR
       ansible.builtin.shell:
@@ -60,7 +118,85 @@
           -signkey '{{ tas_single_node_remote_private_key }}'
           -out '{{ tas_single_node_remote_ca }}'
         creates: "{{ tas_single_node_remote_ca }}"
-      no_log: true
+
+- name: Handle user provided root
+  when: >
+    tas_single_node_root.ca_certificate != ""
+    and tas_single_node_root.private_key != ""
+  block:
+    - name: Refresh list of files in certs directory
+      ansible.builtin.find:
+        file_type: file
+        paths: "{{ tas_single_node_certs_dir }}"
+      register: certs_dir_files
+
+    - name: Create marker file if private key/root cert are provided by the user
+      ansible.builtin.file:
+        path: "{{ tas_single_node_use_provided_root_marker_file }}"
+        state: touch
+        mode: '0644'
+      when: >
+        (tas_single_node_root.ca_certificate != "" or tas_single_node_root.private_key != "")
+          and certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_use_provided_root_marker_file) | list | length == 0
+
+    - name: Read the old private key content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_remote_private_key }}"
+      register: old_key_content
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
+
+    - name: Read the old root ca content
+      ansible.builtin.slurp:
+        src: "{{ tas_single_node_remote_ca }}"
+      register: old_root_ca_content
+      when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) != 0
+
+    - name: Backup old private key and root ca
+      when: >
+          (tas_single_node_root.ca_certificate != "" or tas_single_node_root.private_key != "")
+          and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
+          and
+          (old_key_content.content | b64decode != tas_single_node_root.private_key
+            or old_root_ca_content.content | b64decode != tas_single_node_root.ca_certificate)
+      block:
+        - name: Back-up old provided private key
+          ansible.builtin.copy:
+            src: "{{ tas_single_node_remote_private_key }}"
+            dest: "{{ tas_single_node_remote_private_key + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          when: >
+            old_key_content.content | b64decode != tas_single_node_root.private_key
+
+        - name: Back-up old root ca
+          ansible.builtin.copy:
+            src: "{{ tas_single_node_remote_ca }}"
+            dest: "{{ tas_single_node_remote_ca + '.' + ansible_date_time.iso8601_basic }}"
+            remote_src: true
+            mode: '0600'
+          when: >
+            (tas_single_node_root.ca_certificate != "" and old_root_ca_content.content | b64decode != tas_single_node_root.ca_certificate
+              or old_key_content.content | b64decode != tas_single_node_root.private_key)
+
+    - name: Set user provided root ca
+      ansible.builtin.copy:
+        content: "{{ tas_single_node_root.ca_certificate }}"
+        dest: "{{ tas_single_node_remote_ca }}"
+        mode: '0600'
+      when: tas_single_node_root.ca_certificate != ""
+
+    - name: Set user provided private key
+      ansible.builtin.copy:
+        content: "{{ tas_single_node_root.private_key }}"
+        dest: "{{ tas_single_node_remote_private_key }}"
+        mode: '600'
+      when: tas_single_node_root.private_key != ""
+
+- name: Refresh list of files in certs directory
+  ansible.builtin.find:
+    file_type: file
+    paths: "{{ tas_single_node_certs_dir }}"
+  register: certs_dir_files
 
 - name: Create ingress certificates
   ansible.builtin.include_tasks: create_ingress_cert.yml
