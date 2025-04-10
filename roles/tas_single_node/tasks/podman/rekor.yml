@@ -25,6 +25,7 @@
     - "{{ tas_single_node_remote_rekor_private_key }}"
     - "{{ tas_single_node_remote_rekor_public_key }}"
   register: remote_rekor_keys
+  no_log: true
 
 - name: Create Rekor Secret
   ansible.builtin.set_fact:
@@ -36,6 +37,7 @@
     key_ids: ['{{ tas_single_node_rekor.private_keys }}', '{{ tas_single_node_rekor.public_keys }}']
     key_lists: ['{{ tas_single_node_remote_rekor_private_key }}', '{{ tas_single_node_remote_rekor_public_key }}']
     slurped_certs: '{{ remote_rekor_keys }}'
+  no_log: true
 
 - name: Create Custom rekor Secret
   ansible.builtin.copy:
@@ -43,6 +45,7 @@
     dest: "{{ tas_single_node_rekor_secret }}"
     mode: "0600"
   register: secret_result
+  no_log: true
 
 - name: Deploy Rekor Redis Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

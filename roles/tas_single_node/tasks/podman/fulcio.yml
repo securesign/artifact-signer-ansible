@@ -14,6 +14,7 @@
     - "{{ tas_single_node_remote_fulcio_public_key }}"
     - "{{ tas_single_node_remote_fulcio_root_ca }}"
   register: remote_fulcio_certificates
+  no_log: true
 
 - name: Load Fulcio config content
   ansible.builtin.set_fact:
@@ -60,6 +61,7 @@
           {{ (remote_fulcio_certificates.results | selectattr('source', 'equalto', tas_single_node_remote_fulcio_public_key) | list | first).content }}
         password: "{{ tas_single_node_fulcio.ca_passphrase | b64encode }}"
   register: secret_result
+  no_log: true
 
 - name: Deploy Fulcio Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

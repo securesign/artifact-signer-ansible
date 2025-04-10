@@ -12,6 +12,7 @@
     - "{{ tas_single_node_remote_ctlog_private_key }}"
     - "{{ tas_single_node_remote_ctlog_public_key }}"
   register: remote_ctlog_certificates
+  no_log: true
 
 - name: Load ctlog config content
   block:
@@ -48,6 +49,7 @@
                 '{{ tas_single_node_remote_ctlog_public_key }}',
                 '{{ tas_single_node_remote_fulcio_root_ca }}']
     slurped_certs: '{{ remote_ctlog_certificates }}'
+  no_log: true
 
 - name: Create Custom ctlog Secret
   ansible.builtin.copy:
@@ -55,6 +57,7 @@
     dest: "{{ tas_single_node_ctlog_secret }}"
     mode: "0600"
   register: secret_result
+  no_log: true
 
 - name: Deploy ctlog Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

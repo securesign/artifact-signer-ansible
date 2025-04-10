@@ -16,6 +16,7 @@
     src: "{{ tas_single_node_tsa_signer_private_key }}"
   register: tsa_private_key
   when: tas_single_node_tsa.signer_type == 'file'
+  no_log: true
 
 - name: Set TSA Secret data
   ansible.builtin.set_fact:
@@ -24,16 +25,19 @@
         {{ tsa_private_key.content | default('') }}
       certificate-chain.pem: |
         {{ tsa_cert_chain.content }}
+  no_log: true
 
 - name: Add TSA secret password (if applicable)
   ansible.builtin.set_fact:
     secret_data: "{{ secret_data | combine({'password': tas_single_node_tsa.ca_passphrase | b64encode}) }}"
   when: tas_single_node_tsa.signer_type == 'file'
+  no_log: true
 
 - name: Add TSA secret Tink keyset (if applicable)
   ansible.builtin.set_fact:
     secret_data: "{{ secret_data | combine({'encrypted_key_set': tas_single_node_tsa.tink.keyset | to_json | b64encode}) }}"
   when: tas_single_node_tsa.signer_type == 'tink'
+  no_log: true
 
 - name: Create TSA Secret
   ansible.builtin.copy:
@@ -49,6 +53,7 @@
         namespace: tsa-system
       data: "{{ secret_data }}"
   register: tsa_secret_result
+  no_log: true
 
 - name: Create TSA ConfigMap
   ansible.builtin.copy:
