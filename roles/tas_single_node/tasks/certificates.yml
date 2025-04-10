@@ -93,32 +93,32 @@
       when: >
         tas_single_node_root.private_key != ""
 
-- name: Create root CA
-  when: >
-    (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
-  block:
-    - name: Create certificate signing request (CSR) for CA certificate
-      ansible.builtin.command:
-        cmd: >-
-          openssl req -new -batch
-          -key '{{ tas_single_node_remote_private_key }}'
-          -subj '/CN={{ tas_single_node_base_hostname }}'
-          -addext 'basicConstraints=critical,CA:TRUE'
-          -addext 'keyUsage = critical,keyCertSign'
-      register: ca_csr
-      changed_when: false
+    - name: Create root CA
+      when: >
+        (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_ca) | list | length) == 0
+      block:
+        - name: Create certificate signing request (CSR) for CA certificate
+          ansible.builtin.command:
+            cmd: >-
+              openssl req -new -batch
+              -key '{{ tas_single_node_remote_private_key }}'
+              -subj '/CN={{ tas_single_node_base_hostname }}'
+              -addext 'basicConstraints=critical,CA:TRUE'
+              -addext 'keyUsage = critical,keyCertSign'
+          register: ca_csr
+          changed_when: false
 
-    - name: Create self-signed CA certificate from CSR
-      ansible.builtin.shell:
-        # valid for two years
-        cmd: >-
-          set -o pipefail &&
-          echo "{{ ca_csr.stdout }}" |
-          openssl x509 -req -days 730
-          -copy_extensions copyall
-          -signkey '{{ tas_single_node_remote_private_key }}'
-          -out '{{ tas_single_node_remote_ca }}'
-        creates: "{{ tas_single_node_remote_ca }}"
+        - name: Create self-signed CA certificate from CSR
+          ansible.builtin.shell:
+            # valid for two years
+            cmd: >-
+              set -o pipefail &&
+              echo "{{ ca_csr.stdout }}" |
+              openssl x509 -req -days 730
+              -copy_extensions copyall
+              -signkey '{{ tas_single_node_remote_private_key }}'
+              -out '{{ tas_single_node_remote_ca }}'
+            creates: "{{ tas_single_node_remote_ca }}"
 
 - name: Handle user provided root
   when: >
