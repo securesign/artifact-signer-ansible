@@ -107,6 +107,7 @@
               -addext 'keyUsage = critical,keyCertSign'
           register: ca_csr
           changed_when: false
+          no_log: true
 
         - name: Create self-signed CA certificate from CSR
           ansible.builtin.shell:
@@ -119,6 +120,7 @@
               -signkey '{{ tas_single_node_remote_private_key }}'
               -out '{{ tas_single_node_remote_ca }}'
             creates: "{{ tas_single_node_remote_ca }}"
+          no_log: true
 
 - name: Handle user provided root
   when: >
@@ -234,6 +236,7 @@
       changed_when: false
       failed_when: check_key_passphrase.stdout == "failed"
       when: tas_single_node_fulcio.private_key is defined and tas_single_node_fulcio.private_key != ""
+      no_log: true
 
     - name: Verify if the passphrase matches the auto_generated private key
       ansible.builtin.shell:
@@ -245,6 +248,7 @@
       when: >
         tas_single_node_fulcio.private_key == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) != 0
+      no_log: true
 
     - name: Backup and clean-up old private key
       when: >
@@ -327,6 +331,7 @@
         tas_single_node_fulcio.private_key is not defined
         or tas_single_node_fulcio.private_key == ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_auto_generated_private_key) | list | length) == 0
+      no_log: true
 
     - name: Clean-up old tas_single_node_remote_fulcio_user_provided_private_key
       ansible.builtin.file:
@@ -370,6 +375,7 @@
       register: public_key_match_check
       changed_when: false
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) != 0
+      no_log: true
 
     - name: Create Fulcio public key
       ansible.builtin.command:
@@ -384,7 +390,7 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_public_key) | list | length) == 0
         or public_key_match_check.stdout_lines[0] != public_key_match_check.stdout_lines[1]
-
+      no_log: true
     - name: Detect private key type
       ansible.builtin.shell:
         cmd: >-
@@ -424,6 +430,7 @@
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
       register: rsa_key_cert_match_check
       changed_when: false
+      no_log: true
 
     - name: Verify if EC private key matches the certificate
       ansible.builtin.shell:
@@ -438,6 +445,7 @@
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) != 0
       register: ec_key_cert_match_check
       changed_when: false
+      no_log: true
 
     - name: Set default value for key_cert_mismatch
       ansible.builtin.set_fact:
@@ -502,6 +510,7 @@
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or key_cert_mismatch
+      no_log: true
 
     - name: Backup and clean-up old Fulcio root
       when: cert_changed
@@ -543,6 +552,7 @@
         (tas_single_node_fulcio.root_ca is not defined or tas_single_node_fulcio.root_ca == "")
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or key_cert_mismatch
+      no_log: true
 
 # Back-up ctlog private keys
 - name: Get existing ctlog private keys
@@ -790,6 +800,8 @@
           -out '{{ tas_single_node_remote_ctlog_private_key.0 }}'
           -passout 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_private_key.0 }}"
+      no_log: true
+
     - name: Create ctlog public key
       ansible.builtin.command:
         cmd: >-
@@ -798,6 +810,7 @@
           -out '{{ tas_single_node_remote_ctlog_public_key.0 }}'
           -passin 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
+      no_log: true
 
 # Back-up rekor private keys
 - name: Get existing rekor private keys
@@ -1042,6 +1055,7 @@
           -out '{{ tas_single_node_remote_rekor_private_key.0 }}'
           -passout 'pass:{{ tas_single_node_rekor.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_rekor_private_key.0 }}"
+      no_log: true
     - name: Create Rekor public key
       ansible.builtin.command:
         cmd: >-
@@ -1050,6 +1064,7 @@
           -out '{{ tas_single_node_remote_rekor_public_key.0 }}'
           -passin 'pass:{{ tas_single_node_rekor.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_rekor_public_key.0 }}"
+      no_log: true
 
 - name: Handle TSA certificate chain
   when: >
@@ -1065,6 +1080,7 @@
       register: tsa_key_passphrase
       changed_when: false
       when: (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) != 0
+      no_log: true
 
     - name: Get current certificate subject details
       ansible.builtin.command:
@@ -1137,6 +1153,7 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_tsa_private_key) | list | length) == 0
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+      no_log: true
 
     - name: Create certificate signing request (CSR) for TSA root certificate
       ansible.builtin.command:
@@ -1153,6 +1170,7 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
       changed_when: false
+      no_log: true
 
     - name: Create self-signed TSA root CA from CSR
       ansible.builtin.shell:
@@ -1168,6 +1186,7 @@
         creates: "{{ tas_single_node_tsa_certificate_chain }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+      no_log: true
 
     # Leaf certificate
     - name: Create TSA leaf CA private key
@@ -1182,6 +1201,8 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_signer_private_key) | list | length) == 0
+      no_log: true
+
     - name: Create TSA leaf CSR
       ansible.builtin.command:
         cmd: >-
@@ -1196,6 +1217,7 @@
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
       changed_when: false
+      no_log: true
 
     - name: Sign leaf certificate with Root CA
       ansible.builtin.shell:
@@ -1212,6 +1234,7 @@
         creates: "{{ tas_single_node_remote_tsa_leaf_certificate }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+      no_log: true
 
     - name: Slurp the leaf certificate
       ansible.builtin.slurp:
@@ -1333,3 +1356,4 @@
       changed_when: false
       failed_when: tsa_key_passphrase.stdout == "failed"
       when: tas_single_node_tsa.signer_private_key is defined and tas_single_node_tsa.signer_private_key != ""
+      no_log: true
