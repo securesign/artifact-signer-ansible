@@ -20,7 +20,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
 | tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
 | tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
-| tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
+| tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'root': {'ca_certificate': '', 'private_key': ''}, 'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
 | tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': []}}`  |
 | tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
@@ -44,7 +44,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_podman_volume_create_extra_args | A dictionary of additional arguments to pass to the `podman volume create` command for each volume. This allows customization of options when creating specific volumes. Each key in the dictionary corresponds to a volume name with hyphens replaced by underscores. | dict of 'tas_single_node_podman_volume_create_extra_args' options |  `{'trillian_mysql': '', 'rekor_redis_storage': '', 'redis_backfill_storage': '', 'rekor_server': '', 'tuf_repository': '', 'tuf_signing_keys': ''}`  |
 | tas_single_node_trust_root | Configuration options for the Trust Root. | dict of 'tas_single_node_trust_root' options |  `{'full_archive': ''}`  |
 | tas_single_node_backup_restore | Configuration options for the Backup and Restore of Trusted Artifact Signer. | dict of 'tas_single_node_backup_restore' options |  `{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}`  |
-| tas_single_node_root | Configuration options for the Root Certificate Authority used by the Trusted Artifact Signer. | dict of 'tas_single_node_root' options |  `{'ca_certificate': '', 'private_key': ''}`  |
 
 #### Options for main > tas_single_node_rekor_redis
 
@@ -91,12 +90,20 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
+| root | Configuration settings for the Root Certificate Authority used to sign the ingress certificates | dict of 'root' options | no |  |
 | fulcio | Certificate details for the fulcio service. | dict of 'fulcio' options | no |  |
 | rekor | Certificate details for the rekor service. | dict of 'rekor' options | no |  |
 | tuf | Certificate details for the TUF service. | dict of 'tuf' options | no |  |
 | tsa | Certificate details for the TSA service. | dict of 'tsa' options | no |  |
 | rekor-search | Certificate details for the rekor-search service. | dict of 'rekor-search' options | no |  |
 | cli-server | Certificate details for the cli-server service. | dict of 'cli-server' options | no |  |
+
+#### Options for main > tas_single_node_ingress_certificates > root
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| ca_certificate | The root certificate used to initialize the Root Certificate Authority (CA). Used for signing and validating ingress certificates. | str | no |  |
+| private_key | The private key corresponding to the root certificate. It is used to sign new certificates. | str | no |  |
 
 #### Options for main > tas_single_node_ingress_certificates > fulcio
 
@@ -406,13 +413,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | enabled | Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true. Should only be set to true on a single Ansible execution and then reverted back to false. | bool | no |  |
 | source | The filepath leading the to compressed and encrypted backup file that will be used for the full restore. Needs to be located on the Ansible Control Node. | str | no |  |
 | passphrase | The passphrase used to decrypt the compressed backup file. | str | no |  |
-
-#### Options for main > tas_single_node_root
-
-|Option|Description|Type|Required|Default|
-|---|---|---|---|---|
-| ca_certificate | The root certificate used to initialize the Root Certificate Authority (CA). Used for signing and validating certificates within Trusted Artifact Signer system. | str | no |  |
-| private_key | The private key corresponding to the root certificate. It is used to sign new certificates. | str | no |  |
 
 ## Example Playbook
 

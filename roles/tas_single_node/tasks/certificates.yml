@@ -28,22 +28,22 @@
     state: present
 
 - name: Handle root generation
-  when: tas_single_node_root.ca_certificate == ""
+  when: tas_single_node_ingress_certificates.root.ca_certificate == ""
   block:
     - name: Read the old private key content
       ansible.builtin.slurp:
         src: "{{ tas_single_node_remote_private_key }}"
       register: old_key_content
       when: >
-        tas_single_node_root.private_key != ""
+        tas_single_node_ingress_certificates.root.private_key != ""
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
 
     - name: Back-up and clean up old provided root
       when: >
         certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_use_provided_root_marker_file) | list | length != 0
-        or (tas_single_node_root.private_key != ""
+        or (tas_single_node_ingress_certificates.root.private_key != ""
           and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
-          and old_key_content.content | b64decode != tas_single_node_root.private_key)
+          and old_key_content.content | b64decode != tas_single_node_ingress_certificates.root.private_key)
       block:
         - name: Back-up old provided private key & root CA
           ansible.builtin.copy:
@@ -69,7 +69,7 @@
         state: absent
       when: >
         certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_use_provided_root_marker_file) | list | length != 0
-        and tas_single_node_root.private_key == ""
+        and tas_single_node_ingress_certificates.root.private_key == ""
 
     - name: Refresh list of files in certs directory
       ansible.builtin.find:
@@ -83,15 +83,15 @@
         creates: "{{ tas_single_node_remote_private_key }}"
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) == 0
-        and tas_single_node_root.private_key == ""
+        and tas_single_node_ingress_certificates.root.private_key == ""
 
     - name: Set user provided private key, if only private key is provided
       ansible.builtin.copy:
-        content: "{{ tas_single_node_root.private_key }}"
+        content: "{{ tas_single_node_ingress_certificates.root.private_key }}"
         dest: "{{ tas_single_node_remote_private_key }}"
         mode: '600'
       when: >
-        tas_single_node_root.private_key != ""
+        tas_single_node_ingress_certificates.root.private_key != ""
 
     - name: Create root CA
       when: >
@@ -122,8 +122,8 @@
 
 - name: Handle user provided root
   when: >
-    tas_single_node_root.ca_certificate != ""
-    and tas_single_node_root.private_key != ""
+    tas_single_node_ingress_certificates.root.ca_certificate != ""
+    and tas_single_node_ingress_certificates.root.private_key != ""
   block:
     - name: Refresh list of files in certs directory
       ansible.builtin.find:
@@ -137,7 +137,7 @@
         state: touch
         mode: '0644'
       when: >
-        (tas_single_node_root.ca_certificate != "" or tas_single_node_root.private_key != "")
+        (tas_single_node_ingress_certificates.root.ca_certificate != "" or tas_single_node_ingress_certificates.root.private_key != "")
           and certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_use_provided_root_marker_file) | list | length == 0
 
     - name: Read the old private key content
@@ -154,11 +154,11 @@
 
     - name: Backup old private key and root ca
       when: >
-          (tas_single_node_root.ca_certificate != "" or tas_single_node_root.private_key != "")
+          (tas_single_node_ingress_certificates.root.ca_certificate != "" or tas_single_node_ingress_certificates.root.private_key != "")
           and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_private_key) | list | length) != 0
           and
-          (old_key_content.content | b64decode != tas_single_node_root.private_key
-            or old_root_ca_content.content | b64decode != tas_single_node_root.ca_certificate)
+          (old_key_content.content | b64decode != tas_single_node_ingress_certificates.root.private_key
+            or old_root_ca_content.content | b64decode != tas_single_node_ingress_certificates.root.ca_certificate)
       block:
         - name: Back-up old provided private key
           ansible.builtin.copy:
@@ -167,7 +167,7 @@
             remote_src: true
             mode: '0600'
           when: >
-            old_key_content.content | b64decode != tas_single_node_root.private_key
+            old_key_content.content | b64decode != tas_single_node_ingress_certificates.root.private_key
 
         - name: Back-up old root ca
           ansible.builtin.copy:
@@ -176,22 +176,23 @@
             remote_src: true
             mode: '0600'
           when: >
-            (tas_single_node_root.ca_certificate != "" and old_root_ca_content.content | b64decode != tas_single_node_root.ca_certificate
-              or old_key_content.content | b64decode != tas_single_node_root.private_key)
+            (tas_single_node_ingress_certificates.root.ca_certificate != ""
+              and old_root_ca_content.content | b64decode != tas_single_node_ingress_certificates.root.ca_certificate)
+            or old_key_content.content | b64decode != tas_single_node_ingress_certificates.root.private_key
 
     - name: Set user provided root ca
       ansible.builtin.copy:
-        content: "{{ tas_single_node_root.ca_certificate }}"
+        content: "{{ tas_single_node_ingress_certificates.root.ca_certificate }}"
         dest: "{{ tas_single_node_remote_ca }}"
         mode: '0600'
-      when: tas_single_node_root.ca_certificate != ""
+      when: tas_single_node_ingress_certificates.root.ca_certificate != ""
 
     - name: Set user provided private key
       ansible.builtin.copy:
-        content: "{{ tas_single_node_root.private_key }}"
+        content: "{{ tas_single_node_ingress_certificates.root.private_key }}"
         dest: "{{ tas_single_node_remote_private_key }}"
         mode: '600'
-      when: tas_single_node_root.private_key != ""
+      when: tas_single_node_ingress_certificates.root.private_key != ""
 
 - name: Refresh list of files in certs directory
   ansible.builtin.find:
