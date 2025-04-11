@@ -30,6 +30,7 @@
     chdir: "{{ restore_dir }}/"
   register: tarball
   changed_when: true
+  no_log: true
 
 - name: Extract Compressed Backup Tarball
   ansible.builtin.unarchive:

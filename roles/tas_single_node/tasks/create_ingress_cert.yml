@@ -87,6 +87,7 @@
       when: >
         tas_single_node_ingress_certificates[cert_name].certificate | default('') == ''
         or tas_single_node_ingress_certificates[cert_name].private_key | default('') == ''
+      no_log: true
 
     - name: Clean-up existing cert if it exists ({{ cert_name }})
       ansible.builtin.file:
