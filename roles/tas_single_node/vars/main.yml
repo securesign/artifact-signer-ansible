@@ -1,10 +1,6 @@
 ---
 # vars file for tas_single_node
 
-_tas_single_node_root:
-  ca_certificate: ""
-  private_key: ""
-
 _tas_single_node_backup_restore:
   backup:
     enabled: false
@@ -53,6 +49,9 @@ _tas_single_node_trillian:
   trusted_ca: ""
 
 _tas_single_node_ingress_certificates:
+  root:
+    ca_certificate: ""
+    private_key: ""
   fulcio:
     certificate: ""
     private_key: ""
