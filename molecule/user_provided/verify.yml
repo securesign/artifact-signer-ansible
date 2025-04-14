@@ -6,6 +6,7 @@
     test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
   vars_files:
     - vars/vars.yml
+    - vars/volumes.yml
   tasks:
     - name: Verify fulcio config
       block:
@@ -102,6 +103,44 @@
             - { msg: "certchain.pem", test_content: "{{ tas_single_node_tsa.certificate_chain }}", tsa_config: "{{ tsa_configs.results[1] }}" }
           loop_control:
             label: "{{ item.msg }}"
+
+    - name: Verify storage options
+      block:
+        - name: Load volume info
+          containers.podman.podman_volume_info:
+            name: "{{ volume_name }}"
+          register: volume_info
+          loop: "{{ volumes }}"
+          loop_control:
+            loop_var: volume_name
+
+        - name: Assert that volumes were created with specific options
+          ansible.builtin.assert:
+            that:
+              - "'/home/root/volumes/' + item.volume_name in item.volumes[0].Options.device"
+              - "'bind' in item.volumes[0].Options.o"
+              - "'none' in item.volumes[0].Options.type"
+            msg: "Volume '{{ item.volume_name }}' was not created with the expected options."
+          loop: "{{ volume_info.results }}"
+
+    - name: Verify that TUF repository was initialized on mounted volume
+      block:
+        - name: Check if the directory is not empty
+          ansible.builtin.stat:
+            path: "{{ '/home/root/volumes/' + item | regex_replace('_', '-') }}"
+          register: directory_stats
+          loop:
+            - tuf_repository
+            - tuf_signing_keys
+
+        - name: Assert the directories are not empty
+          ansible.builtin.assert:
+            that:
+              - item.stat.exists
+              - item.stat.isdir
+              - item.stat.size > 0
+            msg: "The directory '{{ item.stat.path }}' is either empty or does not exist."
+          loop: "{{ directory_stats.results }}"
 
     - name: Include create common tasks
       ansible.builtin.include_tasks:

@@ -9,6 +9,7 @@
         password: password123
   vars_files:
     - vars/vars.yml
+    - vars/volumes.yml
   tasks:
 
     - name: Configure Dex OIDC instance
@@ -116,6 +117,13 @@
           ssl-key=/etc/mysql/ssl/server-key.pem
       notify:
         - Restart MariaDB
+
+    - name: Create directory for volumes
+      file:
+        path: "/home/root/volumes/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ volumes }}"
 
   handlers:
     - name: Restart MariaDB

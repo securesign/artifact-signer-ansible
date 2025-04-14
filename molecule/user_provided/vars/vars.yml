@@ -3,6 +3,11 @@ tas_single_node_cockpit:
   enabled: false
 tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
 tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
+tas_single_node_podman_volume_create_extra_args:
+  redis_backfill_storage: "--opt type=none --opt device=/home/root/volumes/redis-backfill-storage --opt o=bind"
+  rekor_server: "--opt type=none --opt device=/home/root/volumes/rekor-server --opt o=bind"
+  tuf_repository: "--opt type=none --opt device=/home/root/volumes/tuf-repository --opt o=bind"
+  tuf_signing_keys: "--opt type=none --opt device=/home/root/volumes/tuf-signing-keys --opt o=bind"
 tas_single_node_trillian:
   database_deploy: false
   mysql:
