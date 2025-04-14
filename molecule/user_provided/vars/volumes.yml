@@ -1,0 +1,5 @@
+volumes:
+- tuf-signing-keys
+- tuf-repository
+- rekor-server
+- redis-backfill-storage
