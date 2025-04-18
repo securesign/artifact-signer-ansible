@@ -283,18 +283,39 @@ To view details on a specific volume:
 `podman volume inspect <volume_name>`
 
 You can customize the volume creation process by setting specific options with the `tas_single_node_podman_volume_create_extra_args` variable.
+Not configuring the `tas_single_node_podman_volume_create_extra_args` variable uses the default settings.
+Here are the default settings:
 
-To create all volumes with a specific size limit:
+```yaml
+tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: ""
+  rekor_redis_storage: ""
+  redis_backfill_storage: ""
+  rekor_server: ""
+  tuf_repository: ""
+  tuf_signing_keys: ""
+```
 
-`tas_single_node_podman_volume_create_extra_args: "--opt o=size=10G"`
+To create a specific volume with a specific size limit:
 
-To specify a different file system and storage driver:
+```yaml
+tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: "--opt o=size=10G"
+```
 
-`tas_single_node_podman_volume_create_extra_args: "--opt device=tmpfs --opt type=tmpfs"`
+To specify a different file system, and storage driver for a specific volume:
 
-To set a custom mount path:
+```yaml
+tas_single_node_podman_volume_create_extra_args: 
+   trillian_mysql: "--opt device=tmpfs --opt type=tmpfs"
+```
 
-`tas_single_node_podman_volume_create_extra_args: "--opt device=/data/custom_volume"`
+To set a custom mount path for a specific volume:
+
+```yaml
+tas_single_node_podman_volume_create_extra_args: 
+   trillian_mysql: "--opt device=/data/custom_volume"
+```
 
 ## Testing
 
