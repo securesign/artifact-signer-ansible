@@ -269,6 +269,33 @@ tas_single_node_rekor_redis:
     password: <password>
 ```
 
+## Configuring Podman volumes for the RHTAS Ansible Collection
+
+Deploying RHTAS on Red Hat Enterprise Linux uses Podman volumes instead of creating volumes with Kubernetes manifests.
+This gives you persistent storage for your signing data.
+
+To view a list of Podman volumes:
+
+`podman volume ls`
+
+To view details on a specific volume:
+
+`podman volume inspect <volume_name>`
+
+You can customize the volume creation process by setting specific options with the `tas_single_node_podman_volume_create_extra_args` variable.
+
+To create all volumes with a specific size limit:
+
+`tas_single_node_podman_volume_create_extra_args: "--opt o=size=10G"`
+
+To specify a different file system and storage driver:
+
+`tas_single_node_podman_volume_create_extra_args: "--opt device=tmpfs --opt type=tmpfs"`
+
+To set a custom mount path:
+
+`tas_single_node_podman_volume_create_extra_args: "--opt device=/data/custom_volume"`
+
 ## Testing
 
 ### Testing locally
