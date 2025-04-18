@@ -230,13 +230,29 @@ This gives you persistent storage for your signing data.</p>
 <p><code>podman volume ls</code></p>
 <p>To view details on a specific volume:</p>
 <p><code>podman volume inspect &lt;volume_name&gt;</code></p>
-<p>You can customize the volume creation process by setting specific options with the <code>tas_single_node_podman_volume_create_extra_args</code> variable.</p>
-<p>To create all volumes with a specific size limit:</p>
-<p><code>tas_single_node_podman_volume_create_extra_args: "--opt o=size=10G"</code></p>
-<p>To specify a different file system and storage driver:</p>
-<p><code>tas_single_node_podman_volume_create_extra_args: "--opt device=tmpfs --opt type=tmpfs"</code></p>
-<p>To set a custom mount path:</p>
-<p><code>tas_single_node_podman_volume_create_extra_args: "--opt device=/data/custom_volume"</code></p>
+<p>You can customize the volume creation process by setting specific options with the <code>tas_single_node_podman_volume_create_extra_args</code> variable.
+Not configuring the <code>tas_single_node_podman_volume_create_extra_args</code> variable uses the default settings.
+Here are the default settings:</p>
+<pre><code>tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: ""
+  rekor_redis_storage: ""
+  redis_backfill_storage: ""
+  rekor_server: ""
+  tuf_repository: ""
+  tuf_signing_keys: ""
+</code></pre>
+<p>To create a specific volume with a specific size limit:</p>
+<pre><code>tas_single_node_podman_volume_create_extra_args:
+  trillian_mysql: "--opt o=size=10G"
+</code></pre>
+<p>To specify a different file system, and storage driver for a specific volume:</p>
+<pre><code>tas_single_node_podman_volume_create_extra_args: 
+   trillian_mysql: "--opt device=tmpfs --opt type=tmpfs"
+</code></pre>
+<p>To set a custom mount path for a specific volume:</p>
+<pre><code>tas_single_node_podman_volume_create_extra_args: 
+   trillian_mysql: "--opt device=/data/custom_volume"
+</code></pre>
 <h2>Testing</h2>
 <h3>Testing locally</h3>
 <p>This Git repository has GitHub actions that tests incoming pull requests with <code>ansible-lint</code> and <code>sanity-test</code> to enforce good code quality and practices. </p>
