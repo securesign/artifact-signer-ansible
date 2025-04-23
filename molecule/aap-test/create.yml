@@ -20,13 +20,18 @@
     - name: Generate instance IDs
       ansible.builtin.set_fact:
         instance_ids:
-          aap: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
-          worker: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
+          AAP: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
+          Worker: "{{ lookup('pipe', 'uuidgen') | regex_replace('[^a-zA-Z0-9]', '') | truncate(8) }}"
+
+    - name: Set CI workflow name
+      ansible.builtin.set_fact:
+        workflow_id: "{{ lookup('env', 'RUN_ID') + '-' + lookup('env', 'SCENARIO_NAME') }}"
+      when: lookup('env', 'RUN_ID')  | length > 0
 
     - name: Launch EC2 instances
       amazon.aws.ec2_instance:
-        name: "{{ item.key }}-VM"
-        key_name: "{{ item.value.aws_key_name }}"
+        name: "{{ item.key + '-' + (workflow_id | default(instance_ids.get(item.key, ''))) }}"
+        key_name: "{{ lookup('env', 'AWS_KEY_NAME') }}"
         instance_type: "{{ item.value.instance_type }}"
         image_id: "{{ item.value.image_id }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
@@ -69,7 +74,7 @@
           'address': "{{ item.value.ip }}",
           'user': "ec2-user",
           'port': "22",
-          'identity_file': "{{ molecule_yml.platforms[0].aws_key_name }}",
+          'identity_file': "{{ lookup('env', 'AWS_KEY_NAME') }}",
         }
       with_items:
         - "{{ instance_data | dict2items }}"

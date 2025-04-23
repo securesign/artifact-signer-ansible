@@ -3,6 +3,7 @@ name: Using Ansible Molecule, test RHTAS collection deployment from a private AA
 on:
   schedule:
   - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
   test-aap-collection:
@@ -10,15 +11,42 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
+        - name: Create ansible.cfg
+          env:
+            AUTOMATION_HUB_TOKEN: ${{ secrets.AUTOMATION_HUB_TOKEN }}
+          run: |
+            cat <<EOF > ~/.ansible.cfg
+            [galaxy]
+            server_list = automation_hub, ansible_galaxy
+            
+            [galaxy_server.ansible_galaxy]
+            url = https://galaxy.ansible.com
+            
+            [galaxy_server.automation_hub]
+            url = https://console.redhat.com/api/automation-hub/
+            auth_url = https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+            token =  ${AUTOMATION_HUB_TOKEN}
+            EOF
+        - name: Cache venv test directory
+          uses: actions/cache@v3
+          with:
+            path: venv
+            key: ${{ runner.os }}-python-venv-${{ hashFiles('testing-requirements.txt') }}
+
+        - name: Cache Ansible Galaxy roles and collections
+          uses: actions/cache@v3
+          with:
+            path: |
+              ~/.ansible/roles
+              ~/.ansible/collections
+            key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('requirements.yml', 'molecule/aap-test/requirements.yml') }}
         - name: Install dependencies
           run: |
-            ansible --version
             python -m venv venv
             source venv/bin/activate
             python -m pip install --upgrade pip
             pip install -r testing-requirements.txt
             ansible-galaxy install -r requirements.yml
-            ansible-galaxy install -r molecule/requirements.yml
         - name: Set up SSH key
           run: |
             mkdir -p ~/.ssh
@@ -26,14 +54,16 @@ jobs:
             chmod 600 ~/.ssh/id_rsa
         - name: Run molecule
           env:
+            AWS_SSH_KEY: ${{ secrets.AAP_AWS_SSH_KEY }}
+            AWS_KEY_NAME: AAP-TEST
             TAS_SINGLE_NODE_REGISTRY_USERNAME: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_USERNAME }}
             TAS_SINGLE_NODE_REGISTRY_PASSWORD: ${{ secrets.TAS_SINGLE_NODE_REGISTRY_PASSWORD }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             GITHUB_RUN_ID: ${{ github.run_id }}
+
             REDHAT_API_TOKEN: ${{ secrets.REDHAT_API_TOKEN }}
-            AUTOMATION_HUB_TOKEN: ${{ secrets.AUTOMATION_HUB_TOKEN }}
             SUB_USERNAME: ${{ secrets.SUB_USERNAME }}
             SUB_PASSWORD: ${{ secrets.SUB_PASSWORD }}
           run: |
