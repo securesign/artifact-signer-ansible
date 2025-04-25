@@ -20,6 +20,7 @@
       when: tas_single_node_ctlog.sharding_config != ""
       ansible.builtin.set_fact:
         ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config-template.j2') }}"
+      no_log: true
 
 - name: Create ctlog configmap
   ansible.builtin.copy:
