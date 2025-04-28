@@ -22,7 +22,7 @@ jobs:
         scenario:
           - default
           - user_provided
-      max-parallel: 2
+          - key_rotation
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

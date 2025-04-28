@@ -1,0 +1,31 @@
+- name: Get local path stat for "{{ item.key }}"
+  ansible.builtin.stat:
+    path: "{{ item.value }}"
+  register: local_dir_info
+  delegate_to: localhost
+  become: false
+
+- name: Get mount path of volume "{{ item.key }}"
+  containers.podman.podman_volume_info:
+    name: "{{ item.key }}"
+  register: volume_info
+  when: not local_dir_info.stat.exists or (local_dir_info.stat.exists and local_dir_info.stat.isdir and local_dir_info.stat.size == 0)
+
+- name: Set fact for remote volume path "{{ item.key }}"
+  ansible.builtin.set_fact:
+    remote_volume_paths: "{{ remote_volume_paths | default({}) | combine({ item.key: volume_info.volumes[0].Mountpoint }) }}"
+  when:
+    - not local_dir_info.stat.exists or (local_dir_info.stat.exists and local_dir_info.stat.isdir and local_dir_info.stat.size == 0)
+    - volume_info.volumes is defined
+    - volume_info.volumes | length > 0
+
+- name: Download volume contents "{{ item.key }}"
+  ansible.posix.synchronize:
+    src: "{{ remote_volume_paths[item.key] }}/"
+    dest: "{{ item.value }}"
+    mode: pull
+    recursive: yes
+  when:
+    - not local_dir_info.stat.exists or (local_dir_info.stat.exists and local_dir_info.stat.isdir and local_dir_info.stat.size == 0)
+    - remote_volume_paths is defined
+    - remote_volume_paths[item.key] is defined

@@ -1,0 +1,46 @@
+---
+- name: Rotate keys
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/vars.yml
+  vars:
+    volumes:
+      tuf-signing-keys: "{{ molecule_ephemeral_directory }}/tuf-signing-keys"
+      tuf-repository: "{{ molecule_ephemeral_directory }}/tuf-repo"
+  tasks:
+    - name: Fulcio key rotation
+      ansible.builtin.set_fact:
+        tas_single_node_fulcio: "{{ tas_single_node_fulcio | combine({
+        'private_key' :  \"{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.key') }}\",
+            'root_ca': \"{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}\",
+            'ca_passphrase': 'password1'
+         }) }}"
+    - name: Update TUF repository
+      ansible.builtin.include_tasks:
+        file: tasks/tuf.yml
+      vars:
+        component: 'fulcio'
+        active_cert_path: '/etc/rhtas/certs/fulcio.pem'
+        active_cert_name: 'fulcio_v1.crt.pem'
+        new_cert_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}"
+        new_cert_name: 'new-fulcio.pem'
+
+    - name: Archive tuf-repo locally
+      ansible.builtin.command:
+        cmd: "tar -czf {{ molecule_ephemeral_directory }}/tuf-repo.tar.gz -C {{ volumes['tuf-repository'] }} ../tuf-repo"
+      delegate_to: localhost
+      become: false
+
+    - name: Set base64-encoded archive as variable
+      ansible.builtin.set_fact:
+        tas_single_node_trust_root:
+            full_archive: "{% raw %}{{ lookup('file', molecule_ephemeral_directory + '/tuf-repo.tar.gz') | b64encode }}{% endraw %}"
+
+    - name: Store generated values to var file
+      ansible.builtin.copy:
+        content: "{{ vars | dict2items | selectattr('key', 'search', '^tas_single_node_') | items2dict | to_nice_yaml }}"
+        dest: "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+      delegate_to: localhost
+      become: false
