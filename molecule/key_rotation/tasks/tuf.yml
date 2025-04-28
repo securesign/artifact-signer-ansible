@@ -1,0 +1,80 @@
+---
+- name: Resolve remote host IP
+  ansible.builtin.set_fact:
+    remote_host:  "{{ ansible_host }}"
+
+# ansible builtin moduels does not support SNI resolution
+- name: Download tuftool
+  ansible.builtin.command:
+    cmd: "curl --insecure --resolve cli-server.myrhtas:443:{{ remote_host }} https://cli-server.myrhtas/clients/linux/tuftool-amd64.gz -o {{ molecule_ephemeral_directory }}/tuftool.gz"
+    creates: "{{ molecule_ephemeral_directory }}/tuftool.gz"
+  delegate_to: localhost
+  become: false
+
+- name: Set facts
+  ansible.builtin.set_fact:
+    tuftool: "{{ molecule_ephemeral_directory }}/tuftool"
+
+# ansible unarchive module supports only tar
+- name: Unzip tuftool.gz using gunzip
+  ansible.builtin.shell:
+    cmd: "gunzip -c {{ molecule_ephemeral_directory }}/tuftool.gz > {{ tuftool }}"
+    creates: "{{ tuftool }}"
+  delegate_to: localhost
+  become: false
+
+- name: Make tuftool executable
+  ansible.builtin.file:
+    path: "{{ tuftool }}"
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+
+- name: Process and Download Volumes
+  ansible.builtin.include_tasks:
+    file: tasks/download_volumes.yml
+  loop: "{{ volumes | dict2items }}"
+
+- name: Fetch old cert
+  ansible.builtin.fetch:
+    src: "{{ active_cert_path }}"
+    dest: "{{ molecule_ephemeral_directory }}/{{ active_cert_name }}"
+    flat: yes
+
+- name: Create a file with content from a variable
+  ansible.builtin.copy:
+    dest: "{{ molecule_ephemeral_directory }}/{{ new_cert_name }}"
+    content: "{{ new_cert_content }}"
+  delegate_to: localhost
+  become: false
+
+- name: Update Repository
+  block:
+    - name: Expire old cert
+      ansible.builtin.command:
+        cmd: >-
+          {{ tuftool }} rhtas
+          --root "{{ volumes['tuf-repository'] }}/root.json"
+          --key "{{ volumes['tuf-signing-keys'] }}/snapshot.pem"
+          --key "{{ volumes['tuf-signing-keys'] }}/targets.pem"
+          --key "{{ volumes['tuf-signing-keys'] }}/timestamp.pem"
+          {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ active_cert_name }}"
+          --{{ component }}-uri "https://{{ component }}.rhtas"
+          --{{ component }}-status "Expired"
+          --outdir "{{ volumes['tuf-repository'] }}"
+          --metadata-url "file://{{ volumes['tuf-repository'] }}"
+
+    - name: Add new cert
+      ansible.builtin.command:
+        cmd: >-
+          {{ tuftool }} rhtas
+          --root "{{ volumes['tuf-repository'] }}/root.json"
+          --key "{{ volumes['tuf-signing-keys'] }}/snapshot.pem"
+          --key "{{ volumes['tuf-signing-keys'] }}/targets.pem"
+          --key "{{ volumes['tuf-signing-keys'] }}/timestamp.pem"
+          {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ new_cert_name }}"
+          --{{ component }}-uri "https://{{ component }}.rhtas"
+          --outdir "{{ volumes['tuf-repository'] }}"
+          --metadata-url "file://{{ volumes['tuf-repository'] }}"
+  delegate_to: localhost
+  become: false

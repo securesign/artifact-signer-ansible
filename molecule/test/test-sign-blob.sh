@@ -44,10 +44,27 @@ if [ -z "${TOKEN}" ]; then
 fi
 
 env
+cd /test
+FILENAME="$(date +%Y%m%d%H%M%S)"
 cosign initialize
 
-echo "testing" > to-sign
+echo "testing" > "$FILENAME.txt"
 
-cosign --verbose sign-blob to-sign --bundle signed.bundle --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp=timestamp.txt
+cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
 
-cosign --verbose verify-blob --certificate-identity="${EMAIL}" --bundle signed.bundle to-sign --rfc3161-timestamp=timestamp.txt --use-signed-timestamps
+validation_counter=0
+for file in /test/*.txt; do
+  if [ -f "$file" ]; then  # Check if it is a regular file
+    echo "Executing cosign verification on file: $file"
+    cosign --verbose verify-blob --certificate-identity="${EMAIL}" --bundle "${file%.*}.bundle" "$file" --rfc3161-timestamp="${file%.*}.timestamp" --use-signed-timestamps
+
+   validation_counter=$((validation_counter + 1))
+  fi
+done
+
+if [ "$validation_counter" -eq 0 ]; then
+  echo "Error: No files processed. Exiting with non-zero status."
+  exit 1
+fi
+
+echo "Total file validations: $validation_counter"

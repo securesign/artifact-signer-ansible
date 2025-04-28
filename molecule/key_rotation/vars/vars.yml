@@ -1,0 +1,53 @@
+tas_single_node_base_hostname: myrhtas
+tas_single_node_cockpit:
+  enabled: false
+tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
+tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
+
+tas_single_node_tsa:
+  ca_passphrase: rhtas
+  signer_type: file
+  signer_private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/private-key.pem') }}"
+  certificate_chain: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/cert-chain.pem') }}"
+
+tas_single_node_ctlog:
+  sharding_config:
+    - config:
+      treeid:
+      prefix: "rhtasansible"
+      root_pem_file: "/ctfe-keys/fulcio-0"
+      password: "password"
+      private_key: "private-ctlog-key0"
+  private_keys:
+    - id: "private-ctlog-key0"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.key') }}
+  public_keys:
+    - id: "public-ctlog-key0"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
+
+tas_single_node_fulcio:
+  private_key: |
+    {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/fulcio.key') }}
+  root_ca: |
+    {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/fulcio.pem') }}
+  ca_passphrase: password
+  fulcio_config:
+    meta_issuers:
+      - issuer_pattern: "http://dex-*:5556/dex"
+        client_id: example-app
+        type: email
+
+tas_single_node_rekor:
+  ca_passphrase: password
+  active_signer_type: file
+  active_signer_id: rekor-private-key0
+  private_keys: 
+    - id: "rekor-private-key0"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest0.key') }}
+  public_keys: 
+    - id: "rekor-public-key0"
+      key: |
+        {{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest0.pub') }}

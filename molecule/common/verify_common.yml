@@ -39,6 +39,14 @@
   become: false
   delegate_to: localhost
 
+- name: Create test directory
+  ansible.builtin.file:
+    path: "{{ molecule_ephemeral_directory }}/test"
+    state: directory
+    mode: '0777'
+  delegate_to: localhost
+  become: false
+
 - name: Run tests in a Podman container
   containers.podman.podman_container:
     name: "rhtas-test-container-{{ ansible_date_time.epoch }}"
@@ -63,9 +71,10 @@
       - "--add-host"
       - "dex-idp:{{ node_ip }}"
     volume:
-      - "{{ test_dir_path }}:/mnt:z"
+      - "{{ test_dir_path }}:/scripts:z"
+      - "{{ molecule_ephemeral_directory }}/test:/test:z"
     entrypoint: /bin/bash
-    command: /mnt/test-sign-blob.sh
+    command: /scripts/test-sign-blob.sh
     attach:
       - stdout
       - stderr
@@ -76,3 +85,9 @@
 - name: Ensure the blob was verified successfully
   ansible.builtin.assert:
     that: blob_verify_output.stderr is contains("Verified OK")
+
+- name: Ensure the blob verified multiple artifacts
+  ansible.builtin.assert:
+    that:
+      - "'Total file validations: ' + expected_validations | string in  blob_verify_output.stderr"
+  when: expected_validations is defined
