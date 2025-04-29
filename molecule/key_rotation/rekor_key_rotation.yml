@@ -1,0 +1,144 @@
+---
+- name: Rotate Rekor key
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+  vars:
+    volumes:
+      tuf-signing-keys: "{{ molecule_ephemeral_directory }}/tuf-signing-keys"
+      tuf-repository: "{{ molecule_ephemeral_directory }}/tuf-repo"
+  tasks:
+    - name: Resolve remote host IP
+      ansible.builtin.set_fact:
+        remote_host: "{{ ansible_host }}"
+    # ansible builtin moduels does not support SNI resolution
+    - name: Rekor TreeID
+      ansible.builtin.command:
+        cmd: "curl --insecure --resolve rekor.myrhtas:443:{{ remote_host }} https://rekor.myrhtas//api/v1/log"
+      register: treeIDjson
+      delegate_to: localhost
+      become: false
+
+    - name: Parse treeID from JSON
+      ansible.builtin.set_fact:
+        old_tree_id: "{{ treeIDjson.stdout | from_json | json_query('treeID') | trim }}"
+
+    - name: Parse shard length from JSON
+      ansible.builtin.set_fact:
+        old_shard_length: "{{ treeIDjson.stdout | from_json | json_query('treeSize') | trim }}"
+
+    - name: Drain tree
+      containers.podman.podman_container:
+        name: "rhtas-key-rotation-{{ ansible_date_time.epoch }}"
+        image: registry.redhat.io/rhtas/updatetree-rhel9:1.1.0
+        network: rhtas
+        rm: true
+        recreate: true
+        command:
+          - "--admin_server=trillian-logserver-pod:8091"
+          - "--tree_id={{ old_tree_id }}"
+          - "--tree_state=DRAINING"
+        attach:
+          - stdout
+          - stderr
+
+    - name: Freeze tree
+      containers.podman.podman_container:
+        name: "rhtas-key-rotation-{{ ansible_date_time.epoch }}"
+        image: registry.redhat.io/rhtas/updatetree-rhel9:1.1.0
+        rm: true
+        network: rhtas
+        recreate: true
+        command:
+          - "--admin_server=trillian-logserver-pod:8091"
+          - "--tree_id={{ old_tree_id }}"
+          - "--tree_state=FROZEN"
+        attach:
+          - stdout
+          - stderr
+
+    - name: Create new tree
+      containers.podman.podman_container:
+        name: "rhtas-key-rotation-{{ ansible_date_time.epoch }}"
+        image: registry.redhat.io/rhtas/createtree-rhel9:1.1.0
+        rm: true
+        network: rhtas
+        recreate: true
+        command:
+          - "--admin_server=trillian-logserver-pod:8091"
+          - "-display_name=rekor-tree"
+        attach:
+          - stdout
+          - stderr
+      register: new_tree_out
+
+    - name: Add rekor public key to list
+      ansible.builtin.set_fact:
+        tas_single_node_rekor: >-
+          {{
+            tas_single_node_rekor | combine({
+              'public_keys': tas_single_node_rekor.public_keys + [{
+                'id': 'new-rekor-key-pub',
+                'key': lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.pub')
+              }]
+            })
+          }}
+
+
+    - name: Add rekor private key
+      ansible.builtin.set_fact:
+        tas_single_node_rekor: >-
+          {{
+            tas_single_node_rekor | combine({
+              'private_keys': tas_single_node_rekor.private_keys + [{
+                'id': 'new-rekor-key',
+                'key': lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.key')
+              }]
+            })
+          }}
+
+    - name: Configure rekor to use new keys
+      ansible.builtin.set_fact:
+        tas_single_node_rekor: >-
+          {{
+            tas_single_node_rekor | combine({
+              'ca_passphrase': 'passphrase',
+              'active_signer_id': 'new-rekor-key',
+              'active_tree_id': new_tree_out.stdout | trim,
+              'sharding_config': [{
+                'tree_id': old_tree_id,
+                'tree_length': old_shard_length,
+                'pem_pub_key': 'rekor-public-key0'
+              }]
+            })
+          }}
+
+    - name: Update TUF repository
+      ansible.builtin.include_tasks:
+        file: tasks/tuf.yml
+      vars:
+        component: 'rekor'
+        active_key_path: '/etc/rhtas/certs/rekor-pub-key0.pub'
+        active_key_name: 'rekor.pub'
+        new_key_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.pub') }}"
+        new_key_name: 'new-rekor.pub'
+
+    - name: Archive tuf-repo locally
+      ansible.builtin.command:
+        cmd: "tar -czf {{ molecule_ephemeral_directory }}/tuf-repo.tar.gz -C {{ volumes['tuf-repository'] }} ../tuf-repo"
+      delegate_to: localhost
+      become: false
+
+    - name: Set base64-encoded archive as variable
+      ansible.builtin.set_fact:
+        tas_single_node_trust_root:
+          full_archive: "{% raw %}{{ lookup('file', molecule_ephemeral_directory + '/tuf-repo.tar.gz') | b64encode }}{% endraw %}"
+
+    - name: Store generated values to var file
+      ansible.builtin.copy:
+        content: "{{ vars | dict2items | selectattr('key', 'search', '^tas_single_node_') | items2dict | to_nice_yaml }}"
+        dest: "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+      delegate_to: localhost
+      become: false

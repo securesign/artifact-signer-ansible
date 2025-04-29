@@ -31,7 +31,7 @@ scenario:
     - prepare
     - converge
     - verify
-    - side_effect key_rotation.yml
+    - side_effect fulcio_key_rotation.yml rekor_key_rotation.yml
     - converge
     - verify verify_rotated.yml
     - destroy
