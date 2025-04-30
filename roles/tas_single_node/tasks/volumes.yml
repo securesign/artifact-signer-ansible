@@ -9,7 +9,8 @@
         [
           "rekor-server",
           tas_single_node_tuf_repository_volume_name,
-          tas_single_node_tuf_signing_keys_volume_name
+          tas_single_node_tuf_signing_keys_volume_name,
+          "rekor-monitor"
         ]
       }}
 

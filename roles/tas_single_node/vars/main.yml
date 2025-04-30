@@ -24,7 +24,7 @@ _tas_single_node_rekor:
   private_keys: []
   public_keys: []
   sharding_config: []
-
+  monitor_check_interval: 3600 # 1 hour
 
 _tas_single_node_rekor_redis:
   database_deploy: true
