@@ -1,10 +1,10 @@
 ---
-- name: Rotate keys
+- name: Rotate Fulcio keys
   hosts: molecule
   gather_facts: true
   become: true
   vars_files:
-    - vars/vars.yml
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
   vars:
     volumes:
       tuf-signing-keys: "{{ molecule_ephemeral_directory }}/tuf-signing-keys"
@@ -22,10 +22,10 @@
         file: tasks/tuf.yml
       vars:
         component: 'fulcio'
-        active_cert_path: '/etc/rhtas/certs/fulcio.pem'
-        active_cert_name: 'fulcio_v1.crt.pem'
-        new_cert_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}"
-        new_cert_name: 'new-fulcio.pem'
+        active_key_path: '/etc/rhtas/certs/fulcio.pem'
+        active_key_name: 'fulcio_v1.crt.pem'
+        new_key_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}"
+        new_key_name: 'new-fulcio.pem'
 
     - name: Archive tuf-repo locally
       ansible.builtin.command:
