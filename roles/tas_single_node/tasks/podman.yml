@@ -54,7 +54,8 @@
       "{{ tas_single_node_tsa_enabled }}",
       "{{ tas_single_node_rekor_search_enabled }}",
       "{{ tas_single_node_client_server_enabled }}",
-      "{{ tas_single_node_createtree_enabled }}"
+      "{{ tas_single_node_createtree_enabled }}",
+      "{{ tas_single_node_rekor_monitor_enabled }}"
     ]
   loop:
     - "{{ tas_single_node_fulcio_server_image }}"
@@ -73,6 +74,7 @@
     - "{{ tas_single_node_rekor_search_ui_image }}"
     - "{{ tas_single_node_client_server_image }}"
     - "{{ tas_single_node_createtree_image }}"
+    - "{{ tas_single_node_rekor_monitor_image }}"
   loop_control:
     index_var: idx
   when: enabled_vals[idx] | bool

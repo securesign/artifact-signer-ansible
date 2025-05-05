@@ -143,6 +143,7 @@ tas_single_node_fulcio_enabled: true
 tas_single_node_rekor_search_enabled: true
 tas_single_node_client_server_enabled: true
 tas_single_node_createtree_enabled: true
+tas_single_node_rekor_monitor_enabled: true
 
 # Directory Structure
 # NOTE: Do not change these values, they're referred to from docs
