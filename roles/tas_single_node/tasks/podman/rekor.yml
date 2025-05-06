@@ -55,6 +55,8 @@
       systemd_file: redis
       network: "{{ tas_single_node_podman_network }}"
       kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/redis-server.j2') | from_yaml }}"
+      secret: "{{ tas_single_node_rekor_secret }}"
+      secret_changed: "{{ secret_result.changed }}"
   when: tas_single_node_rekor_redis.database_deploy
 
 - name: Deploy Rekor Server Pod

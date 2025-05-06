@@ -25,6 +25,12 @@ spec:
       containers:
         - name: backfill-redis
           image: "{{ tas_single_node_backfill_redis_image }}"
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis_password
+                  name: rekor-secret
           command:
             - /bin/sh
             - -c
@@ -46,7 +52,7 @@ spec:
                 -h {{ tas_single_node_rekor_redis.redis.host }} \
                 -p {{ tas_single_node_rekor_redis.redis.port }} \
 {% if tas_single_node_rekor_redis.redis.password != "" %}
-                -a "{{ tas_single_node_rekor_redis.redis.password }}" \
+                -a "${REDIS_PASSWORD}" \
 {% endif %}
                 GET last_filled_index)
 
@@ -73,7 +79,7 @@ spec:
                 --redis-hostname={{ tas_single_node_rekor_redis.redis.host }} \
                 --redis-port={{ tas_single_node_rekor_redis.redis.port }} \
 {% if tas_single_node_rekor_redis.redis.password != "" %}
-                --redis-password="{{ tas_single_node_rekor_redis.redis.password }}" \
+                --redis-password="${REDIS_PASSWORD}" \
 {% endif %}
                 --rekor-address=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} \
                 --start="${startIndex}" --end="${endIndex}"
@@ -83,7 +89,7 @@ spec:
                 -h {{ tas_single_node_rekor_redis.redis.host }} \
                 -p {{ tas_single_node_rekor_redis.redis.port }} \
 {% if tas_single_node_rekor_redis.redis.password != "" %}
-                -a "{{ tas_single_node_rekor_redis.redis.password }}" \
+                -a "${REDIS_PASSWORD}" \
 {% endif %}
                 SET last_filled_index "$((endIndex))"
           volumeMounts:
