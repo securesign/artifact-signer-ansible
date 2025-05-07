@@ -27,7 +27,7 @@ spec:
               command:
                 - bash
                 - '-c'
-                - 'mariadb -u {{ tas_single_node_trillian.mysql.user }} -p{{ tas_single_node_trillian.mysql.password }} -e "SELECT 1;"'
+                - 'mariadb -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1;"'
             initialDelaySeconds: 10
             timeoutSeconds: 1
             periodSeconds: 10
@@ -38,7 +38,7 @@ spec:
               command:
                 - bash
                 - '-c'
-                - 'mariadb-admin -u {{ tas_single_node_trillian.mysql.user }} -p{{ tas_single_node_trillian.mysql.password }} ping'
+                - 'mariadb-admin -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" ping'
             initialDelaySeconds: 10
             timeoutSeconds: 1
             periodSeconds: 10

@@ -29,7 +29,10 @@ spec:
 {% if tas_single_node_rekor_redis.redis.password != "" %}
           env:
             - name: REDIS_PASSWORD
-              value: "{{ tas_single_node_rekor_redis.redis.password }}"
+              valueFrom:
+                secretKeyRef:
+                  key: redis-password
+                  name: rekor-secret
 {% endif %}
           imagePullPolicy: IfNotPresent
           ports:

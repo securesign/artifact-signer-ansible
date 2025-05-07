@@ -45,22 +45,28 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
+          command:
+            - /bin/sh
           args:
-            - serve
-            - --port={{ tas_single_node_fulcio_port_http }}
-            - --grpc-port={{ tas_single_node_fulcio_port_grpc }}
-            - --metrics-port={{ tas_single_node_fulcio_port_metrics }}
-            - --ca=fileca
-            - --fileca-key
-            - /var/run/fulcio-secrets/key.pem
-            - --fileca-cert
-            - /var/run/fulcio-secrets/cert.pem
-            - --fileca-key-passwd
-            - "{{ tas_single_node_fulcio.ca_passphrase }}"
-            - "--ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_fulcio.ct_log_prefix }}"
+            - -c
+            - |
+              exec /usr/local/bin/fulcio-server serve \
+                --port={{ tas_single_node_fulcio_port_http }} \
+                --grpc-port={{ tas_single_node_fulcio_port_grpc }} \
+                --metrics-port={{ tas_single_node_fulcio_port_metrics }} \
+                --ca=fileca \
+                --fileca-key /var/run/fulcio-secrets/key.pem \
+                --fileca-cert /var/run/fulcio-secrets/cert.pem \
+                --fileca-key-passwd "${PASSPHRASE}" \
+                --ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_fulcio.ct_log_prefix }}
           env:
             - name: SSL_CERT_DIR
               value: /certs
+            - name: PASSPHRASE
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: fulcio-server-secret
           image: "{{ tas_single_node_fulcio_server_image }}"
           imagePullPolicy: IfNotPresent
           ports:
