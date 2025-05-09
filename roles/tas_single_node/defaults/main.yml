@@ -50,6 +50,8 @@ tas_single_node_createtree_image:
 # CLI Server
 tas_single_node_client_server_image:
   "registry.redhat.io/rhtas/client-server-rhel9@sha256:e9a175b14891e7bdd724cdd7d98129bcc8bc3f87435020292ede514534ae23a0"
+tas_single_node_rekor_monitor_image:
+  "registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:440cda39c67da81fa8f7e8b1fc4b78694c8fc5e932f62744210db66659492b55"
 
 tas_single_node_podman: {}
 

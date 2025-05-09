@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rekor-monitor
+  namespace: rekor-system
+  labels:
+    app.podman.io/component: rekor-monitor
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: rekor-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rekor-monitor
+  template:
+    metadata:
+      labels:
+        app.name: rekor-monitor
+    spec:
+      containers:
+        - name: rekor-monitor
+          image: "{{ tas_single_node_rekor_monitor_image }}"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              export SSL_CERT_FILE=/rhtas.pem
+              while true; do
+                timestamp=$(date +"%Y-%m-%dT%H:%M:%S")
+                echo "[$timestamp]" >> /data/rekor-monitor.log
+                /rekor_monitor \
+                  --file=/data/checkpoint_log.txt \
+                  --once=true \
+                  --url=https://rekor.{{ tas_single_node_base_hostname }} >> /data/rekor-monitor.log 2>&1
+                echo "" >> /data/rekor-monitor.log
+                sleep {{ tas_single_node_rekor.monitor_check_interval }}
+              done
+          volumeMounts:
+            - name: checkpoint-storage
+              mountPath: /data
+            - name: host-cert
+              mountPath: /rhtas.pem
+              subPath: rhtas.pem
+      restartPolicy: Always
+      volumes:
+        - name: checkpoint-storage
+          persistentVolumeClaim:
+            claimName: rekor-monitor
+        - name: host-cert
+          hostPath:
+            path: {{ tas_single_node_certs_dir }}
