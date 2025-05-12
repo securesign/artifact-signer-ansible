@@ -20,21 +20,17 @@ spec:
       containers:
         - name: rekor-monitor
           image: "{{ tas_single_node_rekor_monitor_image }}"
-          command:
-            - /bin/sh
-            - -c
-            - |
-              export SSL_CERT_FILE=/rhtas.pem
-              while true; do
-                timestamp=$(date +"%Y-%m-%dT%H:%M:%S")
-                echo "[$timestamp]" >> /data/rekor-monitor.log
-                /rekor_monitor \
-                  --file=/data/checkpoint_log.txt \
-                  --once=true \
-                  --url=https://rekor.{{ tas_single_node_base_hostname }} >> /data/rekor-monitor.log 2>&1
-                echo "" >> /data/rekor-monitor.log
-                sleep {{ tas_single_node_rekor.monitor_check_interval }}
-              done
+          ports:
+          - containerPort: 4317
+          env:
+          - name: SSL_CERT_FILE
+            value: /rhtas.pem
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://otel-collector-pod:4317
+          - name: REKOR_SERVER_ENDPOINT
+            value: https://rekor.{{ tas_single_node_base_hostname }}
+          - name: CHECK_INTERVAL_SECONDS
+            value: 5
           volumeMounts:
             - name: checkpoint-storage
               mountPath: /data

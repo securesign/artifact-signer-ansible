@@ -18,6 +18,19 @@
     mode: "0600"
   register: configmap_result
 
+- name: Load OpenTelemetry collector config content
+  block:
+    - name: Generate OpenTelemetry collector config
+      ansible.builtin.set_fact:
+        otel_collector_config_content: "{{ lookup('ansible.builtin.template', 'configs/otel-collector-config.j2') }}"
+
+- name: Create OpenTelemetry collector Config
+  ansible.builtin.copy:
+    content: "{{ otel_collector_config_content }}"
+    dest: "{{ tas_single_node_otel_collector_config }}"
+    mode: "0600"
+  register: otel_collector_configmap_result
+
 - name: Slurp Rekor keys
   ansible.builtin.slurp:
     src: "{{ item }}"
@@ -96,6 +109,17 @@
     state: started
     daemon_reload: "{{ copy_timer_systemd_file.changed }}"
   when: tas_single_node_backfill_redis.enabled
+
+- name: Deploy OpenTelemetry collector Pod
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: otel_collector
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/otel-collector.j2') | from_yaml }}"
+      configmap: "{{ tas_single_node_otel_collector_config }}"
+      configmap_changed: "{{ otel_collector_configmap_result.changed }}"
 
 - name: Deploy Rekor Monitor Pod
   ansible.builtin.include_tasks: podman/install_manifest.yml

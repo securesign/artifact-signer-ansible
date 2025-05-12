@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: rekor-system
+  labels:
+    app.podman.io/component: otel-collector
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: otel/opentelemetry-collector:latest
+          args: ["--config=/etc/otel-collector-config.yaml"]
+          ports:
+            - containerPort: 4317 # gRPC
+            - containerPort: 4318 # HTTP
+            - containerPort: 9464 # Prometheus
+              hostPort: 9464
+          volumeMounts:
+            - name: otel-config
+              mountPath: /etc/otel-collector-config.yaml
+              subPath: otel-collector-config.yaml
+      volumes:
+        - name: otel-config
+          configMap:
+            name: otel-collector-config

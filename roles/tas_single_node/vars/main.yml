@@ -196,6 +196,7 @@ tas_single_node_rekor_treeid_config: "{{ tas_single_node_kube_configmap_dir }}/r
 tas_single_node_ctlog_treeid_config: "{{ tas_single_node_kube_configmap_dir }}/ctlog-treeid-config.yaml"
 tas_single_node_rekor_secret: "{{ tas_single_node_kube_configmap_dir }}/rekor-secret.yaml"
 tas_single_node_rekor_server_config: "{{ tas_single_node_kube_configmap_dir }}/rekor-server-config.yaml"
+tas_single_node_otel_collector_config: "{{ tas_single_node_kube_configmap_dir }}/otel-collector-config.yaml"
 tas_single_node_nginx_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-config.yaml"
 tas_single_node_apache_config: "{{ tas_single_node_kube_configmap_dir }}/apache-config.yaml"
 tas_single_node_nginx_certs_config: "{{ tas_single_node_kube_configmap_dir }}/nginx-certs.yaml"
