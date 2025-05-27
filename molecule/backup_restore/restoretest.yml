@@ -1,0 +1,38 @@
+---
+- name: Restore
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/podman.yml
+    - vars/run-restore.yml
+  tasks:
+    - name: Ensure Registry credentials are set
+      ansible.builtin.include_tasks: ../common/check_creds.yml
+
+    - name: Find recent Backup
+      ansible.builtin.find:
+        paths: /root/tas_backups
+      register: found_files
+
+    - name: Get latest BACKUP file
+      ansible.builtin.set_fact:
+        latest_file: "{{ found_files.files | sort(attribute='mtime',reverse=true) | first }}"
+
+    - name: Copy Backup file from remote
+      ansible.builtin.fetch:
+        src: "{{ latest_file.path }}"
+        dest: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
+        flat: yes
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
+
+
+      
