@@ -320,7 +320,7 @@
                       oidc_issuers:
                         - issuer: "http://dex-idp:5556/dex"
                           url: "http://dex-idp:5556/dex"
-                          client_id: example-app
+                          client_id: trusted-artifact-signer
                           type: email
                       meta_issuers: []
                   tas_single_node_base_hostname: myrhtas
