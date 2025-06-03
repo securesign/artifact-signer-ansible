@@ -1,0 +1,19 @@
+---
+- name: Backup
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/podman.yml
+    - vars/run-backup.yml
+  tasks:
+    - name: Ensure Registry credentials are set
+      ansible.builtin.include_tasks: ../common/check_creds.yml
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
+
+
+      
