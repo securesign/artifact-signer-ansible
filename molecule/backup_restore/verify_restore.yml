@@ -1,0 +1,115 @@
+- name: verifyRestore
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/podman.yml
+    - vars/verify-restore.yml
+  tasks:
+
+    - name: Ansible backup nam
+      ansible.builtin.set_fact:
+        backupname: "{{lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
+
+    - name: Print Name
+      ansible.builtin.debug:
+        msg: "{{backupname}}"
+
+    - name: Setting path for test staging
+      ansible.builtin.set_fact:
+        test_staging: "/var/lib/tas_restore_test"
+  
+    - name: Make Tas Restore Verification staging folder
+      ansible.builtin.file:
+        path: "{{ test_staging }}"
+        state: directory
+        mode: '0755'
+
+    - name: Push Encrypted Backup Tarball to Remote Server
+      ansible.builtin.copy:
+        src: "{{molecule_ephemeral_directory}}/{{backupname}}"
+        dest: "{{ test_staging }}/{{ backupname }}"
+        remote_src: false
+        mode: "0600"
+
+    - name: Decrypt Backup Tarball
+      ansible.builtin.shell: |
+        openssl enc -d -aes-256-cbc -salt -pbkdf2 -iter 600000 \
+        -in "{{ test_staging }}/{{ backupname }}" \
+        -out "backup.tgz" \
+        -pass pass:"{{ tas_single_node_backup_restore.restore.passphrase }}"
+      args:
+        executable: /bin/bash
+        chdir: "{{ test_staging }}/"
+      register: tarball
+      changed_when: true
+
+    - name: Extract Compressed Backup Tarball
+      ansible.builtin.unarchive:
+        src: "{{ test_staging }}/backup.tgz"
+        dest: "{{ test_staging }}"
+        remote_src: true
+
+    - name: Find Extracted Backup Folder
+      ansible.builtin.find:
+        paths: "{{ test_staging }}"
+        pattern: "BACKUP*"
+        file_type: "directory"
+      register: extracted_backup
+
+    - name: Get Keys
+      ansible.builtin.find:
+        path: "{{ extracted_backup.files[0].path }}/rhtas/certs"
+      register: rhtaskeys
+
+
+    - name: rhtaskeys print
+      ansible.builtin.debug:
+        msg: "{{rhtaskeys}}"
+
+
+    # Extracted backup name might be different to tarball name, hence having to find it ourselves
+    - name: Find ExtractedBackup Files and Current Config files
+      ansible.builtin.find:
+        paths: "{{item}}"
+        recurse: yes
+        get_checksum: true
+      register: gathered_files
+      loop:
+        - "{{rhtaskeys.files[0].path}}"
+        - "/etc/rhtas/certs"
+
+    - name: Debug Print files
+      ansible.builtin.debug:
+        msg: "{{gathered_files.results[0].files}}"
+
+    - name: Debug Print files
+      ansible.builtin.debug:
+        msg: "{{gathered_files.results[1].files}}"
+
+    - name: Debug print
+      vars:
+        file2: >- 
+          {{
+            gathered_files.results[1].files |
+            selectattr('path', 'eq', file1.path | replace({{gathered_files.files[0].path}}, "/etc/rhtas/")) |
+            list |
+            first |
+            default({})
+          }}
+      ansible.builtin.assert:
+        that: file1.checksum == file2.checksum
+      loop: "{{gathered_files.results[0].files}}"
+      loop_control:
+        loop_var: file1
+
+    - name: Compare Checksums
+      ansible.builtin.assert:
+        that: file1.checksum != gathered_files.results[0].files[num].checksum
+        fail_msg: "was not taken by TAS"
+        success_msg: "was taken by TAS"
+      loop: "{{gathered_files.results[0].files}}"
+      loop_control:
+        loop_var: file1
+        index_var: num
