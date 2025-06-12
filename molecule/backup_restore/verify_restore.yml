@@ -111,3 +111,9 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
+
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
+      vars:
+        expected_validations: 2
