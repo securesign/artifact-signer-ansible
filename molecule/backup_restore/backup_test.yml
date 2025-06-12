@@ -6,7 +6,7 @@
   vars_files:
     - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/podman.yml
-    - vars/run-backup.yml
+    - vars/run-backup-vars.yml
   tasks:
     - name: Ensure Registry credentials are set
       ansible.builtin.include_tasks: ../common/check_creds.yml

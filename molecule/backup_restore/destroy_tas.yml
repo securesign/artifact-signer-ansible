@@ -8,7 +8,6 @@
       - user: testingUser
         password: password123
   vars_files:
-    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/podman.yml
     - vars/vars.yml
   tasks:

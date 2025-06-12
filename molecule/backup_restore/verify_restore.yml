@@ -5,16 +5,12 @@
   vars_files:
     - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/podman.yml
-    - vars/verify-restore.yml
+    - vars/verify-restore-vars.yml
   tasks:
 
     - name: Ansible backup nam
       ansible.builtin.set_fact:
         backupname: "{{lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
-
-    - name: Print Name
-      ansible.builtin.debug:
-        msg: "{{backupname}}"
 
     - name: Setting path for test staging
       ansible.builtin.set_fact:
@@ -28,7 +24,7 @@
 
     - name: Push Encrypted Backup Tarball to Remote Server
       ansible.builtin.copy:
-        src: "{{molecule_ephemeral_directory}}/{{backupname}}"
+        src: "{{ molecule_ephemeral_directory }}/{{ backupname }}"
         dest: "{{ test_staging }}/{{ backupname }}"
         remote_src: false
         mode: "0600"
@@ -58,58 +54,60 @@
         file_type: "directory"
       register: extracted_backup
 
-    - name: Get Keys
-      ansible.builtin.find:
-        path: "{{ extracted_backup.files[0].path }}/rhtas/certs"
-      register: rhtaskeys
-
-
-    - name: rhtaskeys print
-      ansible.builtin.debug:
-        msg: "{{rhtaskeys}}"
-
-
     # Extracted backup name might be different to tarball name, hence having to find it ourselves
-    - name: Find ExtractedBackup Files and Current Config files
+    - name: Collect Certs in Backup and Collect Certs in Use
       ansible.builtin.find:
         paths: "{{item}}"
         recurse: yes
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{rhtaskeys.files[0].path}}"
+        - "{{extracted_backup.files[0].path}}/rhtas/certs"
         - "/etc/rhtas/certs"
 
-    - name: Debug Print files
-      ansible.builtin.debug:
-        msg: "{{gathered_files.results[0].files}}"
-
-    - name: Debug Print files
-      ansible.builtin.debug:
-        msg: "{{gathered_files.results[1].files}}"
-
-    - name: Debug print
-      vars:
-        file2: >- 
-          {{
-            gathered_files.results[1].files |
-            selectattr('path', 'eq', file1.path | replace({{gathered_files.files[0].path}}, "/etc/rhtas/")) |
-            list |
-            first |
-            default({})
-          }}
+    - name: Assert that key checksums match
       ansible.builtin.assert:
-        that: file1.checksum == file2.checksum
+        that: item.checksum == gathered_files.results[1].files[num].checksum
+        success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
+        fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
-        loop_var: file1
+        index_var: num
 
-    - name: Compare Checksums
+    - name: Collect Manifests in Backup and Collect Manifests in Use
+      ansible.builtin.find:
+        paths: "{{item}}"
+        recurse: yes
+        get_checksum: true
+      register: gathered_files
+      loop:
+        - "{{extracted_backup.files[0].path}}/rhtas/manifests"
+        - "/etc/rhtas/manifests"
+
+    - name: Assert that manifest checksums match
       ansible.builtin.assert:
-        that: file1.checksum != gathered_files.results[0].files[num].checksum
-        fail_msg: "was not taken by TAS"
-        success_msg: "was taken by TAS"
+        that: item.checksum == gathered_files.results[1].files[num].checksum
+        success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
+        fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
-        loop_var: file1
+        index_var: num
+
+    - name: Collect Configs in Backup and Collect Configs in Use
+      ansible.builtin.find:
+        paths: "{{item}}"
+        recurse: yes
+        get_checksum: true
+      register: gathered_files
+      loop:
+        - "{{extracted_backup.files[0].path}}/rhtas/configs"
+        - "/etc/rhtas/configs"
+
+    - name: Assert that config checksums match
+      ansible.builtin.assert:
+        that: item.checksum == gathered_files.results[1].files[num].checksum
+        success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
+        fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
+      loop: "{{gathered_files.results[0].files}}"
+      loop_control:
         index_var: num

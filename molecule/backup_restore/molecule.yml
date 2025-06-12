@@ -31,6 +31,5 @@ scenario:
     - prepare
     - converge
     - verify
-    - side_effect backuptest.yml destroytas.yml restoretest.yml ## Create Backup, Gutting Procedure and then subsequent restore
-    - verify
-    - destroy
+    - side_effect backup_test.yml destroy_tas.yml restore_test.yml ## Create Backup, Gutting Procedure and then subsequent restore
+    - verify verify_restore.yml

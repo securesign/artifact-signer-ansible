@@ -4,9 +4,8 @@
   gather_facts: true
   become: true
   vars_files:
-    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/run-restore-vars.yml
     - vars/podman.yml
-    - vars/run-restore.yml
   tasks:
     - name: Ensure Registry credentials are set
       ansible.builtin.include_tasks: ../common/check_creds.yml
@@ -26,9 +25,11 @@
         dest: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
         flat: yes
 
-    - name: Debug
-      ansible.builtin.debug:
-        msg: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
+    - name: Save Backup name to file to transfer between steps
+      ansible.builtin.copy:
+        content: '{{ latest_file.path | basename }}'
+        dest: 'backupname.txt'
+        mode: "0600"
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
