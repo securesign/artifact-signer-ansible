@@ -27,4 +27,3 @@
         path: /etc/rhtas
         state: absent
         mode: "0777"
-
