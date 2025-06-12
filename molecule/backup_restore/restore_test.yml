@@ -4,6 +4,7 @@
   gather_facts: true
   become: true
   vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/run-restore-vars.yml
     - vars/podman.yml
   tasks:
