@@ -72,5 +72,3 @@
         dest: "{{ molecule_ephemeral_directory + '/vars.yml' }}"
       delegate_to: localhost
       become: false
-
-
