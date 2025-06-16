@@ -5,12 +5,12 @@
   vars_files:
     - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/podman.yml
-    - vars/verify-restore-vars.yml
+    - vars/backup-restore-vars.yml
   vars:
     test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
   tasks:
 
-    - name: Ansible backup nam
+    - name: Ansible backup name
       ansible.builtin.set_fact:
         backupname: "{{lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
 

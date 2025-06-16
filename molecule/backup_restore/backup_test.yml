@@ -6,10 +6,14 @@
   vars_files:
     - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/podman.yml
-    - vars/run-backup-vars.yml
+    - vars/backup-restore-vars.yml
   tasks:
     - name: Ensure Registry credentials are set
       ansible.builtin.include_tasks: ../common/check_creds.yml
+
+    - name: Enable Backup Force Run
+      ansible.builtin.set_fact:
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'backup': {'force_run': true}}, recursive=True) }}"
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
