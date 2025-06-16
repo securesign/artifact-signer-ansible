@@ -1,0 +1,13 @@
+tas_single_node_base_hostname: yourrhtas
+
+tas_single_node_backup_restore:
+  backup:
+    enabled: true
+    schedule: "*-*-* 00:00:00"
+    force_run: false
+    passphrase: "example123"
+    directory: /root/tas_backups
+  restore:
+    enabled: false
+    source: /root/tas_backups
+    passphrase: "example123"
