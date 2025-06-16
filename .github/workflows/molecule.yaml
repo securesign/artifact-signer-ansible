@@ -23,6 +23,7 @@ jobs:
           - default
           - user_provided
           - key_rotation
+          - backup_restore
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
