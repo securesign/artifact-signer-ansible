@@ -1,0 +1,55 @@
+---
+- name: Restore
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/backup-restore-vars.yml
+    - vars/podman.yml
+  tasks:
+    - name: Ensure Registry credentials are set
+      ansible.builtin.include_tasks: ../common/check_creds.yml
+
+    - name: Find recent Backup
+      ansible.builtin.find:
+        paths: /root/tas_backups
+      register: found_files
+
+    - name: Get latest BACKUP file
+      ansible.builtin.set_fact:
+        latest_file: "{{ found_files.files | sort(attribute='mtime',reverse=true) | first }}"
+
+    - name: Copy Backup file from remote
+      ansible.builtin.fetch:
+        src: "{{ latest_file.path }}"
+        dest: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
+        flat: yes
+      register: backupLocation
+
+    - name: Save Backup name to file to transfer between steps
+      ansible.builtin.copy:
+        content: '{{ latest_file.path | basename }}'
+        dest: 'backupname.txt'
+        mode: "0600"
+    
+    - name: Copy Backup file from remote
+      ansible.builtin.fetch:
+        src: "backupname.txt"
+        dest: "{{ molecule_ephemeral_directory }}/backupname.txt"
+        flat: yes
+
+    - name: Turn restore on
+      ansible.builtin.set_fact:
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'enabled': true}}, recursive=True) }}"
+
+    - name: Set Restore Path
+      ansible.builtin.set_fact:
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'source': backupLocation.dest}}, recursive=True) }}"
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
+
+
+      
