@@ -3,10 +3,6 @@
   hosts: molecule
   gather_facts: true
   become: true
-  vars:
-   users:
-      - user: testingUser
-        password: password123
   vars_files:
     - vars/podman.yml
     - vars/vars.yml
@@ -19,9 +15,6 @@
       ansible.builtin.shell: podman volume rm -f -a 
       become: true
     
-    - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../common/dex-setup.yaml
-
     - name: Recursively remove directory
       ansible.builtin.file:
         path: /etc/rhtas
