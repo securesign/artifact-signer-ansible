@@ -36,7 +36,7 @@ tas_single_node_fulcio:
   fulcio_config:
     meta_issuers:
       - issuer_pattern: "http://dex-*:5556/dex"
-        client_id: example-app
+        client_id: trusted-artifact-signer
         type: email
 
 tas_single_node_rekor:
