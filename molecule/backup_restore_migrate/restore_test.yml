@@ -50,6 +50,4 @@
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
         name: tas_single_node
-
-
       

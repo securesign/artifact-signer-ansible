@@ -1,5 +1,3 @@
-tas_single_node_base_hostname: yourrhtas
-
 tas_single_node_backup_restore:
   backup:
     enabled: true

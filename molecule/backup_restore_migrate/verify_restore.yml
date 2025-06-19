@@ -75,6 +75,7 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
+      ignore_errors: true
 
     - name: Collect Manifests in Backup and Collect Manifests in Use
       ansible.builtin.find:
@@ -94,6 +95,7 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
+      ignore_errors: true
 
     - name: Collect Configs in Backup and Collect Configs in Use
       ansible.builtin.find:
@@ -113,7 +115,26 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
+      ignore_errors: true
 
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
+      vars:
+        expected_validations: 2
+
+    - name: Turn restore off
+      ansible.builtin.set_fact:
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'enabled': false}}, recursive=True) }}"
+
+    - name: Set HostName
+      ansible.builtin.set_fact:
+        tas_single_node_base_hostname: yourrhtas
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
+    
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml
