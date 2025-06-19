@@ -37,6 +37,11 @@
         network:
           assign_public_ip: true
         security_group: "{{ sgID }}"
+        volumes:
+          - device_name: /dev/sda1
+            ebs:
+              volume_size: "{{ item.volume_size }}"
+              delete_on_termination: true
         wait: yes
         state: running
       with_items: "{{ molecule_yml.platforms }}"

@@ -12,6 +12,7 @@ platforms:
     image_id: ami-0dac29b55bd7c33aa
     instance_type: m5.large
     aws_key_name: CI-TEST
+    volume_size: 10
 provisioner:
   name: ansible
   env:
