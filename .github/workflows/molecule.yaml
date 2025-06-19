@@ -24,6 +24,7 @@ jobs:
           - user_provided
           - key_rotation
           - backup_restore
+          - backup_restore_migrate
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
