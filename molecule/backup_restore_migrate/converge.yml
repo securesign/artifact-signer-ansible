@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: molecule
+  gather_facts: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/backup-restore-vars.yml
+    - vars/podman.yml
+  tasks:
+    - name: Ensure Registry credentials are set
+      ansible.builtin.include_tasks: ../common/check_creds.yml
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
