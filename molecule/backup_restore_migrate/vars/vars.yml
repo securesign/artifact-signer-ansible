@@ -11,15 +11,3 @@ tas_single_node_fulcio:
         url: "http://dex-idp:5556/dex"
         client_id: trusted-artifact-signer
         type: email
-
-tas_single_node_backup_restore:
-  backup:
-    enabled: true
-    schedule: "*-*-* 00:00:00"
-    force_run: false
-    passphrase: "example123"
-    directory: /root/tas_backups
-  restore:
-    enabled: false
-    source: /root/tas_backups
-    passphrase: "example123"
