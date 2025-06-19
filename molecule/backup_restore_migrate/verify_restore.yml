@@ -78,7 +78,7 @@
 
     - name: Collect Manifests in Backup and Collect Manifests in Use
       ansible.builtin.find:
-        paths: "{{item}}"
+        paths: "{{ item }}"
         recurse: yes
         get_checksum: true
       register: gathered_files
