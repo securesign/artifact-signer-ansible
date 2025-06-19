@@ -75,7 +75,6 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
-      ignore_errors: true
 
     - name: Collect Manifests in Backup and Collect Manifests in Use
       ansible.builtin.find:
@@ -95,7 +94,6 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
-      ignore_errors: true
 
     - name: Collect Configs in Backup and Collect Configs in Use
       ansible.builtin.find:
@@ -115,7 +113,6 @@
       loop: "{{gathered_files.results[0].files}}"
       loop_control:
         index_var: num
-      ignore_errors: true
 
     - name: Include create common tasks
       ansible.builtin.include_tasks:
