@@ -12,7 +12,7 @@
 
     - name: Ansible backup name
       ansible.builtin.set_fact:
-        backupname: "{{lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
+        backupname: "{{ lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
 
     - name: Setting path for test staging
       ansible.builtin.set_fact:
@@ -59,7 +59,7 @@
     # Extracted backup name might be different to tarball name, hence having to find it ourselves
     - name: Collect Certs in Backup and Collect Certs in Use
       ansible.builtin.find:
-        paths: "{{item}}"
+        paths: "{{ item }}"
         recurse: yes
         get_checksum: true
       register: gathered_files
@@ -102,7 +102,7 @@
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{extracted_backup.files[0].path}}/rhtas/configs"
+        - "{{ extracted_backup.files[0].path }}/rhtas/configs"
         - "/etc/rhtas/configs"
 
     - name: Assert that config checksums match
