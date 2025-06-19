@@ -139,4 +139,4 @@
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml
       vars:
-        expected_validations: 2
+        expected_validations: 3
