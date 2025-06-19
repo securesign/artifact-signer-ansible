@@ -25,7 +25,7 @@
         src: "{{ latest_file.path }}"
         dest: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
         flat: yes
-      register: backupLocation
+      register: backup_location
 
     - name: Save Backup name to file to transfer between steps
       ansible.builtin.copy:
@@ -45,7 +45,7 @@
 
     - name: Set Restore Path
       ansible.builtin.set_fact:
-        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'source': backupLocation.dest}}, recursive=True) }}"
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'source': backup_location.dest}}, recursive=True) }}"
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
