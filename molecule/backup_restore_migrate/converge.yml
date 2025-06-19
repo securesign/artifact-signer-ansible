@@ -4,6 +4,7 @@
   gather_facts: true
   vars_files:
     - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+    - vars/backup-restore-vars.yml
     - vars/podman.yml
   tasks:
     - name: Ensure Registry credentials are set
