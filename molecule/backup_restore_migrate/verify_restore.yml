@@ -64,7 +64,7 @@
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{extracted_backup.files[0].path}}/rhtas/certs"
+        - "{{ extracted_backup.files[0].path }}/rhtas/certs"
         - "/etc/rhtas/certs"
 
     - name: Assert that key checksums match
@@ -72,7 +72,7 @@
         that: item.checksum == gathered_files.results[1].files[num].checksum
         success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
         fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
-      loop: "{{gathered_files.results[0].files}}"
+      loop: "{{ gathered_files.results[0].files }}"
       loop_control:
         index_var: num
 
@@ -83,7 +83,7 @@
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{extracted_backup.files[0].path}}/rhtas/manifests"
+        - "{{ extracted_backup.files[0].path }}/rhtas/manifests"
         - "/etc/rhtas/manifests"
 
     - name: Assert that manifest checksums match
@@ -91,13 +91,13 @@
         that: item.checksum == gathered_files.results[1].files[num].checksum
         success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
         fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
-      loop: "{{gathered_files.results[0].files}}"
+      loop: "{{ gathered_files.results[0].files }}"
       loop_control:
         index_var: num
 
     - name: Collect Configs in Backup and Collect Configs in Use
       ansible.builtin.find:
-        paths: "{{item}}"
+        paths: "{{ item }}"
         recurse: yes
         get_checksum: true
       register: gathered_files
@@ -110,7 +110,7 @@
         that: item.checksum == gathered_files.results[1].files[num].checksum
         success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
         fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
-      loop: "{{gathered_files.results[0].files}}"
+      loop: "{{ gathered_files.results[0].files }}"
       loop_control:
         index_var: num
 
