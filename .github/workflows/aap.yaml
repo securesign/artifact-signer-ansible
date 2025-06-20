@@ -1,9 +1,8 @@
 name: Using Ansible Molecule, test RHTAS collection deployment from a private AAP
 
 on:
-  schedule:
-  - cron: "0 0 * * *"
-  workflow_dispatch:
+  push:
+  pull_request:
 
 jobs:
   test-aap-collection:
