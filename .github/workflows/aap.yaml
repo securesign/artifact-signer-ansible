@@ -56,12 +56,3 @@ jobs:
             molecule -v create --scenario-name aap-test
             molecule -v converge --scenario-name aap-test
             molecule -v verify --scenario-name aap-test
-        - name: Destroy molecule infrastructure
-          env:
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          if: always()
-          run: |
-            source venv/bin/activate
-            molecule -v destroy --scenario-name aap-test
