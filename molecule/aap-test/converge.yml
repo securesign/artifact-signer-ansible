@@ -171,8 +171,8 @@
             aap_hostname: "{{ aap_instance_ip }}"
             aap_username: "admin"
             aap_password: "password"
-            redhat_subscription_username: "{{ lookup('ansible.builtin.env', 'SUB_USERNAME') }}"
-            redhat_subscription_password: "{{ lookup('ansible.builtin.env', 'SUB_PASSWORD') }}"
+            client_id: "{{ lookup('ansible.builtin.env', 'SUB_USERNAME') }}"
+            client_secret: "{{ lookup('ansible.builtin.env', 'SUB_PASSWORD') }}"
             aap_validate_certs: false
             aap_request_timeout: 900
             controller_license:
