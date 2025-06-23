@@ -1,1 +1,33 @@
-# workaround https://github.com/ansible/molecule/issues/3617
+---
+- name: Set up initial state (dummy old TSA keys) for key rotation test
+  hosts: all
+  become: true # CRITICAL for writing to /etc
+  tasks:
+    - name: Ensure /etc/rhtas/certs directory exists
+      ansible.builtin.file:
+        path: /etc/rhtas/certs # Literal path, no variables needed here
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create a dummy old TSA private key file (tsa.key)
+      ansible.builtin.copy:
+        content: |
+          -----BEGIN PRIVATE KEY-----
+          # Dummy content for old private key.
+          MIID+jCCAuKgAwIBAgIUWp/6Yx0D5X+u+m8V4y7M2q1K6+4wDQYJKoZIhvcNAQELBQAw...
+          -----END PRIVATE KEY-----
+        dest: /etc/rhtas/certs/tsa.key
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Verify dummy TSA key creation
+      ansible.builtin.stat:
+        path: /etc/rhtas/certs/tsa.key
+      register: dummy_key_stat
+
+    - name: Debug dummy TSA key stat
+      ansible.builtin.debug:
+        msg: "Dummy TSA key exists in side_effect: {{ dummy_key_stat.stat.exists }}, size: {{ dummy_key_stat.stat.size }}"

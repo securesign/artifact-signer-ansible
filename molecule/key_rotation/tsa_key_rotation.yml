@@ -1,0 +1,47 @@
+---
+- name: Rotate TSA key
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars_files:
+    - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+  vars:
+    volumes:
+      tuf-signing-keys: "{{ molecule_ephemeral_directory }}/tuf-signing-keys"
+      tuf-repository: "{{ molecule_ephemeral_directory }}/tuf-repo"
+    tas_single_node_tsa: {}
+  tasks:
+    - name: TSA key rotation
+      ansible.builtin.set_fact:
+        tas_single_node_tsa: "{{ (tas_single_node_tsa | default({})) | combine({
+          'private_key': lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa.pem'),
+          'certificate': lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa-cert.pem'),
+          'ca_passphrase': 'tsa'
+        }) }}"
+    - name: Update TUF repository
+      ansible.builtin.include_tasks:
+        file: tasks/tuf.yml
+      vars:
+        component: 'tsa'
+        active_key_path: '/etc/rhtas/certs/tsa.key'
+        active_key_name: 'tsa_v1.crt.pem'
+        new_key_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa.pem') }}"
+        new_key_name: 'new-tsa.pem'
+
+    - name: Archive tuf-repo locally
+      ansible.builtin.command:
+        cmd: "tar -czf {{ molecule_ephemeral_directory }}/tuf-repo.tar.gz -C {{ volumes['tuf-repository'] }} ../tuf-repo"
+      delegate_to: localhost
+      become: false
+
+    - name: Set base64-encoded archive as variable
+      ansible.builtin.set_fact:
+        tas_single_node_trust_root:
+            full_archive: "{% raw %}{{ lookup('file', molecule_ephemeral_directory + '/tuf-repo.tar.gz') | b64encode }}{% endraw %}"
+
+    - name: Store generated values to var file
+      ansible.builtin.copy:
+        content: "{{ vars | dict2items | selectattr('key', 'search', '^tas_single_node_') | items2dict | to_nice_yaml }}"
+        dest: "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+      delegate_to: localhost
+      become: false
