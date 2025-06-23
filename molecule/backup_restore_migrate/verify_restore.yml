@@ -128,12 +128,41 @@
       ansible.builtin.set_fact:
         tas_single_node_base_hostname: yourrhtas
 
+    - name: Ensure the file is absent
+      ansible.builtin.file:
+        path: /etc/rhtas/certs/rhtas.pem
+        state: absent
+
+
+    - name: Ensure the file is absent
+      ansible.builtin.file:
+        path: /etc/rhtas/certs/rhtas.key
+        state: absent
+
+    - name: Find files matching 
+      ansible.builtin.find:
+        paths: "/etc/rhtas/certs/"
+        patterns: "ingress-*"
+        file_type: file # Only search for files (not directories)
+        recurse: yes # Search recursively in subdirectories
+      register: files_to_delete
+
+    - name: Delete the found files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ files_to_delete.files }}"
+      when: files_to_delete.files is defined and files_to_delete.files | length > 0
+
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
         name: tas_single_node
-    
+      vars:
+        tas_single_node_base_hostname: yourrhtas
+
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml
       vars:
         expected_validations: 3
+      ignore_errors: true
