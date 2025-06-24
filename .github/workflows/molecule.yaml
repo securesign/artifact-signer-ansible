@@ -24,6 +24,11 @@ jobs:
           - user_provided
           - key_rotation
           - backup_restore_migrate
+        hostname:
+          - myrhtas
+          - myrhtas
+          - myrhtas
+          - yourrhtas
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,6 +48,12 @@ jobs:
         uses: ./.github/actions/go-e2e
         with:
           tas_address: ${{ env.tas_singlenode_address }}
+          fulcio_host: fulcio.${{ matrix.hostname }}
+          rekor_host: rekor.${{ matrix.hostname }}
+          tsa_host: tsa.${{ matrix.hostname }}
+          rekor_search_host: rekor-search.${{ matrix.hostname }}
+          tuf_host: tuf.${{ matrix.hostname }}
+          cli_server_host: fulcio.${{ matrix.hostname }}
 
       - name: Destroy molecule infrastructure
         if: always()
