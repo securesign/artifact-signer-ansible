@@ -21,7 +21,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
 | tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL or MariaDB instance. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
 | tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'root': {'ca_certificate': '', 'private_key': ''}, 'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
-| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': []}}`  |
+| tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': [], 'ci_issuer_metadata': []}}`  |
 | tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
 | tas_single_node_setup_host_dns | Set up DNS on the managed host to resolve URLs of the configured RHTAS services. | bool |  `True`  |
 | tas_single_node_ctlog | Configuration and specification of ctlog Custom Configuration as well as custom keys. | dict of 'tas_single_node_ctlog' options |  `{'ca_passphrase': 'rhtas', 'sharding_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [], 'public_keys': []}`  |
@@ -173,6 +173,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | oidc_issuers | The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'oidc_issuers' options | no |  |
 | meta_issuers | The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests. | list of dicts of 'meta_issuers' options | no |  |
+| ci_issuer_metadata | Additional metadata for ci-provider OIDC issuers. | list of dicts of 'ci_issuer_metadata' options | no |  |
 
 #### Options for main > tas_single_node_fulcio > fulcio_config > oidc_issuers
 
@@ -182,6 +183,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | url | The OIDC issuer service URL. | str | yes |  |
 | client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
 | type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
+| ci_provider | An optional configuration to map token claims to extensions for CI workflows | str | no |  |
 
 #### Options for main > tas_single_node_fulcio > fulcio_config > meta_issuers
 
@@ -190,6 +192,35 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | issuer_pattern | A URL template to match multiple OIDC issuers, for example, `'https://oidc.eks.*.amazonaws.com/id/*'`. | str | yes |  |
 | client_id | The OIDC client identifier used by the RHTAS service. | str | yes |  |
 | type | The type of the OIDC token issuer, for example, 'email'. | str | yes |  |
+| ci_provider | An optional configuration to map token claims to extensions for CI workflows. | str | no |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config > ci_issuer_metadata
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| issuer_name | Name of the issuer. | str | yes |  |
+| default_template_values | Defaults contains key-value pairs that can be used for filling the templates from extension_templates. | dict | no |  |
+| subject_alternative_name_template | Template for the Subject Alternative Name extension. | str | no |  |
+| extension_templates | A mapping between certificate extension and token claim using Go templating syntax. | dict of 'extension_templates' options | no |  |
+
+#### Options for main > tas_single_node_fulcio > fulcio_config > ci_issuer_metadata > extension_templates
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| build_signer_uri | Reference to specific build instructions that are responsible for signing. | str | no |  |
+| build_signer_digest | Immutable reference to the specific version of the build instructions that is responsible for signing. | str | no |  |
+| runner_environment | Specifies whether the build took place in platform-hosted cloud infrastructure or customer/self-hosted infrastructure. | str | no |  |
+| source_repository_uri | Source repository URL that the build was based on. | str | no |  |
+| source_repository_digest | Immutable reference to a specific version of the source code that the build was based upon. | str | no |  |
+| source_repository_ref | Source Repository Ref that the build run was based upon. | str | no |  |
+| source_repository_identifier | Immutable identifier for the source repository the workflow was based upon. | str | no |  |
+| source_repository_owner_uri | Source repository owner URL of the owner of the source repository that the build was based on. | str | no |  |
+| source_repository_owner_identifier | Immutable identifier for the owner of the source repository that the workflow was based upon. | str | no |  |
+| build_config_uri | Build Config URL to the top-level/initiating build instructions. | str | no |  |
+| build_config_digest | Immutable reference to the specific version of the top-level/initiating build instructions. | str | no |  |
+| build_trigger | Event or action that initiated the build. | str | no |  |
+| run_invocation_uri | Run Invocation URL to uniquely identify the build execution. | str | no |  |
+| source_repository_visibility_at_signing | Source repository visibility at the time of signing the certificate. | str | no |  |
 
 #### Options for main > tas_single_node_rekor
 
