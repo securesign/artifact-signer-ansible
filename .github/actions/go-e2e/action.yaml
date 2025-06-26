@@ -46,6 +46,11 @@ inputs:
     required: true
     default: '1.21'
     type: string
+  scenario_name:
+    description: 'Scenario Name'
+    required: false
+    default: ""
+    type: string
 runs:
   using: 'composite'
   steps:
@@ -58,6 +63,16 @@ runs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.go_version }}
+
+    - name: check scenario
+      if: ${{ matrix.scenario == "backup_restore_migrate"}}
+      run: |
+        echo "fulcio_host=fulcio.yourrhtas" >> $GITHUB_ENV
+        echo "rekor_host=rekor.yourrhtas" >> $GITHUB_ENV
+        echo "tuf_host=tuf.yourrhtas" >> $GITHUB_ENV
+        echo "tsa_host=tsa.yourrhtas" >> $GITHUB_ENV
+        echo "cli_server_host=cli-server.yourrhtas" >> $GITHUB_ENV
+        echo "rekor_search_host=rekor-search.yourrhtas" >> $GITHUB_ENV
 
     - name: Resolve TAS_SINGLENODE hostname
       shell: bash
