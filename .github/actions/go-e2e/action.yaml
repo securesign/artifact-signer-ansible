@@ -1,6 +1,10 @@
 name: 'Go E2E Tests Reusable Action'
 description: 'Run Go E2E tests using the provided TAS server and Go version.'
 inputs:
+  host:
+    description: hostname
+    required: true
+    type: string
   tas_address:
     description: 'TAS server address'
     required: true
@@ -64,17 +68,6 @@ runs:
       with:
         go-version: ${{ inputs.go_version }}
 
-    - name: check scenario
-      shell: bash
-      if: ${{ inputs.scenario_name == 'backup_restore_migrate' }}
-      run: |
-        echo "fulcio_host=fulcio.yourrhtas" >> $GITHUB_ENV
-        echo "rekor_host=rekor.yourrhtas" >> $GITHUB_ENV
-        echo "tuf_host=tuf.yourrhtas" >> $GITHUB_ENV
-        echo "tsa_host=tsa.yourrhtas" >> $GITHUB_ENV
-        echo "cli_server_host=cli-server.yourrhtas" >> $GITHUB_ENV
-        echo "rekor_search_host=rekor-search.yourrhtas" >> $GITHUB_ENV
-
     - name: Resolve TAS_SINGLENODE hostname
       shell: bash
       run: |
@@ -89,7 +82,7 @@ runs:
     - name: Resolve certificates
       shell: bash
       run: |
-        sudo bash -c "source molecule/test/extract_root_cert.sh; extractRootCert ${{ inputs.rekor_host }} /usr/local/share/ca-certificates/myrhtas.crt"
+        sudo bash -c "source molecule/test/extract_root_cert.sh; extractRootCert ${{ inputs.rekor_host }} /usr/local/share/ca-certificates/${{ inputs.host }}.crt"
         sudo update-ca-certificates
     - name: Resolve OIDC TOKEN
       shell: bash
