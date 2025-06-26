@@ -65,6 +65,7 @@ runs:
         go-version: ${{ inputs.go_version }}
 
     - name: check scenario
+      shell: bash
       if: ${{ matrix.scenario == "backup_restore_migrate"}}
       run: |
         echo "fulcio_host=fulcio.yourrhtas" >> $GITHUB_ENV
