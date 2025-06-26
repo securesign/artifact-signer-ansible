@@ -66,7 +66,7 @@ runs:
 
     - name: check scenario
       shell: bash
-      if: ${{ matrix.scenario == "backup_restore_migrate"}}
+      if: ${{ inputs.scenario_name == "backup_restore_migrate" }}
       run: |
         echo "fulcio_host=fulcio.yourrhtas" >> $GITHUB_ENV
         echo "rekor_host=rekor.yourrhtas" >> $GITHUB_ENV
