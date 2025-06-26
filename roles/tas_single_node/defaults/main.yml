@@ -43,13 +43,13 @@ tas_single_node_nginx_image:
 tas_single_node_timestamp_authority_image:
   "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:f36e7c34b6b2f2da954362fc1d340445304a7b05676de5d05ac0a2c3602d9840"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:fac813242312bed694b4fc3691b460a425f6c5d9f239804e37f4499914672ba6"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e88543c21266236787ae0cef3d6a9808928b5a90a93a6e3fd632a69048380750"
 # Create Tree
 tas_single_node_createtree_image:
   "registry.redhat.io/rhtas/createtree-rhel9@sha256:93becddd958348ac12000cf5ca3f3e63a6722455c232d551cda5988300c477b5"
 # CLI Server
 tas_single_node_client_server_image:
-  "registry.redhat.io/rhtas/client-server-rhel9@sha256:5abd0def17cf9eaf00b07fbaee4e6c97d2acdcba95bd1987962cf2033e2f4273"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:c3fa85077b47ebaf4f1f176767b86a9f1a9169f2b1c21bf68a27fb48b8affc7f"
 
 tas_single_node_podman: {}
 
