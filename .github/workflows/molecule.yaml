@@ -59,7 +59,7 @@ jobs:
           fulcio_host: fulcio.${{ env.host }}
           rekor_host: rekor.${{ env.host }}
           tsa_host: tsa.${{ env.host }}
-          cli_server: cli-server.${{ env.host }}
+          cli_server_host: cli-server.${{ env.host }}
           rekor_search_host: rekor-search.${{ env.host }}
           tuf_host: tuf.${{ env.host }}
           host: ${{ env.host }}
