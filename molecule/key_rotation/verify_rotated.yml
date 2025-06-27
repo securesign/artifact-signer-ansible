@@ -120,8 +120,8 @@
               src: "{{ item.system_path }}"
             register: tsa_keys
             loop:
-              - { msg: "tsa.key", system_path: "/etc/rhtas/certs/tsa.key" }
-              - { msg: "tsa.pem", system_path: "/etc/rhtas/certs/tsa.pem" }
+              - { msg: "tsa.key", system_path: "/etc/rhtas/certs/tsa-signer-private-key.pem" }
+              - { msg: "tsa.pem", system_path: "/etc/rhtas/certs/tsa-cert-chain.pem" }
             loop_control:
               label: "{{ item.msg }}"
           - name: Assert that new tsa key and certificate were taken by TAS 
@@ -131,8 +131,8 @@
               fail_msg: "{{ item.msg }} was not taken by TAS"
               success_msg: "{{ item.msg }} was taken by TAS"
             loop:
-              - { msg: "tsa.key", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa-key.pem') }}", tsa_config: "{{ tsa_keys.results[0] }}" }
-              - { msg: "tsa.pem", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa-chain.pem') }}", tsa_config: "{{ tsa_keys.results[1] }}" }
+              - { msg: "tsa.key", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-private-key.pem') }}", tsa_config: "{{ tsa_keys.results[0] }}" }
+              - { msg: "tsa.pem", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-cert-chain.pem') }}", tsa_config: "{{ tsa_keys.results[1] }}" }
             loop_control:
               label: "{{ item.msg }}"
           - name: Verify TSA key backup
@@ -140,7 +140,7 @@
               - name: Find files with pattern tsa.key.*
                 ansible.builtin.find:
                   paths: "/etc/rhtas/certs"
-                  patterns: "tsa.key.*"
+                  patterns: "tsa-signer-private-key.pem*"
                 register: found_files
               - name: Verify that at least one backup file exists
                 ansible.builtin.fail:
@@ -151,7 +151,7 @@
               - name: Find files with pattern tsa.pem.*
                 ansible.builtin.find:
                   paths: "/etc/rhtas/certs"
-                  patterns: "tsa.pem.*"
+                  patterns: "tsa-cert-chain.pem.*"
                 register: found_files
               - name: Verify that at least one backup file exists
                 ansible.builtin.fail:

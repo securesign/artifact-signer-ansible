@@ -14,9 +14,9 @@
     - name: TSA key rotation
       ansible.builtin.set_fact:
         tas_single_node_tsa: "{{ (tas_single_node_tsa | default({})) | combine({
-          'signer_private_key': lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa.pem'),
-          'certificate_chain': lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa-cert.pem'),
-          'ca_passphrase': 'tsa'
+          'signer_private_key': lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-private-key.pem'),
+          'certificate_chain': lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-cert-chain.pem'),
+          'ca_passphrase': 'password1'
         }) }}"
     - name: Update TUF repository
       ansible.builtin.include_tasks:
@@ -25,8 +25,8 @@
         component: 'tsa'
         active_key_path: '/etc/rhtas/certs/tsa-signer-private-key.pem'
         active_key_name: 'tsa_v1.crt.pem'
-        new_key_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-tsa.pem') }}"
-        new_key_name: 'new-tsa.pem'
+        new_key_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/tsa/new-private-key.pem') }}"
+        new_key_name: 'new_tsa_key.pem'
 
     - name: Archive tuf-repo locally
       ansible.builtin.command:
