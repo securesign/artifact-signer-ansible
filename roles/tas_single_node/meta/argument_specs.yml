@@ -456,7 +456,9 @@ argument_specs:
                     required: false
                     version_added: "1.3.0"
                   extension_templates:
-                    description: "A mapping between certificate extension and token claim using Go templating syntax."
+                    description: |-
+                      A mapping between certificate extension and token claim using Go templating syntax.
+                      To prevent Ansible from trying to interpolate Go template values, use the "!unsafe" data type.
                     type: dict
                     required: false
                     version_added: "1.3.0"

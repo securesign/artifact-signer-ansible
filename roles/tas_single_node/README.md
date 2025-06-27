@@ -201,7 +201,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | issuer_name | Name of the issuer. | str | yes |  |
 | default_template_values | Defaults contains key-value pairs that can be used for filling the templates from extension_templates. | dict | no |  |
 | subject_alternative_name_template | Template for the Subject Alternative Name extension. | str | no |  |
-| extension_templates | A mapping between certificate extension and token claim using Go templating syntax. | dict of 'extension_templates' options | no |  |
+| extension_templates | A mapping between certificate extension and token claim using Go templating syntax. To prevent Ansible from trying to interpolate Go template values, use the "!unsafe" data type. | dict of 'extension_templates' options | no |  |
 
 #### Options for main > tas_single_node_fulcio > fulcio_config > ci_issuer_metadata > extension_templates
 
