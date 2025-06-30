@@ -13,7 +13,8 @@
 
 - name: Check CI Issuer Metadata
   ansible.builtin.fail:
-    msg: All tas_single_node_fulcio.fulcio_config.{{ item }}.ci_provider must be present in tas_single_node_fulcio.ci_issuer_metadata
+    msg: "All tas_single_node_fulcio.fulcio_config.{{ item }}.ci_provider must be present in tas_single_node_fulcio.ci_issuer_metadata: {{
+        (used_ci_issuers[item] | difference(defined_ci_issuers)) | join(', ') }}"
   when: >-
     used_ci_issuers[item] | difference(defined_ci_issuers) | length > 0
   loop: ["oidc_issuers", "meta_issuers"]
