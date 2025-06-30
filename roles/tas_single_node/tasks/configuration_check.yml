@@ -4,6 +4,22 @@
     msg: "Either tas_single_node_fulcio.fulcio_config.oidc_issuers or tas_single_node_fulcio.fulcio_config.meta_issuers must be specified"
   when: not tas_single_node_fulcio.fulcio_config.oidc_issuers and not tas_single_node_fulcio.fulcio_config.meta_issuers
 
+- name: Set miscellaneous variables for CI Issuer Metadata check
+  ansible.builtin.set_fact:
+    used_ci_issuers:
+      oidc_issuers: "{{ tas_single_node_fulcio.fulcio_config.oidc_issuers | selectattr('ci_provider', 'defined') | map(attribute='ci_provider') }}"
+      meta_issuers: "{{ tas_single_node_fulcio.fulcio_config.meta_issuers | selectattr('ci_provider', 'defined') | map(attribute='ci_provider') }}"
+    defined_ci_issuers: "{{ tas_single_node_fulcio.fulcio_config.ci_issuer_metadata | map(attribute='issuer_name') }}"
+
+- name: Check CI Issuer Metadata
+  ansible.builtin.fail:
+    msg: All tas_single_node_fulcio.fulcio_config.{{ item }}.ci_provider must be present in tas_single_node_fulcio.ci_issuer_metadata
+  when: >-
+    used_ci_issuers[item] | difference(defined_ci_issuers) | length > 0
+  loop: ["oidc_issuers", "meta_issuers"]
+  loop_control:
+    loop_var: item
+
 - name: Prevent usage of memory signer for TSA
   ansible.builtin.fail:
     msg: "'memory' signer can't be used for TSA"
