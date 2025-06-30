@@ -84,6 +84,7 @@ _tas_single_node_fulcio:
   fulcio_config:
     oidc_issuers: []
     meta_issuers: []
+    ci_issuer_metadata: []
 
 _tas_single_node_tsa:
   env: []
