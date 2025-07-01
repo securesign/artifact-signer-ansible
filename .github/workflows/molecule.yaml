@@ -40,13 +40,13 @@ jobs:
           echo "tas_singlenode_address=$tas_singlenode_address" >> $GITHUB_ENV
 
 
-      - name: check scenario
+      - name: If Migration Scenario set migration hostname
         shell: bash
         if: ${{ matrix.scenario == 'backup_restore_migrate' }}
         run: |
           echo "host=yourrhtas" >> $GITHUB_ENV
 
-      - name: check scenario
+      - name: If not Migration Scenario set default name
         shell: bash
         if: ${{ matrix.scenario != 'backup_restore_migrate' }}
         run: |
