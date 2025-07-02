@@ -70,6 +70,8 @@
     vpc_id: "{{ vpc_id }}"
     region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
     state: present
+    tags:
+      Name: "CI-TEST"
   when: igw_facts.internet_gateways | length == 0
   register: igw_exists
 
