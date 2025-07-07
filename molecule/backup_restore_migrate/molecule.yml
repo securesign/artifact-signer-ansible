@@ -33,4 +33,5 @@ scenario:
     - verify
     - side_effect backup_test.yml destroy_tas.yml restore_test.yml ## Create Backup, Gutting Procedure and then subsequent restore
     - verify verify_restore.yml
+    - idempotence
     - destroy
