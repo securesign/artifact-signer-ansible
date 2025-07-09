@@ -52,6 +52,5 @@ jobs:
           run: |
             source venv/bin/activate
             molecule reset
-            molecule -v create --scenario-name aap-test
             molecule -v converge --scenario-name aap-test
             molecule -v verify --scenario-name aap-test
