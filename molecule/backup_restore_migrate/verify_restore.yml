@@ -12,7 +12,7 @@
 
     - name: Ansible backup name
       ansible.builtin.set_fact:
-        backupname: "{{lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
+        backupname: "{{ lookup('file', '{{ molecule_ephemeral_directory}}/backupname.txt') }}"
 
     - name: Setting path for test staging
       ansible.builtin.set_fact:
@@ -59,12 +59,12 @@
     # Extracted backup name might be different to tarball name, hence having to find it ourselves
     - name: Collect Certs in Backup and Collect Certs in Use
       ansible.builtin.find:
-        paths: "{{item}}"
+        paths: "{{ item }}"
         recurse: yes
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{extracted_backup.files[0].path}}/rhtas/certs"
+        - "{{ extracted_backup.files[0].path }}/rhtas/certs"
         - "/etc/rhtas/certs"
 
     - name: Assert that key checksums match
@@ -72,18 +72,18 @@
         that: item.checksum == gathered_files.results[1].files[num].checksum
         success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
         fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
-      loop: "{{gathered_files.results[0].files}}"
+      loop: "{{ gathered_files.results[0].files }}"
       loop_control:
         index_var: num
 
     - name: Collect Manifests in Backup and Collect Manifests in Use
       ansible.builtin.find:
-        paths: "{{item}}"
+        paths: "{{ item }}"
         recurse: yes
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{extracted_backup.files[0].path}}/rhtas/manifests"
+        - "{{ extracted_backup.files[0].path }}/rhtas/manifests"
         - "/etc/rhtas/manifests"
 
     - name: Assert that manifest checksums match
@@ -91,18 +91,18 @@
         that: item.checksum == gathered_files.results[1].files[num].checksum
         success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
         fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
-      loop: "{{gathered_files.results[0].files}}"
+      loop: "{{ gathered_files.results[0].files }}"
       loop_control:
         index_var: num
 
     - name: Collect Configs in Backup and Collect Configs in Use
       ansible.builtin.find:
-        paths: "{{item}}"
+        paths: "{{ item }}"
         recurse: yes
         get_checksum: true
       register: gathered_files
       loop:
-        - "{{extracted_backup.files[0].path}}/rhtas/configs"
+        - "{{ extracted_backup.files[0].path }}/rhtas/configs"
         - "/etc/rhtas/configs"
 
     - name: Assert that config checksums match
@@ -110,7 +110,7 @@
         that: item.checksum == gathered_files.results[1].files[num].checksum
         success_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} match!"
         fail_msg: "Checksums for {{ item.path }} and {{ gathered_files.results[1].files[num].path }} do not match!"
-      loop: "{{gathered_files.results[0].files}}"
+      loop: "{{ gathered_files.results[0].files }}"
       loop_control:
         index_var: num
 
@@ -119,3 +119,50 @@
         file: ../common/verify_common.yml
       vars:
         expected_validations: 2
+
+    - name: Turn restore off
+      ansible.builtin.set_fact:
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'enabled': false}}, recursive=True) }}"
+
+    - name: Set HostName
+      ansible.builtin.set_fact:
+        tas_single_node_base_hostname: yourrhtas
+
+    - name: Ensure the file is absent
+      ansible.builtin.file:
+        path: /etc/rhtas/certs/rhtas.pem
+        state: absent
+
+
+    - name: Ensure the file is absent
+      ansible.builtin.file:
+        path: /etc/rhtas/certs/rhtas.key
+        state: absent
+
+    - name: Find files matching 
+      ansible.builtin.find:
+        paths: "/etc/rhtas/certs/"
+        patterns: "ingress-*"
+        file_type: file # Only search for files (not directories)
+        recurse: yes # Search recursively in subdirectories
+      register: files_to_delete
+
+    - name: Delete the found files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ files_to_delete.files }}"
+      when: files_to_delete.files is defined and files_to_delete.files | length > 0
+
+    - name: Apply tas_single_node role
+      ansible.builtin.include_role:
+        name: tas_single_node
+      vars:
+        tas_single_node_base_hostname: yourrhtas
+
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
+      vars:
+        expected_validations: 3
+      ignore_errors: true

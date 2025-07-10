@@ -3,18 +3,11 @@
   hosts: molecule
   gather_facts: true
   become: true
-  vars:
-   users:
-    - user: testingUser
-      password: password123
   vars_files:
     - "{{ molecule_ephemeral_directory + '/vars.yml' }}"
     - vars/backup-restore-vars.yml
     - vars/podman.yml
   tasks:
-    - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../common/dex-setup.yaml
-
     - name: Ensure Registry credentials are set
       ansible.builtin.include_tasks: ../common/check_creds.yml
 
@@ -32,7 +25,7 @@
         src: "{{ latest_file.path }}"
         dest: "{{ molecule_ephemeral_directory }}/{{ latest_file.path | basename }}"
         flat: yes
-      register: backupLocation
+      register: backup_location
 
     - name: Save Backup name to file to transfer between steps
       ansible.builtin.copy:
@@ -52,11 +45,9 @@
 
     - name: Set Restore Path
       ansible.builtin.set_fact:
-        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'source': backupLocation.dest}}, recursive=True) }}"
+        tas_single_node_backup_restore: "{{ tas_single_node_backup_restore | combine({'restore': {'source': backup_location.dest}}, recursive=True) }}"
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
         name: tas_single_node
-
-
       
