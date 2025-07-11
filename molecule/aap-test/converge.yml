@@ -177,7 +177,6 @@
             aap_request_timeout: 900
             controller_license:
               use_lookup: true
-              force: true
 
     - name: Create project for TAS single node playbook
       delegate_to: localhost
