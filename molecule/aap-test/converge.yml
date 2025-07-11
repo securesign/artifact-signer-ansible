@@ -9,8 +9,8 @@
     - vars/vars.yml
     - vars/podman.yml
   vars:
-    aap_instance_ip: "{{ groups['aap_group'][0] }}"
-    worker_instance_ip: "{{ groups['worker_group'][0] }}"
+    aap_instance_ip: "13.51.106.206" #"{{ groups['aap_group'][0] }}"
+    worker_instance_ip: "13.60.198.76" #"{{ groups['worker_group'][0] }}"
     aap_setup_down_version: "2.5"
     aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
     aap_setup_down_type: "setup"
