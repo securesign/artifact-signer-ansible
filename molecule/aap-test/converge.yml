@@ -223,20 +223,6 @@
     - name: Create rhtas host
       delegate_to: localhost
       block:
-        - name: Check installed Ansible collections
-          ansible.builtin.command:
-            cmd: ansible-galaxy collection list
-          register: collection_list
-          changed_when: false
-          failed_when: collection_list.rc != 0
-          environment:
-            ANSIBLE_LOG_LEVEL: debug
-
-        - name: Display installed collections
-          ansible.builtin.debug:
-            msg: "{{ collection_list.stdout_lines }}"
-          when: collection_list.stdout_lines is defined
-
         - name: Include role to create host
           ansible.builtin.include_role:
             name: infra.aap_configuration.controller_hosts
