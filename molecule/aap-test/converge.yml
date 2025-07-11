@@ -164,8 +164,7 @@
       delegate_to: localhost
       block:
         - name: Include role to add subscription to controller
-          ansible.builtin.include_role:
-            name: infra.aap_configuration.controller_license
+          ansible.builtin.include_tasks: files/subscription.yml
           vars:
             controller_dependency_check: true
             aap_hostname: "{{ aap_instance_ip }}"
@@ -177,7 +176,9 @@
             aap_request_timeout: 900
             controller_license:
               use_lookup: true
-              force: true
+              filters:
+                product_name: "Red Hat Ansible Automation Platform"
+                support_level: "Self-Support"
 
     - name: Create project for TAS single node playbook
       delegate_to: localhost
