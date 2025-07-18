@@ -14,7 +14,7 @@ _tas_single_node_backup_restore:
     passphrase: ""
 
 _tas_single_node_rekor:
-  ca_passphrase: rhtas
+  ca_passphrase: ""
   public_key_retries: 5
   public_key_delay: 10
   active_tree_id: 0
@@ -31,7 +31,7 @@ _tas_single_node_rekor_redis:
   redis:
     host: rekor-redis-pod
     port: 6379
-    password: password
+    password: ""
 
 _tas_single_node_backfill_redis:
   enabled: true
@@ -41,8 +41,8 @@ _tas_single_node_trillian:
   database_deploy: true
   mysql:
     user: mysql
-    root_password: rootpassword
-    password: password
+    root_password: ""
+    password: ""
     database: trillian
     host: trillian-mysql-pod
     port: 3306
@@ -78,7 +78,7 @@ _tas_single_node_fulcio:
     common_name: ""
   private_key: ""
   root_ca: ""
-  ca_passphrase: rhtas
+  ca_passphrase: ""
   trusted_ca: ""
   ct_log_prefix: rhtasansible
   fulcio_config:
@@ -101,17 +101,17 @@ _tas_single_node_tsa:
     hcvault_token: ""
   signer_private_key: ""
   certificate_chain: ""
-  ca_passphrase: rhtas
+  ca_passphrase: ""
   ntp_config: ""
   trusted_ca: ""
 
 _tas_single_node_ctlog:
-  ca_passphrase: rhtas
+  ca_passphrase: ""
   sharding_config:
     - treeid:
       prefix: "rhtasansible"
       root_pem_file: "/ctfe-keys/fulcio-0"
-      password: "rhtas"
+      password: ""
       private_key: "private-0"
   private_keys: []
   public_keys: []
