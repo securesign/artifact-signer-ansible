@@ -1,4 +1,5 @@
 tas_single_node_fulcio:
+  ca_passphrase: rhtas
   fulcio_config:
     oidc_issuers:
       - issuer: "http://dex-idp:5556/dex"
@@ -10,3 +11,19 @@ tas_single_node_cockpit:
   enabled: false
 tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
 tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
+tas_single_node_rekor:
+  ca_passphrase: rhtas
+tas_single_node_rekor_redis:
+  redis:
+    password: password
+tas_single_node_tsa:
+  ca_passphrase: rhtas
+tas_single_node_ctlog:
+  ca_passphrase: rhtas
+  sharding_config:
+    password: rhtas
+tas_single_node_trillian:
+  database_deploy: true
+  mysql:
+    root_password: rootpassword
+    password: password
