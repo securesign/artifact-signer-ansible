@@ -4,10 +4,31 @@ oidc-issuers:
     issuer-url: {{ issuer.url | quote }}
     client-id: {{ issuer.client_id | quote }}
     type: {{ issuer.type | quote }}
+{% if 'ci_provider' in issuer %}
+    ci-provider: {{ issuer.ci_provider | quote }}
+{% endif %}
 {% endfor %}
 meta-issuers:
 {% for meta_issuer in tas_single_node_fulcio.fulcio_config.meta_issuers %}
   {{ meta_issuer.issuer_pattern | quote }}:
     client-id: {{ meta_issuer.client_id | quote }}
     type: {{ meta_issuer.type | quote }}
+{% if 'ci_provider' in meta_issuer %}
+    ci-provider: {{ meta_issuer.ci_provider | quote }}
+{% endif %}
+{% endfor %}
+ci-issuer-metadata:
+{% for cim in tas_single_node_fulcio.fulcio_config.ci_issuer_metadata %}
+  {{ cim.issuer_name | quote }}:
+{% if 'subject_alternative_name_template' in cim %}
+    subject-alternative-name-template: {{ cim.subject_alternative_name_template | quote }}
+{% endif %}
+{% if 'default_template_values' in cim %}
+    default-template-values:
+      {{ cim.default_template_values | to_yaml }}
+{% endif %}
+    extension-templates:
+      {% for k, v in cim.extension_templates.items() %}
+        {{ k | replace('_', '-') }}: {{ v | quote }}
+      {% endfor %}
 {% endfor %}

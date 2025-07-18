@@ -1,4 +1,4 @@
-tas_single_node_base_hostname: myrhtas
+tas_single_node_base_hostname: yourrhtas
 tas_single_node_cockpit:
   enabled: false
 tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
