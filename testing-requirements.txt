@@ -2,6 +2,6 @@ ansible-lint==25.1.2
 antsibull-docs==2.18.0
 awscli==1.40.31
 botocore==1.38.32
-boto3==1.38.32
+boto3==1.39.9
 galaxy-importer==0.4.30
 molecule==25.1.0
