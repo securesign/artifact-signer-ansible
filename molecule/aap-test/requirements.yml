@@ -3,12 +3,11 @@
 ---
 
 collections:
-  - name: community.crypto
-  - name: containers.podman
-  - name: amazon.aws
-  - name: ansible.controller
-  - name: ansible.platform
-  - name: infra.aap_utilities
-    version: 2.6.1
-  - name: infra.ah_configuration
-  - name: infra.aap_configuration
+  - community.crypto
+  - containers.podman
+  - amazon.aws
+  - ansible.controller
+  - ansible.platform
+  - infra.aap_utilities
+  - infra.ah_configuration
+  - infra.aap_configuration
