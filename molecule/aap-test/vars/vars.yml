@@ -12,3 +12,4 @@ aap_setup_prep_inv_secrets:
   all:
     registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
     registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
+registry_auth: false
