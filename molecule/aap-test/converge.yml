@@ -68,7 +68,7 @@
         name: "{{ item }}"
       loop:
         - infra.aap_utilities.aap_setup_download
-        - infra.aap_utilities.127.0.0.1
+        - infra.aap_utilities.aap_setup_prepare
 
     - name: Find the latest AAP setup folder
       ansible.builtin.find:
@@ -324,7 +324,6 @@
                           client_id: trusted-artifact-signer
                           type: email
                       meta_issuers: []
-                      ci_issuer_metadata: []
                   tas_single_node_base_hostname: myrhtas
                   tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
                   tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
