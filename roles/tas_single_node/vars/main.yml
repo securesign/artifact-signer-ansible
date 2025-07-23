@@ -20,11 +20,14 @@ _tas_single_node_rekor:
   active_tree_id: 0
   active_signer_type: file
   active_signer_id: "private-0"
-  env:
+  env: []
   private_keys: []
   public_keys: []
   sharding_config: []
-
+  attestations:
+    enabled: true
+    url: "file:///var/run/attestations?no_tmp_dir=true"
+    max_size: "100000"
 
 _tas_single_node_rekor_redis:
   database_deploy: true
