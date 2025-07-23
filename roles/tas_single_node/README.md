@@ -238,7 +238,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | private_keys | List of private keys for use within rekor. | list of dicts of 'private_keys' options | no |  |
 | public_keys | List of public keys for use within rekor. | list of dicts of 'public_keys' options | no |  |
 | sharding_config | Sharding configuration for rekor | list of dicts of 'sharding_config' options | no |  |
-| attestations | Configuration for Rekor attestation storage. | dict of 'attestations' options | no |  `{'enabled': True, 'url': 'file:///var/run/attestations?no_tmp_dir=true', 'max_size': '100000'}`  |
+| attestations | Configuration for Rekor attestation storage. | dict of 'attestations' options | no |  `{'enabled': True, 'url': 'file:///var/run/attestations?no_tmp_dir=true', 'max_size': 100000}`  |
 
 #### Options for main > tas_single_node_rekor > kms
 
@@ -282,7 +282,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | enabled | Enable Rekor attestation storage. | bool | no |  |
 | url | Url of the storage location, supports go-cloud blob URLs. The 'file:///var/run/attestations' path is specifically for local storage. Other valid protocols include s3://, gs://, azblob://, and mem://. Cloud credentials can be provided as environment variables through the "env" variable. | str | no |  |
-| max_size | Maximum allowed size for an individual attestation, in bytes. | str | no |  |
+| max_size | Maximum allowed size for an individual attestation, in bytes. | int | no |  |
 
 #### Options for main > tas_single_node_ctlog
 

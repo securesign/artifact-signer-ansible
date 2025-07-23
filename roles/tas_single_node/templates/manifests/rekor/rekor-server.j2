@@ -37,8 +37,8 @@ spec:
                 key: ca-passphrase
                 name: rekor-secret
 {% for var in tas_single_node_rekor.env %}
-          - name: {{ var.name }}
-            value: {{ var.value }}
+          - name: "{{ var.name }}"
+            value: "{{ var.value }}"
 {% endfor %}
           readinessProbe:
             failureThreshold: 3

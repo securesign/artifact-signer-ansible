@@ -669,7 +669,7 @@ argument_specs:
             default:
               enabled: true
               url: "file:///var/run/attestations?no_tmp_dir=true"
-              max_size: "100000"
+              max_size: 100000
             options:
               enabled:
                 description: "Enable Rekor attestation storage."
@@ -686,7 +686,7 @@ argument_specs:
                 version_added: "1.3.0"
               max_size:
                 description: "Maximum allowed size for an individual attestation, in bytes."
-                type: "str"
+                type: "int"
                 required: false
                 version_added: "1.3.0"
       tas_single_node_setup_host_dns:
