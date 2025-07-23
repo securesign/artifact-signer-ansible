@@ -1,3 +1,4 @@
+ansible-core>=2.16.0,<2.19.0
 ansible-lint==25.1.2
 antsibull-docs==2.16.3
 awscli==1.38.9

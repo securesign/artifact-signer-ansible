@@ -22,15 +22,15 @@
 
     aap_setup_prep_inv_nodes:
       automationcontroller:
-        127.0.0.1:
+        - "127.0.0.1"
       automationhub:
-        127.0.0.1:
+        - "127.0.0.1"
       database:
-        127.0.0.1:
+        - "127.0.0.1"
       automationgateway:
-        127.0.0.1:
+        - "127.0.0.1"
       automationeda:
-        127.0.0.1:
+        - "127.0.0.1"
     aap_setup_prep_inv_vars:
       all:
         ansible_user: "ec2-user"
