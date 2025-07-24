@@ -583,6 +583,17 @@ argument_specs:
             description: "Env vars to be specified to access AWS Cloud keys."
             type: "list"
             elements: "dict"
+            options:
+              name:
+                description: "Environment variable key name."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
+              value:
+                description: "Environment variable value."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
           ca_passphrase:
@@ -1001,6 +1012,17 @@ argument_specs:
             description: "Environment vars to be specified to access AWS Cloud keys when using Tink or KMS"
             type: "list"
             elements: "dict"
+            options:
+              name:
+                description: "Environment variable key name."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
+              value:
+                description: "Environment variable value."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
       tas_single_node_skip_os_install:
