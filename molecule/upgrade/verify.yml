@@ -1,0 +1,76 @@
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars:
+    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
+    tas_pods:
+      - name: cli-server-pod
+        image_var: tas_single_node_client_server_image
+      - name: ctlog-pod
+        image_var: tas_single_node_ctlog_image
+      - name: fulcio-server-pod
+        image_var: tas_single_node_fulcio_server_image
+      - name: rekor-redis-pod
+        image_var: tas_single_node_rekor_redis_image
+      - name: rekor-server-pod
+        image_var: tas_single_node_rekor_server_image
+      - name: rekor-search-ui-pod
+        image_var: tas_single_node_rekor_search_ui_image
+      - name: trillian-logserver-pod
+        image_var: tas_single_node_trillian_log_server_image
+      - name: trillian-logsigner-pod
+        image_var: tas_single_node_trillian_log_signer_image
+      - name: trillian-mysql-pod
+        image_var: tas_single_node_trillian_db_image
+      - name: tsa-server-pod
+        image_var: tas_single_node_timestamp_authority_image
+      - name: tuf-init-pod
+        image_var: tas_single_node_tuf_image
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: Load development build vars
+      include_vars:
+        file: "../../roles/tas_single_node/defaults/main.yml"
+        name: dev_vars
+
+    - name: Get pod information for multiple pods
+      containers.podman.podman_pod_info:
+        name: "{{ item.name }}"
+      register: pod_info_list
+      loop: "{{ tas_pods }}"
+
+    - name: Get container information for all containers in the pods
+      containers.podman.podman_container_info:
+        name: "{{ container_ids }}"
+      vars:
+        container_ids: "{{ item.pods[0].Containers | map(attribute='Id') | list }}"
+      loop: "{{ pod_info_list.results }}"
+      loop_control:
+        label: "{{ item.pods[0].Name }}"
+      when: item.pods is defined and item.pods[0].Containers is defined
+      register: container_info_list
+
+
+    - name: Create a dictionary of pod names and container images
+      set_fact:
+        pod_images: "{{ pod_images | default({}) | combine({ pod_info_list.results[index].pods[0].Name: item.containers | map(attribute='ImageDigest') | list }) }}"
+      loop: "{{ container_info_list.results }}"
+      loop_control:
+        index_var: index
+    - name: Verify image digests
+      assert:
+        that:
+          - digest in pod_images[item.name]
+      vars:
+        digest: "{{ dev_vars[item.image_var].split('@')[1] }}"
+      loop: "{{ tas_pods }}"
+      loop_control:
+        loop_var: item
+
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
+      vars:
+        expected_validations: 2

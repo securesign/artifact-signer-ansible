@@ -12,6 +12,7 @@ platforms:
     image_id: ami-0dac29b55bd7c33aa
     instance_type: m5.large
     aws_key_name: CI-TEST
+    volume_size: 10
 provisioner:
   name: ansible
   env:
@@ -31,7 +32,7 @@ scenario:
     - prepare
     - converge
     - verify
-    - side_effect key_rotation.yml
+    - side_effect fulcio_key_rotation.yml rekor_key_rotation.yml ctl_key_rotation.yml
     - converge
     - verify verify_rotated.yml
     - destroy

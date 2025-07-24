@@ -1,6 +1,10 @@
 name: 'Go E2E Tests Reusable Action'
 description: 'Run Go E2E tests using the provided TAS server and Go version.'
 inputs:
+  host:
+    description: hostname
+    required: true
+    type: string
   tas_address:
     description: 'TAS server address'
     required: true
@@ -46,6 +50,11 @@ inputs:
     required: true
     default: '1.21'
     type: string
+  scenario_name:
+    description: 'Scenario Name'
+    required: false
+    default: ""
+    type: string
 runs:
   using: 'composite'
   steps:
@@ -73,34 +82,28 @@ runs:
     - name: Resolve certificates
       shell: bash
       run: |
-        sudo bash -c "source molecule/test/extract_root_cert.sh; extractRootCert ${{ inputs.rekor_host }} /usr/local/share/ca-certificates/myrhtas.crt"
+        sudo bash -c "source molecule/test/extract_root_cert.sh; extractRootCert ${{ inputs.rekor_host }} /usr/local/share/ca-certificates/${{ inputs.host }}.crt"
         sudo update-ca-certificates
     - name: Resolve OIDC TOKEN
       shell: bash
       run: |
-        AUTHTOKEN="$(curl -Lis "http://${{ inputs.oidc_host }}:5556/dex/auth/mock?client_id=example-app&scope=openid%20email&redirect_uri=http://${{ inputs.oidc_host }}:5556/callback&response_type=code" | grep -oP "code=\K[^&]+")"
-
-        if [ -z "${AUTHTOKEN}" ]; then
-          echo "Error: Unable to fetch authorization code."
-          exit 1
-        fi
-
-        TOKEN="$(curl -s -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=authorization_code" -d "code=${AUTHTOKEN}" -d "redirect_uri=http://${{ inputs.oidc_host }}:5556/callback" -d "client_id=example-app" -d "client_secret=${{ inputs.oidc_client_secret }}" "http://${{ inputs.oidc_host }}:5556/dex/token" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
-        
-        if [ -z "${TOKEN}" ]; then
-          echo "Error: Unable to fetch access code."
-          exit 1
-        fi
+        TOKEN="$(curl -s -X POST 'http://${{ inputs.oidc_host }}:5556/dex/token' \
+        -H 'Authorization: Basic dHJ1c3RlZC1hcnRpZmFjdC1zaWduZXI6WlhoaGJYQnNaUzFoY0hBdGMyVmpjbVYw' \
+        -H 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'grant_type=password' \
+        --data-urlencode 'scope=openid email profile' \
+        --data-urlencode 'username=jdoe@redhat.com' \
+        --data-urlencode 'password=secure' | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
         
         echo "OIDC_TOKEN=$TOKEN" >> $GITHUB_ENV
     - name: Run e2e
       shell: bash
       env:
         OIDC_ISSUER_URL: ${{ inputs.oidc_url }}
-        OIDC_CLIENT_ID: example-app
-        OIDC_USER: "kilgore"
-        OIDC_USER_DOMAIN: "kilgore.trout"
-        KEYKLOAK_REALM: example-app
+        OIDC_CLIENT_ID: trusted-artifact-signer
+        OIDC_USER: "jdoe"
+        OIDC_USER_DOMAIN: "redhat.com"
+        KEYKLOAK_REALM: trusted-artifact-signer
         CLI_STRATEGY: cli_server
         CLI_SERVER_URL: "https://${{ inputs.cli_server_host }}"
         FULCIO_URL: "https://${{ inputs.fulcio_host }}"

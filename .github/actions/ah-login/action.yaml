@@ -1,0 +1,24 @@
+name: 'Automation Hub login'
+inputs:
+  token:
+    description: 'automation hub token'
+    required: true
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Create ansible.cfg
+      run: |
+        cat <<EOF > ~/.ansible.cfg
+        [galaxy]
+        server_list = automation_hub, ansible_galaxy
+
+        [galaxy_server.ansible_galaxy]
+        url = https://galaxy.ansible.com
+
+        [galaxy_server.automation_hub]
+        url = https://console.redhat.com/api/automation-hub/
+        auth_url = https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+        token =  ${{ inputs.token }}
+        EOF
+      shell: bash

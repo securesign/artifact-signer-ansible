@@ -1,0 +1,22 @@
+---
+- name: Prepare
+  hosts: molecule
+  gather_facts: false
+  become: yes
+  vars:
+    users:
+      - user: testingUser
+        password: password123
+  vars_files:
+    - vars/vars.yml
+
+  tasks:
+    - name: Prepare dynamic vars file
+      ansible.builtin.copy:
+        src: "{{ molecule_scenario_directory + '/vars/vars.yml' }}"
+        dest: "{{ molecule_ephemeral_directory + '/vars.yml' }}"
+      delegate_to: localhost
+      become: false
+
+    - name: Configure Dex OIDC instance
+      ansible.builtin.include_tasks: ../common/dex-setup.yaml

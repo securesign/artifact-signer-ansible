@@ -1,0 +1,24 @@
+---
+- name: Prepare
+  hosts: molecule
+  become: yes
+  vars:
+    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
+    users:
+      - user: testingUser
+        password: password123
+  vars_files:
+    - vars/vars.yml
+
+  tasks:
+
+    - name: Configure Dex OIDC instance
+      ansible.builtin.include_tasks: ../common/dex-setup.yaml
+
+    - name: Apply latest release role
+      ansible.builtin.include_role:
+        name: redhat.artifact_signer.tas_single_node
+
+    - name: Prepare signed data to be verified after upgrade
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml

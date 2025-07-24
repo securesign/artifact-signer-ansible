@@ -1,0 +1,28 @@
+---
+prerun: false
+dependency:
+  name: galaxy
+  options:
+    requirements-file: molecule/upgrade/requirements.yml
+driver:
+  name: default
+platforms:
+  - name: instance
+    private_key_file_path: ~/.ssh/id_rsa
+    image_id: ami-0dac29b55bd7c33aa
+    instance_type: m5.large
+    aws_key_name: CI-TEST
+    volume_size: 15
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "../../roles"
+  config_options:
+    defaults:
+      host_key_checking: false
+      internal_poll_interval: '0.0001'
+    ssh_connection:
+      ssh_args: '-o ControlMaster=auto -o ControlPersist=240s'
+      # note: if we ever need to do some more complex sudo/become usage, pipelining
+      # might need to be disabled, because it messes with these operations
+      pipelining: true

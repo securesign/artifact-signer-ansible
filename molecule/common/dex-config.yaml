@@ -7,16 +7,11 @@ web:
   http: 0.0.0.0:5556
 
 staticClients:
-- id: example-app
+- id: trusted-artifact-signer
   redirectURIs:
   - 'http://dex-idp:5556/callback'
-  name: 'Example App'
+  name: 'Trusted Artifact Signer'
   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-
-connectors:
-- type: mockCallback
-  id: mock
-  name: Example
 
 enablePasswordDB: true
 
@@ -26,7 +21,7 @@ staticPasswords:
   username: "admin"
   userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
 - email: "jdoe@redhat.com"
-  hash: "$2y$10$DajldwSiGeSKe.2FsuTkueyhtvjdhkgBpisLrY.1Bdr4KlYeefn9O" # secure
+  hash: "$2y$10$hUQg/726r34CrnMKx0iBde3luhdxb6elLqLjO4AVlu2psmnQOXXR2" # secure
   username: "jdoe"
   userID: "123456"
 
@@ -34,7 +29,7 @@ oauth2:
   responseTypes: ["code"]
   alwaysShowLoginScreen: true
   skipApprovalScreen: true
-  passwordConnection: mock
+  passwordConnector: local
 
 expiry:
   signingKeys: "24h"
