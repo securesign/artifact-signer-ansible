@@ -3,6 +3,7 @@
 ---
 
 collections:
+  - community.general
   - community.crypto
   - containers.podman
   - amazon.aws

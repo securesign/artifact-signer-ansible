@@ -25,13 +25,21 @@ spec:
     spec:
       containers:
         - name: rekor-server
-{% if tas_single_node_rekor.active_signer_type == 'kms' or tas_single_node_rekor.active_signer_type == 'tink'%}
           env:
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: redis-password
+                name: rekor-secret
+          - name: CA_PASSPHRASE
+            valueFrom:
+              secretKeyRef:
+                key: ca-passphrase
+                name: rekor-secret
 {% for var in tas_single_node_rekor.env %}
-          - name: {{ var.name }}
-            value: {{ var.value }}
+          - name: "{{ var.name }}"
+            value: "{{ var.value }}"
 {% endfor %}
-{% endif %}
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -52,39 +60,46 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
+          command:
+            - /bin/sh
+          # NOTE: we need to use no_tmp_dir=true with file-based storage to prevent
+          # cross-device link error - see https://github.com/google/go-cloud/issues/3314
           args:
-            - serve
-            - --trillian_log_server.address={{ tas_single_node_trillian_logserver_pod }}-pod
-            - --trillian_log_server.port={{ tas_single_node_trillian_logserver_port_rpc }}
-            - --trillian_log_server.sharding_config=/config/sharding-config.yaml
-            - --redis_server.address={{ tas_single_node_rekor_redis.redis.host }}
-            - --redis_server.port={{ tas_single_node_rekor_redis.redis.port }}
+            - -c
+            - |
+              exec rekor-server serve \
+                --trillian_log_server.address={{ tas_single_node_trillian_logserver_pod }}-pod \
+                --trillian_log_server.port={{ tas_single_node_trillian_logserver_port_rpc }} \
+                --trillian_log_server.sharding_config=/config/sharding-config.yaml \
+                --redis_server.address={{ tas_single_node_rekor_redis.redis.host }} \
+                --redis_server.port={{ tas_single_node_rekor_redis.redis.port }} \
 {% if tas_single_node_rekor_redis.redis.password != "" %}
-            - --redis_server.password={{ tas_single_node_rekor_redis.redis.password }}
+                --redis_server.password="${REDIS_PASSWORD}" \
 {% endif %}
-            - --rekor_server.address=0.0.0.0
+                --rekor_server.address=0.0.0.0 \
 {% if tas_single_node_rekor.active_signer_type == "file" %}
-            - --rekor_server.signer=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
-            - --rekor_server.signer-passwd={{ tas_single_node_rekor.ca_passphrase }}
+                --rekor_server.signer=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }} \
+                --rekor_server.signer-passwd="${CA_PASSPHRASE}" \
 {% endif %}
 {% if tas_single_node_rekor.active_signer_type == "kms" %}
-            - --rekor_server.signer=awskms:///{{ tas_single_node_rekor.kms.kms_resource }}
+                --rekor_server.signer=awskms:///{{ tas_single_node_rekor.kms.kms_resource }} \
 {% endif %}
 {% if tas_single_node_rekor.active_signer_type == "tink" %}
-            - --rekor_server.tink_kek_uri=aws-kms:///{{ tas_single_node_rekor.tink.tink_kek_uri }}
-            - --rekor_server.tink_keyset_path=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }}
+                --rekor_server.tink_kek_uri=aws-kms:///{{ tas_single_node_rekor.tink.tink_kek_uri }} \
+                --rekor_server.tink_keyset_path=/rekor-keys/{{ tas_single_node_rekor.active_signer_id }} \
 {% endif %}
-            - --enable_retrieve_api=true
+                --enable_retrieve_api=true \
 {% if tas_single_node_rekor.active_tree_id is defined and tas_single_node_rekor.active_tree_id != 0 %}
-            - --trillian_log_server.tlog_id={{ tas_single_node_rekor.active_tree_id }}
+                --trillian_log_server.tlog_id={{ tas_single_node_rekor.active_tree_id }} \
 {% else %}
-            - --trillian_log_server.tlog_id={{ trillian_tree_id }}
+                --trillian_log_server.tlog_id={{ trillian_tree_id }} \
 {% endif %}
-            - --enable_attestation_storage
-            # NOTE: we need to use no_tmp_dir=true with file-based storage to prevent
-            # cross-device link error - see https://github.com/google/go-cloud/issues/3314
-            - "--attestation_storage_bucket=file:///var/run/attestations?no_tmp_dir=true"
-            - --port={{ tas_single_node_rekor_server_port_http }}
+{% if tas_single_node_rekor.attestations.enabled %}
+                --enable_attestation_storage \
+                --attestation_storage_bucket="{{ tas_single_node_rekor.attestations.url }}" \
+                --max_attestation_size="{{ tas_single_node_rekor.attestations.max_size }}" \
+{% endif %}
+                --port={{ tas_single_node_rekor_server_port_http }}
           image: "{{ tas_single_node_rekor_server_image }}"
           imagePullPolicy: IfNotPresent
           terminationMessagePath: /dev/termination-log

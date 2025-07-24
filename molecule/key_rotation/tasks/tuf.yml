@@ -35,22 +35,22 @@
     file: tasks/download_volumes.yml
   loop: "{{ volumes | dict2items }}"
 
-- name: Fetch old cert
+- name: Fetch old key
   ansible.builtin.fetch:
-    src: "{{ active_cert_path }}"
-    dest: "{{ molecule_ephemeral_directory }}/{{ active_cert_name }}"
+    src: "{{ active_key_path }}"
+    dest: "{{ molecule_ephemeral_directory }}/{{ active_key_name }}"
     flat: yes
 
 - name: Create a file with content from a variable
   ansible.builtin.copy:
-    dest: "{{ molecule_ephemeral_directory }}/{{ new_cert_name }}"
-    content: "{{ new_cert_content }}"
+    dest: "{{ molecule_ephemeral_directory }}/{{ new_key_name }}"
+    content: "{{ new_key_content }}"
   delegate_to: localhost
   become: false
 
 - name: Update Repository
   block:
-    - name: Expire old cert
+    - name: Expire old key
       ansible.builtin.command:
         cmd: >-
           {{ tuftool }} rhtas
@@ -58,13 +58,13 @@
           --key "{{ volumes['tuf-signing-keys'] }}/snapshot.pem"
           --key "{{ volumes['tuf-signing-keys'] }}/targets.pem"
           --key "{{ volumes['tuf-signing-keys'] }}/timestamp.pem"
-          {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ active_cert_name }}"
+          {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ active_key_name }}"
           --{{ component }}-uri "https://{{ component }}.rhtas"
           --{{ component }}-status "Expired"
           --outdir "{{ volumes['tuf-repository'] }}"
           --metadata-url "file://{{ volumes['tuf-repository'] }}"
 
-    - name: Add new cert
+    - name: Add new key
       ansible.builtin.command:
         cmd: >-
           {{ tuftool }} rhtas
@@ -72,7 +72,7 @@
           --key "{{ volumes['tuf-signing-keys'] }}/snapshot.pem"
           --key "{{ volumes['tuf-signing-keys'] }}/targets.pem"
           --key "{{ volumes['tuf-signing-keys'] }}/timestamp.pem"
-          {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ new_cert_name }}"
+          {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ new_key_name }}"
           --{{ component }}-uri "https://{{ component }}.rhtas"
           --outdir "{{ volumes['tuf-repository'] }}"
           --metadata-url "file://{{ volumes['tuf-repository'] }}"

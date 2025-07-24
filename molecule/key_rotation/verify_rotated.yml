@@ -7,53 +7,111 @@
   vars_files:
     - vars/vars.yml
   tasks:
-      - name: Read fulcio config on molecule
-        ansible.builtin.slurp:
-          src: "{{ item.system_path }}"
-        register: fulcio_configs
-        loop:
-          - { msg: "fulcio.key", system_path: "/etc/rhtas/certs/fulcio.key" }
-          - { msg: "fulcio.pem", system_path: "/etc/rhtas/certs/fulcio.pem" }
-        loop_control:
-          label: "{{ item.msg }}"
-
-      - name: Assert that new fulcio key and certificate were taken by TAS
-        ansible.builtin.assert:
-          that:
-            - item.test_content == item.fulcio_config['content'] | b64decode
-          fail_msg: "{{ item.msg }} was not taken by TAS"
-          success_msg: "{{ item.msg }} was taken by TAS"
-        loop:
-          - { msg: "fulcio.key", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.key') }}", fulcio_config: "{{ fulcio_configs.results[0] }}" }
-          - { msg: "fulcio.pem", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}", fulcio_config: "{{ fulcio_configs.results[1] }}" }
-        loop_control:
-          label: "{{ item.msg }}"
-
-      - name: Vefify fulcio.key backup
+      - name: Verify Fulcio key rotation
         block:
-        - name: Find files with pattern fulcio.key.*
-          ansible.builtin.find:
-            paths: "/etc/rhtas/certs"
-            patterns: "fulcio.key.*"
-          register: found_files
+        - name: Read fulcio config on molecule
+          ansible.builtin.slurp:
+            src: "{{ item.system_path }}"
+          register: fulcio_configs
+          loop:
+            - { msg: "fulcio.key", system_path: "/etc/rhtas/certs/fulcio.key" }
+            - { msg: "fulcio.pem", system_path: "/etc/rhtas/certs/fulcio.pem" }
+          loop_control:
+            label: "{{ item.msg }}"
 
-        - name: Verify that at least one backup file exists
-          ansible.builtin.fail:
-            msg: "No files matching 'fulcio.key.*' were found."
-          when: found_files.matched == 0
+        - name: Assert that new fulcio key and certificate were taken by TAS
+          ansible.builtin.assert:
+            that:
+              - item.test_content == item.fulcio_config['content'] | b64decode
+            fail_msg: "{{ item.msg }} was not taken by TAS"
+            success_msg: "{{ item.msg }} was taken by TAS"
+          loop:
+            - { msg: "fulcio.key", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.key') }}", fulcio_config: "{{ fulcio_configs.results[0] }}" }
+            - { msg: "fulcio.pem", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}", fulcio_config: "{{ fulcio_configs.results[1] }}" }
+          loop_control:
+            label: "{{ item.msg }}"
 
-      - name: Vefify fulcio.pem backup
-        block:
-          - name: Find files with pattern fulcio.pem.*
+        - name: Vefify fulcio.key backup
+          block:
+          - name: Find files with pattern fulcio.key.*
             ansible.builtin.find:
               paths: "/etc/rhtas/certs"
-              patterns: "fulcio.pem.*"
+              patterns: "fulcio.key.*"
             register: found_files
 
           - name: Verify that at least one backup file exists
             ansible.builtin.fail:
-              msg: "No files matching 'fulcio.pem.*' were found."
+              msg: "No files matching 'fulcio.key.*' were found."
             when: found_files.matched == 0
+
+        - name: Vefify fulcio.pem backup
+          block:
+            - name: Find files with pattern fulcio.pem.*
+              ansible.builtin.find:
+                paths: "/etc/rhtas/certs"
+                patterns: "fulcio.pem.*"
+              register: found_files
+
+            - name: Verify that at least one backup file exists
+              ansible.builtin.fail:
+                msg: "No files matching 'fulcio.pem.*' were found."
+              when: found_files.matched == 0
+
+      - name: Verify Rekor key rotation
+        block:
+          - name: Read rekor config on molecule
+            ansible.builtin.slurp:
+              src: "{{ item.system_path }}"
+            register: rekor_keys
+            loop:
+              - { msg: "rekor-pub-0", system_path: "/etc/rhtas/certs/rekor-pub-key0.pub" }
+              - { msg: "rekor-pub-1", system_path: "/etc/rhtas/certs/rekor-pub-key1.pub" }
+              - { msg: "rekor-pub-0", system_path: "/etc/rhtas/certs/rekor-signer0.key" }
+              - { msg: "rekor-pub-1", system_path: "/etc/rhtas/certs/rekor-signer1.key" }
+            loop_control:
+              label: "{{ item.msg }}"
+
+          - name: Assert that rekor keys are present
+            ansible.builtin.assert:
+              that:
+                - item.test_content | trim == item.rekor_config['content'] | b64decode | trim
+              fail_msg: "{{ item.msg }} was not taken by TAS"
+              success_msg: "{{ item.msg }} was taken by TAS"
+            loop:
+              - { msg: "rekor-pub-0", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest0.pub') }}", rekor_config: "{{ rekor_keys.results[0] }}" }
+              - { msg: "rekor-pub-1", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.pub') }}", rekor_config: "{{ rekor_keys.results[1] }}" }
+              - { msg: "rekor-signer-0", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest0.key') }}", rekor_config: "{{ rekor_keys.results[2] }}" }
+              - { msg: "rekor-signer-1", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/rekor/rekortest1.key') }}", rekor_config: "{{ rekor_keys.results[3] }}" }
+            loop_control:
+              label: "{{ item.msg }}"
+
+      - name: Verify CTL key rotation
+        block:
+          - name: Read ctlog config on molecule
+            ansible.builtin.slurp:
+              src: "{{ item.system_path }}"
+            register: ctlog_keys
+            loop:
+              - { msg: "ctlog-pub-0", system_path: "/etc/rhtas/certs/ctlog0.pub" }
+              - { msg: "ctlog-pub-1", system_path: "/etc/rhtas/certs/ctlog1.pub" }
+              - { msg: "ctlog-key-0", system_path: "/etc/rhtas/certs/ctlog0.key" }
+              - { msg: "ctlog-key-1", system_path: "/etc/rhtas/certs/ctlog1.key" }
+            loop_control:
+              label: "{{ item.msg }}"
+
+          - name: Assert that ctlog keys are present
+            ansible.builtin.assert:
+              that:
+                - item.test_content | trim == item.ctlog_config['content'] | b64decode | trim
+              fail_msg: "{{ item.msg }} was not taken by TAS"
+              success_msg: "{{ item.msg }} was taken by TAS"
+            loop:
+              - { msg: "ctlog-pub-0", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}", ctlog_config: "{{ ctlog_keys.results[0] }}" }
+              - { msg: "ctlog-pub-1", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog1.pub') }}", ctlog_config: "{{ ctlog_keys.results[1] }}" }
+              - { msg: "ctlog-key-0", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.key') }}", ctlog_config: "{{ ctlog_keys.results[2] }}" }
+              - { msg: "ctlog-key-1", test_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog1.key') }}", ctlog_config: "{{ ctlog_keys.results[3] }}" }
+            loop_control:
+              label: "{{ item.msg }}"
 
       - name: Include create common tasks
         ansible.builtin.include_tasks:

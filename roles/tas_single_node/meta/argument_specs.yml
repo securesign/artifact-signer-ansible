@@ -311,6 +311,7 @@ argument_specs:
           fulcio_config:
             oidc_issuers: []
             meta_issuers: []
+            ci_issuer_metadata: []
         options:
           certificate:
             description: "Details on the certificate attributes for Fulcio.
@@ -400,6 +401,11 @@ argument_specs:
                     type: "str"
                     required: true
                     version_added: "1.1.0"
+                  ci_provider:
+                    description: "An optional configuration to map token claims to extensions for CI workflows"
+                    type: "str"
+                    required: false
+                    version_added: "1.3.0"
               meta_issuers:
                 description: "The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests."
                 type: "list"
@@ -422,6 +428,111 @@ argument_specs:
                     type: "str"
                     required: true
                     version_added: "1.1.0"
+                  ci_provider:
+                    description: "An optional configuration to map token claims to extensions for CI workflows."
+                    type: "str"
+                    required: false
+                    version_added: "1.3.0"
+              ci_issuer_metadata:
+                description: "Additional metadata for ci-provider OIDC issuers."
+                type: "list"
+                elements: "dict"
+                required: false
+                version_added: "1.3.0"
+                options:
+                  issuer_name:
+                    description: "Name of the issuer."
+                    type: "str"
+                    required: true
+                    version_added: "1.3.0"
+                  default_template_values:
+                    description: "Defaults contains key-value pairs that can be used for filling the templates from extension_templates."
+                    type: "dict"
+                    required: false
+                    version_added: "1.3.0"
+                  subject_alternative_name_template:
+                    description: "Template for the Subject Alternative Name extension."
+                    type: "str"
+                    required: false
+                    version_added: "1.3.0"
+                  extension_templates:
+                    description: |-
+                      A mapping between certificate extension and token claim using Go templating syntax.
+                      To prevent Ansible from trying to interpolate Go template values, use the "!unsafe" data type.
+                    type: dict
+                    required: false
+                    version_added: "1.3.0"
+                    options:
+                      build_signer_uri:
+                        description: "Reference to specific build instructions that are responsible for signing."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      build_signer_digest:
+                        description: "Immutable reference to the specific version of the build instructions that is responsible for signing."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      runner_environment:
+                        description: "Specifies whether the build took place in platform-hosted cloud infrastructure or customer/self-hosted infrastructure."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_uri:
+                        description: "Source repository URL that the build was based on."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_digest:
+                        description: "Immutable reference to a specific version of the source code that the build was based upon."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_ref:
+                        description: "Source Repository Ref that the build run was based upon."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_identifier:
+                        description: "Immutable identifier for the source repository the workflow was based upon."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_owner_uri:
+                        description: "Source repository owner URL of the owner of the source repository that the build was based on."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_owner_identifier:
+                        description: "Immutable identifier for the owner of the source repository that the workflow was based upon."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      build_config_uri:
+                        description: "Build Config URL to the top-level/initiating build instructions."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      build_config_digest:
+                        description: "Immutable reference to the specific version of the top-level/initiating build instructions."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      build_trigger:
+                        description: "Event or action that initiated the build."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      run_invocation_uri:
+                        description: "Run Invocation URL to uniquely identify the build execution."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
+                      source_repository_visibility_at_signing:
+                        description: "Source repository visibility at the time of signing the certificate."
+                        type: "str"
+                        required: false
+                        version_added: "1.3.0"
       tas_single_node_rekor:
         description: >
           Details on the Rekor server configuration options. Includes Certificate Authority Passphrase,
@@ -472,6 +583,17 @@ argument_specs:
             description: "Env vars to be specified to access AWS Cloud keys."
             type: "list"
             elements: "dict"
+            options:
+              name:
+                description: "Environment variable key name."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
+              value:
+                description: "Environment variable value."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
           ca_passphrase:
@@ -550,6 +672,34 @@ argument_specs:
                 version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
+          attestations:
+            description: "Configuration for Rekor attestation storage."
+            type: "dict"
+            required: false
+            version_added: "1.3.0"
+            default:
+              enabled: true
+              url: "file:///var/run/attestations?no_tmp_dir=true"
+              max_size: 100000
+            options:
+              enabled:
+                description: "Enable Rekor attestation storage."
+                type: "bool"
+                required: false
+                version_added: "1.3.0"
+              url:
+                description: |-
+                  Url of the storage location, supports go-cloud blob URLs. The 'file:///var/run/attestations'
+                  path is specifically for local storage. Other valid protocols include s3://, gs://, azblob://, and mem://.
+                  Cloud credentials can be provided as environment variables through the "env" variable.
+                type: "str"
+                required: false
+                version_added: "1.3.0"
+              max_size:
+                description: "Maximum allowed size for an individual attestation, in bytes."
+                type: "int"
+                required: false
+                version_added: "1.3.0"
       tas_single_node_setup_host_dns:
         description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"
@@ -862,6 +1012,17 @@ argument_specs:
             description: "Environment vars to be specified to access AWS Cloud keys when using Tink or KMS"
             type: "list"
             elements: "dict"
+            options:
+              name:
+                description: "Environment variable key name."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
+              value:
+                description: "Environment variable value."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
       tas_single_node_skip_os_install:

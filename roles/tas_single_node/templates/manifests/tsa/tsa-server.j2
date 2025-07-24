@@ -43,8 +43,13 @@ spec:
             failureThreshold: 3
           image: {{ tas_single_node_timestamp_authority_image }}
           imagePullPolicy: IfNotPresent
-{% if tas_single_node_tsa.trusted_ca != '' or tas_single_node_tsa.signer_type in ['kms', 'tink'] or tas_single_node_tsa.env | length > 0 %}
           env:
+            - name: PASSPHRASE
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: tsa-server-secret
+{% if tas_single_node_tsa.trusted_ca != '' or tas_single_node_tsa.signer_type in ['kms', 'tink'] or tas_single_node_tsa.env | length > 0 %}
 {% if tas_single_node_tsa.trusted_ca != '' %}
             - name: SSL_CERT_DIR
               value: "/var/run/configs/tas/ca-trust"
@@ -57,27 +62,29 @@ spec:
 {% endif %}
 {% endif %}
           command:
-            - "timestamp-server"
+            - /bin/sh
           args:
-            - "serve"
-            - "--host=0.0.0.0"
-            - "--port={{ tas_single_node_tsa_server_port_tcp }}"
-            - "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem"
-            - "--timestamp-signer={{ tas_single_node_tsa.signer_type }}"
+            - -c
+            - |
+              exec timestamp-server serve \
+                "--host=0.0.0.0" \
+                "--port={{ tas_single_node_tsa_server_port_tcp }}" \
+                "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem" \
+                "--timestamp-signer={{ tas_single_node_tsa.signer_type }}" \
 {% if tas_single_node_tsa.ntp_config != '' %}
-            - "--ntp-monitoring=/etc/config/ntpsync.yaml"
+                "--ntp-monitoring=/etc/config/ntpsync.yaml" \
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'file' %}
-            - "--file-signer-key-path=/etc/secrets/keys/private_key.pem"
-            - "--file-signer-passwd={{ tas_single_node_tsa.ca_passphrase }}"
+                "--file-signer-key-path=/etc/secrets/keys/private_key.pem" \
+                "--file-signer-passwd=${PASSPHRASE}"
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'kms' %}
-            - "--kms-key-resource={{ tas_single_node_tsa.kms.key_resource }}"
+                "--kms-key-resource={{ tas_single_node_tsa.kms.key_resource }}"
 {% endif %}
 {% if tas_single_node_tsa.signer_type == 'tink' %}
-            - "--tink-key-resource={{ tas_single_node_tsa.tink.key_resource }}"
-            - "--tink-keyset-path=/etc/secrets/keys/encrypted_key_set"
-            - "--tink-hcvault-token={{ tas_single_node_tsa.tink.hcvault_token }}"
+                "--tink-key-resource={{ tas_single_node_tsa.tink.key_resource }}" \
+                "--tink-keyset-path=/etc/secrets/keys/encrypted_key_set" \
+                "--tink-hcvault-token={{ tas_single_node_tsa.tink.hcvault_token }}"
 {% endif %}
           ports:
             - containerPort: {{ tas_single_node_tsa_server_port_tcp }}

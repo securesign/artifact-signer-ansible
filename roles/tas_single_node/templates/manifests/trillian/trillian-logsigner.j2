@@ -48,18 +48,22 @@ spec:
               protocol: TCP
             - containerPort: {{ tas_single_node_trillian_logsigner_port_rpc }}
               protocol: TCP
+          command:
+            - /bin/sh
           args:
-            - --storage_system=mysql
-            - --quota_system=mysql
-            - --mysql_uri={{ tas_single_node_trillian.mysql.user }}:{{ tas_single_node_trillian.mysql.password }}@tcp({{ tas_single_node_trillian.mysql.host }}:{{ tas_single_node_trillian.mysql.port }})/{{ tas_single_node_trillian.mysql.database }}
-            - --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_rpc }}
-            - --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_metrics }}
-            - --force_master=true
-            - --alsologtostderr
-{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %}
-            - --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem
-            - --mysql_server_name={{ tas_single_node_trillian.mysql.host }}
-{% endif %}
+            - -c 
+            - | 
+              exec /trillian_log_signer \
+                --storage_system=mysql \
+                --quota_system=mysql \
+                --mysql_uri="${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DATABASE}" \
+                --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_rpc }} \
+                --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_metrics }} \
+                --force_master=true \
+                --alsologtostderr{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
+                --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem \
+                --mysql_server_name="${MYSQL_HOSTNAME}"{% endif %}
+
           env:
             - name: MYSQL_USER
               valueFrom:
