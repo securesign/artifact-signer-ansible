@@ -231,7 +231,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | active_tree_id | Tree Id of active rekor log. | int | no |  |
 | kms | Details for KMS configuration of rekor cli-server. | dict of 'kms' options | no |  |
 | tink | Details for tink configuration within rekor-server. | dict of 'tink' options | no |  |
-| env | Env vars to be specified to access AWS Cloud keys. | list of 'dict' | no |  |
+| env | Env vars to be specified to access AWS Cloud keys. | list of dicts of 'env' options | no |  |
 | ca_passphrase | Passphrase used for Certificate Authority cert. | str | no |  |
 | public_key_retries | The number of attempts to retrieve the Rekor public key when constructing the trust root. | int | no |  |
 | public_key_delay | The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root. | int | no |  |
@@ -252,6 +252,13 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | tink_kek_uri | URI for tink resource. | str | no |  |
 | tink_keyset_path | Keyset to be unencrypted by tink. | str | no |  |
+
+#### Options for main > tas_single_node_rekor > env
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| name | Environment variable key name. | str | yes |  |
+| value | Environment variable value. | str | yes |  |
 
 #### Options for main > tas_single_node_rekor > private_keys
 
@@ -359,7 +366,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | ca_passphrase | Passphrase for Certificate Authority. **Note**: Updating the passphrase will regenerate the auto-generated private key and the TSA certificate as a consequence, and a manual update in the trust root is required." | str | no |  |
 | ntp_config | NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more. Valid file format and configuration can be found [here](https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml). | str | no |  |
 | trusted_ca | Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections. Used to ensure authenticity and trusted data exchange. | str | no |  |
-| env | Environment vars to be specified to access AWS Cloud keys when using Tink or KMS | list of 'dict' | no |  |
+| env | Environment vars to be specified to access AWS Cloud keys when using Tink or KMS | list of dicts of 'env' options | no |  |
 
 #### Options for main > tas_single_node_tsa > certificate
 
@@ -382,6 +389,13 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | key_resource | The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://]. | str | no |  |
 | keyset | The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string. | str | no |  |
 | hcvault_token | The authentication token for Hashicorp Vault API calls. | str | no |  |
+
+#### Options for main > tas_single_node_tsa > env
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| name | Environment variable key name. | str | yes |  |
+| value | Environment variable value. | str | yes |  |
 
 #### Options for main > tas_single_node_podman
 
