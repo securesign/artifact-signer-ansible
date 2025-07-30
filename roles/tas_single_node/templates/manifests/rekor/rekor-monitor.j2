@@ -28,8 +28,18 @@ spec:
           command:
             - /bin/sh
             - -c
-            - until curl -sf http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} > /dev/null 2>&1; do echo 'Waiting
-              for rekor-server to be ready...'; sleep 5; done
+            - |
+              max_retries=60
+              count=0
+              until curl -sf http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} > /dev/null 2>&1; do
+                count=$((count+1))
+                if [ "$count" -ge "$max_retries" ]; then
+                  echo "Timed out waiting for rekor-server after $max_retries attempts."
+                  exit 1
+                fi
+                echo 'Waiting for rekor-server to be ready...'
+                sleep 5
+              done
       containers:
         - name: rekor-monitor
           command:
