@@ -43,6 +43,7 @@
       "{{ tas_single_node_trillian_enabled }}",
       "{{ tas_single_node_trillian_enabled }}",
       "{{ tas_single_node_rekor_enabled }}",
+      "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_monitor_enabled }}",
       "{{ tas_single_node_ctlog_enabled }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy and tas_single_node_backfill_redis.enabled }}",
@@ -61,6 +62,7 @@
     - "{{ tas_single_node_trillian_log_server_image }}"
     - "{{ tas_single_node_trillian_log_signer_image }}"
     - "{{ tas_single_node_rekor_server_image }}"
+    - "{{ tas_single_node_rekor_monitor_image }}"
     - "{{ tas_single_node_ctlog_image }}"
     - "{{ tas_single_node_rekor_redis_image }}"
     - "{{ tas_single_node_backfill_redis_image }}"
