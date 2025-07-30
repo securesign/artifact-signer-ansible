@@ -37,6 +37,12 @@
         network:
           assign_public_ip: true
         security_group: "{{ sgID }}"
+        instance_initiated_shutdown_behavior: terminate
+        user_data: |
+          #!/bin/bash
+          echo "Instance will terminate in 5 hours."
+          sleep 18000
+          sudo shutdown -h now
         volumes:
           - device_name: /dev/sda1
             ebs:
