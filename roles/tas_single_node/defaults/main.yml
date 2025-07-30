@@ -25,7 +25,7 @@ tas_single_node_trillian_log_signer_image:
 tas_single_node_rekor_server_image:
   "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:055096ecfdd2a265a1e241b8632f3f8814cf348fcfb817d8a66de4d12c7ca9e6"
 tas_single_node_ctlog_image:
-  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:65314f32eaf1c5414ca5d5c5e5188f10ecfb04e2c95eafdc73bb5a1d42c82efa"
+  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:2528b2596d0a6e3bf86a66711eba3667f8d95125e7831cdb30ea27e3d6aad8f2"
 tas_single_node_rekor_redis_image:
   "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:44c6da8c9427cf6f630fa11761fa72c3f2e0d86279b2cb535864ee54c3b5b148"
 tas_single_node_backfill_redis_image:
