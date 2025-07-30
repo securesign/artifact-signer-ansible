@@ -59,6 +59,26 @@ spec:
             - containerPort: {{ tas_single_node_rekor_monitor_port_http }}
               protocol: TCP
           resources: {}
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - grep -q rekor_monitor /proc/*/comm
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - test -f /data/checkpoint_log.txt
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
           volumeMounts:
             - mountPath: /data
               name: rekor-monitor-storage
