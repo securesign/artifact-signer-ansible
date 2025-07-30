@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ tas_single_node_rekor_monitor_pod }}"
+  namespace: rekor-system
+  labels:
+    app.podman.io/component: rekor-monitor
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: rekor-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.name: rekor-monitor
+  template:
+    metadata:
+      labels:
+        app.podman.io/component: rekor-monitor
+        app.podman.io/part-of: trusted-artifact-signer
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9464"
+        prometheus.io/scrape: "true"
+    spec:
+      initContainers:
+        - name: wait-for-rekor-server
+          image: "{{ tas_single_node_rekor_monitor_image }}"
+          command:
+            - /bin/sh
+            - -c
+            - until curl -sf http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} > /dev/null 2>&1; do echo 'Waiting
+              for rekor-server to be ready...'; sleep 5; done
+      containers:
+        - name: rekor-monitor
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - exec /rekor_monitor --file=/data/checkpoint_log.txt --once=false --interval={{ tas_single_node_rekor.monitor.interval }} --url=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}
+          image: "{{ tas_single_node_rekor_monitor_image }}"
+          imagePullPolicy: IfNotPresent
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: file
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: {{ tas_single_node_rekor_monitor_port_http }}
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: rekor-monitor-storage
+      restartPolicy: Always
+      volumes:
+        - name: rekor-monitor-storage
+          persistentVolumeClaim:
+            claimName: rekor-monitor-storage          
