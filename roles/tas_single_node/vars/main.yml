@@ -120,6 +120,7 @@ _tas_single_node_ctlog:
       private_key: "private-0"
   private_keys: []
   public_keys: []
+  max_cert_chain_size: 153600
 
 _tas_single_node_cockpit:
   enabled: false # install redhat.rhel_system_roles before enabling
