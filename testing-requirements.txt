@@ -4,7 +4,7 @@ ansible-core>=2.16.0,<2.19.0
 ansible-lint==25.6.1
 antsibull-docs==2.19.1
 awscli==1.41.9
-botocore==1.39.15
+botocore==1.39.9
 boto3==1.39.9
 galaxy-importer==0.4.30
 molecule==25.6.0
