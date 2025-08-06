@@ -52,6 +52,7 @@ _tas_single_node_trillian:
     host: trillian-mysql-pod
     port: 3306
   trusted_ca: ""
+  max_msg_size_bytes: 153600
 
 _tas_single_node_ingress_certificates:
   root:
@@ -120,6 +121,7 @@ _tas_single_node_ctlog:
       private_key: "private-0"
   private_keys: []
   public_keys: []
+  max_cert_chain_size: 153600
 
 _tas_single_node_cockpit:
   enabled: false # install redhat.rhel_system_roles before enabling
