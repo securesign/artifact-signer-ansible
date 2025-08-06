@@ -41,6 +41,8 @@ spec:
                 --storage_system=mysql \
                 --quota_system=mysql \
                 --mysql_uri="${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DATABASE}" \
+                --mysql_max_conns=30 \
+                --mysql_max_idle_conns=10 \
                 --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_rpc }} \
                 --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logserver_port_metrics }} \
                 --max_msg_size_bytes={{ tas_single_node_trillian.max_msg_size_bytes }} \
