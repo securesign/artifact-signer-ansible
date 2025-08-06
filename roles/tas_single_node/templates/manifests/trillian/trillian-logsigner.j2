@@ -59,6 +59,7 @@ spec:
                 --mysql_uri="${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DATABASE}" \
                 --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_rpc }} \
                 --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_metrics }} \
+                --max_msg_size_bytes={{ tas_single_node_trillian.max_msg_size_bytes }} \
                 --force_master=true \
                 --alsologtostderr{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
                 --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem \

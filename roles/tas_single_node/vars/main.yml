@@ -52,6 +52,7 @@ _tas_single_node_trillian:
     host: trillian-mysql-pod
     port: 3306
   trusted_ca: ""
+  max_msg_size_bytes: 153600
 
 _tas_single_node_ingress_certificates:
   root:
