@@ -30,6 +30,7 @@ _tas_single_node_rekor:
     max_size: "100000"
   monitor:
     interval: 10m
+  max_request_body_size: 10485760
 
 _tas_single_node_rekor_redis:
   database_deploy: true

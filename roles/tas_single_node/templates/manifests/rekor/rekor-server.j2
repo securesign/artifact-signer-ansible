@@ -99,6 +99,7 @@ spec:
                 --attestation_storage_bucket="{{ tas_single_node_rekor.attestations.url }}" \
                 --max_attestation_size="{{ tas_single_node_rekor.attestations.max_size }}" \
 {% endif %}
+                --max_request_body_size={{ tas_single_node_rekor.max_request_body_size }} \
                 --port={{ tas_single_node_rekor_server_port_http }}
           image: "{{ tas_single_node_rekor_server_image }}"
           imagePullPolicy: IfNotPresent
