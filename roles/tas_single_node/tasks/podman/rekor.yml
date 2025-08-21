@@ -72,6 +72,15 @@
       secret: "{{ tas_single_node_rekor_secret }}"
       secret_changed: "{{ secret_result.changed }}"
 
+- name: Deploy Rekor Monitor Pod
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: rekor_monitor
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/rekor/rekor-monitor.j2') | from_yaml }}"
+
 - name: Deploy backfill Redis job
   ansible.builtin.include_tasks: podman/install_manifest.yml
   vars:

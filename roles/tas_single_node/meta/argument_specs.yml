@@ -583,6 +583,17 @@ argument_specs:
             description: "Env vars to be specified to access AWS Cloud keys."
             type: "list"
             elements: "dict"
+            options:
+              name:
+                description: "Environment variable key name."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
+              value:
+                description: "Environment variable value."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
           ca_passphrase:
@@ -661,6 +672,34 @@ argument_specs:
                 version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
+          attestations:
+            description: "Configuration for Rekor attestation storage."
+            type: "dict"
+            required: false
+            version_added: "1.3.0"
+            default:
+              enabled: true
+              url: "file:///var/run/attestations?no_tmp_dir=true"
+              max_size: 100000
+            options:
+              enabled:
+                description: "Enable Rekor attestation storage."
+                type: "bool"
+                required: false
+                version_added: "1.3.0"
+              url:
+                description: |-
+                  Url of the storage location, supports go-cloud blob URLs. The 'file:///var/run/attestations'
+                  path is specifically for local storage. Other valid protocols include s3://, gs://, azblob://, and mem://.
+                  Cloud credentials can be provided as environment variables through the "env" variable.
+                type: "str"
+                required: false
+                version_added: "1.3.0"
+              max_size:
+                description: "Maximum allowed size for an individual attestation, in bytes."
+                type: "int"
+                required: false
+                version_added: "1.3.0"
       tas_single_node_setup_host_dns:
         description: "Set up DNS on the managed host to resolve URLs of the configured RHTAS services."
         type: "bool"
@@ -973,6 +1012,17 @@ argument_specs:
             description: "Environment vars to be specified to access AWS Cloud keys when using Tink or KMS"
             type: "list"
             elements: "dict"
+            options:
+              name:
+                description: "Environment variable key name."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
+              value:
+                description: "Environment variable value."
+                type: "str"
+                required: true
+                version_added: "1.2.0"
             required: false
             version_added: "1.2.0"
       tas_single_node_skip_os_install:

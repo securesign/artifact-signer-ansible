@@ -22,15 +22,15 @@
 
     aap_setup_prep_inv_nodes:
       automationcontroller:
-        127.0.0.1:
+        - "127.0.0.1"
       automationhub:
-        127.0.0.1:
+        - "127.0.0.1"
       database:
-        127.0.0.1:
+        - "127.0.0.1"
       automationgateway:
-        127.0.0.1:
+        - "127.0.0.1"
       automationeda:
-        127.0.0.1:
+        - "127.0.0.1"
     aap_setup_prep_inv_vars:
       all:
         ansible_user: "ec2-user"
@@ -164,8 +164,7 @@
       delegate_to: localhost
       block:
         - name: Include role to add subscription to controller
-          ansible.builtin.include_role:
-            name: infra.aap_configuration.controller_license
+          ansible.builtin.include_tasks: files/subscription.yml
           vars:
             controller_dependency_check: true
             aap_hostname: "{{ aap_instance_ip }}"
@@ -177,7 +176,9 @@
             aap_request_timeout: 900
             controller_license:
               use_lookup: true
-              force: true
+              filters:
+                product_name: "Red Hat Ansible Automation Platform"
+                support_level: "Self-Support"
 
     - name: Create project for TAS single node playbook
       delegate_to: localhost
@@ -323,6 +324,7 @@
                           client_id: trusted-artifact-signer
                           type: email
                       meta_issuers: []
+                      ci_issuer_metadata: []
                   tas_single_node_base_hostname: myrhtas
                   tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
                   tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"

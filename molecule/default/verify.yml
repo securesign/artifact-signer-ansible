@@ -7,6 +7,24 @@
   vars_files:
     - vars/vars.yml
   tasks:
+    - name: Multiple OIDCs are configured
+      block:
+        - name: Slurp fulcio config
+          ansible.builtin.slurp:
+            src: "/etc/rhtas/configs/fulcio-config.yaml"
+          register: fulcio_config
+        - name: Assert the sigstore is instance present
+          ansible.builtin.assert:
+            that:
+              - fulcio_config
+              - "'https://oauth2.sigstore.dev/auth' in (fulcio_config.content | b64decode)"
+            fail_msg: "The sigstore endpoint was not found in fulcio config"
+        - name: Assert the DEX is instance present
+          ansible.builtin.assert:
+            that:
+              - fulcio_config
+              - "'http://dex-idp:5556/dex' in (fulcio_config.content | b64decode)"
+            fail_msg: "The DEX endpoint was not found in fulcio config"
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml

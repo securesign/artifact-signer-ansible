@@ -20,11 +20,17 @@ _tas_single_node_rekor:
   active_tree_id: 0
   active_signer_type: file
   active_signer_id: "private-0"
-  env:
+  env: []
   private_keys: []
   public_keys: []
   sharding_config: []
-
+  attestations:
+    enabled: true
+    url: "file:///var/run/attestations?no_tmp_dir=true"
+    max_size: "100000"
+  monitor:
+    interval: 10m
+  max_request_body_size: 10485760
 
 _tas_single_node_rekor_redis:
   database_deploy: true
@@ -47,6 +53,7 @@ _tas_single_node_trillian:
     host: trillian-mysql-pod
     port: 3306
   trusted_ca: ""
+  max_msg_size_bytes: 153600
 
 _tas_single_node_ingress_certificates:
   root:
@@ -115,6 +122,7 @@ _tas_single_node_ctlog:
       private_key: "private-0"
   private_keys: []
   public_keys: []
+  max_cert_chain_size: 153600
 
 _tas_single_node_cockpit:
   enabled: false # install redhat.rhel_system_roles before enabling
@@ -137,6 +145,7 @@ tas_single_node_rekor_templates:
 # Individual service enablement
 tas_single_node_trillian_enabled: true
 tas_single_node_rekor_enabled: true
+tas_single_node_rekor_monitor_enabled: true
 tas_single_node_ctlog_enabled: true
 tas_single_node_tuf_enabled: true
 tas_single_node_tsa_enabled: true
@@ -255,6 +264,9 @@ tas_single_node_rekor_server_port_metrics: 2112
 
 tas_single_node_rekor_search_ui_pod: rekor-search-ui
 tas_single_node_rekor_search_ui_port_tcp: 3000
+
+tas_single_node_rekor_monitor_pod: rekor-monitor
+tas_single_node_rekor_monitor_port_http: 9464
 
 tas_single_node_trillian_logserver_pod: trillian-logserver
 tas_single_node_trillian_logserver_port_rpc: 8091
