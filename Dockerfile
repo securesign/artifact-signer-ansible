@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ansible-automation-platform-25/ansible-dev-tools-rhel8@sha256:5cfbffa83dedf8ab03b0ca68f18f9c88876c50c53e22b7e3d6ef96ce293f7fb5 as builder
+FROM registry.redhat.io/ansible-automation-platform-25/ansible-dev-tools-rhel8@sha256:6b296a35a4cefc6eaf2c48ab721c067e6fd9f7c9541941aa216a8b65a673cdac as builder
 
 WORKDIR /tmp/source
 
