@@ -71,6 +71,7 @@ spec:
                 "--port={{ tas_single_node_tsa_server_port_tcp }}" \
                 "--certificate-chain-path=/etc/secrets/cert_chain/certificate-chain.pem" \
                 "--timestamp-signer={{ tas_single_node_tsa.signer_type }}" \
+                "--max-request-body-size={{ tas_single_node_tsa.max_request_body_size }}" \
 {% if tas_single_node_tsa.ntp_config != '' %}
                 "--ntp-monitoring=/etc/config/ntpsync.yaml" \
 {% endif %}

@@ -111,6 +111,7 @@ _tas_single_node_tsa:
   ca_passphrase: rhtas
   ntp_config: ""
   trusted_ca: ""
+  max_request_body_size: 1048576
 
 _tas_single_node_ctlog:
   ca_passphrase: rhtas
