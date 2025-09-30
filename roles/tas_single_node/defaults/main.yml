@@ -35,7 +35,7 @@ tas_single_node_backfill_redis_image:
 tas_single_node_trillian_db_image:
   "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:2d91dceb216d8cb8dacefcfe86f357f4ff4eb5e5e998f264d1ad231821a92fad"
 tas_single_node_tuf_image:
-  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:978f4388b272517fb2c044b8a717b6fbf06ddff608d47fc27b3a7941f542cef3"
+  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:fcb225019f865dd4b7af1f5134a9aed9c5c8a425f3ee43b74e0517ce602e209c"
 tas_single_node_http_server_image:
   "registry.redhat.io/ubi9/httpd-24@sha256:29382518403a4361c48fccc057163dc4a9f43ee159432754fa63c76485b223f5"
 tas_single_node_trillian_netcat_image:
@@ -51,7 +51,7 @@ tas_single_node_createtree_image:
   "registry.redhat.io/rhtas/createtree-rhel9@sha256:244758721aa1c63adfffbae31df58059ff8a06311f6cb60515eeae14b20e78ce"
 # CLI Server
 tas_single_node_client_server_image:
-  "registry.redhat.io/rhtas/client-server-rhel9@sha256:e94612668c7021dcd27be44c663b623aa4ff2a36af3f1c498418aeaf0f084d94"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:f2798c21dbcb3334b256bf1370a42c013f8f3eefb0641e1c2f250428a82ddb82"
 
 tas_single_node_podman: {}
 
