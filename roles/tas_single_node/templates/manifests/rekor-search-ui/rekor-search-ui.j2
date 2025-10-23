@@ -23,7 +23,7 @@ spec:
       containers:
         - name: rekor-search-ui
           image: "{{ tas_single_node_rekor_search_ui_image }}"
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: file

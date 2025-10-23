@@ -48,13 +48,18 @@ cosign initialize
 
 echo "testing" > "$FILENAME.txt"
 
-cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
+cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --use-signing-config=false
 
 validation_counter=0
 for file in /test/*.txt; do
   if [ -f "$file" ]; then  # Check if it is a regular file
     echo "Executing cosign verification on file: $file"
-    cosign --verbose verify-blob --certificate-identity="${EMAIL}" --bundle "${file%.*}.bundle" "$file" --rfc3161-timestamp="${file%.*}.timestamp" --use-signed-timestamps
+    cosign --verbose verify-blob \
+        --certificate-identity="${EMAIL}" \
+        --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
+        --bundle "${file%.*}.bundle" \
+        --trusted-root "/root/.sigstore/root" \
+        "$file"
 
    validation_counter=$((validation_counter + 1))
   fi

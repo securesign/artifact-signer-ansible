@@ -37,11 +37,11 @@ tas_single_node_trillian_db_image:
 tas_single_node_tuf_image:
   "registry.redhat.io/rhtas/tuffer-rhel9@sha256:fcb225019f865dd4b7af1f5134a9aed9c5c8a425f3ee43b74e0517ce602e209c"
 tas_single_node_http_server_image:
-  "registry.redhat.io/ubi9/httpd-24@sha256:29382518403a4361c48fccc057163dc4a9f43ee159432754fa63c76485b223f5"
+  "registry.redhat.io/ubi9/httpd-24@sha256:86a1a8b0d12c31c007dd411f7076a0cab2cc952ab8a0de74666fa09900c9fb86"
 tas_single_node_trillian_netcat_image:
-  "registry.redhat.io/openshift4/ose-tools-rhel9@sha256:ea1416d4260cc62a830c013754ae9720561b1e6c9c8da0e198ebae67783e8a1c"
+  "registry.redhat.io/openshift4/ose-tools-rhel9@sha256:451bb63ed850d6164b52b1370164815a88ebdc3025bf14877baf1e1ca4b0af0f"
 tas_single_node_nginx_image:
-  "registry.redhat.io/rhel9/nginx-124@sha256:126903359331eb9f2c87950f952442db456750190956b9301d00acfcadbc19ed"
+  "registry.redhat.io/rhel9/nginx-124@sha256:aa73fdb10af2bf24611ba714a412c2e65cec88a00eee628a0f2a75e564ec18f2"
 tas_single_node_timestamp_authority_image:
   "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:8f8a5d4abf7878ba34151f8632aa7db25218300dbb9f17b121c5f61e0e5c5e03"
 tas_single_node_rekor_search_ui_image:
