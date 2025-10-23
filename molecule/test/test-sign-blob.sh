@@ -9,7 +9,7 @@ source "${script_dir}/extract_root_cert.sh"
 extractRootCert "rekor.${BASE_HOSTNAME}" "/etc/pki/ca-trust/source/anchors/${BASE_HOSTNAME}.pem"
 update-ca-trust
 
-# set up cosign env
+# set up cosign env test
 export TUF_URL=https://tuf.$BASE_HOSTNAME
 export OIDC_ISSUER_URL=$OIDC_ISSUER_URL
 export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
