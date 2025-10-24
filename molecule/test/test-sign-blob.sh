@@ -58,7 +58,7 @@ for file in /test/*.txt; do
         --certificate-identity="${EMAIL}" \
         --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
         --bundle "${file%.*}.bundle" \
-        --trusted-root "/root/.sigstore/root" \
+        --trusted-root "/root/.sigstore/root/targets/trusted_root.json" \
         "$file"
 
    validation_counter=$((validation_counter + 1))
