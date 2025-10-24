@@ -44,7 +44,7 @@ fi
 env
 cd /test
 FILENAME="$(date +%Y%m%d%H%M%S)"
-cosign initialize --mirror="${COSIGN_MIRROR} --root="${COSIGN_ROOT}
+cosign initialize --mirror="${COSIGN_MIRROR}" --root="${COSIGN_ROOT}"
 
 echo "testing" > "$FILENAME.txt"
 
