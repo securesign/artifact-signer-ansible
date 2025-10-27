@@ -44,11 +44,11 @@ fi
 env
 cd /test
 FILENAME="$(date +%Y%m%d%H%M%S)"
-cosign initialize --mirror="${COSIGN_MIRROR}" --root="${COSIGN_ROOT}"
+cosign initialize
 
 echo "testing" > "$FILENAME.txt"
 
-cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --use-signing-config=false
+cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
 
 validation_counter=0
 for file in /test/*.txt; do
@@ -58,7 +58,8 @@ for file in /test/*.txt; do
         --certificate-identity="${EMAIL}" \
         --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
         --bundle "${file%.*}.bundle" \
-        --trusted-root "/root/.sigstore/root/targets/trusted_root.json" \
+        --rfc3161-timestamp="${file%.*}.timestamp" \
+        --use-signed-timestamps \
         "$file"
 
    validation_counter=$((validation_counter + 1))
