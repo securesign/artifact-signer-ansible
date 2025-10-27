@@ -26,6 +26,13 @@
   ansible.builtin.set_fact:
     node_ip: "{{ ansible_ssh_host }}"
 
+- name: Log in to Red Hat Registry
+  containers.podman.podman_login:
+    registry: registry.redhat.io
+    username: "{{ TAS_SINGLE_NODE_REGISTRY_USERNAME }}"
+    password: "{{ TAS_SINGLE_NODE_REGISTRY_PASSWORD }}"
+  delegate_to: localhost
+
 - name: Build the test Podman image
   containers.podman.podman_image:
     name: fedora-cosign
