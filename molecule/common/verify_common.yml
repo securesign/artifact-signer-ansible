@@ -29,8 +29,8 @@
 - name: Log in to Red Hat Registry
   containers.podman.podman_login:
     registry: registry.redhat.io
-    username: "{{ TAS_SINGLE_NODE_REGISTRY_USERNAME }}"
-    password: "{{ TAS_SINGLE_NODE_REGISTRY_PASSWORD }}"
+    username: "{{ tas_single_node_registry_username }}"
+    password: "{{ tas_single_node_registry_password }}"
   delegate_to: localhost
 
 - name: Build the test Podman image
