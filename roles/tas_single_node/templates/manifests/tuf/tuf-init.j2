@@ -62,13 +62,7 @@ spec:
               name: "{{ tas_single_node_tuf_signing_keys_volume_name }}"
               readOnly: false
       enableServiceLinks: true
-      securityContext:
-        capabilities:
-          drop:
-            - ALL
-        runAsNonRoot: true
-        runAsUser: 65532
-        allowPrivilegeEscalation: false
+      securityContext: {}
       serviceAccountName: tuf
       restartPolicy: Never
       volumes:
