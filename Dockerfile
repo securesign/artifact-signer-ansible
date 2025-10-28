@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ansible-automation-platform-25/ansible-dev-tools-rhel8@sha256:5cfbffa83dedf8ab03b0ca68f18f9c88876c50c53e22b7e3d6ef96ce293f7fb5 as builder
+FROM registry.redhat.io/ansible-automation-platform-26/ansible-dev-tools-rhel9@sha256:e672dcffeb6824f4f5e2826e9b94a2c1aaa46e7dd0fc4bdb655f00ae94a0fc6a AS builder
 
 WORKDIR /tmp/source
 
@@ -12,9 +12,7 @@ USER root
 
 RUN ansible-galaxy collection build --force
 
-USER 1001
-
-FROM scratch
+FROM registry.redhat.io/ubi10-minimal@sha256:649f7ce8082531148ac5e45b61612046a21e36648ab096a77e6ba0c94428cf60
 
 LABEL vendor="Red Hat, Inc."
 LABEL url="https://www.redhat.com"
@@ -24,6 +22,8 @@ LABEL description="Ansible collection to automate the deployment of the Red Hat 
 LABEL summary="Ansible Collection for Red Hat Trusted Artifact Signer"
 LABEL com.redhat.component="rhtas-ansible-collection"
 LABEL name="rhtas-ansible-collection"
+LABEL io.k8s.description="The image for the rhtas-ansible collection."
 
 COPY LICENSE /licenses/LICENSE
 COPY --from=builder /tmp/source/redhat-artifact_signer-*.tar.gz /releases/
+USER 65532:65532

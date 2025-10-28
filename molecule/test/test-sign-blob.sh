@@ -54,7 +54,13 @@ validation_counter=0
 for file in /test/*.txt; do
   if [ -f "$file" ]; then  # Check if it is a regular file
     echo "Executing cosign verification on file: $file"
-    cosign --verbose verify-blob --certificate-identity="${EMAIL}" --bundle "${file%.*}.bundle" "$file" --rfc3161-timestamp="${file%.*}.timestamp" --use-signed-timestamps
+    cosign --verbose verify-blob \
+        --certificate-identity="${EMAIL}" \
+        --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
+        --bundle "${file%.*}.bundle" \
+        --rfc3161-timestamp="${file%.*}.timestamp" \
+        --use-signed-timestamps \
+        "$file"
 
    validation_counter=$((validation_counter + 1))
   fi
