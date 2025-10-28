@@ -1,4 +1,4 @@
-FROM registry.redhat.io/rhtas/cosign-rhel9:1.3.0 as cosign-bin
+FROM quay.io/securesign/cli-cosign@sha256:fdece07017a48490a2f3c43d0fb138c71aca071dfc6c32e2f9732e3b73ada6ae as cosign-bin
 
 FROM fedora:40
 RUN dnf install -y openssl vim && dnf clean all
