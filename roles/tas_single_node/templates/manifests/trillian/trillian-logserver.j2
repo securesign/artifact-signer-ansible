@@ -100,7 +100,10 @@ spec:
       # Needs to be set until https://github.com/containers/podman/pull/16698 is downsteamed
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        allowPrivilegeEscalation: false
       serviceAccount: trillian-logserver
       serviceAccountName: trillian-logserver
       terminationGracePeriodSeconds: 30

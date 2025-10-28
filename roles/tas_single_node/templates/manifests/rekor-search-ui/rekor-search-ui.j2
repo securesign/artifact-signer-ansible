@@ -28,6 +28,9 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: file
           securityContext:
+            capabilities:
+              drop:
+                - ALL
             runAsNonRoot: true
             runAsUser: 65533
             allowPrivilegeEscalation: false

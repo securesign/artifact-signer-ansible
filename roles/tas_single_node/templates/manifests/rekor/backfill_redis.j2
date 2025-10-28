@@ -21,6 +21,13 @@ spec:
         app.instance: backfill-redis
         app.name: backfill-redis
     spec:
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        runAsNonRoot: true
+        runAsUser: 65533
+        allowPrivilegeEscalation: false
       restartPolicy: OnFailure
       containers:
         - name: backfill-redis

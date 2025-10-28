@@ -83,7 +83,10 @@ spec:
       priority: 0
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        allowPrivilegeEscalation: false
       serviceAccountName: trillian-mysql
       tolerations:
         - effect: NoExecute
