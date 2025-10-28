@@ -54,7 +54,13 @@ spec:
               readOnly: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
-      securityContext: {}
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        runAsNonRoot: true
+        runAsUser: 1001
+        allowPrivilegeEscalation: false
       serviceAccountName: tuf
       tolerations:
         - effect: NoExecute

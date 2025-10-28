@@ -64,8 +64,8 @@ spec:
         capabilities:
           drop:
             - ALL
-        runAsUser: 65533
         runAsNonRoot: true
+        runAsUser: 65533
         allowPrivilegeEscalation: false
       serviceAccountName: rekor-redis
       tolerations:

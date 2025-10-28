@@ -73,6 +73,9 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
+        capabilities:
+          drop:
+            - ALL
         runAsNonRoot: true
         runAsUser: 65533
         allowPrivilegeEscalation: false

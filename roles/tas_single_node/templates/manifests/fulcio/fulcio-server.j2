@@ -95,6 +95,9 @@ spec:
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       securityContext:
+        capabilities:
+          drop:
+            - ALL
         runAsNonRoot: true
         runAsUser: 65533
         allowPrivilegeEscalation: false
