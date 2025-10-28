@@ -86,7 +86,7 @@
       - stdout
       - stderr
   delegate_to: localhost
-  become: false
+  become: true
   register: blob_verify_output
 
 - name: Ensure the blob was verified successfully
