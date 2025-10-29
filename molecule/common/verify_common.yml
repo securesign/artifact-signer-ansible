@@ -21,66 +21,81 @@
     podman network disconnect podman dex-idp
   when: podman_check.stdout
 
-- name: Get IP of the current node
-  # The tasks below run locally, so their ansible_ssh_host is 127.0.0.1
-  ansible.builtin.set_fact:
-    node_ip: "{{ ansible_ssh_host }}"
+- name: Run cosign verify
+  block:
+  - name: Get IP of the current node
+    # Simulate external connection - use host IP address
+    ansible.builtin.set_fact:
+      node_ip: "{{ ansible_ssh_host }}"
 
-- name: Build the test Podman image
-  containers.podman.podman_image:
-    name: fedora-cosign
-    tag: latest
-    pull: false
-    force: true
-    path: "{{ test_dir_path }}"
-    build:
-      cache: true
-      file: "{{ test_dir_path }}/Containerfile"
-  become: false
-  delegate_to: localhost
+  - name: Create temporary directory on remote host
+    ansible.builtin.file:
+      path: "/tmp/{{ lookup('env', 'MOLECULE_SCENARIO_NAME') }}"
+      state: directory
+      mode: '0755'
+    register: remote_temp_dir
+    become: false
 
-- name: Create test directory
-  ansible.builtin.file:
-    path: "{{ molecule_ephemeral_directory }}/test"
-    state: directory
-    mode: '0777'
-  delegate_to: localhost
-  become: false
+  - name: Copy test files to remote host
+    ansible.builtin.copy:
+      src: "{{ test_dir_path }}/"
+      dest: "{{ remote_temp_dir.path }}/"
+      mode: '0755'
+    become: false
 
-- name: Run tests in a Podman container
-  containers.podman.podman_container:
-    name: "rhtas-test-container-{{ ansible_date_time.epoch }}"
-    image: fedora-cosign:latest
-    rm: true
-    recreate: true
-    env:
-      BASE_HOSTNAME: "{{ tas_single_node_base_hostname }}"
-      EMAIL: "jdoe@redhat.com"
-      OIDC_ISSUER_URL: "http://dex-idp:5556/dex"
-    # NOTE: we can't add hosts with the etc_hosts parameter, because we would need to template
-    # the dictionary keys for it and Ansible doesn't do that
-    cmd_args:
-      - "--add-host"
-      - "fulcio.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
-      - "--add-host"
-      - "rekor.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
-      - "--add-host"
-      - "tuf.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
-      - "--add-host"
-      - "tsa.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
-      - "--add-host"
-      - "dex-idp:{{ node_ip }}"
-    volume:
-      - "{{ test_dir_path }}:/scripts:z"
-      - "{{ molecule_ephemeral_directory }}/test:/test:z"
-    entrypoint: /bin/bash
-    command: /scripts/test-sign-blob.sh
-    attach:
-      - stdout
-      - stderr
-  delegate_to: localhost
-  become: false
-  register: blob_verify_output
+  - name: Build the test Podman image
+    containers.podman.podman_image:
+      name: fedora-cosign
+      tag: latest
+      pull: false
+      force: false
+      path: "{{ remote_temp_dir.path }}"
+      build:
+        cache: true
+        file: "{{ remote_temp_dir.path }}/Containerfile"
+    become: false
+
+  - name: Create test directory
+    ansible.builtin.file:
+      path: "{{ remote_temp_dir.path }}/test-output"
+      state: directory
+      mode: '0777'
+    become: false
+
+  - name: Run tests in a Podman container
+    containers.podman.podman_container:
+      name: "rhtas-test-container-{{ ansible_date_time.epoch }}"
+      image: fedora-cosign:latest
+      rm: true
+      recreate: true
+      network_mode: host
+      env:
+        BASE_HOSTNAME: "{{ tas_single_node_base_hostname }}"
+        EMAIL: "jdoe@redhat.com"
+        OIDC_ISSUER_URL: "http://dex-idp:5556/dex"
+      # NOTE: we can't add hosts with the etc_hosts parameter, because we would need to template
+      # the dictionary keys for it and Ansible doesn't do that
+      cmd_args:
+        - "--add-host"
+        - "fulcio.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+        - "--add-host"
+        - "rekor.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+        - "--add-host"
+        - "tuf.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+        - "--add-host"
+        - "tsa.{{ tas_single_node_base_hostname }}:{{ node_ip }}"
+        - "--add-host"
+        - "dex-idp:{{ node_ip }}"
+      volume:
+        - "{{ remote_temp_dir.path }}:/scripts:z"
+        - "{{ remote_temp_dir.path }}/test-output:/test:z"
+      entrypoint: /bin/bash
+      command: /scripts/test-sign-blob.sh
+      attach:
+        - stdout
+        - stderr
+    become: false
+    register: blob_verify_output
 
 - name: Ensure the blob was verified successfully
   ansible.builtin.assert:
