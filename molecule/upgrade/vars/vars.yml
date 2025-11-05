@@ -1,1 +1,40 @@
-../../default/vars/vars.yml
+tas_single_node_fulcio:
+  fulcio_config:
+    oidc_issuers:
+      - issuer: "http://dex-idp:5556/dex"
+        url: "http://dex-idp:5556/dex"
+        client_id: trusted-artifact-signer
+        type: email
+      - issuer: "sigstore"
+        url: "https://oauth2.sigstore.dev/auth"
+        client_id: sigstore
+        type: email
+tas_single_node_base_hostname: myrhtas
+tas_single_node_cockpit:
+  enabled: false
+tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
+tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
+
+tas_pods:
+  - name: cli-server-pod
+    image_var: tas_single_node_client_server_image
+  - name: ctlog-pod
+    image_var: tas_single_node_ctlog_image
+  - name: fulcio-server-pod
+    image_var: tas_single_node_fulcio_server_image
+  - name: rekor-redis-pod
+    image_var: tas_single_node_rekor_redis_image
+  - name: rekor-server-pod
+    image_var: tas_single_node_rekor_server_image
+  - name: rekor-search-ui-pod
+    image_var: tas_single_node_rekor_search_ui_image
+  - name: trillian-logserver-pod
+    image_var: tas_single_node_trillian_log_server_image
+  - name: trillian-logsigner-pod
+    image_var: tas_single_node_trillian_log_signer_image
+  - name: trillian-mysql-pod
+    image_var: tas_single_node_trillian_db_image
+  - name: tsa-server-pod
+    image_var: tas_single_node_timestamp_authority_image
+  - name: tuf-init-pod
+    image_var: tas_single_node_tuf_image

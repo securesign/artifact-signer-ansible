@@ -4,31 +4,9 @@
   become: true
   vars:
     test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
-    tas_pods:
-      - name: cli-server-pod
-        image_var: tas_single_node_client_server_image
-      - name: ctlog-pod
-        image_var: tas_single_node_ctlog_image
-      - name: fulcio-server-pod
-        image_var: tas_single_node_fulcio_server_image
-      - name: rekor-redis-pod
-        image_var: tas_single_node_rekor_redis_image
-      - name: rekor-server-pod
-        image_var: tas_single_node_rekor_server_image
-      - name: rekor-search-ui-pod
-        image_var: tas_single_node_rekor_search_ui_image
-      - name: trillian-logserver-pod
-        image_var: tas_single_node_trillian_log_server_image
-      - name: trillian-logsigner-pod
-        image_var: tas_single_node_trillian_log_signer_image
-      - name: trillian-mysql-pod
-        image_var: tas_single_node_trillian_db_image
-      - name: tsa-server-pod
-        image_var: tas_single_node_timestamp_authority_image
-      - name: tuf-init-pod
-        image_var: tas_single_node_tuf_image
   vars_files:
     - vars/vars.yml
+    - "{{ molecule_ephemeral_directory }}/images.yml"
   tasks:
     - name: Load development build vars
       include_vars:
@@ -63,6 +41,7 @@
       assert:
         that:
           - digest in pod_images[item.name]
+          - digest not in released_images[item.name]
       vars:
         digest: "{{ dev_vars[item.image_var].split('@')[1] }}"
       loop: "{{ tas_pods }}"
