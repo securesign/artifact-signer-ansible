@@ -1,6 +1,6 @@
-FROM registry.redhat.io/rhtas/cosign-rhel9:1.3.0 as cosign-bin
+FROM ghcr.io/sigstore/cosign/cosign:latest as cosign-bin
 
 FROM fedora:44
 RUN dnf install -y openssl vim && dnf clean all
 
-COPY --from=cosign-bin /usr/local/bin/cosign /usr/local/bin/cosign
+COPY --from=cosign-bin /ko-app/cosign /usr/local/bin/cosign

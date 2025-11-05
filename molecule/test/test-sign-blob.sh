@@ -43,12 +43,16 @@ fi
 
 env
 cd /test
+rm -f /test/*.txt /test/*.bundle /test/*.timestamp
 FILENAME="$(date +%Y%m%d%H%M%S)"
+
 cosign initialize
+
+TRUSTED_ROOT_FILE="/root/.sigstore/root/tuf.myrhtas/targets/trusted_root.json"
 
 echo "testing" > "$FILENAME.txt"
 
-cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
+cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --use-signing-config=false
 
 validation_counter=0
 for file in /test/*.txt; do
@@ -58,8 +62,7 @@ for file in /test/*.txt; do
         --certificate-identity="${EMAIL}" \
         --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
         --bundle "${file%.*}.bundle" \
-        --rfc3161-timestamp="${file%.*}.timestamp" \
-        --use-signed-timestamps \
+        --trusted-root="${TRUSTED_ROOT_FILE}" \
         "$file"
 
    validation_counter=$((validation_counter + 1))
