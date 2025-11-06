@@ -15,9 +15,45 @@
     - name: Configure Dex OIDC instance
       ansible.builtin.include_tasks: ../common/dex-setup.yaml
 
+    - name: Display installed collection version
+      ansible.builtin.debug:
+        msg: >
+          The 'redhat.artifact_signer' collection version being used is: 
+          {{ lookup('community.general.collection_version', 'redhat.artifact_signer') }}
+
     - name: Apply latest release role
       ansible.builtin.include_role:
         name: redhat.artifact_signer.tas_single_node
+
+    - name: Collect image SHAs
+      block:
+        - name: Get pod information for multiple pods
+          containers.podman.podman_pod_info:
+            name: "{{ item.name }}"
+          register: pod_info_list
+          loop: "{{ tas_pods }}"
+        - name: Get container information for all containers in the pods
+          containers.podman.podman_container_info:
+            name: "{{ container_ids }}"
+          vars:
+            container_ids: "{{ item.pods[0].Containers | map(attribute='Id') | list }}"
+          loop: "{{ pod_info_list.results }}"
+          loop_control:
+            label: "{{ item.pods[0].Name }}"
+          when: item.pods is defined and item.pods[0].Containers is defined
+          register: container_info_list
+        - name: Create a dictionary of pod names and container images
+          set_fact:
+            pod_images: "{{ pod_images | default({}) | combine({ pod_info_list.results[index].pods[0].Name: item.containers | map(attribute='ImageDigest') | list }) }}"
+          loop: "{{ container_info_list.results }}"
+          loop_control:
+            index_var: index
+        - name: Save released pod_images (Image SHAs) for verification
+          ansible.builtin.copy:
+            content: "{{ {'released_images' : pod_images} | to_nice_yaml }}"
+            dest: "{{ molecule_ephemeral_directory }}/images.yml"
+          delegate_to: localhost
+          become: false
 
     - name: Prepare signed data to be verified after upgrade
       ansible.builtin.include_tasks:
