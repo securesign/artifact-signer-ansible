@@ -1,5 +1,5 @@
 ---
-# General notes that apply throughout the file
+# General notes that apply throughout the file.
 # * openssl ecparam doesn't directly allow to encrypt the key with passphrase, so we pipe it to encryption command
 # * openssl's ec curve "prime256v1" is equivalent to what everyone else calls "secp256r1"
 
