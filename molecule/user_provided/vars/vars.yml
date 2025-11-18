@@ -1,6 +1,6 @@
 tas_single_node_base_hostname: myrhtas
 tas_single_node_cockpit:
-  enabled: false
+  enabled: true
 tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
 tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
 tas_single_node_podman_volume_create_extra_args:

@@ -145,3 +145,11 @@
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml
+
+    - name: Check if the cockpit monitor is Available (HTTP 200)
+      ansible.builtin.uri:
+        url: "https://{{ ansible_ssh_host }}:9090"
+        method: GET
+        validate_certs: false
+        status_code: 200
+        timeout: 30

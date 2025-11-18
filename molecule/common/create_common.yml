@@ -145,6 +145,10 @@
         ports: 5556
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow traffic for using Dex as OIDC server + IDP
+      - proto: tcp
+        ports: 9090
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow traffic for cockpit monitor
     state: present
   when: security_group.security_groups | length == 0
   register: created_security_group
