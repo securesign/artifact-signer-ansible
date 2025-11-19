@@ -4,21 +4,25 @@
   gather_facts: true
   become: true
   vars:
-   users:
+    users:
       - user: testingUser
         password: password123
   vars_files:
     - vars/podman.yml
     - vars/vars.yml
   tasks:
-    - name: Delete all containers 
-      ansible.builtin.shell: podman container rm -f -a 
+    - name: Stop all containers
+      ansible.builtin.shell: podman container stop -a -t 1
       become: true
 
-    - name: Delete all container volumes 
-      ansible.builtin.shell: podman volume rm -f -a 
+    - name: Delete all containers
+      ansible.builtin.shell: podman container rm -f -a
       become: true
-    
+
+    - name: Delete all container volumes
+      ansible.builtin.shell: podman volume rm -f -a
+      become: true
+
     - name: Configure Dex OIDC instance
       ansible.builtin.include_tasks: ../common/dex-setup.yaml
 

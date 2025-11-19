@@ -28,6 +28,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Automation Hub login
+        uses: ./.github/actions/ah-login
+        with:
+          token: ${{ secrets.AUTOMATION_HUB_TOKEN }}
+
       - name: Install TAS using molecule test
         uses: ./.github/actions/molecule-test
         with:
