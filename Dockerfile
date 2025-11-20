@@ -14,7 +14,7 @@ RUN ansible-galaxy collection build --force
 
 FROM registry.redhat.io/ubi10-minimal@sha256:649f7ce8082531148ac5e45b61612046a21e36648ab096a77e6ba0c94428cf60
 
-LABEL vendor="Red Hat, Inc."
+LABEL vendor="Red Hat, Inc.x"
 LABEL url="https://www.redhat.com"
 LABEL distribution-scope="private"
 LABEL version="1.3.0"
