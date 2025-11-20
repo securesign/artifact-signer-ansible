@@ -142,10 +142,6 @@
             msg: "The directory '{{ item.stat.path }}' is either empty or does not exist."
           loop: "{{ directory_stats.results }}"
 
-    - name: Include create common tasks
-      ansible.builtin.include_tasks:
-        file: ../common/verify_common.yml
-
     - name: Check if the cockpit monitor is Available (HTTP 200)
       ansible.builtin.uri:
         url: "https://{{ ansible_ssh_host }}:9090"
@@ -153,3 +149,22 @@
         validate_certs: false
         status_code: 200
         timeout: 30
+
+    - name: Verify ingress certs against configured files
+      ansible.builtin.include_tasks:
+          file: tasks/verify_ingress_certs.yml
+      vars:
+        component: "{{ item }}"
+      loop:
+        - fulcio
+        - rekor
+        - rekor-search
+        - cli-server
+        - tuf
+        - tsa
+      loop_control:
+        loop_var: item
+
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
