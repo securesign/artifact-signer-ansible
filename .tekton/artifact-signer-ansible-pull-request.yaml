@@ -14,8 +14,8 @@ metadata:
       || "requirements.json".pathChanged())
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: ansible
-    appstudio.openshift.io/component: artifact-signer-ansible
+    appstudio.openshift.io/application: ansible-v1-3
+    appstudio.openshift.io/component: artifact-signer-ansible-v1-3
     pipelines.appstudio.openshift.io/type: build
   name: artifact-signer-ansible-on-pull-request
   namespace: rhtas-tenant
