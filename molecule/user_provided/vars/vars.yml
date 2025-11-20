@@ -1,6 +1,28 @@
 tas_single_node_base_hostname: myrhtas
 tas_single_node_cockpit:
   enabled: true
+tas_single_node_ingress_certificates:
+  root:
+    ca_certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/rhtas.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/rhtas.key') }}"
+  fulcio:
+    certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-fulcio.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-fulcio.key') }}"
+  rekor:
+    certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-rekor.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-rekor.key') }}"
+  tuf:
+    certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-tuf.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-tuf.key') }}"
+  tsa:
+    certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-tsa.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-tsa.key') }}"
+  rekor-search:
+    certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-rekor-search.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-rekor-search.key') }}"
+  cli-server:
+    certificate: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-cli-server.pem') }}"
+    private_key: "{{ lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-cli-server.key') }}"
 tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_USERNAME') }}"
 tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
 tas_single_node_podman_volume_create_extra_args:
