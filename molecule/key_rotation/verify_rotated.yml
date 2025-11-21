@@ -7,6 +7,9 @@
   vars_files:
     - vars/vars.yml
   tasks:
+      - name: Wait for 30 second to increase test stability (
+        ansible.builtin.pause:
+          seconds: 30
       - name: Verify Fulcio key rotation
         block:
         - name: Read fulcio config on molecule

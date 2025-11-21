@@ -12,11 +12,15 @@
     state: directory
     mode: "0755"
 
-- name: Copy Dex config over
+- name: Copy TLS secured Dex config over
   ansible.builtin.copy:
-    src: "dex-config.yaml"
-    dest: "/etc/dex/config/dex.yaml"
+    src: "{{ item.src }}"
+    dest: "/etc/dex/config/{{ item.dest }}"
     mode: "0644"
+  loop:
+    - { src: "dex-config-tls.yaml", dest: "dex.yaml" }
+    - { src: "tls.crt", dest: "tls.crt" }
+    - { src: "tls.key", dest: "tls.key"}
 
 - name: Run Dex container
   ansible.builtin.shell: |
@@ -24,11 +28,11 @@
       --name dex-idp \
       --replace \
       -p 5556:5556 \
-      -v /etc/dex/config/dex.yaml:/etc/dex/cfg/dex.yaml:Z \
+      -v /etc/dex/config:/etc/dex/cfg:Z \
       quay.io/asiek/dexidp:v2.32.0 \
       dex serve /etc/dex/cfg/dex.yaml
 
 - name: Dex container health check
-  ansible.builtin.shell: curl http://127.0.0.1:5556/dex/healthz
+  ansible.builtin.shell: curl -k https://127.0.0.1:5556/dex/healthz
   retries: 3
   delay: 5

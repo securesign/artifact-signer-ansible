@@ -319,8 +319,8 @@
                     ct_log_prefix: rhtasansible
                     fulcio_config:
                       oidc_issuers:
-                        - issuer: "http://dex-idp:5556/dex"
-                          url: "http://dex-idp:5556/dex"
+                        - issuer: "https://dex-idp:5556/dex"
+                          url: "https://dex-idp:5556/dex"
                           client_id: trusted-artifact-signer
                           type: email
                       meta_issuers: []
