@@ -168,3 +168,5 @@
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml
+      vars:
+        oidc_issuer_url: "https://dex-idp:5556/dex"
