@@ -1,15 +1,17 @@
-issuer: http://dex-idp:5556/dex
+issuer: https://dex-idp:5556/dex
 
 storage:
   type: memory
 
 web:
-  http: 0.0.0.0:5556
+  https: 0.0.0.0:5556
+  tlsCert: /etc/dex/cfg/tls.crt
+  tlsKey: /etc/dex/cfg/tls.key
 
 staticClients:
 - id: trusted-artifact-signer
   redirectURIs:
-  - 'http://dex-idp:5556/callback'
+  - 'https://dex-idp:5556/callback'
   name: 'Trusted Artifact Signer'
   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 

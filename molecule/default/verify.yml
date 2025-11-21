@@ -23,7 +23,7 @@
           ansible.builtin.assert:
             that:
               - fulcio_config
-              - "'http://dex-idp:5556/dex' in (fulcio_config.content | b64decode)"
+              - "'https://dex-idp:5556/dex' in (fulcio_config.content | b64decode)"
             fail_msg: "The DEX endpoint was not found in fulcio config"
     - name: Include create common tasks
       ansible.builtin.include_tasks:
