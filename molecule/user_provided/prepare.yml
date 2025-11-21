@@ -13,7 +13,9 @@
   tasks:
 
     - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../common/dex-setup.yaml
+      ansible.builtin.include_tasks: ../common/dex/dex-setup.yaml
+      vars:
+        https: true
 
     - name: Install Redis and MariaDB
       ansible.builtin.yum:

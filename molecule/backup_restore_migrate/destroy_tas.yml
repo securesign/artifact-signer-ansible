@@ -24,7 +24,7 @@
       become: true
 
     - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../common/dex-setup.yaml
+      ansible.builtin.include_tasks: ../common/dex/dex-setup.yaml
 
     - name: Recursively remove directory
       ansible.builtin.file:
