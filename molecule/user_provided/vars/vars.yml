@@ -72,6 +72,7 @@ tas_single_node_ctlog:
         {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
 
 tas_single_node_fulcio:
+  trusted_ca: "{{ lookup('file', '../common/dex/tls.crt') }}"
   private_key: |
     {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio.key') }}
   root_ca: |
@@ -79,7 +80,7 @@ tas_single_node_fulcio:
   ca_passphrase: password
   fulcio_config:
     meta_issuers:
-      - issuer_pattern: "http://dex-*:5556/dex"
+      - issuer_pattern: "https://dex-*:5556/dex"
         client_id: trusted-artifact-signer
         type: email
 
