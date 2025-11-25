@@ -3,7 +3,7 @@
 ansible-core>=2.16.0,<2.19.0
 ansible-lint==25.1.2
 antsibull-docs==2.22.0
-awscli==1.41.9
+awscli==1.43.4
 botocore==1.39.9
 boto3==1.39.9
 galaxy-importer==0.4.34
