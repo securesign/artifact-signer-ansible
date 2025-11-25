@@ -32,6 +32,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r testing-requirements.txt
             ansible-galaxy install -r requirements.yml
+            ansible-galaxy install -r molecule/aap-test/requirements.yml
         - name: Set up SSH key
           run: |
             mkdir -p ~/.ssh
