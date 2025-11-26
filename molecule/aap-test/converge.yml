@@ -290,7 +290,7 @@
                     private_key: ""
                     root_ca: ""
                     ca_passphrase: rhtas
-                    trusted_ca: ""
+                    trusted_ca: "{{ lookup('file', '../common/dex/tls.crt') }}"
                     ct_log_prefix: rhtasansible
                     fulcio_config:
                       oidc_issuers:
