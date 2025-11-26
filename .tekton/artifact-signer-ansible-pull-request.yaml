@@ -51,7 +51,7 @@ spec:
   taskRunTemplate:
     serviceAccountName: build-pipeline-artifact-signer-ansible
   workspaces:
-  - name: git-auth
-    secret:
-      secretName: '{{ git_auth_secret }}'
+    - name: git-auth
+      secret:
+        secretName: '{{ git_auth_secret }}'
   status: {}
