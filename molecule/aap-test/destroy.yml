@@ -17,7 +17,7 @@
       amazon.aws.ec2_instance:
         state: absent
         instance_ids:
-          - "{{ item['instance'] }}"
+          - "{{ item.instance_id | default(omit) }}"
         region: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
       register: terminate_result
       with_items: "{{ instance_configs }}"
