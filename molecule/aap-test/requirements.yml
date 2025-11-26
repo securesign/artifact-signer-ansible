@@ -12,4 +12,3 @@ collections:
     version: 2.6.1
   - name: infra.ah_configuration
   - name: infra.aap_configuration
-    version: 3.7.0
