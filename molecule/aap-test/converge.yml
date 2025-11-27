@@ -11,7 +11,7 @@
   vars:
     aap_instance_ip: "{{ groups['aap_group'][0] }}"
     worker_instance_ip: "{{ groups['worker_group'][0] }}"
-    aap_setup_down_version: "2.5"
+    aap_setup_down_version: "2.6"
     aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
     aap_setup_down_type: "setup"
     aap_setup_rhel_version: 9
@@ -19,19 +19,27 @@
     aap_setup_containerized: true
     aap_setup_arch: "x86_64"
     aap_setup_prep_process_template: true
+    controller_validate_certs: false
+    ah_validate_certs: false
 
     aap_setup_prep_inv_nodes:
       automationcontroller:
-        - "127.0.0.1"
+        "127.0.0.1":
       automationhub:
-        - "127.0.0.1"
+        "127.0.0.1":
       database:
-        - "127.0.0.1"
+        "127.0.0.1":
       automationgateway:
-        - "127.0.0.1"
+        "127.0.0.1":
       automationeda:
-        - "127.0.0.1"
+        "127.0.0.1":
     aap_setup_prep_inv_vars:
+      automationcontroller:
+        nginx_https_port: 443
+      automationhub:
+        nginx_https_port: 8444
+      automationeda:
+        nginx_https_port: 8445
       all:
         ansible_user: "ec2-user"
         ansible_connection: local
@@ -69,40 +77,7 @@
       loop:
         - infra.aap_utilities.aap_setup_download
         - infra.aap_utilities.aap_setup_prepare
-
-    - name: Find the latest AAP setup folder
-      ansible.builtin.find:
-        paths: /var/tmp
-        patterns: ansible-automation-platform-containerized-setup-*
-        file_type: directory
-        recurse: false
-      register: aap_folders
-
-    - name: Set the latest AAP setup path
-      ansible.builtin.set_fact:
-        aap_setup_path: >-
-          {{
-            (aap_folders.files | sort(attribute='mtime', reverse=true) | first | default('')).path
-            if aap_folders.files | length > 0 else ''
-          }}
-
-    - name: Install AAP
-      ansible.builtin.shell:
-        cmd: |
-          cd {{ aap_setup_path }}
-          ansible-playbook -i inventory ansible.containerized_installer.install
-      async: 1800
-      poll: 0
-      register: aap_install_task
-      changed_when: false
-
-    - name: Wait for AAP installation to complete
-      ansible.builtin.async_status:
-        jid: "{{ aap_install_task.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 100
-      delay: 30
+        - infra.aap_utilities.aap_setup_install
 
     - name: Create a new token using username/password
       infra.ah_configuration.ah_token:
@@ -315,7 +290,7 @@
                     private_key: ""
                     root_ca: ""
                     ca_passphrase: rhtas
-                    trusted_ca: ""
+                    trusted_ca: "{{ lookup('file', '../common/dex/tls.crt') }}"
                     ct_log_prefix: rhtasansible
                     fulcio_config:
                       oidc_issuers:

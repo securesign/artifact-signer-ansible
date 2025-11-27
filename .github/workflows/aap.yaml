@@ -1,9 +1,10 @@
 name: Using Ansible Molecule, test RHTAS collection deployment from a private AAP
 
 on:
-  schedule:
-  - cron: "0 0 * * *"
-  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+  pull_request:
 
 jobs:
   test-aap-collection:
@@ -31,6 +32,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r testing-requirements.txt
             ansible-galaxy install -r requirements.yml
+            ansible-galaxy install -r molecule/aap-test/requirements.yml
         - name: Set up SSH key
           run: |
             mkdir -p ~/.ssh
