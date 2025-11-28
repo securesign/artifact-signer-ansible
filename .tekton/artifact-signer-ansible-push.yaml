@@ -10,6 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "main" && (".tekton/artifact-signer-ansible-push.yaml".pathChanged() || "Dockerfile".pathChanged()
       || "roles/***".pathChanged() || "meta/***".pathChanged()
+      || "molecule/***".pathChanged() || "testing-requirements.txt".pathChanged()
       || "requirements.json".pathChanged())
   creationTimestamp: null
   labels:
