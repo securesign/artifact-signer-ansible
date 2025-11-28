@@ -33,6 +33,6 @@
       dex serve /etc/dex/cfg/dex.yaml
 
 - name: Dex container health check
-  ansible.builtin.shell: curl http://127.0.0.1:5556/dex/healthz
+  ansible.builtin.shell: curl -k https://127.0.0.1:5556/dex/healthz
   retries: 3
   delay: 5
