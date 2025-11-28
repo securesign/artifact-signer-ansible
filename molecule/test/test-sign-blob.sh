@@ -27,7 +27,7 @@ export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
 export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 export EMAIL=jdoe@redhat.com
 
-TOKEN="$(curl -s -X POST 'http://dex-idp:5556/dex/token' \
+TOKEN="$(curl -s -X POST "$OIDC_ISSUER_URL/token" -k \
 -H 'Authorization: Basic dHJ1c3RlZC1hcnRpZmFjdC1zaWduZXI6WlhoaGJYQnNaUzFoY0hBdGMyVmpjbVYw' \
 -H 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'grant_type=password' \

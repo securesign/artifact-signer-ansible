@@ -13,7 +13,7 @@
   tasks:
 
     - name: Configure Dex OIDC instance
-      ansible.builtin.include_tasks: ../common/dex-setup.yaml
+      ansible.builtin.include_tasks: ../common/dex/dex-setup.yaml
 
     - name: Display installed collection version
       ansible.builtin.debug:
