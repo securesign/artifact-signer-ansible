@@ -146,7 +146,6 @@ tas_single_node_rekor_templates:
 # Individual service enablement
 tas_single_node_trillian_enabled: true
 tas_single_node_rekor_enabled: true
-tas_single_node_rekor_monitor_enabled: true
 tas_single_node_ctlog_enabled: true
 tas_single_node_tuf_enabled: true
 tas_single_node_tsa_enabled: true

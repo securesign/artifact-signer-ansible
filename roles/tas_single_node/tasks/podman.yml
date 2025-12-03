@@ -43,7 +43,7 @@
       "{{ tas_single_node_trillian_enabled }}",
       "{{ tas_single_node_trillian_enabled }}",
       "{{ tas_single_node_rekor_enabled }}",
-      "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_monitor_enabled }}",
+      "{{ tas_single_node_rekor_enabled and tas_single_node_rekor.monitor.enabled }}",
       "{{ tas_single_node_ctlog_enabled }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy and tas_single_node_backfill_redis.enabled }}",
@@ -121,3 +121,7 @@
 - name: Configure/Deploy RekorSearch
   ansible.builtin.include_tasks: podman/rekor_search.yml
   when: tas_single_node_rekor_search_enabled | bool
+
+- name: Configure/Deploy RekorMonitor
+  ansible.builtin.include_tasks: podman/rekor_monitor.yml
+  when: tas_single_node_rekor.monitor.enabled | bool

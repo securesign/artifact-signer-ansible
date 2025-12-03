@@ -41,9 +41,6 @@
     enabled: true
     daemon_reload: true
     name: "{{ podman_spec.systemd_file }}"
-  # Make async non-blocking only for long-running services
-  async: "{{ 45 if (podman_spec.systemd_type is not defined or podman_spec.systemd_type != 'oneshot') else 0 }}"
-  poll: "{{ 0 if (podman_spec.systemd_type is not defined or podman_spec.systemd_type != 'oneshot') else 1 }}"
   when: |
     copy_manifest.changed or copy_systemd_file.changed or
     (podman_spec.secret is defined and podman_spec.secret_changed) or
