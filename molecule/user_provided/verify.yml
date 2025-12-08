@@ -165,6 +165,32 @@
       loop_control:
         loop_var: item
 
+    - name: Verify Rekor Monitor
+      block:
+        - name: Check if Rekor Monitor pod is running
+          ansible.builtin.shell: "podman ps --filter 'name=rekor-monitor' --format '{{ '{{.Names}}' }}'"
+          register: rekor_monitor_pod
+          changed_when: false
+
+        - name: Assert Rekor Monitor pod is running
+          ansible.builtin.assert:
+            that:
+              - "'rekor-monitor-pod-rekor-monitor' in rekor_monitor_pod.stdout"
+            fail_msg: "Rekor Monitor pod is not running"
+            success_msg: "Rekor Monitor pod is running"
+
+        - name: Check Rekor Monitor logs for activity
+          ansible.builtin.shell: "podman logs rekor-monitor-pod-rekor-monitor 2>&1 | tail -n 10"
+          register: rekor_monitor_logs
+          changed_when: false
+
+        - name: Assert Rekor Monitor has processed at least one run
+          ansible.builtin.assert:
+            that:
+              - "'New monitor run' in rekor_monitor_logs.stdout"
+            fail_msg: "Rekor Monitor did not start any monitoring runs"
+            success_msg: "Rekor Monitor is actively monitoring"
+
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml

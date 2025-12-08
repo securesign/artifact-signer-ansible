@@ -6,11 +6,11 @@
         (["trillian-mysql"] if tas_single_node_trillian.database_deploy else []) +
         (["rekor-redis-storage"] if tas_single_node_rekor_redis.database_deploy else []) +
         (["redis-backfill-storage"] if tas_single_node_backfill_redis.enabled else []) +
+        (["rekor-monitor-storage"] if tas_single_node_rekor.monitor.enabled else []) +
         [
           "rekor-server",
           tas_single_node_tuf_repository_volume_name,
-          tas_single_node_tuf_signing_keys_volume_name,
-          "rekor-monitor-storage"
+          tas_single_node_tuf_signing_keys_volume_name
         ]
       }}
 
