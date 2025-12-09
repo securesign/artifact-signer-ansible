@@ -19,3 +19,4 @@ context/
 .idea/
 importer_result.json
 redhat-artifact_signer-*.tar.gz
+.ansible/
