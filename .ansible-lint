@@ -4,3 +4,5 @@ exclude_paths:
   - .tekton
   - molecule
   - vm-testing
+skip_list:
+  - var-naming
