@@ -23,31 +23,56 @@ spec:
         prometheus.io/scrape: "true"
     spec:
       initContainers:
-        - name: wait-for-rekor-server
+        - name: tuf-init
           image: "{{ tas_single_node_rekor_monitor_image }}"
+          volumeMounts:
+            - mountPath: /data
+              name: rekor-monitor-storage
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
           command:
             - /bin/sh
             - -c
             - |
               max_retries=60
               count=0
-              until curl -sf http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }} > /dev/null 2>&1; do
+              tuf_host="http://{{ tas_single_node_tuf_pod }}-pod:{{ tas_single_node_tuf_port_http }}"
+
+              until curl "${tuf_host}" > /dev/null 2>&1; do
                 count=$((count+1))
                 if [ "$count" -ge "$max_retries" ]; then
-                  echo "Timed out waiting for rekor-server after $max_retries attempts."
+                  echo "Timed out waiting for tuf-server after $max_retries attempts."
                   exit 1
                 fi
-                echo 'Waiting for rekor-server to be ready...'
+                echo 'Waiting for tuf-server to be ready...'
                 sleep 5
               done
+
+              echo "TUF server is ready."
+              echo "Downloading root.json..."
+              if ! curl "${tuf_host}/root.json" -o "/data/root.json"; then
+                echo "Failed to download root.json from ${tuf_host}"
+                exit 1
+              fi
       containers:
         - name: rekor-monitor
-          command:
-            - /bin/sh
+          command: ["/rekor_monitor"]
           args:
-            - -c
-            - exec /rekor_monitor --file=/data/checkpoint_log.txt --once=false --interval={{ tas_single_node_rekor.monitor.interval }} --url=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}
+            - "--file=/data/checkpoint_log.txt"
+            - "--once=false"
+            - "--interval={{ tas_single_node_rekor.monitor.interval | default('10m') }}"
+            - "--url=http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}"
+            - "--tuf-repository=http://{{ tas_single_node_tuf_pod }}-pod:{{ tas_single_node_tuf_port_http }}"
+            - "--tuf-root-path=/data/root.json"
           image: "{{ tas_single_node_rekor_monitor_image }}"
+          env:
+          - name: HOME
+            value: "/data"
           imagePullPolicy: IfNotPresent
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: file
