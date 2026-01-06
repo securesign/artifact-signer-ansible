@@ -16,5 +16,12 @@
             "datasourceTemplate": "docker",
             "versioningTemplate": "redhat"
         }
+    ],
+    "packageRules": [
+        {   "description" : "Pin ansible-core version <2.20 (not supported on RHEL9)",
+            "matchFileNames": ["testing-requirements.txt"],
+            "matchPackageNames": ["ansible-core", "boto3", "botocore", "awscli", "ansible-lint"],
+            "enabled": false
+        }
     ]
 }
