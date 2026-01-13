@@ -24,7 +24,7 @@ spec:
         - name: wait-for-trillian-db
           image: "{{ tas_single_node_trillian_netcat_image}}"
           imagePullPolicy: IfNotPresent
-          command: ["sh", "-c", "until nc -z -w 10 {{ tas_single_node_trillian.mysql.host }} {{ tas_single_node_trillian.mysql.port }}; do echo waiting for trillian mysql; sleep 5; done;"]
+          command: ["sh", "-c", "until nc -z -w 10 {{ tas_single_node_trillian.db.host }} {{ tas_single_node_trillian.db.port }}; do echo waiting for trillian database; sleep 5; done;"]
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
@@ -54,39 +54,45 @@ spec:
             - -c 
             - | 
               exec /trillian_log_signer \
-                --storage_system=mysql \
-                --quota_system=mysql \
-                --mysql_uri="${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOSTNAME}:${MYSQL_PORT})/${MYSQL_DATABASE}" \
+                --storage_system={{ tas_single_node_trillian.provider }} \
+                --quota_system={{ tas_single_node_trillian.provider }} \
+{% if tas_single_node_trillian.provider == "mysql" %}
+                --mysql_uri="${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOSTNAME}:${DB_PORT})/${DB_DATABASE}" \
                 --mysql_max_conns=30 \
-                --mysql_max_idle_conns=10 \
+                --mysql_max_idle_conns=10{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
+                --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem \
+                --mysql_server_name="${DB_HOSTNAME}"{% endif %} \
+{% endif %}
+{% if tas_single_node_trillian.provider == "postgresql" %}
+                --postgresql_uri="postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOSTNAME):$(DB_PORT)/$(DB_DATABASE)"{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
+                --postgresql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem{% endif %} \
+{% endif %}
                 --rpc_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_rpc }} \
                 --http_endpoint=0.0.0.0:{{ tas_single_node_trillian_logsigner_port_metrics }} \
                 --max_msg_size_bytes={{ tas_single_node_trillian.max_msg_size_bytes }} \
                 --force_master=true \
-                --alsologtostderr{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
-                --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem \
-                --mysql_server_name="${MYSQL_HOSTNAME}"{% endif %}
+                --alsologtostderr
 
           env:
-            - name: MYSQL_USER
+            - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  key: mysql-user
-                  name: trillian-mysql
-            - name: MYSQL_PASSWORD
+                  key: db-user
+                  name: trillian-db
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: mysql-password
-                  name: trillian-mysql
-            - name: MYSQL_DATABASE
+                  key: db-password
+                  name: trillian-db
+            - name: DB_DATABASE
               valueFrom:
                 secretKeyRef:
-                  key: mysql-database
-                  name: trillian-mysql
-            - name: MYSQL_HOSTNAME
-              value: "{{ tas_single_node_trillian.mysql.host }}"
-            - name: MYSQL_PORT
-              value: "{{ tas_single_node_trillian.mysql.port | quote }}"
+                  key: db-database
+                  name: trillian-db
+            - name: DB_HOSTNAME
+              value: "{{ tas_single_node_trillian.db.host }}"
+            - name: DB_PORT
+              value: "{{ tas_single_node_trillian.db.port | quote }}"
 {% if tas_single_node_trillian.trusted_ca != "" %}
             - name: SSL_CERT_DIR
               value: "/var/run/configs/tas/ca-trust"

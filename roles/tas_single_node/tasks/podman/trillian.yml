@@ -9,13 +9,13 @@
       kind: Secret
       apiVersion: v1
       metadata:
-        name: trillian-mysql
+        name: trillian-db
         namespace: trillian-system
       data:
-        mysql-root-password: "{{ tas_single_node_trillian.mysql.root_password | b64encode }}"
-        mysql-password: "{{ tas_single_node_trillian.mysql.password | b64encode }}"
-        mysql-database: "{{ tas_single_node_trillian.mysql.database | b64encode }}"
-        mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
+        db-root-password: "{{ tas_single_node_trillian.db.root_password | default('') | b64encode }}"
+        db-password: "{{ tas_single_node_trillian.db.password | b64encode }}"
+        db-database: "{{ tas_single_node_trillian.db.database | b64encode }}"
+        db-user: "{{ tas_single_node_trillian.db.user | b64encode }}"
   register: secret_result
 
 - name: Create Trillian CA certificate ConfigMap (with default empty value if not provided)

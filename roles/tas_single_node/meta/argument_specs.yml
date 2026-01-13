@@ -84,13 +84,14 @@ argument_specs:
       tas_single_node_trillian:
         description: >
           Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority.
-          You can set this to a custom MySQL or MariaDB instance.
+          You can set this to a custom MySQL/MariaDB (`'provider': mysql`) or PostgreSQL (`'provider': postgresql`) instance.
         type: "dict"
         required: false
         version_added: "1.1.0"
         default:
           database_deploy: true
-          mysql:
+          provider: mysql
+          db:
             user: mysql
             root_password: rootpassword
             password: password
@@ -104,7 +105,15 @@ argument_specs:
             type: "bool"
             required: false
             version_added: "1.1.0"
-          mysql:
+          provider:
+            description: "Database provider to use. Supported values are 'mysql' and 'postgresql'."
+            type: "str"
+            required: false
+            version_added: "1.1.0"
+            choices:
+              - mysql
+              - postgresql
+          db:
             description: "Details on the database connection."
             type: "dict"
             required: false
