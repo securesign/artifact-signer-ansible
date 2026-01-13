@@ -32,7 +32,7 @@ tas_single_node_podman_volume_create_extra_args:
   tuf_signing_keys: "--opt type=none --opt device=/home/root/volumes/tuf-signing-keys --opt o=bind"
 tas_single_node_trillian:
   database_deploy: false
-  mysql:
+  db:
     user: mysql
     root_password: rootpassword
     password: password
