@@ -1,0 +1,18 @@
+- name: Store host IP
+  ansible.builtin.set_fact:
+    host_ip: "{{ ansible_ssh_host }}"
+
+- name: Download Live Certificate
+  ansible.builtin.shell: |
+    openssl s_client -connect {{ host_ip }}:443 \
+    -servername "{{ component }}.{{ tas_single_node_base_hostname }}" < /dev/null 2>/dev/null | \
+    sed -n '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
+  register: live_cert_result
+  delegate_to: localhost
+  become: false
+
+- name: Assert live cert and configured one match
+  ansible.builtin.assert:
+    that:
+      - live_cert_result.stdout | trim == lookup('file', molecule_scenario_directory + '/test_creds/ingress_certs/ingress-' + component +'.pem')
+    fail_msg: "ERROR: Live certificate for {{ component }} does NOT match the configured file."

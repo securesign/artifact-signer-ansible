@@ -1,0 +1,136 @@
+---
+- name: Prepare
+  hosts: molecule
+  gather_facts: true
+  become: yes
+  vars:
+    users:
+      - user: testingUser
+        password: password123
+  vars_files:
+    - vars/vars.yml
+    - vars/volumes.yml
+  tasks:
+
+    - name: Configure Dex OIDC instance
+      ansible.builtin.include_tasks: ../common/dex/dex-setup.yaml
+
+    - name: Install PostgreSQL
+      ansible.builtin.yum:
+        name:
+          - postgresql-server
+          - postgresql
+        state: latest
+
+    - name: Initialize PostgreSQL database
+      ansible.builtin.command: postgresql-setup --initdb
+      args:
+        creates: /var/lib/pgsql/data/PG_VERSION
+
+    - name: Allow PostgreSQL to listen on all interfaces
+      ansible.builtin.lineinfile:
+        path: /var/lib/pgsql/data/postgresql.conf
+        regexp: '^#?listen_addresses\s*='
+        line: "listen_addresses = '*'"
+      notify: Restart PostgreSQL
+
+    - name: Allow external connections from any host (dynamic clients)
+      become: yes
+      become_user: postgres
+      ansible.builtin.lineinfile:
+        path: /var/lib/pgsql/data/pg_hba.conf
+        insertafter: EOF
+        line: "hostssl all all 0.0.0.0/0 md5"
+        state: present
+      notify: Reload PostgreSQL
+
+    - name: Enable and start PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        enabled: yes
+        state: started
+
+    - name: Set superuser password and create application user + database
+      become: yes
+      become_user: postgres
+      ansible.builtin.shell: |
+        set -e
+
+        # Set superuser password
+        psql -c "ALTER USER postgres WITH PASSWORD 'password';"
+
+        # Create database if it doesn't exist
+        psql -tc "SELECT 1 FROM pg_database WHERE datname='trillian';" | grep -q 1 || \
+          psql -c "CREATE DATABASE trillian;"
+
+        # Create application user if it doesn't exist
+        psql -tc "SELECT 1 FROM pg_roles WHERE rolname='trillian';" | grep -q 1 || \
+          psql -c "CREATE USER trillian WITH PASSWORD 'password';"
+
+        # Set application user as owner of the database
+        psql -c "ALTER DATABASE trillian OWNER TO trillian;"
+      args:
+        executable: /bin/bash
+      notify: Restart PostgreSQL
+
+
+    - name: Download Trillian schema
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/securesign/trillian/main/storage/postgresql/schema/storage.sql
+        dest: /tmp/schema.sql
+      retries: 5
+      delay: 5
+
+    - name: Import Trillian schema
+      become: yes
+      become_user: postgres
+      ansible.builtin.shell: |
+        psql -d trillian -f /tmp/schema.sql
+      args:
+        executable: /bin/bash
+
+    - name: Generate TLS certificates for MariaDB
+      ansible.builtin.shell: |
+        rm -rf /etc/postgres/ssl
+        mkdir -p /etc/postgres/ssl
+        openssl genrsa -out /etc/postgres/ssl/ca-key.pem 2048
+        openssl req -x509 -new -nodes -key /etc/postgres/ssl/ca-key.pem -sha256 -days 3650 -out /etc/postgres/ssl/ca-cert.pem -subj "/CN=CustomCA" \
+          -addext "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}"
+        openssl genrsa -out /etc/postgres/ssl/server-key.pem 2048
+        openssl req -new -key /etc/postgres/ssl/server-key.pem -out /etc/postgres/ssl/server-req.pem -subj "/CN=PostgreSQLServer" \
+            -addext "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}"
+        openssl x509 -req -in /etc/postgres/ssl/server-req.pem -CA /etc/postgres/ssl/ca-cert.pem -CAkey /etc/postgres/ssl/ca-key.pem -CAcreateserial \
+            -out /etc/postgres/ssl/server-cert.pem -days 365 -sha256 -extfile <(printf "subjectAltName=DNS:localhost,IP:{{ ansible_default_ipv4.address }}")
+
+        chmod 600 /etc/postgres/ssl/*.pem
+        chown postgres:postgres /etc/postgres/ssl/*.pem
+      args:
+        creates: /etc/postgres/ssl/server-cert.pem
+
+    - name: Configure TLS for PostgreSQL
+      ansible.builtin.blockinfile:
+        path: /var/lib/pgsql/data/postgresql.conf
+        block: |
+          ssl = on
+          ssl_ca_file = '/etc/postgres/ssl/ca-cert.pem'
+          ssl_cert_file = '/etc/postgres/ssl/server-cert.pem'
+          ssl_key_file = '/etc/postgres/ssl/server-key.pem'
+      notify: Restart PostgreSQL
+
+    - name: Create directory for volumes
+      file:
+        path: "/home/root/volumes/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ volumes }}"
+
+  handlers:
+    - name: Restart PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+    - name: Reload PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: reloaded

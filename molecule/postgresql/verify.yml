@@ -1,0 +1,196 @@
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars:
+    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
+  vars_files:
+    - vars/vars.yml
+    - vars/volumes.yml
+  tasks:
+    - name: Verify fulcio config
+      block:
+      - name: Read fulcio config on molecule
+        ansible.builtin.slurp:
+          src: "{{ item.system_path }}"
+        register: fulcio_configs
+        loop:
+          - { msg: "fulcio.key", system_path: "/etc/rhtas/certs/fulcio.key" }
+          - { msg: "fulcio.pem", system_path: "/etc/rhtas/certs/fulcio.pem" }
+        loop_control:
+          label: "{{ item.msg }}"
+
+      - name: Assert that user-provided fulcio key and certificate were taken by TAS
+        ansible.builtin.assert:
+          that:
+            - "{{ item.test_content | b64encode == item.fulcio_config['content'] }}"
+          fail_msg: "{{ item.msg }} was not taken by TAS"
+          success_msg: "{{ item.msg }} was taken by TAS"
+        loop:
+          - { msg: "fulcio.key", test_content: "{{ tas_single_node_fulcio.private_key }}", fulcio_config: "{{ fulcio_configs.results[0] }}" }
+          - { msg: "fulcio.pem", test_content: "{{ tas_single_node_fulcio.root_ca }}", fulcio_config: "{{ fulcio_configs.results[1] }}" }
+        loop_control:
+          label: "{{ item.msg }}"
+
+    - name: Verify ctlog config
+      block:
+        - name: Read ctlog config on molecule
+          ansible.builtin.slurp:
+            src: "{{ item.system_path }}"
+          register: ctlog_configs
+          loop:
+            - { msg: "ctlog0.key", system_path: "/etc/rhtas/certs/ctlog0.key" }
+            - { msg: "ctlog0.pub", system_path: "/etc/rhtas/certs/ctlog0.pub" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+        - name: Assert that user-provided ctlog keys were taken by TAS
+          ansible.builtin.assert:
+            that:
+              - "{{ item.test_content.key | b64encode == item.ctlog_config['content'] }}"
+            fail_msg: "{{ item.msg }} was not taken by TAS"
+            success_msg: "{{ item.msg }} was taken by TAS"
+          loop:
+            - { msg: "ctlog0.key", test_content: "{{ tas_single_node_ctlog.private_keys[0] }}", ctlog_config: "{{ ctlog_configs.results[0] }}" }
+            - { msg: "ctlog0.pub", test_content: "{{ tas_single_node_ctlog.public_keys[0] }}", ctlog_config: "{{ ctlog_configs.results[1] }}" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+    - name: Verify Rekor config
+      block:
+        - name: Read Rekor config on molecule
+          ansible.builtin.slurp:
+            src: "{{ item.system_path }}"
+          register: rekor_configs
+          loop:
+            - { msg: "rekor0.key", system_path: "/etc/rhtas/certs/rekor-signer0.key" }
+            - { msg: "rekor0.pub", system_path: "/etc/rhtas/certs/rekor-pub-key0.pub" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+        - name: Assert that user-provided rekor keys were taken by TAS
+          ansible.builtin.assert:
+            that:
+              - "{{ item.test_content | b64encode == item.rekor_config['content'] }}"
+            fail_msg: "{{ item.msg }} was not taken by TAS"
+            success_msg: "{{ item.msg }} was taken by TAS"
+          loop:
+            - { msg: "rekor0.key", test_content: "{{ tas_single_node_rekor.private_keys[0].key }}", rekor_config: "{{ rekor_configs.results[0] }}" }
+            - { msg: "rekor0.pub", test_content: "{{ tas_single_node_rekor.public_keys[0].key }}", rekor_config: "{{ rekor_configs.results[1] }}" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+    - name: Verify TSA config
+      block:
+        - name: Read TSA config on molecule
+          ansible.builtin.slurp:
+            src: "{{ item.system_path }}"
+          register: tsa_configs
+          loop:
+            - { msg: "signer.pem", system_path: "/etc/rhtas/certs/tsa-signer-private-key.pem" }
+            - { msg: "certchain.pem", system_path: "/etc/rhtas/certs/tsa-cert-chain.pem" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+        - name: Assert that user-provided TSA keys were taken by TAS
+          ansible.builtin.assert:
+            that:
+              - "{{ item.test_content | b64encode == item.tsa_config['content'] }}"
+            fail_msg: "{{ item.msg }} was not taken by TAS"
+            success_msg: "{{ item.msg }} was taken by TAS"
+          loop:
+            - { msg: "signer.pem", test_content: "{{ tas_single_node_tsa.signer_private_key }}", tsa_config: "{{ tsa_configs.results[0] }}" }
+            - { msg: "certchain.pem", test_content: "{{ tas_single_node_tsa.certificate_chain }}", tsa_config: "{{ tsa_configs.results[1] }}" }
+          loop_control:
+            label: "{{ item.msg }}"
+
+    - name: Verify storage options
+      block:
+        - name: Load volume info
+          containers.podman.podman_volume_info:
+            name: "{{ volume_name }}"
+          register: volume_info
+          loop: "{{ volumes }}"
+          loop_control:
+            loop_var: volume_name
+
+        - name: Assert that volumes were created with specific options
+          ansible.builtin.assert:
+            that:
+              - "'/home/root/volumes/' + item.volume_name in item.volumes[0].Options.device"
+              - "'bind' in item.volumes[0].Options.o"
+              - "'none' in item.volumes[0].Options.type"
+            msg: "Volume '{{ item.volume_name }}' was not created with the expected options."
+          loop: "{{ volume_info.results }}"
+
+    - name: Verify that TUF repository was initialized on mounted volume
+      block:
+        - name: Check if the directory is not empty
+          ansible.builtin.stat:
+            path: "{{ '/home/root/volumes/' + item | regex_replace('_', '-') }}"
+          register: directory_stats
+          loop:
+            - tuf_repository
+            - tuf_signing_keys
+
+        - name: Assert the directories are not empty
+          ansible.builtin.assert:
+            that:
+              - item.stat.exists
+              - item.stat.isdir
+              - item.stat.size > 0
+            msg: "The directory '{{ item.stat.path }}' is either empty or does not exist."
+          loop: "{{ directory_stats.results }}"
+
+    - name: Check if the cockpit monitor is Available (HTTP 200)
+      ansible.builtin.uri:
+        url: "https://{{ ansible_ssh_host }}:9090"
+        method: GET
+        validate_certs: false
+        status_code: 200
+        timeout: 30
+
+    - name: Verify ingress certs against configured files
+      ansible.builtin.include_tasks:
+          file: tasks/verify_ingress_certs.yml
+      vars:
+        component: "{{ item }}"
+      loop:
+        - fulcio
+        - rekor
+        - rekor-search
+        - cli-server
+        - tuf
+        - tsa
+      loop_control:
+        loop_var: item
+
+    - name: Verify Rekor Monitor
+      block:
+        - name: Check if Rekor Monitor pod is running
+          ansible.builtin.shell: "podman ps --filter 'name=rekor-monitor' --format '{{ '{{.Names}}' }}'"
+          register: rekor_monitor_pod
+          changed_when: false
+
+        - name: Assert Rekor Monitor pod is running
+          ansible.builtin.assert:
+            that:
+              - "'rekor-monitor-pod-rekor-monitor' in rekor_monitor_pod.stdout"
+            fail_msg: "Rekor Monitor pod is not running"
+            success_msg: "Rekor Monitor pod is running"
+
+        - name: Check Rekor Monitor logs for activity
+          ansible.builtin.shell: "podman logs rekor-monitor-pod-rekor-monitor 2>&1 | tail -n 10"
+          register: rekor_monitor_logs
+          changed_when: false
+
+        - name: Assert Rekor Monitor has processed at least one run
+          ansible.builtin.assert:
+            that:
+              - "'New monitor run' in rekor_monitor_logs.stdout"
+            fail_msg: "Rekor Monitor did not start any monitoring runs"
+            success_msg: "Rekor Monitor is actively monitoring"
+
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
