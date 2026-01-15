@@ -73,9 +73,9 @@ spec:
                   key: db-database
                   name: trillian-db
             - name: DB_HOSTNAME
-              value: "{{ tas_single_node_trillian.db.host }}"
+              value: "{{ tas_db_config.host }}"
             - name: DB_PORT
-              value: "{{ tas_single_node_trillian.db.port | quote }}"
+              value: "{{ tas_db_config.port | quote }}"
 {% if tas_single_node_trillian.trusted_ca != "" %}
             - name: SSL_CERT_DIR
               value: "/var/run/configs/tas/ca-trust"
@@ -92,7 +92,7 @@ spec:
         - name: wait-for-trillian-db
           image: "{{ tas_single_node_trillian_netcat_image }}"
           imagePullPolicy: IfNotPresent
-          command: ["sh", "-c", "until nc -z -w 10 {{ tas_single_node_trillian.db.host }} {{ tas_single_node_trillian.db.port }}; do echo waiting for trillian database; sleep 5; done;"]
+          command: ["sh", "-c", "until nc -z -w 10 {{ tas_db_config.host }} {{ tas_db_config.port }}; do echo waiting for trillian database; sleep 5; done;"]
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
