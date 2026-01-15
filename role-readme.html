@@ -66,7 +66,7 @@
 </tr>
 <tr>
 <td>tas_single_node_trillian</td>
-<td>Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL/MariaDB (<code>'provider': mysql</code>) or PostgreSQL (<code>'provider': postgresql</code>) instance.</td>
+<td>Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL/MariaDB (<code>'provider': mysql</code>) or PostgreSQL (<code>'provider': postgresql</code>) instance. <strong>Deprecation notice</strong>: The top-level <code>mysql</code> key is <strong>deprecated</strong> since version 1.4.0 (or whenever you introduced <code>db</code>) and will be <strong>removed in the next major release</strong>. Please migrate to the new generic <code>db</code> key for database connection details. Existing playbooks using only <code>mysql</code> will continue to work until removal, with a runtime deprecation warning shown.</td>
 <td>dict of 'tas_single_node_trillian' options</td>
 <td><code>{'database_deploy': True, 'provider': 'mysql', 'db': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}</code></td>
 </tr>
@@ -335,7 +335,7 @@
 </tr>
 <tr>
 <td>db</td>
-<td>Details on the database connection.</td>
+<td><strong>Preferred</strong> — Details on the database connection (replaces the deprecated <code>mysql</code> key). Use this key for both MySQL/MariaDB and PostgreSQL configurations. The old <code>mysql</code> key is deprecated — migrate to this one to prepare for future releases. See the top-level <code>tas_single_node_trillian</code> description for deprecation details.</td>
 <td>dict of 'db' options</td>
 <td>no</td>
 <td></td>
