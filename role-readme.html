@@ -68,7 +68,7 @@
 <td>tas_single_node_trillian</td>
 <td>Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL/MariaDB (<code>'provider': mysql</code>) or PostgreSQL (<code>'provider': postgresql</code>) instance. <strong>Deprecation notice</strong>: The top-level <code>mysql</code> key is <strong>deprecated</strong> since version 1.4.0 (or whenever you introduced <code>db</code>) and will be <strong>removed in the next major release</strong>. Please migrate to the new generic <code>db</code> key for database connection details. Existing playbooks using only <code>mysql</code> will continue to work until removal, with a runtime deprecation warning shown.</td>
 <td>dict of 'tas_single_node_trillian' options</td>
-<td><code>{'database_deploy': True, 'provider': 'mysql', 'db': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}</code></td>
+<td><code>{'database_deploy': True, 'provider': 'mysql', 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}</code></td>
 </tr>
 <tr>
 <td>tas_single_node_ingress_certificates</td>
@@ -341,6 +341,13 @@
 <td></td>
 </tr>
 <tr>
+<td>mysql</td>
+<td><strong>Deprecated</strong> — Legacy MySQL configuration. This key is kept for backward compatibility only and will be removed in the next major release. Migrate to the <code>db</code> key.</td>
+<td>dict of 'mysql' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
 <td>trusted_ca</td>
 <td>Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database. This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges.</td>
 <td>str</td>
@@ -399,6 +406,62 @@
 <tr>
 <td>database</td>
 <td>The database name to connect to.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_trillian &gt; mysql</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>host</td>
+<td>The MySQL database host.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>port</td>
+<td>The MySQL database port.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>user</td>
+<td>The MySQL database user.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>password</td>
+<td>The MySQL database password.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>root_password</td>
+<td>The MySQL database root password.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>database</td>
+<td>The MySQL database name.</td>
 <td>str</td>
 <td>no</td>
 <td></td>
