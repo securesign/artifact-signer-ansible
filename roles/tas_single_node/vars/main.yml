@@ -45,6 +45,7 @@ _tas_single_node_backfill_redis:
 
 _tas_single_node_trillian:
   database_deploy: true
+  provider: mysql
   mysql:
     user: mysql
     root_password: rootpassword
