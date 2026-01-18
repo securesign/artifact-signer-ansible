@@ -96,7 +96,7 @@ argument_specs:
         default:
           database_deploy: true
           provider: mysql
-          db:
+          mysql:
             user: mysql
             root_password: rootpassword
             password: password
@@ -157,6 +157,47 @@ argument_specs:
                 version_added: "1.1.0"
               database:
                 description: "The database name to connect to."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+          mysql:
+            description: >
+              **Deprecated** — Legacy MySQL configuration.
+
+              This key is kept for backward compatibility only and will be removed
+              in the next major release.
+              Migrate to the `db` key.
+            type: "dict"
+            required: false
+            version_added: "1.1.0"
+            options:
+              host:
+                description: "The MySQL database host."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              port:
+                description: "The MySQL database port."
+                type: "int"
+                required: false
+                version_added: "1.1.0"
+              user:
+                description: "The MySQL database user."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              password:
+                description: "The MySQL database password."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              root_password:
+                description: "The MySQL database root password."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              database:
+                description: "The MySQL database name."
                 type: "str"
                 required: false
                 version_added: "1.1.0"

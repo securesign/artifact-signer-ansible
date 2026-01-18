@@ -1,0 +1,12 @@
+---
+- name: Parse out instance UUID
+  ansible.builtin.set_fact:
+    tf_instance_uuid: "{{ item.stdout | regex_search('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}') }}"
+
+- name: Parse out instance username and IP address
+  ansible.builtin.set_fact:
+    tf_instance_user_ip: "{{ item.stdout | regex_search('(\\S+)@([0-9\\.]+)', '\\1', '\\2') }}"
+
+- name: Create attribute dictionary for this instance
+  ansible.builtin.set_fact:
+    tf_parsed_results: "{{ tf_parsed_results + [{'uuid': tf_instance_uuid, 'username': tf_instance_user_ip[0], 'ip': tf_instance_user_ip[1]}] }}"

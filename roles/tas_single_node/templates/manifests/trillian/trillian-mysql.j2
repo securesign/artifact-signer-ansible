@@ -53,23 +53,23 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: db-root-password
-                  name: trillian-db
+                  key: mysql-root-password
+                  name: trillian-mysql
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  key: db-user
-                  name: trillian-db
+                  key: mysql-user
+                  name: trillian-mysql
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: db-password
-                  name: trillian-db
+                  key: mysql-password
+                  name: trillian-mysql
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
-                  key: db-database
-                  name: trillian-db
+                  key: mysql-database
+                  name: trillian-mysql
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File

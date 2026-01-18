@@ -9,8 +9,20 @@
         password: password123
   vars_files:
     - vars/vars.yml
-    - vars/volumes.yml
   tasks:
+
+    - name: Install dnf versionlock plugin
+      ansible.builtin.package:
+        name: "python3-dnf-plugin-versionlock"
+        state: latest
+
+    # Ensure we test with the base RHEL 9.4 podman version.
+    # We're ok with doing this only in the default scenario - if we get later
+    # version in other scenarios, we actually get better test coverage for
+    # different podman versions.
+    - name: Lock podman to version 4.9
+      ansible.builtin.command:
+        cmd: "dnf versionlock add 'podman-4:4.9.4-16.el9_4.x86_64'"
 
     - name: Configure Dex OIDC instance
       ansible.builtin.include_tasks: ../common/dex/dex-setup.yaml
@@ -116,13 +128,6 @@
           ssl_cert_file = '/etc/postgres/ssl/server-cert.pem'
           ssl_key_file = '/etc/postgres/ssl/server-key.pem'
       notify: Restart PostgreSQL
-
-    - name: Create directory for volumes
-      file:
-        path: "/home/root/volumes/{{ item }}"
-        state: directory
-        mode: '0755'
-      loop: "{{ volumes }}"
 
   handlers:
     - name: Restart PostgreSQL

@@ -19,7 +19,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_podman_network | Name of the Podman network for containers to use. | str |  `rhtas`  |
 | tas_single_node_rekor_redis | Details on the Redis connection for Rekor. You can set this to a custom Redis instance. | dict of 'tas_single_node_rekor_redis' options |  `{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}`  |
 | tas_single_node_backfill_redis | Configuration options for the backfill redis job. | dict of 'tas_single_node_backfill_redis' options |  `{'enabled': True, 'schedule': '*-*-* 00:00:00'}`  |
-| tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL/MariaDB (`'provider': mysql`) or PostgreSQL (`'provider': postgresql`) instance. **Deprecation notice**: The top-level `mysql` key is **deprecated** since version 1.4.0 (or whenever you introduced `db`) and will be **removed in the next major release**. Please migrate to the new generic `db` key for database connection details. Existing playbooks using only `mysql` will continue to work until removal, with a runtime deprecation warning shown. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'provider': 'mysql', 'db': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
+| tas_single_node_trillian | Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL/MariaDB (`'provider': mysql`) or PostgreSQL (`'provider': postgresql`) instance. **Deprecation notice**: The top-level `mysql` key is **deprecated** since version 1.4.0 (or whenever you introduced `db`) and will be **removed in the next major release**. Please migrate to the new generic `db` key for database connection details. Existing playbooks using only `mysql` will continue to work until removal, with a runtime deprecation warning shown. | dict of 'tas_single_node_trillian' options |  `{'database_deploy': True, 'provider': 'mysql', 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}`  |
 | tas_single_node_ingress_certificates | Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server. | dict of 'tas_single_node_ingress_certificates' options |  `{'root': {'ca_certificate': '', 'private_key': ''}, 'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}`  |
 | tas_single_node_fulcio | Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. **Note**: Updating any of the certificate attributes (such as `organization_name`, `organization_email`, or `common_name`) or the Certificate Authority passphrase (`ca_passphrase`) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root. | dict of 'tas_single_node_fulcio' options |  `{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': [], 'ci_issuer_metadata': []}}`  |
 | tas_single_node_rekor | Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more. | dict of 'tas_single_node_rekor' options |  |
@@ -74,6 +74,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | database_deploy | Whether or not to deploy the database. | bool | no |  |
 | provider | Database provider to use. Supported values are 'mysql' and 'postgresql'. | str | no |  |
 | db | **Preferred** — Details on the database connection (replaces the deprecated `mysql` key). Use this key for both MySQL/MariaDB and PostgreSQL configurations. The old `mysql` key is deprecated — migrate to this one to prepare for future releases. See the top-level `tas_single_node_trillian` description for deprecation details. | dict of 'db' options | no |  |
+| mysql | **Deprecated** — Legacy MySQL configuration. This key is kept for backward compatibility only and will be removed in the next major release. Migrate to the `db` key. | dict of 'mysql' options | no |  |
 | trusted_ca | Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database. This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges. | str | no |  |
 
 #### Options for main > tas_single_node_trillian > db
@@ -86,6 +87,17 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | user | The database user. | str | no |  |
 | root_password | The root password for the database. | str | no |  |
 | database | The database name to connect to. | str | no |  |
+
+#### Options for main > tas_single_node_trillian > mysql
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| host | The MySQL database host. | str | no |  |
+| port | The MySQL database port. | int | no |  |
+| user | The MySQL database user. | str | no |  |
+| password | The MySQL database password. | str | no |  |
+| root_password | The MySQL database root password. | str | no |  |
+| database | The MySQL database name. | str | no |  |
 
 #### Options for main > tas_single_node_ingress_certificates
 
