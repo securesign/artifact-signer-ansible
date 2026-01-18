@@ -23,7 +23,6 @@ jobs:
           - default
           - user_provided
           - postgresql
-          - postgresql1
           - key_rotation
           - backup_restore_migrate
     steps:
