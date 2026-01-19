@@ -95,7 +95,6 @@ argument_specs:
         version_added: "1.1.0"
         default:
           database_deploy: true
-          provider: mysql
           mysql:
             user: mysql
             root_password: rootpassword
