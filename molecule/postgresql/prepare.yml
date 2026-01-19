@@ -101,7 +101,7 @@
       args:
         executable: /bin/bash
 
-    - name: Generate TLS certificates for MariaDB
+    - name: Generate TLS certificates for PostgreSQL
       ansible.builtin.shell: |
         rm -rf /etc/postgres/ssl
         mkdir -p /etc/postgres/ssl

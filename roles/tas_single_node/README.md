@@ -72,7 +72,6 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
 | database_deploy | Whether or not to deploy the database. | bool | no |  |
-| provider | Database provider to use. Supported values are 'mysql' and 'postgresql'. | str | no |  |
 | db | **Preferred** — Details on the database connection (replaces the deprecated `mysql` key). Use this key for both MySQL/MariaDB and PostgreSQL configurations. The old `mysql` key is deprecated — migrate to this one to prepare for future releases. See the top-level `tas_single_node_trillian` description for deprecation details. | dict of 'db' options | no |  |
 | mysql | **Deprecated** — Legacy MySQL configuration. This key is kept for backward compatibility only and will be removed in the next major release. Migrate to the `db` key. | dict of 'mysql' options | no |  |
 | trusted_ca | Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database. This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges. | str | no |  |
@@ -81,6 +80,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 
 |Option|Description|Type|Required|Default|
 |---|---|---|---|---|
+| provider | Database provider to use. Supported values are 'mysql' and 'postgresql'. | str | no |  |
 | host | The database host. | str | no |  |
 | port | The database host port number. | int | no |  |
 | password | The database password. | str | no |  |

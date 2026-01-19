@@ -4,6 +4,11 @@
     tas_db_config: >-
       {{ tas_single_node_trillian.db | default(tas_single_node_trillian.mysql, true) | default({}) }}
 
+- name: Set Trillian DB provider
+  ansible.builtin.set_fact:
+    tas_trillian_db_provider: >-
+      {{ 'postgresql' if tas_single_node_trillian.db is defined and tas_single_node_trillian.db.provider == "postgresql" else 'mysql' }}
+
 - name: Show deprecation warning when old mysql key is used
   ansible.builtin.debug:
     msg: |
@@ -14,7 +19,6 @@
       The 'mysql' key will be removed in the next major release.
   when:
     - tas_single_node_trillian.mysql is defined
-    - tas_single_node_trillian.db is not defined
   run_once: true
   delegate_to: localhost
 
@@ -26,7 +30,7 @@
   vars:
     secret_content: >-
       {{
-        mysql_secret if tas_single_node_trillian.provider | default('mysql') == 'mysql'
+        mysql_secret if tas_trillian_db_provider == "mysql"
         else postgres_secret
       }}
 

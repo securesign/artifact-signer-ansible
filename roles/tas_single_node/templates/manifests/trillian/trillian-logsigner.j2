@@ -54,16 +54,16 @@ spec:
             - -c 
             - | 
               exec /trillian_log_signer \
-                --storage_system={{ tas_single_node_trillian.provider }} \
-                --quota_system={{ tas_single_node_trillian.provider }} \
-{% if tas_single_node_trillian.provider == "mysql" %}
+                --storage_system={{ tas_trillian_db_provider }} \
+                --quota_system={{ tas_trillian_db_provider }} \
+{% if tas_trillian_db_provider == "mysql" %}
                 --mysql_uri="${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOSTNAME}:${DB_PORT})/${DB_DATABASE}" \
                 --mysql_max_conns=30 \
                 --mysql_max_idle_conns=10{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
                 --mysql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem \
                 --mysql_server_name="${DB_HOSTNAME}"{% endif %} \
 {% endif %}
-{% if tas_single_node_trillian.provider == "postgresql" %}
+{% if tas_trillian_db_provider == "postgresql" %}
                 --postgresql_uri="postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOSTNAME):$(DB_PORT)/$(DB_DATABASE)"{% if tas_single_node_trillian.trusted_ca != "" and not tas_single_node_trillian.database_deploy %} \
                 --postgresql_tls_ca=/var/run/configs/tas/ca-trust/trillian-trusted-ca.pem{% endif %} \
 {% endif %}
@@ -77,18 +77,18 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  key: "{{ 'mysql-user' if tas_single_node_trillian.provider | default('mysql') == 'mysql' else 'db-user' }}"
-                  name: "{{ 'trillian-mysql' if tas_single_node_trillian.provider | default('mysql') == 'mysql' else 'trillian-db' }}"
+                  key: "{{ 'mysql-user' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'db-user' }}"
+                  name: "{{ 'trillian-mysql' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'trillian-db' }}"
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: "{{ 'mysql-password' if tas_single_node_trillian.provider | default('mysql') == 'mysql' else 'db-password' }}"
-                  name: "{{ 'trillian-mysql' if tas_single_node_trillian.provider | default('mysql') == 'mysql' else 'trillian-db' }}"
+                  key: "{{ 'mysql-password' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'db-password' }}"
+                  name: "{{ 'trillian-mysql' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'trillian-db' }}"
             - name: DB_DATABASE
               valueFrom:
                 secretKeyRef:
-                  key: "{{ 'mysql-database' if tas_single_node_trillian.provider | default('mysql') == 'mysql' else 'db-database' }}"
-                  name: "{{ 'trillian-mysql' if tas_single_node_trillian.provider | default('mysql') == 'mysql' else 'trillian-db' }}"
+                  key: "{{ 'mysql-database' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'db-database' }}"
+                  name: "{{ 'trillian-mysql' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'trillian-db' }}"
             - name: DB_HOSTNAME
               value: "{{ tas_db_config.host }}"
             - name: DB_PORT

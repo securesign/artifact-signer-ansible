@@ -110,14 +110,6 @@ argument_specs:
             type: "bool"
             required: false
             version_added: "1.1.0"
-          provider:
-            description: "Database provider to use. Supported values are 'mysql' and 'postgresql'."
-            type: "str"
-            required: false
-            version_added: "1.1.0"
-            choices:
-              - mysql
-              - postgresql
           db:
             description: >
               **Preferred** — Details on the database connection (replaces the deprecated `mysql` key).
@@ -130,6 +122,14 @@ argument_specs:
             required: false
             version_added: "1.1.0"
             options:
+              provider:
+                description: "Database provider to use. Supported values are 'mysql' and 'postgresql'."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+                choices:
+                  - mysql
+                  - postgresql
               host:
                 description: "The database host."
                 type: "str"

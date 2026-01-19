@@ -243,8 +243,8 @@ Add the following to the installation playbook, `play.yml`:
 ```yaml
 tas_single_node_trillian:
     database_deploy: false
-    provider: mysql
     db:
+        provider: mysql
         user: <username>
         root_password: <rootpassword>
         password: <password>

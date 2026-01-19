@@ -17,8 +17,8 @@ tas_single_node_registry_username: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_U
 tas_single_node_registry_password: "{{ lookup('env', 'TAS_SINGLE_NODE_REGISTRY_PASSWORD') }}"
 tas_single_node_trillian:
   database_deploy: false
-  provider: postgresql
   db:
+    provider: postgresql
     user: postgres
     password: password
     database: trillian
