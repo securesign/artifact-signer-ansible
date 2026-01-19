@@ -201,8 +201,8 @@ Make note the instance's hostname, port, username, password, and root's password
 Add the following to the installation playbook, <code>play.yml</code>:</p>
 <pre><code>tas_single_node_trillian:
     database_deploy: false
-    provider: mysql
     db:
+        provider: mysql
         user: &lt;username&gt;
         root_password: &lt;rootpassword&gt;
         password: &lt;password&gt;

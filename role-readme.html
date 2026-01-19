@@ -327,13 +327,6 @@
 <td></td>
 </tr>
 <tr>
-<td>provider</td>
-<td>Database provider to use. Supported values are 'mysql' and 'postgresql'.</td>
-<td>str</td>
-<td>no</td>
-<td></td>
-</tr>
-<tr>
 <td>db</td>
 <td><strong>Preferred</strong> — Details on the database connection (replaces the deprecated <code>mysql</code> key). Use this key for both MySQL/MariaDB and PostgreSQL configurations. The old <code>mysql</code> key is deprecated — migrate to this one to prepare for future releases. See the top-level <code>tas_single_node_trillian</code> description for deprecation details.</td>
 <td>dict of 'db' options</td>
@@ -368,6 +361,13 @@
 </tr>
 </thead>
 
+<tr>
+<td>provider</td>
+<td>Database provider to use. Supported values are 'mysql' and 'postgresql'.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
 <tr>
 <td>host</td>
 <td>The database host.</td>
