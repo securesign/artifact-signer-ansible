@@ -77,18 +77,18 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  key: "{{ 'mysql-user' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'db-user' }}"
-                  name: "{{ 'trillian-mysql' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'trillian-db' }}"
+                  key: db-user
+                  name: trillian-db
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: "{{ 'mysql-password' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'db-password' }}"
-                  name: "{{ 'trillian-mysql' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'trillian-db' }}"
+                  key: db-password
+                  name: trillian-db
             - name: DB_DATABASE
               valueFrom:
                 secretKeyRef:
-                  key: "{{ 'mysql-database' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'db-database' }}"
-                  name: "{{ 'trillian-mysql' if tas_trillian_db_provider | default('mysql') == 'mysql' else 'trillian-db' }}"
+                  key: db-database
+                  name: trillian-db
             - name: DB_HOSTNAME
               value: "{{ tas_db_config.host }}"
             - name: DB_PORT

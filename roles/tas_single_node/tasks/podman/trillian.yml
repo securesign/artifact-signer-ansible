@@ -28,31 +28,14 @@
     dest: "{{ tas_single_node_trillian_secret }}"
     mode: "0600"
   vars:
-    secret_content: >-
-      {{
-        mysql_secret if tas_trillian_db_provider == "mysql"
-        else postgres_secret
-      }}
-
-    mysql_secret:
-      kind: Secret
-      apiVersion: v1
-      metadata:
-        name: trillian-mysql
-        namespace: trillian-system
-      data:
-        mysql-root-password: "{{ tas_db_config.root_password | b64encode }}"
-        mysql-password: "{{ tas_db_config.password | b64encode }}"
-        mysql-database: "{{ tas_db_config.database | b64encode }}"
-        mysql-user: "{{ tas_db_config.user | b64encode }}"
-
-    postgres_secret:
+    secret_content:
       kind: Secret
       apiVersion: v1
       metadata:
         name: trillian-db
         namespace: trillian-system
       data:
+        db-root-password: "{{ tas_db_config.root_password | default('') | b64encode }}"
         db-password: "{{ tas_db_config.password | b64encode }}"
         db-database: "{{ tas_db_config.database | b64encode }}"
         db-user: "{{ tas_db_config.user | b64encode }}"

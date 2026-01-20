@@ -43,6 +43,7 @@ fi
 
 env
 cd /test
+rm -f *.txt *.bundle *.timestamp
 FILENAME="$(date +%Y%m%d%H%M%S)"
 cosign initialize
 
