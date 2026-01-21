@@ -53,7 +53,6 @@ cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identit
 validation_counter=0
 for file in /test/*.txt; do
   if [ -f "$file" ]; then  # Check if it is a regular file
-    [ -f "${file%.*}.bundle" ] || continue # Avoid cosign failure on missing bundle
     echo "Executing cosign verification on file: $file"
     cosign --verbose verify-blob \
         --certificate-identity="${EMAIL}" \
