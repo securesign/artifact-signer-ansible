@@ -1,4 +1,13 @@
 ---
+- name: Validate auto-deployed database provider
+  ansible.builtin.assert:
+    that:
+      - not tas_single_node_trillian.database_deploy | bool
+        or tas_single_node_trillian.db.provider == 'mysql'
+    fail_msg: >
+      Only MySQL can be auto-deployed.
+      Set db.provider=mysql or disable database_deploy.
+
 - name: Set unified database configuration (backward compatible)
   ansible.builtin.set_fact:
     tas_db_config: >-
@@ -7,7 +16,7 @@
 - name: Set Trillian DB provider
   ansible.builtin.set_fact:
     tas_trillian_db_provider: >-
-      {{ 'postgresql' if tas_single_node_trillian.db is defined and tas_single_node_trillian.db.provider == "postgresql" else 'mysql' }}
+      {{ tas_single_node_trillian.get('db', {}).get('provider', 'mysql') }}
 
 - name: Show deprecation warning when old mysql key is used
   ansible.builtin.debug:

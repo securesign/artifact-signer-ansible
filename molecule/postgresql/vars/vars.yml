@@ -24,3 +24,4 @@ tas_single_node_trillian:
     database: trillian
     host: "{{ ansible_default_ipv4.address }}"
     port: 5432
+  trusted_ca: "{{ ca_cert_content.content | b64decode }}"
