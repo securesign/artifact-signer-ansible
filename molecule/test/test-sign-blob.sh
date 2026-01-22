@@ -46,15 +46,6 @@ cd /test
 FILENAME="$(date +%Y%m%d%H%M%S)"
 cosign initialize
 
-# --- PRIME REKOR CONNECTION ---
-echo "Priming Rekor connection to trillian..."
-TMP_PRIME="rekor-prime"
-echo "prime" > "$TMP_PRIME.txt"
-
-cosign sign-blob "$TMP_PRIME.txt" --identity-token="${TOKEN}" --bundle "$TMP_PRIME.bundle" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$TMP_PRIME.timestamp" || true
-rm -f -- "$TMP_PRIME"*
-echo "Rekor primed"
-
 echo "testing" > "$FILENAME.txt"
 
 cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
