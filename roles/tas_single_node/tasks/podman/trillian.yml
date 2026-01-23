@@ -1,4 +1,36 @@
 ---
+- name: Set unified database configuration (backward compatible)
+  ansible.builtin.set_fact:
+    tas_db_config: >-
+      {{ tas_single_node_trillian.db | default(tas_single_node_trillian.mysql, true) | default({}) }}
+
+- name: Set Trillian DB provider
+  ansible.builtin.set_fact:
+    tas_trillian_db_provider: >-
+      {{ tas_single_node_trillian.get('db', {}).get('provider', 'mysql') }}
+
+- name: Validate auto-deployed database provider
+  ansible.builtin.assert:
+    that:
+      - not tas_single_node_trillian.database_deploy | bool
+        or tas_trillian_db_provider == 'mysql'
+    fail_msg: >
+      Only MySQL can be auto-deployed.
+      Set db.provider=mysql or disable database_deploy.
+
+- name: Show deprecation warning when old mysql key is used
+  ansible.builtin.debug:
+    msg: |
+      DEPRECATION WARNING:
+      You are using the deprecated 'mysql' key under
+      tas_single_node_trillian.
+      Please migrate to the new 'db' key.
+      The 'mysql' key will be removed in the next major release.
+  when:
+    - tas_single_node_trillian.mysql is defined
+  run_once: true
+  delegate_to: localhost
+
 - name: Create Trillian Secret
   ansible.builtin.copy:
     content: "{{ secret_content | to_nice_yaml(indent=2) }}"
@@ -9,13 +41,13 @@
       kind: Secret
       apiVersion: v1
       metadata:
-        name: trillian-mysql
+        name: trillian-db
         namespace: trillian-system
       data:
-        mysql-root-password: "{{ tas_single_node_trillian.mysql.root_password | b64encode }}"
-        mysql-password: "{{ tas_single_node_trillian.mysql.password | b64encode }}"
-        mysql-database: "{{ tas_single_node_trillian.mysql.database | b64encode }}"
-        mysql-user: "{{ tas_single_node_trillian.mysql.user | b64encode }}"
+        db-root-password: "{{ tas_db_config.root_password | default('') | b64encode }}"
+        db-password: "{{ tas_db_config.password | b64encode }}"
+        db-database: "{{ tas_db_config.database | b64encode }}"
+        db-user: "{{ tas_db_config.user | b64encode }}"
   register: secret_result
 
 - name: Create Trillian CA certificate ConfigMap (with default empty value if not provided)

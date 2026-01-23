@@ -22,6 +22,7 @@ jobs:
         scenario:
           - default
           - user_provided
+          - postgresql
           - key_rotation
           - backup_restore_migrate
     steps:

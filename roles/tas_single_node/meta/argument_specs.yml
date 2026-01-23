@@ -84,7 +84,12 @@ argument_specs:
       tas_single_node_trillian:
         description: >
           Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority.
-          You can set this to a custom MySQL or MariaDB instance.
+          You can set this to a custom MySQL/MariaDB (`'provider': mysql`) or PostgreSQL (`'provider': postgresql`) instance.
+
+          **Deprecation notice**: The top-level `mysql` key is **deprecated** since version 1.4.0 (or whenever you introduced `db`)
+          and will be **removed in the next major release**.
+          Please migrate to the new generic `db` key for database connection details.
+          Existing playbooks using only `mysql` will continue to work until removal, with a runtime deprecation warning shown.
         type: "dict"
         required: false
         version_added: "1.1.0"
@@ -104,12 +109,26 @@ argument_specs:
             type: "bool"
             required: false
             version_added: "1.1.0"
-          mysql:
-            description: "Details on the database connection."
+          db:
+            description: >
+              **Preferred** — Details on the database connection (replaces the deprecated `mysql` key).
+
+              Use this key for both MySQL/MariaDB and PostgreSQL configurations.
+
+              The old `mysql` key is deprecated — migrate to this one to prepare for future releases.
+              See the top-level `tas_single_node_trillian` description for deprecation details.
             type: "dict"
             required: false
             version_added: "1.1.0"
             options:
+              provider:
+                description: "Database provider to use. Supported values are 'mysql' and 'postgresql'."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+                choices:
+                  - mysql
+                  - postgresql
               host:
                 description: "The database host."
                 type: "str"
@@ -137,6 +156,47 @@ argument_specs:
                 version_added: "1.1.0"
               database:
                 description: "The database name to connect to."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+          mysql:
+            description: >
+              **Deprecated** — Legacy MySQL configuration.
+
+              This key is kept for backward compatibility only and will be removed
+              in the next major release.
+              Migrate to the `db` key.
+            type: "dict"
+            required: false
+            version_added: "1.1.0"
+            options:
+              host:
+                description: "The MySQL database host."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              port:
+                description: "The MySQL database port."
+                type: "int"
+                required: false
+                version_added: "1.1.0"
+              user:
+                description: "The MySQL database user."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              password:
+                description: "The MySQL database password."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              root_password:
+                description: "The MySQL database root password."
+                type: "str"
+                required: false
+                version_added: "1.1.0"
+              database:
+                description: "The MySQL database name."
                 type: "str"
                 required: false
                 version_added: "1.1.0"

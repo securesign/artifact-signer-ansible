@@ -1,0 +1,19 @@
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  become: true
+  vars:
+    test_dir_path: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../test"
+  vars_files:
+    - vars/vars.yml
+  tasks:
+    - name: Check that no trillian-mysql pod was created
+      ansible.builtin.command:
+        cmd: "podman pod ps --format '{% raw %}{{.Name}}{% endraw %}'"
+      register: pod_list
+      changed_when: false
+      failed_when: "'trillian-mysql-pod' in pod_list.stdout_lines"
+
+    - name: Include create common tasks
+      ansible.builtin.include_tasks:
+        file: ../common/verify_common.yml
