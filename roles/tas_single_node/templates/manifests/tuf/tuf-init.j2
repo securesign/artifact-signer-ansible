@@ -35,15 +35,19 @@ spec:
               --export-keys file:///var/run/tuf-signing-keys
 {% if tas_single_node_rekor_enabled %}
               --rekor-key /var/run/tuf-secrets/rekor.pub
+              --rekor-uri http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}
 {% endif %}
 {% if tas_single_node_ctlog_enabled %}
               --ctlog-key /var/run/tuf-secrets/ctfe.pub
+              --ctlog-uri http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_fulcio.ct_log_prefix }}
 {% endif %}
 {% if tas_single_node_fulcio_enabled %}
               --fulcio-cert /var/run/tuf-secrets/fulcio_v1.crt.pem
+              --fulcio-uri http://{{ tas_single_node_fulcio_pod }}-pod:{{ tas_single_node_fulcio_port_http }}
 {% endif %}
 {% if tas_single_node_tsa_enabled %}
               --tsa-cert /var/run/tuf-secrets/tsa.certchain.pem
+              --tsa-uri http://{{ tas_single_node_tsa_server_pod }}-pod:{{ tas_single_node_tsa_server_port_tcp }}
 {% endif %}
               /var/run/target
           image: "{{ tas_single_node_tuf_image }}"
