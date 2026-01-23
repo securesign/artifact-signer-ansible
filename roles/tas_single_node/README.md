@@ -321,6 +321,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | sharding_config | Configuration for each log in ctlog. | str | no |  |
 | private_keys | List of private keys for use within ctlog. | list of dicts of 'private_keys' options | no |  |
 | public_keys | List of public keys for use within ctlog. | list of dicts of 'public_keys' options | no |  |
+| monitor | Configuration options for ctlog monitoring. | dict of 'monitor' options | no |  `{'enabled': False}`  |
 
 #### Options for main > tas_single_node_ctlog > sharding_config
 
@@ -374,6 +375,13 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 |---|---|---|---|---|
 | id | Custom ctlog secret ID. | str | no |  |
 | key | Custom ctlog Public key value. | str | no |  |
+
+#### Options for main > tas_single_node_ctlog > monitor
+
+|Option|Description|Type|Required|Default|
+|---|---|---|---|---|
+| enabled | Enable or disable ctlog monitor functionality. | bool | no |  |
+| interval | Interval at which the ctlog monitor should run. Format examples: '10m', '1h'. | str | no |  `10m`  |
 
 #### Options for main > tas_single_node_tsa
 

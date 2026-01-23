@@ -191,6 +191,32 @@
             fail_msg: "Rekor Monitor did not start any monitoring runs"
             success_msg: "Rekor Monitor is actively monitoring"
 
+    - name: Verify ctlog Monitor
+      block:
+        - name: Check if ctlog Monitor pod is running
+          ansible.builtin.shell: "podman ps --filter 'name=ctlog-monitor' --format '{{ '{{.Names}}' }}'"
+          register: ctlog_monitor_pod
+          changed_when: false
+
+        - name: Assert ctlog Monitor pod is running
+          ansible.builtin.assert:
+            that:
+              - "'ctlog-monitor-pod-ctlog-monitor' in ctlog_monitor_pod.stdout"
+            fail_msg: "ctlog Monitor pod is not running"
+            success_msg: "ctlog Monitor pod is running"
+
+        - name: Check ctlog Monitor logs for activity
+          ansible.builtin.shell: "podman logs ctlog-monitor-pod-ctlog-monitor 2>&1 | tail -n 10"
+          register: ctlog_monitor_logs
+          changed_when: false
+
+        - name: Assert ctlog Monitor has processed at least one run
+          ansible.builtin.assert:
+            that:
+              - "'New monitor run' in ctlog_monitor_logs.stdout"
+            fail_msg: "ctlog Monitor did not start any monitoring runs"
+            success_msg: "ctlog Monitor is actively monitoring"
+
     - name: Include create common tasks
       ansible.builtin.include_tasks:
         file: ../common/verify_common.yml

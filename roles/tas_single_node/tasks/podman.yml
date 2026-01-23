@@ -45,6 +45,7 @@
       "{{ tas_single_node_rekor_enabled }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor.monitor.enabled }}",
       "{{ tas_single_node_ctlog_enabled }}",
+      "{{ tas_single_node_ctlog_enabled and tas_single_node_ctlog.monitor.enabled }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy }}",
       "{{ tas_single_node_rekor_enabled and tas_single_node_rekor_redis.database_deploy and tas_single_node_backfill_redis.enabled }}",
       "{{ tas_single_node_trillian_enabled and tas_single_node_trillian.database_deploy }}",
@@ -64,6 +65,7 @@
     - "{{ tas_single_node_rekor_server_image }}"
     - "{{ tas_single_node_rekor_monitor_image }}"
     - "{{ tas_single_node_ctlog_image }}"
+    - "{{ tas_single_node_ctlog_monitor_image }}"
     - "{{ tas_single_node_rekor_redis_image }}"
     - "{{ tas_single_node_backfill_redis_image }}"
     - "{{ tas_single_node_trillian_db_image }}"
@@ -125,3 +127,7 @@
 - name: Configure/Deploy RekorMonitor
   ansible.builtin.include_tasks: podman/rekor_monitor.yml
   when: tas_single_node_rekor.monitor.enabled | bool
+
+- name: Configure/Deploy CtlogMonitor
+  ansible.builtin.include_tasks: podman/ctlog_monitor.yml
+  when: tas_single_node_ctlog.monitor.enabled | bool

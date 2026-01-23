@@ -124,6 +124,8 @@ _tas_single_node_ctlog:
   private_keys: []
   public_keys: []
   max_cert_chain_size: 153600
+  monitor:
+    enabled: false
 
 _tas_single_node_cockpit:
   enabled: false # install redhat.rhel_system_roles before enabling
@@ -267,6 +269,9 @@ tas_single_node_rekor_search_ui_port_tcp: 3000
 
 tas_single_node_rekor_monitor_pod: rekor-monitor
 tas_single_node_rekor_monitor_port_http: 9464
+
+tas_single_node_ctlog_monitor_pod: ctlog-monitor
+tas_single_node_ctlog_monitor_port_http: 9464
 
 tas_single_node_trillian_logserver_pod: trillian-logserver
 tas_single_node_trillian_logserver_port_rpc: 8091
