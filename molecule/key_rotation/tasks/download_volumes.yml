@@ -19,13 +19,31 @@
     - volume_info.volumes is defined
     - volume_info.volumes | length > 0
 
-- name: Download volume contents "{{ item.key }}"
-  ansible.posix.synchronize:
-    src: "{{ remote_volume_paths[item.key] }}/"
-    dest: "{{ item.value }}"
-    mode: pull
-    recursive: yes
+- name: Bundle and Download volume contents "{{ item.key }}"
+  block:
+    - name: Create temporary archive of volume on remote
+      ansible.builtin.shell: "tar -czf /tmp/{{ item.key }}.tar.gz -C {{ remote_volume_paths[item.key] }} ."
+      args:
+        creates: "/tmp/{{ item.key }}.tar.gz"
+
+    - name: Fetch the archive
+      ansible.builtin.fetch:
+        src: "/tmp/{{ item.key }}.tar.gz"
+        dest: "{{ item.value }}/{{ item.key }}.tar.gz"
+        flat: yes
+
+    - name: Unpack archive locally
+      ansible.builtin.unarchive:
+        src: "{{ item.value }}/{{ item.key }}.tar.gz"
+        dest: "{{ item.value }}"
+      delegate_to: localhost
+      become: false
+
+    - name: Clean up remote archive
+      ansible.builtin.file:
+        path: "/tmp/{{ item.key }}.tar.gz"
+        state: absent
   when:
-    - not local_dir_info.stat.exists or (local_dir_info.stat.exists and local_dir_info.stat.isdir and local_dir_info.stat.size == 0)
     - remote_volume_paths is defined
     - remote_volume_paths[item.key] is defined
+    - not local_dir_info.stat.exists or (local_dir_info.stat.exists and local_dir_info.stat.isdir)
