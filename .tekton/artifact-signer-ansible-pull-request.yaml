@@ -57,5 +57,4 @@ spec:
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
-https://github:
-  com/securesign/secure-sign-operator/pull/1500:status: {}
+status: {}
