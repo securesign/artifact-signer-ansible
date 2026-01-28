@@ -970,6 +970,25 @@ argument_specs:
                 type: "str"
                 required: false
                 version_added: "1.2.0"
+          monitor:
+            description: "Configuration options for ctlog monitoring."
+            type: "dict"
+            required: false
+            version_added: "1.4.0"
+            default:
+              enabled: false
+            options:
+              enabled:
+                description: "Enable or disable ctlog monitor functionality."
+                type: "bool"
+                required: false
+                version_added: "1.4.0"
+              interval:
+                description: "Interval at which the ctlog monitor should run. Format examples: '10m', '1h'."
+                type: "str"
+                required: false
+                version_added: "1.4.0"
+                default: "10m"
 
       tas_single_node_tsa:
         description: >

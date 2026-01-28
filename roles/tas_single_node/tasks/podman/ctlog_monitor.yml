@@ -1,0 +1,10 @@
+---
+
+- name: Deploy CTlog Monitor Pod
+  ansible.builtin.include_tasks: podman/install_manifest.yml
+  vars:
+    podman_spec:
+      state: started
+      systemd_file: ctlog_monitor
+      network: "{{ tas_single_node_podman_network }}"
+      kube_file_content: "{{ lookup('ansible.builtin.template', 'manifests/ctlog/ctlog-monitor.j2') | from_yaml }}"
