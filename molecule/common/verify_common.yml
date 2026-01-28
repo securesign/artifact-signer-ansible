@@ -19,7 +19,7 @@
 - name: Disconnecting Dex from Podman network
   ansible.builtin.shell: |
     podman network disconnect podman dex-idp
-  when: podman_check.stdout
+  when: podman_check.stdout | length > 0
 
 - name: Get IP of the current node
   # The tasks below run locally, so their ansible_ssh_host is 127.0.0.1
