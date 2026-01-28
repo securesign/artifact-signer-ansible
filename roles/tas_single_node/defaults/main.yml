@@ -35,7 +35,7 @@ tas_single_node_trillian_db_image:
 tas_single_node_tuf_image:
   "registry.redhat.io/rhtas/tuffer-rhel9@sha256:a93df3206409de75613d398e7dcd8b30ff7cc36eb00349c435784f73f00a2335"
 tas_single_node_http_server_image:
-  "registry.redhat.io/ubi9/httpd-24@sha256:badeee0aa3477e61de64f6a2b93e8a3673edd38fc860125f7536506f3d592132"
+  "registry.redhat.io/ubi9/httpd-24@sha256:47a0b3f12211320d1828524a324ab3ec9deac97c17b9d3f056c87d3384d9eb79"
 tas_single_node_trillian_netcat_image:
   "registry.redhat.io/openshift4/ose-tools-rhel9@sha256:d96bc5c5c2c1d4391daca1198c104593a2f922ed7a5027cfed9b4191028cdc64"
 tas_single_node_nginx_image:
