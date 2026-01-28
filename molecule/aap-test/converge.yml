@@ -12,6 +12,7 @@
     aap_instance_ip: "{{ groups['aap_group'][0] }}"
     worker_instance_ip: "{{ groups['worker_group'][0] }}"
     aap_setup_down_version: "2.6"
+    aap_setup_down_version_patch: 4
     aap_setup_down_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_TOKEN') }}"
     aap_setup_down_type: "setup"
     aap_setup_rhel_version: 9

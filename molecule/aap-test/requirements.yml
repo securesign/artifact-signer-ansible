@@ -9,6 +9,6 @@ collections:
   - name: ansible.controller
   - name: ansible.platform
   - name: infra.aap_utilities
-    version: 2.6.1
+    version: 2.8.0
   - name: infra.ah_configuration
   - name: infra.aap_configuration
