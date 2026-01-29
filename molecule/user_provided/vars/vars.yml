@@ -70,6 +70,8 @@ tas_single_node_ctlog:
     - id: "public-ctlog-key1"
       key: |
         {{ lookup('file', molecule_scenario_directory + '/test_creds/ctlog/ctlog0.pub') }}
+  monitor:
+      enabled: true
 
 tas_single_node_fulcio:
   trusted_ca: "{{ lookup('file', '../common/dex/tls.crt') }}"

@@ -29,3 +29,5 @@ tas_single_node_podman:
       mirror: quay.io/securesign/client-server
     - location: registry.redhat.io/rhtas/rekor-monitor-rhel9
       mirror: quay.io/securesign/rekor-monitor
+    - location: registry.redhat.io/rhtas/ctlog-monitor-rhel9
+      mirror: quay.io/securesign/ctlog-monitor
