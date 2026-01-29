@@ -16,13 +16,13 @@
         - name: Assert the sigstore is instance present
           ansible.builtin.assert:
             that:
-              - fulcio_config
+              - fulcio_config.content is defined
               - "'https://oauth2.sigstore.dev/auth' in (fulcio_config.content | b64decode)"
             fail_msg: "The sigstore endpoint was not found in fulcio config"
         - name: Assert the DEX is instance present
           ansible.builtin.assert:
             that:
-              - fulcio_config
+              - fulcio_config.content is defined
               - "'https://dex-idp:5556/dex' in (fulcio_config.content | b64decode)"
             fail_msg: "The DEX endpoint was not found in fulcio config"
     - name: Include create common tasks
