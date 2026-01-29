@@ -1,6 +1,6 @@
 <!--- to update this file, update files in the role's meta/ directory (and/or its README.j2 template) and run "make role-readme" -->
 # Ansible Role: redhat.artifact_signer.tas_single_node
-Version: 1.2.0
+Version: 1.2.1
 
 Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer) service on a single managed node by using the `tas_single_node` role.
  Requires RHEL 9.4 or later.
