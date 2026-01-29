@@ -2,7 +2,7 @@
 # is released otherwise ansible-lint fails
 ansible-core>=2.16.0,<2.19.0
 ansible-lint==25.1.2
-antsibull-docs==2.16.3
+antsibull-docs==2.24.0
 awscli==1.38.9
 botocore==1.37.9
 boto3==1.37.9
