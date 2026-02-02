@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ tas_single_node_ctlog_monitor_pod }}"
+  namespace: ctlog-system
+  labels:
+    app.podman.io/component: ctlog-monitor
+    app.podman.io/part-of: trusted-artifact-signer
+    app.name: ctlog-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.name: ctlog-monitor
+  template:
+    metadata:
+      labels:
+        app.podman.io/component: ctlog-monitor
+        app.podman.io/part-of: trusted-artifact-signer
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9464"
+        prometheus.io/scrape: "true"
+    spec:
+      initContainers:
+        - name: tuf-init
+          image: "{{ tas_single_node_ctlog_monitor_image }}"
+          volumeMounts:
+            - mountPath: /data
+              name: ctlog-monitor-storage
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
+          command:
+            - /bin/sh
+            - -c
+            - |
+              max_retries=60
+              count=0
+              tuf_host="http://{{ tas_single_node_tuf_pod }}-pod:{{ tas_single_node_tuf_port_http }}"
+
+              until curl "${tuf_host}" > /dev/null 2>&1; do
+                count=$((count+1))
+                if [ "$count" -ge "$max_retries" ]; then
+                  echo "Timed out waiting for tuf-server after $max_retries attempts."
+                  exit 1
+                fi
+                echo 'Waiting for tuf-server to be ready...'
+                sleep 5
+              done
+
+              echo "TUF server is ready."
+              echo "Downloading root.json..."
+              if ! curl "${tuf_host}/root.json" -o "/data/root.json"; then
+                echo "Failed to download root.json from ${tuf_host}"
+                exit 1
+              fi
+      containers:
+        - name: ctlog-monitor
+          command: ["/ctlog_monitor"]
+          args:
+            - "--file=/data/checkpoint_log.txt"
+            - "--once=false"
+            - "--interval={{ tas_single_node_ctlog.monitor.interval | default('10m') }}"
+            - "--url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_fulcio.ct_log_prefix }}"
+            - "--tuf-repository=http://{{ tas_single_node_tuf_pod }}-pod:{{ tas_single_node_tuf_port_http }}"
+            - "--tuf-root-path=/data/root.json"
+          image: "{{ tas_single_node_ctlog_monitor_image }}"
+          env:
+          - name: HOME
+            value: "/data"
+          imagePullPolicy: IfNotPresent
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: file
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 65533
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: {{ tas_single_node_ctlog_monitor_port_http }}
+              protocol: TCP
+          resources: {}
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - grep -q ctlog_monitor /proc/*/comm
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - test -f /data/checkpoint_log.txt
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /data
+              name: ctlog-monitor-storage
+      restartPolicy: Always
+      volumes:
+        - name: ctlog-monitor-storage
+          persistentVolumeClaim:
+            claimName: ctlog-monitor-storage          
