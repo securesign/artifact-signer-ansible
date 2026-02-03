@@ -23,7 +23,7 @@ metadata:
 spec:
   params:
     - name: release-version
-      value: "1.4.0"
+      value: "{{ cel: pac.target_branch == \"main\" ? \"production\" : \"staging\" }}"
     - name: git-url
       value: '{{source_url}}'
     - name: revision
