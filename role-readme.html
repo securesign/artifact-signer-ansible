@@ -1,0 +1,2336 @@
+
+<h1>Ansible Role: redhat.artifact_signer.tas_single_node</h1>
+<p>Version: 1.3.0</p>
+<p>Deploy the <a href="https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer" rel="noopener noreferrer">RHTAS</a> service on a single managed node by using the <code>tas_single_node</code> role.
+ Requires RHEL 9.4 or later.</p>
+<h2>Role Arguments</h2>
+<h3>Required</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>tas_single_node_registry_username</td>
+<td>The user name logging in to the registry to pull images.</td>
+<td>str</td>
+<td></td>
+</tr>
+<tr>
+<td>tas_single_node_registry_password</td>
+<td>The user's password to log in to the registry.</td>
+<td>str</td>
+<td></td>
+</tr>
+<tr>
+<td>tas_single_node_base_hostname</td>
+<td>The base host name of the managed node. This generates self-signed certificates for the individual HTTPS endpoints.</td>
+<td>str</td>
+<td></td>
+</tr>
+
+</table>
+<h3>Optional</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>tas_single_node_podman_network</td>
+<td>Name of the Podman network for containers to use.</td>
+<td>str</td>
+<td><code>rhtas</code></td>
+</tr>
+<tr>
+<td>tas_single_node_rekor_redis</td>
+<td>Details on the Redis connection for Rekor. You can set this to a custom Redis instance.</td>
+<td>dict of 'tas_single_node_rekor_redis' options</td>
+<td><code>{'database_deploy': True, 'redis': {'host': 'rekor-redis-pod', 'port': 6379, 'password': 'password'}}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_backfill_redis</td>
+<td>Configuration options for the backfill redis job.</td>
+<td>dict of 'tas_single_node_backfill_redis' options</td>
+<td><code>{'enabled': True, 'schedule': '*-*-* 00:00:00'}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_trillian</td>
+<td>Details on the configuration options for Trillian. Includes user provided database config, and trusted Certificate Authority. You can set this to a custom MySQL/MariaDB (<code>'provider': mysql</code>) or PostgreSQL (<code>'provider': postgresql</code>) instance. <strong>Deprecation notice</strong>: The top-level <code>mysql</code> key is <strong>deprecated</strong> since version 1.4.0 (or whenever you introduced <code>db</code>) and will be <strong>removed in the next major release</strong>. Please migrate to the new generic <code>db</code> key for database connection details. Existing playbooks using only <code>mysql</code> will continue to work until removal, with a runtime deprecation warning shown.</td>
+<td>dict of 'tas_single_node_trillian' options</td>
+<td><code>{'database_deploy': True, 'mysql': {'user': 'mysql', 'root_password': 'rootpassword', 'password': 'password', 'database': 'trillian', 'host': 'trillian-mysql-pod', 'port': 3306}, 'trusted_ca': ''}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_ingress_certificates</td>
+<td>Details on the certificate settings for various services in the ingress layer. Includes user-provided certificates and private keys for fulcio, rekor, TUF, TSA, rekor-search, and cli-server.</td>
+<td>dict of 'tas_single_node_ingress_certificates' options</td>
+<td><code>{'root': {'ca_certificate': '', 'private_key': ''}, 'fulcio': {'certificate': '', 'private_key': ''}, 'rekor': {'certificate': '', 'private_key': ''}, 'tuf': {'certificate': '', 'private_key': ''}, 'tsa': {'certificate': '', 'private_key': ''}, 'rekor-search': {'certificate': '', 'private_key': ''}, 'cli-server': {'certificate': '', 'private_key': ''}}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_fulcio</td>
+<td>Details on the certificate settings for Fulcio. Includes organizational details, the user-provided private key for signing the root certificate, and the user-provided root certificate itself. <strong>Note</strong>: Updating any of the certificate attributes (such as <code>organization_name</code>, <code>organization_email</code>, or <code>common_name</code>) or the Certificate Authority passphrase (<code>ca_passphrase</code>) key will regenerate the Fulcio certificate, which requires a corresponding manual update in the trust root.</td>
+<td>dict of 'tas_single_node_fulcio' options</td>
+<td><code>{'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'private_key': '', 'root_ca': '', 'trusted_ca': '', 'ca_passphrase': 'rhtas', 'ct_log_prefix': 'rhtasansible', 'fulcio_config': {'oidc_issuers': [], 'meta_issuers': [], 'ci_issuer_metadata': []}}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_rekor</td>
+<td>Details on the Rekor server configuration options. Includes Certificate Authority Passphrase, public key retries, public key delay and more.</td>
+<td>dict of 'tas_single_node_rekor' options</td>
+<td></td>
+</tr>
+<tr>
+<td>tas_single_node_setup_host_dns</td>
+<td>Set up DNS on the managed host to resolve URLs of the configured RHTAS services.</td>
+<td>bool</td>
+<td><code>True</code></td>
+</tr>
+<tr>
+<td>tas_single_node_ctlog</td>
+<td>Configuration and specification of ctlog Custom Configuration as well as custom keys.</td>
+<td>dict of 'tas_single_node_ctlog' options</td>
+<td><code>{'ca_passphrase': 'rhtas', 'sharding_config': [{'config': None, 'treeid': None, 'prefix': '', 'root_pem_file': '', 'password': '', 'private_key': ''}], 'private_keys': [], 'public_keys': []}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_tsa</td>
+<td>Details on the certificate and configuration options for Timestamp Authority. Includes organizational details, the different signer types such as <code>file</code>, <code>kms</code>, and <code>tink</code>, NTP monitoring configuration and user provided certificate chain + signer private key.</td>
+<td>dict of 'tas_single_node_tsa' options</td>
+<td><code>{'env': [], 'signer_type': 'file', 'certificate': {'organization_name': '', 'organization_email': '', 'common_name': ''}, 'kms': {'key_resource': ''}, 'tink': {'key_resource': '', 'keyset': '', 'hcvault_token': ''}, 'signer_private_key': '', 'certificate_chain': '', 'ca_passphrase': 'rhtas', 'ntp_config': '', 'trusted_ca': ''}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_skip_os_install</td>
+<td>Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later.</td>
+<td>bool</td>
+<td><code>False</code></td>
+</tr>
+<tr>
+<td>tas_single_node_fulcio_server_image</td>
+<td>Fulcio image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513</code></td>
+</tr>
+<tr>
+<td>tas_single_node_trillian_log_server_image</td>
+<td>Trillian log server image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208</code></td>
+</tr>
+<tr>
+<td>tas_single_node_logsigner_image</td>
+<td>Trillian logsigner image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0</code></td>
+</tr>
+<tr>
+<td>tas_single_node_rekor_image</td>
+<td>Rekor image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae</code></td>
+</tr>
+<tr>
+<td>tas_single_node_ct_server_image</td>
+<td>ctlog image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:a0c7d71fc8f4cb7530169a6b54dc3a67215c4058a45f84b87bb04fc62e6e8141</code></td>
+</tr>
+<tr>
+<td>tas_single_node_redis_image</td>
+<td>Redis image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:01736bdd96acbc646334a1109409862210e5273394c35fb244f21a143af9f83e</code></td>
+</tr>
+<tr>
+<td>tas_single_node_trillian_db_image</td>
+<td>Trillian database image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/trillian-database-rhel9@sha256:909f584804245f8a9e05ecc4d6874c26d56c0d742ba793c1a4357a14f5e67eb0</code></td>
+</tr>
+<tr>
+<td>tas_single_node_tuf_image</td>
+<td>TUF server image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/tuf-server-rhel9@sha256:34f5cdc53a908ae2819d85ab18e35b69dc4efc135d747dd1d2e216a99a2dcd1b</code></td>
+</tr>
+<tr>
+<td>tas_single_node_netcat_image</td>
+<td>Netcat image</td>
+<td>str</td>
+<td><code>registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7</code></td>
+</tr>
+<tr>
+<td>tas_single_node_nginx_image</td>
+<td>Nginx image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe</code></td>
+</tr>
+<tr>
+<td>tas_single_node_tsa_image</td>
+<td>Timestamp Authority Image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:76f5819d6e8eb9a02b22198fa203d5e6be3f8006e6c98a26d0dc97cc7633f3f7</code></td>
+</tr>
+<tr>
+<td>tas_single_node_rekor_search_image</td>
+<td>Rekor search UI image</td>
+<td>str</td>
+<td><code>registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:8c478fc6122377c6c9df0fddf0ae42b6f6b1648e3c6cf96a0558f366e7921b2b</code></td>
+</tr>
+<tr>
+<td>tas_single_node_podman</td>
+<td>Configuration options for Podman.</td>
+<td>dict of 'tas_single_node_podman' options</td>
+<td></td>
+</tr>
+<tr>
+<td>tas_single_node_cockpit</td>
+<td>Configuration options for Cockpit.</td>
+<td>dict of 'tas_single_node_cockpit' options</td>
+<td><code>{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_podman_volume_create_extra_args</td>
+<td>A dictionary of additional arguments to pass to the <code>podman volume create</code> command for each volume. This allows customization of options when creating specific volumes. Each key in the dictionary corresponds to a volume name with hyphens replaced by underscores.</td>
+<td>dict of 'tas_single_node_podman_volume_create_extra_args' options</td>
+<td><code>{'trillian_mysql': '', 'rekor_redis_storage': '', 'redis_backfill_storage': '', 'rekor_server': '', 'tuf_repository': '', 'tuf_signing_keys': ''}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_trust_root</td>
+<td>Configuration options for the Trust Root.</td>
+<td>dict of 'tas_single_node_trust_root' options</td>
+<td><code>{'full_archive': ''}</code></td>
+</tr>
+<tr>
+<td>tas_single_node_backup_restore</td>
+<td>Configuration options for the Backup and Restore of Trusted Artifact Signer.</td>
+<td>dict of 'tas_single_node_backup_restore' options</td>
+<td><code>{'backup': {'enabled': False, 'schedule': '*-*-* 00:00:00', 'force_run': False, 'passphrase': '', 'directory': '/root/tas_backups'}, 'restore': {'enabled': False, 'source': '', 'passphrase': ''}}</code></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor_redis</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>database_deploy</td>
+<td>Whether or not to deploy Redis.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>redis</td>
+<td>Details on the Redis connection.</td>
+<td>dict of 'redis' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor_redis &gt; redis</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>host</td>
+<td>The Redis host.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>port</td>
+<td>The Redis host port number.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>password</td>
+<td>The Redis password.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_backfill_redis</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Enable or disable the backfill redis job.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>schedule</td>
+<td>Schedule the backfill redis job should follow.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_trillian</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>database_deploy</td>
+<td>Whether or not to deploy the database.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>db</td>
+<td><strong>Preferred</strong> — Details on the database connection (replaces the deprecated <code>mysql</code> key). Use this key for both MySQL/MariaDB and PostgreSQL configurations. The old <code>mysql</code> key is deprecated — migrate to this one to prepare for future releases. See the top-level <code>tas_single_node_trillian</code> description for deprecation details.</td>
+<td>dict of 'db' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>mysql</td>
+<td><strong>Deprecated</strong> — Legacy MySQL configuration. This key is kept for backward compatibility only and will be removed in the next major release. Migrate to the <code>db</code> key.</td>
+<td>dict of 'mysql' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>trusted_ca</td>
+<td>Trusted CA certificate for Trillian, enabling secure TLS connections between the Trillian Logserver/Logsigner and the Trillian database. This CA certificate validates the authenticity of the Trillian database, ensuring encrypted and trusted data exchanges.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_trillian &gt; db</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>provider</td>
+<td>Database provider to use. Supported values are 'mysql' and 'postgresql'.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>host</td>
+<td>The database host.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>port</td>
+<td>The database host port number.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>password</td>
+<td>The database password.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>user</td>
+<td>The database user.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>root_password</td>
+<td>The root password for the database.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>database</td>
+<td>The database name to connect to.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_trillian &gt; mysql</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>host</td>
+<td>The MySQL database host.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>port</td>
+<td>The MySQL database port.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>user</td>
+<td>The MySQL database user.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>password</td>
+<td>The MySQL database password.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>root_password</td>
+<td>The MySQL database root password.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>database</td>
+<td>The MySQL database name.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>root</td>
+<td>Configuration settings for the Root Certificate Authority used to sign the ingress certificates</td>
+<td>dict of 'root' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>fulcio</td>
+<td>Certificate details for the fulcio service.</td>
+<td>dict of 'fulcio' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>rekor</td>
+<td>Certificate details for the rekor service.</td>
+<td>dict of 'rekor' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tuf</td>
+<td>Certificate details for the TUF service.</td>
+<td>dict of 'tuf' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tsa</td>
+<td>Certificate details for the TSA service.</td>
+<td>dict of 'tsa' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>rekor-search</td>
+<td>Certificate details for the rekor-search service.</td>
+<td>dict of 'rekor-search' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>cli-server</td>
+<td>Certificate details for the cli-server service.</td>
+<td>dict of 'cli-server' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; root</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>ca_certificate</td>
+<td>The root certificate used to initialize the Root Certificate Authority (CA). Used for signing and validating ingress certificates.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The private key corresponding to the root certificate. It is used to sign new certificates.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; fulcio</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>The user-provided certificate for fulcio.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for fulcio.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; rekor</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>The user-provided certificate for rekor.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for rekor.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; tuf</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>The user-provided certificate for TUF.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for TUF.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; tsa</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>The user-provided certificate for TSA.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for TSA.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; rekor-search</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>The user-provided certificate for rekor-search.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for rekor-search.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ingress_certificates &gt; cli-server</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>The user-provided certificate for cli-server.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for cli-server.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>certificate</td>
+<td>Details on the certificate attributes for Fulcio. <strong>Note</strong>: Updating any of these values will regenerate the Fulcio certificate, and a manual update in the trust root is required.</td>
+<td>dict of 'certificate' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>The user-provided private key for Fulcio, used for signing root certificate (only RSA with &gt; 2048 B pkey size or ECC with prime256v1 (==secp256r1) are supported).</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>root_ca</td>
+<td>The user-provided root certificate for Fulcio. This field is mutually exclusive with the certificate field.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>trusted_ca</td>
+<td>Trusted OpenID Connect (OIDC) CA certificate for Fulcio, used to validate the identity of the OIDC provider.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ca_passphrase</td>
+<td>"Passphrase for Certificate Authority. <strong>Note</strong>: Updating the passphrase will regenerate the auto-generated private key and the Fulcio certificate as a consequence, and a manual update in the trust root is required."</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ct_log_prefix</td>
+<td>The Prefix for the Certificate Transparency Log that is accessed by Fulcio.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>fulcio_config</td>
+<td>Fulcio configuration for the OIDC issuers and meta issuers.</td>
+<td>dict of 'fulcio_config' options</td>
+<td>yes</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; certificate</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>organization_name</td>
+<td>The name of the organization.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>organization_email</td>
+<td>The email address of the organization.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>common_name</td>
+<td>The common name (e.g., hostname) for the certificate.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>oidc_issuers</td>
+<td>The list of OpenID Connect (OIDC) issuers allowed to authenticate Fulcio certificate requests.</td>
+<td>list of dicts of 'oidc_issuers' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>meta_issuers</td>
+<td>The list of OIDC meta issuers allowed to authenticate Fulcio certificate requests.</td>
+<td>list of dicts of 'meta_issuers' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ci_issuer_metadata</td>
+<td>Additional metadata for ci-provider OIDC issuers.</td>
+<td>list of dicts of 'ci_issuer_metadata' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config &gt; oidc_issuers</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>issuer</td>
+<td>A unique name of the OIDC issuer.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>url</td>
+<td>The OIDC issuer service URL.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>client_id</td>
+<td>The OIDC client identifier used by the RHTAS service.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>The type of the OIDC token issuer, for example, 'email'.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>ci_provider</td>
+<td>An optional configuration to map token claims to extensions for CI workflows</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config &gt; meta_issuers</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>issuer_pattern</td>
+<td>A URL template to match multiple OIDC issuers, for example, <code>'https://oidc.eks.*.amazonaws.com/id/*'</code>.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>client_id</td>
+<td>The OIDC client identifier used by the RHTAS service.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>The type of the OIDC token issuer, for example, 'email'.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>ci_provider</td>
+<td>An optional configuration to map token claims to extensions for CI workflows.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config &gt; ci_issuer_metadata</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>issuer_name</td>
+<td>Name of the issuer.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>default_template_values</td>
+<td>Defaults contains key-value pairs that can be used for filling the templates from extension_templates.</td>
+<td>dict</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>subject_alternative_name_template</td>
+<td>Template for the Subject Alternative Name extension.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>extension_templates</td>
+<td>A mapping between certificate extension and token claim using Go templating syntax. To prevent Ansible from trying to interpolate Go template values, use the "!unsafe" data type.</td>
+<td>dict of 'extension_templates' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_fulcio &gt; fulcio_config &gt; ci_issuer_metadata &gt; extension_templates</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>build_signer_uri</td>
+<td>Reference to specific build instructions that are responsible for signing.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>build_signer_digest</td>
+<td>Immutable reference to the specific version of the build instructions that is responsible for signing.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>runner_environment</td>
+<td>Specifies whether the build took place in platform-hosted cloud infrastructure or customer/self-hosted infrastructure.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_uri</td>
+<td>Source repository URL that the build was based on.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_digest</td>
+<td>Immutable reference to a specific version of the source code that the build was based upon.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_ref</td>
+<td>Source Repository Ref that the build run was based upon.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_identifier</td>
+<td>Immutable identifier for the source repository the workflow was based upon.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_owner_uri</td>
+<td>Source repository owner URL of the owner of the source repository that the build was based on.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_owner_identifier</td>
+<td>Immutable identifier for the owner of the source repository that the workflow was based upon.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>build_config_uri</td>
+<td>Build Config URL to the top-level/initiating build instructions.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>build_config_digest</td>
+<td>Immutable reference to the specific version of the top-level/initiating build instructions.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>build_trigger</td>
+<td>Event or action that initiated the build.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>run_invocation_uri</td>
+<td>Run Invocation URL to uniquely identify the build execution.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source_repository_visibility_at_signing</td>
+<td>Source repository visibility at the time of signing the certificate.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>active_signer_type</td>
+<td>Active logs signer type can be either file, KMS or tink</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>active_signer_id</td>
+<td>ID of the key name containing the active signer key for rekor to use.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>active_tree_id</td>
+<td>Tree Id of active rekor log.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>kms</td>
+<td>Details for KMS configuration of rekor cli-server.</td>
+<td>dict of 'kms' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tink</td>
+<td>Details for tink configuration within rekor-server.</td>
+<td>dict of 'tink' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>env</td>
+<td>Env vars to be specified to access AWS Cloud keys.</td>
+<td>list of dicts of 'env' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ca_passphrase</td>
+<td>Passphrase used for Certificate Authority cert.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>public_key_retries</td>
+<td>The number of attempts to retrieve the Rekor public key when constructing the trust root.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>public_key_delay</td>
+<td>The number of seconds to wait before retrying the retrieval of the Rekor public key when constructing the trust root.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_keys</td>
+<td>List of private keys for use within rekor.</td>
+<td>list of dicts of 'private_keys' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>public_keys</td>
+<td>List of public keys for use within rekor.</td>
+<td>list of dicts of 'public_keys' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>sharding_config</td>
+<td>Sharding configuration for rekor</td>
+<td>list of dicts of 'sharding_config' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>attestations</td>
+<td>Configuration for Rekor attestation storage.</td>
+<td>dict of 'attestations' options</td>
+<td>no</td>
+<td><code>{'enabled': True, 'url': 'file:///var/run/attestations?no_tmp_dir=true', 'max_size': 100000}</code></td>
+</tr>
+<tr>
+<td>monitor</td>
+<td>Configuration options for Rekor monitoring.</td>
+<td>dict of 'monitor' options</td>
+<td>no</td>
+<td><code>{'enabled': False}</code></td>
+</tr>
+<tr>
+<td>max_request_body_size</td>
+<td>Maximum allowed size for incoming request bodies (bytes).</td>
+<td>int</td>
+<td>no</td>
+<td><code>10485760</code></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; kms</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>kms_resource</td>
+<td>KMS resource access</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; tink</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>tink_kek_uri</td>
+<td>URI for tink resource.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tink_keyset_path</td>
+<td>Keyset to be unencrypted by tink.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; env</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>name</td>
+<td>Environment variable key name.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td>Environment variable value.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; private_keys</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>id</td>
+<td>Custom rekor secret ID.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>key</td>
+<td>Custom Rekor Private key value.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; public_keys</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>id</td>
+<td>Custom rekor secret ID.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>key</td>
+<td>Custom Rekor Public key value.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; sharding_config</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>tree_id</td>
+<td>Sharding configuration treeID</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tree_length</td>
+<td>Length of rekor tree.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>signing_config</td>
+<td>Signing Configuration or rekor shard.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>pem_pub_key</td>
+<td>ID of custom key provided to rekor.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; attestations</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Enable Rekor attestation storage.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>url</td>
+<td>Url of the storage location, supports go-cloud blob URLs. The 'file:///var/run/attestations' path is specifically for local storage. Other valid protocols include s3://, gs://, azblob://, and mem://. Cloud credentials can be provided as environment variables through the "env" variable.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>max_size</td>
+<td>Maximum allowed size for an individual attestation, in bytes.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_rekor &gt; monitor</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Enable or disable Rekor monitor functionality.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>interval</td>
+<td>Interval at which the Rekor monitor should run. Format examples: '10m', '1h'.</td>
+<td>str</td>
+<td>no</td>
+<td><code>10m</code></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>ca_passphrase</td>
+<td>Passphrase used for Certificate Authority.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>sharding_config</td>
+<td>Configuration for each log in ctlog.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_keys</td>
+<td>List of private keys for use within ctlog.</td>
+<td>list of dicts of 'private_keys' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>public_keys</td>
+<td>List of public keys for use within ctlog.</td>
+<td>list of dicts of 'public_keys' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>monitor</td>
+<td>Configuration options for ctlog monitoring.</td>
+<td>dict of 'monitor' options</td>
+<td>no</td>
+<td><code>{'enabled': False}</code></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog &gt; sharding_config</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>treeid</td>
+<td>Trillian Tree Id ctlog use.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>prefix</td>
+<td>ctlog log Prefix.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>root_pem_file</td>
+<td>File path to root Pem file.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>password</td>
+<td>Password for private key used by ctlog.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>private_key</td>
+<td>Name of the private key in the system.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>override_handler_prefix</td>
+<td>Overrides the handler prefix for this log.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>public_key</td>
+<td>Public key used for verification (must be in DER format).</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>reject_expired</td>
+<td>Reject certificates that are expired.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>reject_unexpired</td>
+<td>Reject certificates that are not expired.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>not_after_start</td>
+<td>Starting timestamp for valid 'NotAfter' dates.</td>
+<td>dict of 'not_after_start' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>not_after_limit</td>
+<td>Ending timestamp for valid 'NotAfter' dates.</td>
+<td>dict of 'not_after_limit' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>accept_only_ca</td>
+<td>Only accept certificates with CA extension.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>is_mirror</td>
+<td>Indicates whether the log is a mirror log.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>is_readonly</td>
+<td>Indicates whether the log is read-only.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>max_merge_delay_sec</td>
+<td>Maximum merge delay in seconds.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>expected_merge_delay_sec</td>
+<td>Expected merge delay in seconds.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>frozen_sth</td>
+<td>Signed Tree Head (STH) that freezes the log.</td>
+<td>dict</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>reject_extensions</td>
+<td>List of rejected certificate extensions.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ctfe_storage_connection_string</td>
+<td>Storage connection string for CTFE.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>extra_data_issuance_chain_storage_backend</td>
+<td>Storage backend for extra data issuance chain.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog &gt; sharding_config &gt; not_after_start</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>seconds</td>
+<td>Seconds portion of the timestamp.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>nanos</td>
+<td>Nanoseconds portion of the timestamp.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog &gt; sharding_config &gt; not_after_limit</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>seconds</td>
+<td>Seconds portion of the timestamp.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>nanos</td>
+<td>Nanoseconds portion of the timestamp.</td>
+<td>int</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog &gt; private_keys</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>id</td>
+<td>Custom ctlog secret ID.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>key</td>
+<td>Custom ctlog Private key value.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog &gt; public_keys</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>id</td>
+<td>Custom ctlog secret ID.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>key</td>
+<td>Custom ctlog Public key value.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_ctlog &gt; monitor</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Enable or disable ctlog monitor functionality.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>interval</td>
+<td>Interval at which the ctlog monitor should run. Format examples: '10m', '1h'.</td>
+<td>str</td>
+<td>no</td>
+<td><code>10m</code></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_tsa</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>signer_type</td>
+<td>The signer type for TSA. Options include <code>file</code>, <code>kms</code>, <code>tink</code>.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>certificate</td>
+<td>Details on the certificate attributes for TSA. <strong>Note</strong>: Updating any of the certificate attributes (such as <code>organization_name</code>, <code>organization_email</code>, or <code>common_name</code>) or the Certificate Authority passphrase (<code>ca_passphrase</code>) key will regenerate the TSA certificate, which requires a corresponding manual update in the trust root.</td>
+<td>dict of 'certificate' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>kms</td>
+<td>The Key Management Services (KMS) key for signing timestamp responses. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tink</td>
+<td>Tink file signer type configuration for TSA.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>signer_private_key</td>
+<td>Signer private key used in conjuction with the certificate chain for signing and verifying.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>certificate_chain</td>
+<td>Certificate chain used in conjuction with the signer private key for signing and verifying.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ca_passphrase</td>
+<td>Passphrase for Certificate Authority. <strong>Note</strong>: Updating the passphrase will regenerate the auto-generated private key and the TSA certificate as a consequence, and a manual update in the trust root is required."</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>ntp_config</td>
+<td>NTP config for time syncing within a unified consensus of vendors such as Google, Amazon, and more. Valid file format and configuration can be found <a href="https://github.com/sigstore/timestamp-authority/blob/main/pkg/ntpmonitor/ntpsync.yaml" rel="noopener noreferrer">here</a>.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>trusted_ca</td>
+<td>Trusted CA certificate for Trusted Timestamp Authority, enabling secure TLS connections. Used to ensure authenticity and trusted data exchange.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>env</td>
+<td>Environment vars to be specified to access AWS Cloud keys when using Tink or KMS</td>
+<td>list of dicts of 'env' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_tsa &gt; certificate</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>organization_name</td>
+<td>The name of the organization.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>organization_email</td>
+<td>The email of the organization.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>common_name</td>
+<td>The common name (e.g., hostname) for the certificate.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_tsa &gt; kms</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>key_resource</td>
+<td>Key resource used to access signer private key from AWS/GCP/Azure.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_tsa &gt; tink</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>key_resource</td>
+<td>The KMS key for signing timestamp responses for Tink keysets. Valid options are: [gcp-kms://resource, aws-kms://resource, hcvault://].</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>keyset</td>
+<td>The KMS-encrypted keyset for Tink that decrypts the tas_single_node_tsa_tink_key_resource string.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>hcvault_token</td>
+<td>The authentication token for Hashicorp Vault API calls.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_tsa &gt; env</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>name</td>
+<td>Environment variable key name.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td>Environment variable value.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_podman</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>policy</td>
+<td>Contains the content of a <code>policy.json</code> file, which defines security policies for container image sources. Replaces the default policy, allowing you to enforce specific rules for image trust and verification in Podman.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>registry</td>
+<td>A list of registries and their corresponding mirrors. Each item in the list should specify a registry location and a mirror to use for pulling images.</td>
+<td>list of dicts of 'registry' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_podman &gt; registry</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>location</td>
+<td>The primary registry location for the image.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+<tr>
+<td>mirror</td>
+<td>The mirror registry to use for pulling images from the primary registry location.</td>
+<td>str</td>
+<td>yes</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_cockpit</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Whether or not to install Cockpit.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>user</td>
+<td>Configuration for the cockpit user.</td>
+<td>dict of 'user' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_cockpit &gt; user</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>create</td>
+<td>Whether or not to create the cockpit user.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>username</td>
+<td>Username for the cockpit user.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>password</td>
+<td>Password for the cockpit user.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_podman_volume_create_extra_args</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>trillian_mysql</td>
+<td>Additional arguments to pass when creating the "trillian-mysql" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>rekor_redis_storage</td>
+<td>Additional arguments to pass when creating the "rekor-redis-storage" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>redis_backfill_storage</td>
+<td>Additional arguments to pass when creating the "redis-backfill-storage" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>rekor_server</td>
+<td>Additional arguments to pass when creating the "rekor-server" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tuf_repository</td>
+<td>Additional arguments to pass when creating the "tuf-repository" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>tuf_signing_keys</td>
+<td>Additional arguments to pass when creating the "tuf-signing-keys" volume.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_trust_root</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>full_archive</td>
+<td>A compressed base64-encoded .tgz file of the trust root. This archive file has a single directory named <code>tuf-repo/</code>, containing the contents of the TUF repository, for example <code>1.root.json</code>. The default value is an empty string. Using the default value generates the trust root content, unless a trust root already exists. Specifying a <code>full_archive</code> string removes any earlier configured trust root content, and starts to use the new specified content. If changing this value back to an empty string after setting the <code>full_archive</code> option, then we continue serving the previous value for the trust root content. To reset the trust root content, you must remove all files in the volume associated with the <code>tuf-repository</code> pod.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_backup_restore</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>backup</td>
+<td>Configuration options for the backup.</td>
+<td>dict of 'backup' options</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>restore</td>
+<td>Configuration options for the restore.</td>
+<td>dict of 'restore' options</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_backup_restore &gt; backup</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Option to deploy the backup oneshot job and timer.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>schedule</td>
+<td>The schedule for the backup oneshot job. By default runs daily at midnight.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>force_run</td>
+<td>Forcefully runs a manual backup.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>passphrase</td>
+<td>The passphrase used to encrypt the compressed backup file.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>directory</td>
+<td>The directory used to store the backups on the remote server. Stored in /root/tas_backups by default.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h4>Options for main &gt; tas_single_node_backup_restore &gt; restore</h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+
+<tr>
+<td>enabled</td>
+<td>Configure to restore a full TAS instance. It will always run the restore procedure as long as it is set to true. Should only be set to true on a single Ansible execution and then reverted back to false.</td>
+<td>bool</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>source</td>
+<td>The filepath leading the to compressed and encrypted backup file that will be used for the full restore. Needs to be located on the Ansible Control Node.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td>passphrase</td>
+<td>The passphrase used to decrypt the compressed backup file.</td>
+<td>str</td>
+<td>no</td>
+<td></td>
+</tr>
+
+</table>
+<h2>Example Playbook</h2>
+<pre><code>- hosts: rhtas
+  vars:
+    tas_single_node_registry_username: # TODO: required, type: str
+    tas_single_node_registry_password: # TODO: required, type: str
+    tas_single_node_base_hostname: # TODO: required, type: str
+
+  tasks:
+    - name: Include TAS single node role
+      ansible.builtin.include_role:
+        name: redhat.artifact_signer.tas_single_node
+      vars:
+        ansible_become: true
+</code></pre>
+<h2>License</h2>
+<p>Apache-2.0</p>
+<h2>Author and Project Information</h2>
+<p>Red Hat</p>
