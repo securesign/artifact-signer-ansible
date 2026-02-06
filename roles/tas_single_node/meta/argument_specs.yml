@@ -1166,7 +1166,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:a0c7d71fc8f4cb7530169a6b54dc3a67215c4058a45f84b87bb04fc62e6e8141"
+        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:4e84cd5757040c0265b0af6d3d185eddaa787991445aef6d76d8390afbfc41c0"
       tas_single_node_redis_image:
         description: "Redis image"
         type: "str"
