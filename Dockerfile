@@ -7,6 +7,7 @@ COPY roles/ roles/
 COPY galaxy.yml .
 COPY requirements.yml .
 COPY LICENSE .
+COPY README.md .
 
 USER root
 
