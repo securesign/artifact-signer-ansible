@@ -799,6 +799,19 @@ argument_specs:
         required: true
         version_added: "1.1.0"
         # we provide no default value here intentionally
+      tas_single_node_signing_config_url_mode:
+        description: >
+          Controls which service URLs are placed into the TUF trust root during creation.
+          When set to `external`, the signing config uses the external HTTPS URLs
+          (e.g. `https://rekor.<base_hostname>`). When set to `internal`, it uses
+          the internal pod addresses (e.g. `http://rekor-server-pod:3001`).
+        type: "str"
+        required: false
+        version_added: "1.4.0"
+        default: "external"
+        choices:
+          - external
+          - internal
       tas_single_node_ctlog:
         description: >
           Configuration and specification of ctlog Custom Configuration as well as custom keys.

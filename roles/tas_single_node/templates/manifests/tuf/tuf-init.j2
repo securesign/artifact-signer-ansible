@@ -35,7 +35,11 @@ spec:
               --export-keys file:///var/run/tuf-signing-keys
 {% if tas_single_node_rekor_enabled %}
               --rekor-key /var/run/tuf-secrets/rekor.pub
+{% if tas_single_node_signing_config_url_mode == 'external' %}
+              --rekor-uri https://rekor.{{ tas_single_node_base_hostname }}
+{% else %}
               --rekor-uri http://{{ tas_single_node_rekor_server_pod }}-pod:{{ tas_single_node_rekor_server_port_http }}
+{% endif %}
 {% endif %}
 {% if tas_single_node_ctlog_enabled %}
               --ctlog-key /var/run/tuf-secrets/ctfe.pub
@@ -43,11 +47,22 @@ spec:
 {% endif %}
 {% if tas_single_node_fulcio_enabled %}
               --fulcio-cert /var/run/tuf-secrets/fulcio_v1.crt.pem
+{% if tas_single_node_signing_config_url_mode == 'external' %}
+              --fulcio-uri https://fulcio.{{ tas_single_node_base_hostname }}
+{% else %}
               --fulcio-uri http://{{ tas_single_node_fulcio_pod }}-pod:{{ tas_single_node_fulcio_port_http }}
+{% endif %}
 {% endif %}
 {% if tas_single_node_tsa_enabled %}
               --tsa-cert /var/run/tuf-secrets/tsa.certchain.pem
-              --tsa-uri http://{{ tas_single_node_tsa_server_pod }}-pod:{{ tas_single_node_tsa_server_port_tcp }}
+{% if tas_single_node_signing_config_url_mode == 'external' %}
+              --tsa-uri https://tsa.{{ tas_single_node_base_hostname }}/api/v1/timestamp
+{% else %}
+              --tsa-uri http://{{ tas_single_node_tsa_server_pod }}-pod:{{ tas_single_node_tsa_server_port_tcp }}/api/v1/timestamp
+{% endif %}
+{% endif %}
+{% if tas_single_node_fulcio.fulcio_config.oidc_issuers | length > 0 %}
+              --oidc-uri {{ tas_single_node_fulcio.fulcio_config.oidc_issuers[0].url }}
 {% endif %}
               /var/run/target
           image: "{{ tas_single_node_tuf_image }}"
