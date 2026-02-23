@@ -81,7 +81,58 @@ To download the command-line tools for interacting with the Trusted Artifact Sig
 
 ## Verifying the deployment by signing a test container
 
+This section uses [cosign](https://github.com/sigstore/cosign) v3.0.4 or later.
+The TUF repository includes a `signing_config.v0.2.json` and `trusted_root.json`, which allows cosign to automatically discover service URLs (Fulcio, Rekor, TSA) from the TUF metadata.
+
+### Signing with cosign v3 (recommended)
+
 On your workstation, export the following environment variables, replacing `TODO` with your relevant information:
+
+    export BASE_HOSTNAME="TODO"
+    export KEYCLOAK_URL="TODO"
+    export KEYCLOAK_REALM=TODO
+
+    export COSIGN_MIRROR=https://tuf.$BASE_HOSTNAME
+    export COSIGN_ROOT=$COSIGN_MIRROR/root.json
+    export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
+    export COSIGN_YES="true"
+
+Initialize The Update Framework (TUF) system:
+
+    cosign initialize
+
+**NOTE:** If you have used `cosign` before, you might need to delete the `~/.sigstore` directory first.
+
+You can sign a test container image to verify the deployment of RHTAS by doing the following.
+
+Create an empty container image:
+
+    echo "FROM scratch" > ./tmp.Dockerfile
+    podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
+
+Push the empty container image to the `ttl.sh` ephemeral registry:
+
+    podman push ttl.sh/rhtas/test-image:1h
+
+Sign the container image:
+
+    cosign sign -y ttl.sh/rhtas/test-image:1h
+
+**NOTE:** A web browser opens allowing you to sign the container image with an email address.
+
+Remove the temporary Docker file:
+
+    rm ./tmp.Dockerfile
+
+Verify the signed image by replacing `TODO` with the signer's email address:
+
+    cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
+
+If the signature verification does not result in an error, then the deployment of RHTAS was successful!
+
+### Legacy signing (cosign v2 or TUF repositories without signing config)
+
+If your TUF repository does not include `signing_config.v0.2.json` (for example, after upgrading from an older deployment), or you are using cosign v2, you can provide service URLs explicitly and disable the signing config lookup:
 
     export BASE_HOSTNAME="TODO"
     export KEYCLOAK_URL="TODO"
@@ -102,38 +153,13 @@ On your workstation, export the following environment variables, replacing `TODO
     export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
     export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 
-Initialize The Update Framework (TUF) system:
-
     cosign initialize
 
-**NOTE:** If you have used `cosign` before, you might need to delete the `~/.sigstore` directory first.
+When signing with cosign v3, add `--use-signing-config=false` and `--new-bundle-format=false` to fall back to explicit service URLs:
 
-You can sign a test container image to verify the deployment of RHTAS by doing the following.
-   
-Create an empty container image:
-      
-    echo "FROM scratch" > ./tmp.Dockerfile
-    podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
+    cosign sign -y --use-signing-config=false --new-bundle-format=false ttl.sh/rhtas/test-image:1h
 
-Push the empty container image to the `ttl.sh` ephemeral registry:
-      
-    podman push ttl.sh/rhtas/test-image:1h
-
-Sign the container image:
-      
-    cosign sign -y ttl.sh/rhtas/test-image:1h
-
-**NOTE:** A web browser opens allowing you to sign the container image with an email address.
-
-Remove the temporary Docker file:
-
-    rm ./tmp.Dockerfile
-
-Verify the signed image by replacing `TODO` with the signer's email address:
-
-    cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
-   
-If the signature verification does not result in an error, then the deployment of RHTAS was successful!
+    cosign verify --new-bundle-format=false --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
 
 ## Monitoring of containers with Cockpit
 To monitor containers with Cockpit, you need to install the Red Hat Enterprise Linux System Roles Ansible Collection, found [here](https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles/) by using the following command:

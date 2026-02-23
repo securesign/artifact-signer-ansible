@@ -19,12 +19,7 @@ export COSIGN_MIRROR=$TUF_URL
 export COSIGN_ROOT=$TUF_URL/root.json
 export COSIGN_OIDC_CLIENT_ID=trusted-artifact-signer
 export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
-export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
 export COSIGN_YES="true"
-export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
-export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
-export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
-export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 export EMAIL=jdoe@redhat.com
 
 TOKEN="$(curl -s -X POST "$OIDC_ISSUER_URL/token" -k \
@@ -48,7 +43,25 @@ cosign initialize
 
 echo "testing" > "$FILENAME.txt"
 
-cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
+# With a TUF repo that includes signing_config.v0.2.json and trusted_root.json
+# cosign v3 defaults handle everything:
+#
+#   export COSIGN_MIRROR=https://tuf.$BASE_HOSTNAME
+#   export COSIGN_ROOT=$COSIGN_MIRROR/root.json
+#   export COSIGN_OIDC_CLIENT_ID=trusted-artifact-signer
+#   export COSIGN_YES="true"
+#   cosign initialize
+#
+#   cosign sign-blob "$FILE" --bundle "$FILE.bundle" --identity-token="$TOKEN"
+#
+#   cosign verify-blob \
+#       --certificate-identity="$EMAIL" \
+#       --certificate-oidc-issuer="$OIDC_ISSUER_URL" \
+#       --bundle "$FILE.bundle" \
+#       "$FILE"
+
+# Legacy fallback: explicit service URLs for TUF repos without signing config
+cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --use-signing-config=false --new-bundle-format=false --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
 
 validation_counter=0
 for file in /test/*.txt; do
@@ -60,6 +73,7 @@ for file in /test/*.txt; do
         --bundle "${file%.*}.bundle" \
         --rfc3161-timestamp="${file%.*}.timestamp" \
         --use-signed-timestamps \
+        --new-bundle-format=false \
         "$file"
 
    validation_counter=$((validation_counter + 1))
