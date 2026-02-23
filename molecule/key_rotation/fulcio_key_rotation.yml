@@ -26,6 +26,7 @@
         active_key_name: 'fulcio_v1.crt.pem'
         new_key_content: "{{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/new-fulcio.pem') }}"
         new_key_name: 'new-fulcio.pem'
+        oidc_uri: "{{ tas_single_node_fulcio.fulcio_config.oidc_issuers[0].url | default(tas_single_node_fulcio.fulcio_config.meta_issuers[0].issuer_pattern | default('')) }}"
 
     - name: Archive tuf-repo locally
       ansible.builtin.command:

@@ -59,8 +59,9 @@
           --key "{{ volumes['tuf-signing-keys'] }}/targets.pem"
           --key "{{ volumes['tuf-signing-keys'] }}/timestamp.pem"
           {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ active_key_name }}"
-          --{{ component }}-uri "https://{{ component }}.rhtas"
+          --{{ component }}-uri "https://{{ component }}.{{ tas_single_node_base_hostname }}"
           --{{ component }}-status "Expired"
+          {% if component == 'fulcio' and oidc_uri is defined %}--oidc-uri "{{ oidc_uri }}"{% endif %}
           --outdir "{{ volumes['tuf-repository'] }}"
           --metadata-url "file://{{ volumes['tuf-repository'] }}"
 
@@ -73,7 +74,8 @@
           --key "{{ volumes['tuf-signing-keys'] }}/targets.pem"
           --key "{{ volumes['tuf-signing-keys'] }}/timestamp.pem"
           {{ '--set-' + component + '-target' }} "{{ molecule_ephemeral_directory }}/{{ new_key_name }}"
-          --{{ component }}-uri "https://{{ component }}.rhtas"
+          --{{ component }}-uri "https://{{ component }}.{{ tas_single_node_base_hostname }}"
+          {% if component == 'fulcio' and oidc_uri is defined %}--oidc-uri "{{ oidc_uri }}"{% endif %}
           --outdir "{{ volumes['tuf-repository'] }}"
           --metadata-url "file://{{ volumes['tuf-repository'] }}"
   delegate_to: localhost
