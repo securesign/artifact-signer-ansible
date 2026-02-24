@@ -74,25 +74,18 @@ Use the following syntax to install version 1.1.0:</p>
 <h2>Downloading CLI tools</h2>
 <p>To download the command-line tools for interacting with the Trusted Artifact Signer service, you can go to <code>https://cli-server.&lt;base_hostname&gt;</code>, where <code>&lt;base_hostname&gt;</code> is your deployment's base hostname.</p>
 <h2>Verifying the deployment by signing a test container</h2>
+<p>This section uses <a href="https://github.com/sigstore/cosign" rel="noopener noreferrer">cosign</a> v3.0.4 or later.
+The TUF repository includes a <code>signing_config.v0.2.json</code> and <code>trusted_root.json</code>, which allows cosign to automatically discover service URLs (Fulcio, Rekor, TSA) from the TUF metadata.</p>
+<h3>Signing with cosign v3 (recommended)</h3>
 <p>On your workstation, export the following environment variables, replacing <code>TODO</code> with your relevant information:</p>
 <pre><code>export BASE_HOSTNAME="TODO"
 export KEYCLOAK_URL="TODO"
 export KEYCLOAK_REALM=TODO
 
-export TUF_URL=https://tuf.$BASE_HOSTNAME
-export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
-export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
-export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
-export COSIGN_MIRROR=$TUF_URL
-export COSIGN_ROOT=$TUF_URL/root.json
+export COSIGN_MIRROR=https://tuf.$BASE_HOSTNAME
+export COSIGN_ROOT=$COSIGN_MIRROR/root.json
 export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
-export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
-export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
 export COSIGN_YES="true"
-export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
-export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
-export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
-export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
 </code></pre>
 <p>Initialize The Update Framework (TUF) system:</p>
 <pre><code>cosign initialize
@@ -117,6 +110,34 @@ podman build . -f ./tmp.Dockerfile -t ttl.sh/rhtas/test-image:1h
 <pre><code>cosign verify --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
 </code></pre>
 <p>If the signature verification does not result in an error, then the deployment of RHTAS was successful!</p>
+<h3>Legacy signing (cosign v2 or TUF repositories without signing config)</h3>
+<p>If your TUF repository does not include <code>signing_config.v0.2.json</code> (for example, after upgrading from an older deployment), or you are using cosign v2, you can provide service URLs explicitly and disable the signing config lookup:</p>
+<pre><code>export BASE_HOSTNAME="TODO"
+export KEYCLOAK_URL="TODO"
+export KEYCLOAK_REALM=TODO
+
+export TUF_URL=https://tuf.$BASE_HOSTNAME
+export OIDC_ISSUER_URL=$KEYCLOAK_URL/auth/realms/$KEYCLOAK_REALM
+export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
+export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
+export COSIGN_MIRROR=$TUF_URL
+export COSIGN_ROOT=$TUF_URL/root.json
+export COSIGN_OIDC_CLIENT_ID=$KEYCLOAK_REALM
+export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
+export COSIGN_CERTIFICATE_OIDC_ISSUER=$OIDC_ISSUER_URL
+export COSIGN_YES="true"
+export SIGSTORE_FULCIO_URL=$COSIGN_FULCIO_URL
+export SIGSTORE_OIDC_ISSUER=$COSIGN_OIDC_ISSUER
+export SIGSTORE_REKOR_URL=$COSIGN_REKOR_URL
+export REKOR_REKOR_SERVER=$COSIGN_REKOR_URL
+
+cosign initialize
+</code></pre>
+<p>When signing with cosign v3, add <code>--use-signing-config=false</code> and <code>--new-bundle-format=false</code> to fall back to explicit service URLs:</p>
+<pre><code>cosign sign -y --use-signing-config=false --new-bundle-format=false ttl.sh/rhtas/test-image:1h
+
+cosign verify --new-bundle-format=false --certificate-identity=TODO ttl.sh/rhtas/test-image:1h
+</code></pre>
 <h2>Monitoring of containers with Cockpit</h2>
 <p>To monitor containers with Cockpit, you need to install the Red Hat Enterprise Linux System Roles Ansible Collection, found <a href="https://console.redhat.com/ansible/automation-hub/repo/published/redhat/rhel_system_roles/" rel="noopener noreferrer">here</a> by using the following command:</p>
 <pre><code>ansible-galaxy collection install redhat.rhel_system_roles:==1.88.9
