@@ -17,23 +17,23 @@ tas_single_node_trust_root:
 # To avoid breaking our structural tests
 
 tas_single_node_fulcio_server_image:
-  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:c9289244939c0fd2737e8768ac089d09d15ca42ea34e2512c13a73c159338ab7"
+  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:103d1db838a31abaa6694feb48d1170b68e933067f4765e14f0012c6ce795070"
 tas_single_node_trillian_log_server_image:
-  "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b246d096ad6d2b19decfa3d87bca9ab2b78000aee28b717c0a33d1202a1b2d6b"
+  "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:bfaf86c377fb0ac7daa7692c2d09be45e9d7df28e5b6a37ed3cf29c0b400408f"
 tas_single_node_trillian_log_signer_image:
-  "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:d0f8b68e55173b010fd381e374f232a40fba6d03282cfd870bd9c12c492e4aec"
+  "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:62306f2854940eb8de4780da014f5c495ad5e43e592b9a147660508686b969ed"
 tas_single_node_rekor_server_image:
-  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:4afca53f27929243177a80a08e1ca77bd8978a50e8e0e7929781bb7b14a85cd2"
+  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:b5c5de3142a8b9c4bfa43f004707170b76552e44756079180e3cd29f028cebc0"
 tas_single_node_ctlog_image:
   "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:7e70be684d2bc550f1d31b89eadcac24e6385b3578ad29d8bdaa17b260f9dbce"
 tas_single_node_rekor_redis_image:
-  "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:d97e6688aabf25ed1da6a8bf2012efb1772beed49b91456288418f6023a38dac"
+  "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:d394eb6c0cb6051ee0e190743dd554de493f7295a069bac19d04bab68d30550b"
 tas_single_node_backfill_redis_image:
-  "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:9b91bac976cf7c30b15f9a022996142e48711110ecd1c52663504e53dcfdcf09"
+  "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:606ff3ca1c41ac2d2e21015983e5673f080dc2cdcefd617b83f5a0b0b3e0e5b2"
 tas_single_node_trillian_db_image:
-  "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:50bc20bb57e8ee31e56637cafccfed2658982d81ca9bf1e71db9de4b82a2be36"
+  "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:edc8e4dd57caabd4a4b8f59b11b8b389b3871dd1f975559c62e5961d0892a935"
 tas_single_node_tuf_image:
-  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:743bbe6b3a666225eb8ac30f667d20f3daeb0586a6c2d7005d3096c0e823dac5"
+  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:f4057c813c6ea2531aff0dcde7596c35a5d322e94884ea30741d97731d1e4f2f"
 tas_single_node_http_server_image:
   "registry.redhat.io/ubi9/httpd-24@sha256:47a0b3f12211320d1828524a324ab3ec9deac97c17b9d3f056c87d3384d9eb79"
 tas_single_node_trillian_netcat_image:
@@ -41,15 +41,15 @@ tas_single_node_trillian_netcat_image:
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:f3e0afbc6e1459a63b87ded4666b6ea3fa59a5d146d6bfa39995af936b1fb9f3"
 tas_single_node_timestamp_authority_image:
-  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:576d4fc358fffe5bedb93eb3fec68b9c040b1d50e6c4c56a3f8d49084c169e4f"
+  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:45623cdf8c17403afb6fd1f9c36224811bcb585d277ee0fab0d2a5c610d09689"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:1e3a46ade52215e2c78df9229f36301c94099e8397ee74ab99fb8bd504ce7aa2"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e15b7707d8205072b3d8aad44a2962dbc3eb177570dd5d96390d7150256ebe61"
 # Create Tree
 tas_single_node_createtree_image:
-  "registry.redhat.io/rhtas/createtree-rhel9@sha256:7a1e465f93e0560194b7d5d27b46453a0dd4ebb4072235da1ffbe4ccff91d452"
+  "registry.redhat.io/rhtas/createtree-rhel9@sha256:a74cfec780cfc78b6c9c16d02fba9eb00ebcb255c7fe02383b2eed22f6e7ebec"
 # CLI Server
 tas_single_node_client_server_image:
-  "registry.redhat.io/rhtas/client-server-rhel9@sha256:47071a0613d6d262110af4ce6703ce99db72c7ab58e3a6051b82f3098b372a49"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:dfb549187c219db9268974c1f81269bae669bc4d4494961d11e47fcda9a4307e"
 
 tas_single_node_podman: {}
 
