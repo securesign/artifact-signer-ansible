@@ -95,6 +95,12 @@
 <td><code>True</code></td>
 </tr>
 <tr>
+<td>tas_single_node_signing_config_url_mode</td>
+<td>Controls which service URLs are placed into the TUF trust root during creation. When set to <code>external</code>, the signing config uses the external HTTPS URLs (e.g. <code>https://rekor.&lt;base_hostname&gt;</code>). When set to <code>internal</code>, it uses the internal pod addresses (e.g. <code>http://rekor-server-pod:3001</code>).</td>
+<td>str</td>
+<td><code>external</code></td>
+</tr>
+<tr>
 <td>tas_single_node_ctlog</td>
 <td>Configuration and specification of ctlog Custom Configuration as well as custom keys.</td>
 <td>dict of 'tas_single_node_ctlog' options</td>
@@ -176,7 +182,7 @@
 <td>tas_single_node_tsa_image</td>
 <td>Timestamp Authority Image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:fe236dcdd0534e2501dc6b7628a59b47c74629aa2df2d02314e984dce80a6ae8</code></td>
+<td><code>registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:621b2e4beb48d19cfc01ac72ca247010d44ad8b2dc8b851225a0c62ebeba64f6</code></td>
 </tr>
 <tr>
 <td>tas_single_node_rekor_search_image</td>
