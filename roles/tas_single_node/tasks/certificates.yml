@@ -121,6 +121,11 @@
               -out '{{ tas_single_node_remote_ca }}'
             creates: "{{ tas_single_node_remote_ca }}"
           no_log: true
+  rescue:
+    - name: Log root CA generation failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Root CA generation"
 
 - name: Handle user provided root
   when: >
@@ -170,6 +175,12 @@
             mode: '0600'
           when: >
             old_key_content.content | b64decode != tas_single_node_ingress_certificates.root.private_key
+          register: backup_private_key_result
+
+        - name: Record backup path for private key (for restore on failure)
+          ansible.builtin.set_fact:
+            root_backup_private_key_path: "{{ backup_private_key_result.dest }}"
+          when: backup_private_key_result is defined and not (backup_private_key_result.skipped | default(false))
 
         - name: Back-up old root ca
           ansible.builtin.copy:
@@ -181,6 +192,12 @@
             (tas_single_node_ingress_certificates.root.ca_certificate != ""
               and old_root_ca_content.content | b64decode != tas_single_node_ingress_certificates.root.ca_certificate)
             or old_key_content.content | b64decode != tas_single_node_ingress_certificates.root.private_key
+          register: backup_ca_result
+
+        - name: Record backup path for root CA (for restore on failure)
+          ansible.builtin.set_fact:
+            root_backup_ca_path: "{{ backup_ca_result.dest }}"
+          when: backup_ca_result is defined and not (backup_ca_result.skipped | default(false))
 
     - name: Set user provided root ca
       ansible.builtin.copy:
@@ -195,6 +212,40 @@
         dest: "{{ tas_single_node_remote_private_key }}"
         mode: '600'
       when: tas_single_node_ingress_certificates.root.private_key != ""
+
+  rescue:
+    - name: Restore root CA from backup on failure
+      ansible.builtin.copy:
+        src: "{{ root_backup_ca_path }}"
+        dest: "{{ tas_single_node_remote_ca }}"
+        remote_src: true
+        mode: "0600"
+      when: root_backup_ca_path is defined
+
+    - name: Restore private key from backup on failure
+      ansible.builtin.copy:
+        src: "{{ root_backup_private_key_path }}"
+        dest: "{{ tas_single_node_remote_private_key }}"
+        remote_src: true
+        mode: "0600"
+      when: root_backup_private_key_path is defined
+
+    - name: Remove root CA backup file after restore
+      ansible.builtin.file:
+        path: "{{ root_backup_ca_path }}"
+        state: absent
+      when: root_backup_ca_path is defined
+
+    - name: Remove private key backup file after restore
+      ansible.builtin.file:
+        path: "{{ root_backup_private_key_path }}"
+        state: absent
+      when: root_backup_private_key_path is defined
+
+    - name: Log user-provided root failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "User-provided root CA"
 
 - name: Refresh list of files in certs directory
   ansible.builtin.find:

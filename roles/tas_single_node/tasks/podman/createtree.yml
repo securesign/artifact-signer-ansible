@@ -62,3 +62,8 @@
             name: trillian-treeid
           data:
             tree_id: "{{ trillian_tree_id }}"
+  rescue:
+    - name: Log createtree failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Createtree (Trillian tree ID)"

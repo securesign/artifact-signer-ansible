@@ -71,8 +71,11 @@
 
     - name: Fail if the container exited with non-0 exit code
       ansible.builtin.fail:
-        msg:
-          - "Job in container {{ container_name }} failed:"
-          - "stdout: {{ container_logs.stdout }}"
-          - "stderr: {{ container_logs.stderr }}"
+        msg: "Job in container {{ container_name }} failed with non-zero exit code. Check container logs on the host (e.g. journalctl or podman logs)."
       when: container_exit_code.stdout != "0"
+      no_log: true
+  rescue:
+    - name: Log oneshot container failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Oneshot container ({{ podman_spec.systemd_file }})"

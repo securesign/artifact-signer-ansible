@@ -1,0 +1,42 @@
+---
+# Log failure to file and fail. Include from rescue: (rescue runs only on block failure).
+# Optional: failure_log_block_name. When included from rescue, no vars needed.
+# Logs timestamp, host, block name, truncated msg only (no stdout/stderr).
+- name: Log failure to file
+  when: tas_single_node_failure_log_enabled | default(true) | bool
+  block:
+    - name: Ensure failure log directory exists
+      ansible.builtin.file:
+        path: "{{ tas_single_node_failure_log_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Ensure failure log file exists
+      ansible.builtin.file:
+        path: "{{ tas_single_node_failure_log_file }}"
+        state: touch
+        mode: "0600"
+
+    - name: Append failure to log file
+      ansible.builtin.lineinfile:
+        path: "{{ tas_single_node_failure_log_file }}"
+        line: >-
+          {{ ansible_facts['date_time']['iso8601'] | default('') }} {{ ansible_facts['hostname'] | default(inventory_hostname) }}
+          {{ failure_log_block_name | default(ansible_failed_task.name) }}:
+          {{ (ansible_failed_result.msg | default('Task failed.') | string) | replace('\n', ' ') | truncate(300) }}
+        create: true
+        mode: "0600"
+      no_log: true
+
+    - name: Fail and direct to failure log
+      ansible.builtin.fail:
+        msg: >-
+          Task failed. Failure logged to {{ tas_single_node_failure_log_file }} on
+          {{ inventory_hostname }} (check path on target host). Check failure log for details.
+
+- name: Fail and direct to failure log (logging disabled)
+  when: not (tas_single_node_failure_log_enabled | default(true) | bool)
+  ansible.builtin.fail:
+    msg: >-
+      Task failed. Check playbook output. Enable tas_single_node_failure_log_enabled
+      to record failures to {{ tas_single_node_failure_log_file }}.
