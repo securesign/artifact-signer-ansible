@@ -17,7 +17,7 @@ tas_single_node_trust_root:
 # To avoid breaking our structural tests
 
 tas_single_node_fulcio_server_image:
-  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:2417087b96feb8ce3381840bdbb476e9fe135d628ea0fff65e8a05ef472b24f5"
+  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:5aafcf9d59e24b44071860ed06bd0162e0556cbc09355d8c419c009e7d562eb1"
 tas_single_node_trillian_log_server_image:
   "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:48b548505f3688edb1f2a9f13b551b5ffb9b9bd6524971efce26344228c1ead3"
 tas_single_node_trillian_log_signer_image:
