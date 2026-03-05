@@ -30,7 +30,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_skip_os_install | Whether or not to skip the installation of the required operating system packages. Only use this option when all packages are already installed at the versions released for RHEL 9.4 or later. | bool |  `False`  |
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:67495de82e2fcd2ab4ad0e53442884c392da1aa3f5dd56d9488a1ed5df97f513`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:994a860e569f2200211b01f9919de11d14b86c669230184c4997f3d875c79208`  |
-| tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:37028258a88bba4dfaadb59fc88b6efe9c119a808e212ad5214d65072abb29d0`  |
+| tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:fef43db546fd7e7a75ebc4d70bdfb29eba97ac8867fb746540447133dee1d400`  |
 | tas_single_node_rekor_image | Rekor image | str |  `registry.redhat.io/rhtas/rekor-server-rhel9@sha256:133ee0153e12e6562cfea1a74914ebdd7ee76ae131ec7ca0c3e674c2848150ae`  |
 | tas_single_node_ct_server_image | ctlog image | str |  `registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:a0c7d71fc8f4cb7530169a6b54dc3a67215c4058a45f84b87bb04fc62e6e8141`  |
 | tas_single_node_redis_image | Redis image | str |  `registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:01736bdd96acbc646334a1109409862210e5273394c35fb244f21a143af9f83e`  |
