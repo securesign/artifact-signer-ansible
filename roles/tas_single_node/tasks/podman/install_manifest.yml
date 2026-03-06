@@ -76,3 +76,8 @@
           - "stdout: {{ container_logs.stdout }}"
           - "stderr: {{ container_logs.stderr }}"
       when: container_exit_code.stdout != "0"
+  rescue:
+    - name: Log oneshot container failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Oneshot container ({{ podman_spec.systemd_file }})"

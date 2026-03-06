@@ -40,6 +40,11 @@
         enabled: true
         state: started
         daemon_reload: true
+  rescue:
+    - name: Log backup deployment failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Backup service deployment"
 
 - name: Populate Service Facts
   ansible.builtin.service_facts:
@@ -65,3 +70,8 @@
     - name: Reload Systemd Daemon
       ansible.builtin.systemd:
         daemon_reload: true
+  rescue:
+    - name: Log backup prune failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Backup service prune"

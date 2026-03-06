@@ -122,6 +122,11 @@
       ansible.builtin.command:
         cmd: "podman volume unmount {{ tas_single_node_tuf_repository_volume_name }}"
       changed_when: false
+  rescue:
+    - name: Log TUF repository setup failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "TUF repository (trust root archive)"
 
 - name: Initialize trust root
   ansible.builtin.include_tasks: podman/install_manifest.yml

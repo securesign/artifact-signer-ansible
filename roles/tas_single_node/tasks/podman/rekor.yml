@@ -10,6 +10,11 @@
     - name: Generate Rekor Sharding Config
       ansible.builtin.set_fact:
         rekor_sharding_content: "{{ lookup('ansible.builtin.template', 'configs/rekor-sharding-config-template.j2') }}"
+  rescue:
+    - name: Log rekor sharding config failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Rekor sharding config"
 
 - name: Create Rekor Sharding Config
   ansible.builtin.copy:

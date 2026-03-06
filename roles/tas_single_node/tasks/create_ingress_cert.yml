@@ -119,3 +119,8 @@
         path: "{{ tas_single_node_ingress_use_provided_cert_marker_file }}"
         state: absent
       when: existing_files.files | selectattr('path', 'equalto', tas_single_node_ingress_use_provided_cert_marker_file) | list | length != 0
+  rescue:
+    - name: Log ingress certificate failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Ingress certificate ({{ cert_name }})"
