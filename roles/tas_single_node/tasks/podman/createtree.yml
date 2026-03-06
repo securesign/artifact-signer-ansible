@@ -16,6 +16,11 @@
       ansible.builtin.set_fact:
         trillian_tree_id: "{{ (existing_treeid_config.content | b64decode | from_yaml)['data']['tree_id'] }}"
       when: '"tree_id" in (existing_treeid_config.content | b64decode | from_yaml)["data"]'
+  rescue:
+    - name: Log obtain existing Trillian tree ID failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Obtain existing Trillian tree ID"
 
 # Create Tree ID
 - name: Create Tree ID

@@ -605,6 +605,11 @@
         and (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_remote_fulcio_root_ca) | list | length) == 0
         or key_cert_mismatch
       no_log: true
+  rescue:
+    - name: Log Fulcio root failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Fulcio root"
 
 # Back-up ctlog private keys
 - name: Get existing ctlog private keys
@@ -621,6 +626,11 @@
       loop: "{{ existing_ctlog_keys.files }}"
       register: existing_keys
       no_log: true
+  rescue:
+    - name: Log get existing ctlog private keys failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Get existing ctlog private keys"
 
 - name: Set ctlog_private_keys_changed
   ansible.builtin.set_fact:
@@ -658,6 +668,11 @@
         path: "{{ item }}"
         state: absent
       loop: "{{ keys_to_backup }}"
+  rescue:
+    - name: Log ctlog private keys backup failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Back-up ctlog private keys"
 
 # Back-up ctlog public keys
 - name: Get existing ctlog public keys
@@ -673,6 +688,11 @@
         src: "{{ item.path }}"
       loop: "{{ existing_ctlog_keys.files }}"
       register: existing_keys
+  rescue:
+    - name: Log get existing ctlog public keys failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Get existing ctlog public keys"
 
 - name: Set ctlog_public_keys_changed
   ansible.builtin.set_fact:
@@ -710,6 +730,11 @@
         path: "{{ item }}"
         state: absent
       loop: "{{ keys_to_backup }}"
+  rescue:
+    - name: Log ctlog public keys backup failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Back-up ctlog public keys"
 
 - name: Create Custom ctlog Root
   when: >
@@ -824,6 +849,11 @@
         state: absent
       loop: "{{ extra_keys_to_remove }}"
       when: extra_keys_to_remove | length > 0
+  rescue:
+    - name: Log custom ctlog root failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Custom ctlog root"
 
 - name: Refresh list of files in certs directory
   ansible.builtin.find:
@@ -863,6 +893,11 @@
           -passin 'pass:{{ tas_single_node_ctlog.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_ctlog_public_key.0 }}"
       no_log: true
+  rescue:
+    - name: Log ctlog root generation failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Ctlog root generation"
 
 # Back-up rekor private keys
 - name: Get existing rekor private keys
@@ -879,6 +914,11 @@
       loop: "{{ existing_rekor_keys.files }}"
       register: existing_keys
       no_log: true
+  rescue:
+    - name: Log get existing rekor private keys failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Get existing rekor private keys"
 
 - name: Set rekor_private_keys_changed
   ansible.builtin.set_fact:
@@ -916,6 +956,11 @@
         path: "{{ item }}"
         state: absent
       loop: "{{ keys_to_backup }}"
+  rescue:
+    - name: Log rekor private keys backup failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Back-up rekor private keys"
 
 # Back-up rekor public keys
 - name: Get existing rekor public keys
@@ -931,6 +976,11 @@
         src: "{{ item.path }}"
       loop: "{{ existing_rekor_keys.files }}"
       register: existing_keys
+  rescue:
+    - name: Log get existing rekor public keys failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Get existing rekor public keys"
 
 - name: Set rekor_public_keys_changed
   ansible.builtin.set_fact:
@@ -968,6 +1018,11 @@
         path: "{{ item }}"
         state: absent
       loop: "{{ keys_to_backup }}"
+  rescue:
+    - name: Log rekor public keys backup failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Back-up rekor public keys"
 
 - name: Create Custom Rekor Key files
   when: >
@@ -1080,6 +1135,11 @@
         state: absent
       loop: "{{ extra_keys_to_remove }}"
       when: extra_keys_to_remove | length > 0
+  rescue:
+    - name: Log custom Rekor key files failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Custom Rekor key files"
 
 - name: Refresh list of files in certs directory
   ansible.builtin.find:
@@ -1117,6 +1177,11 @@
           -passin 'pass:{{ tas_single_node_rekor.ca_passphrase }}'
         creates: "{{ tas_single_node_remote_rekor_public_key.0 }}"
       no_log: true
+  rescue:
+    - name: Log Rekor signing key failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Rekor signing key"
 
 - name: Handle TSA certificate chain
   when: >
@@ -1309,6 +1374,11 @@
         mode: '600'
       when: >
         (certs_dir_files.files | selectattr('path', 'equalto', tas_single_node_tsa_certificate_chain) | list | length) == 0
+  rescue:
+    - name: Log TSA certificate chain failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "TSA certificate chain"
 
 - name: Handle user provided TSA cert chain and private key
   block:
@@ -1409,3 +1479,8 @@
       failed_when: tsa_key_passphrase.stdout == "failed"
       when: tas_single_node_tsa.signer_private_key is defined and tas_single_node_tsa.signer_private_key != ""
       no_log: true
+  rescue:
+    - name: Log user-provided TSA cert chain and private key failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "User-provided TSA cert chain and private key"

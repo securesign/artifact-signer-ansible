@@ -65,4 +65,4 @@ tas_single_node_podman_volume_create_extra_args: {}
 # Set to false to disable file logging.
 tas_single_node_failure_log_enabled: true
 tas_single_node_failure_log_dir: "{{ (tas_single_node_config_dir | default('/etc/rhtas')) }}/logs"
-tas_single_node_failure_log_file: "{{ (tas_single_node_config_dir | default('/etc/rhtas')) }}/logs/failures.log"
+tas_single_node_failure_log_file: "{{ (tas_single_node_failure_log_dir | default('/etc/rhtas/logs')) }}/failures.log"
