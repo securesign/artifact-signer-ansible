@@ -28,19 +28,26 @@
   changed_when: logincheck.stdout | string != tas_single_node_registry_username | string
 
 - name: Podman login to registry.redhat.io
-  ansible.builtin.command:
-    argv:
-      - podman
-      - login
-      - registry.redhat.io
-      - -u
-      - "{{ tas_single_node_registry_username }}"
-      - --password-stdin
-    stdin: "{{ tas_single_node_registry_password }}"
-  register: podman_login_result
-  when: logincheck.stdout | string != tas_single_node_registry_username | string
-  changed_when: true
-  no_log: true
+  block:
+    - name: Log in to registry.redhat.io
+      ansible.builtin.command:
+        argv:
+          - podman
+          - login
+          - registry.redhat.io
+          - -u
+          - "{{ tas_single_node_registry_username }}"
+          - --password-stdin
+        stdin: "{{ tas_single_node_registry_password }}"
+      register: podman_login_result
+      when: logincheck.stdout | string != tas_single_node_registry_username | string
+      changed_when: true
+      no_log: true
+  rescue:
+    - name: Log Podman login failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Podman registry login"
 
 - name: Pull all images
   ansible.builtin.command:

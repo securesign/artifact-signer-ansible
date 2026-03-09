@@ -53,3 +53,8 @@
       loop_control:
         label: "{{ item.item }}"
       when: item.stdout | default('') | length > 0 and item.stdout != "<no value>"
+  rescue:
+    - name: Log volume SELinux failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Volume SELinux context"

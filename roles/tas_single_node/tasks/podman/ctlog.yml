@@ -21,6 +21,11 @@
       ansible.builtin.set_fact:
         ctlog_config_content: "{{ lookup('ansible.builtin.template', 'configs/ctlog-config-template.j2') }}"
       no_log: true
+  rescue:
+    - name: Log ctlog config load failure to file
+      ansible.builtin.include_tasks: ../../log_failure.yml
+      vars:
+        failure_log_block_name: "Ctlog config"
 
 - name: Create ctlog configmap
   ansible.builtin.copy:

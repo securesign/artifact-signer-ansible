@@ -26,6 +26,11 @@
 
     - name: Exit after Backup
       ansible.builtin.meta: end_host
+  rescue:
+    - name: Log manual backup failure to file
+      ansible.builtin.include_tasks: log_failure.yml
+      vars:
+        failure_log_block_name: "Manual backup"
 
 - name: Check configuration correctness
   ansible.builtin.include_tasks: configuration_check.yml
