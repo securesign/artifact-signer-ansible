@@ -1191,7 +1191,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:661c19e661a3655809755596c4d9f894f792421cd937c6b53cb1c2ba201f18e8"
+        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:bd436bfe85ff71e45068bbfd0df6a319695f2c80a159677aee218a4e6b1779f2"
       tas_single_node_tuf_image:
         description: "TUF server image"
         type: "str"
