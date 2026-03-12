@@ -45,7 +45,7 @@ tas_single_node_trillian_netcat_image:
 tas_single_node_nginx_image:
   "registry.redhat.io/rhel9/nginx-124@sha256:a75f10d71969dd2451914df6539dea28f8e2c88506f691ea211768a0bd0746d1"
 tas_single_node_timestamp_authority_image:
-  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:988cd52cf37d8431c3514eeaf630f4a9bc761a43799868691da4818cfdbceddf"
+  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:025b7fe02980f6f150a8d76f4f8415c63b367f75f7a4460ab37cb50ac4648954"
 tas_single_node_rekor_search_ui_image:
   "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:4872d37ce293b1e236b80ada8ced97531258f7075335d0d2728abfb57bfb8574"
 # Create Tree
