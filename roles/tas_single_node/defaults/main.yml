@@ -53,7 +53,7 @@ tas_single_node_createtree_image:
   "registry.redhat.io/rhtas/createtree-rhel9@sha256:33d35ec69521612701540112edc8454e20c6b63f18fdc288f4625dcc144942bf"
 # CLI Server
 tas_single_node_client_server_image:
-  "registry.redhat.io/rhtas/client-server-rhel9@sha256:5cadc4a8f72f6be85b0a28d4120aa89d319b42e6754d623703725834853bf283"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:3929b345058ecb4c071d38e3fe2c00764bc382635094d6d197d0544aef3a91a1"
 
 tas_single_node_signing_config_url_mode: external
 
