@@ -9,12 +9,12 @@ driver:
 platforms:
   - name: instance
     private_key_file_path: ~/.ssh/id_rsa
-    image_id: ami-0dac29b55bd7c33aa
+    image_id: ami-01e4622577f6bcf2e
     instance_type: m5.2xlarge
     volume_size: 32
   - name: worker-instance
     private_key_file_path: ~/.ssh/id_rsa
-    image_id: ami-0dac29b55bd7c33aa
+    image_id: ami-01e4622577f6bcf2e
     instance_type: m5.large
     volume_size: 10
 provisioner:
