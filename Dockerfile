@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ansible-automation-platform-26/ansible-dev-tools-rhel9@sha256:baf782543d42681d866eaf2262c3ba47b2f55a4e2eeee3ba8eca5e0a35d5ae64 AS builder
+FROM registry.redhat.io/ansible-automation-platform-26/ansible-dev-tools-rhel9@sha256:7b8269fe0fb5212889837592e7cebfc4cff46f8dc45dcb3442782f0739b1642e AS builder
 
 WORKDIR /tmp/source
 
@@ -13,7 +13,7 @@ USER root
 
 RUN ansible-galaxy collection build --force
 
-FROM registry.redhat.io/ubi10-minimal@sha256:a74a7a92d3069bfac09c6882087771fc7db59fa9d8e16f14f4e012fe7288554c
+FROM registry.redhat.io/ubi10-minimal@sha256:c858c2eb5bd336d8c400f6ee976a9d731beccf3351fa7a6f485dced24ae4af17
 
 LABEL vendor="Red Hat, Inc."
 LABEL url="https://www.redhat.com"
