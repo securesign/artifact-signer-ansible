@@ -1167,7 +1167,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:cbdb051c4905892f8a9966c8301a0108de3eb0dfce1eee361fa6eb281fad8070"
+        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:9a030d26d3328738b1df20eeca44b28ebf0a16e1d7fa4aa34a1fb380fb19cea3"
       tas_single_node_rekor_image:
         description: "Rekor image"
         type: "str"
