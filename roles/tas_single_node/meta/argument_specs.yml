@@ -1215,7 +1215,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:025b7fe02980f6f150a8d76f4f8415c63b367f75f7a4460ab37cb50ac4648954"
+        default: "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:b8be0554d55198f65f76bf3a2985697e7f166940c2aec9ef7544e6d81575804c"
       tas_single_node_rekor_search_image:
         description: "Rekor search UI image"
         type: "str"
