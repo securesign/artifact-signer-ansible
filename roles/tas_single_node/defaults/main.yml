@@ -29,7 +29,7 @@ tas_single_node_rekor_monitor_image:
 tas_single_node_ctlog_image:
   "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:414334f1507b75a4c6e0c4fe4fea17acccab41d3f076163dd65c43c55d60dc7c"
 tas_single_node_ctlog_monitor_image:
-  "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:ed0589f6fb0eb1d83ad7144e4c61752de7e010d9066c1039c1c76a029521616a"
+  "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:1292465807d5a3b0a11b48c158105947f46350510c4c11b949bb5a5002f73cd6"
 tas_single_node_rekor_redis_image:
   "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:487eb4f630346e8e35664eadfd0fa3c930e3235c3c2f592c69e8f959ba528eb7"
 tas_single_node_backfill_redis_image:
