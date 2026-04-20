@@ -233,7 +233,7 @@ See [Ansible collections usage](https://docs.ansible.com/ansible/devel/user_guid
 **Steps:**
 
 Create a MariaDB instance.
-Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/deployment_guide/configure-an-alternative-database-for-trusted-artifact-signer#configuring-amazon-rds-for-trusted-artifact-signer_deploy).
+Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1.3/html/deployment_guide/configure-an-alternative-database-for-trusted-artifact-signer#configuring-amazon-rds-for-trusted-artifact-signer_deploy).
 Ensure the instance uses the Trillian schema.
 Make note the instance's hostname, port, username, password, and root's password.
 
@@ -358,7 +358,7 @@ You can open a support ticket for Red Hat Trusted Artifact Signer [here](https:/
 
 ## Release notes and Roadmap
 
-You can read the latest release notes [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/release_notes/index).
+You can read the latest release notes [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1.3/html/release_notes/index).
 
 ## Related Information
 
