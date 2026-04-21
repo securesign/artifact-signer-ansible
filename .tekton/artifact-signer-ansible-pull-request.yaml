@@ -9,14 +9,14 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
-      == "main" && (".tekton/artifact-signer-ansible-pull-request.yaml".pathChanged() || "Dockerfile".pathChanged()
+      == "release-1.4" && (".tekton/artifact-signer-ansible-pull-request.yaml".pathChanged() || "Dockerfile".pathChanged()
       || "roles/***".pathChanged() || "meta/***".pathChanged()
       || "molecule/***".pathChanged() || "testing-requirements.txt".pathChanged()
       || "requirements.json".pathChanged())
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: ansible
-    appstudio.openshift.io/component: artifact-signer-ansible
+    appstudio.openshift.io/application: ansible-v1-4
+    appstudio.openshift.io/component: artifact-signer-ansible-v1-4
     pipelines.appstudio.openshift.io/type: build
   name: artifact-signer-ansible-on-pull-request
   namespace: rhtas-tenant
@@ -52,7 +52,7 @@ spec:
         value: pipelines/docker-build-oci-ta.yaml
     resolver: git
   taskRunTemplate:
-    serviceAccountName: build-pipeline-artifact-signer-ansible
+    serviceAccountName: build-pipeline-artifact-signer-ansible-v1-4
   workspaces:
   - name: git-auth
     secret:
