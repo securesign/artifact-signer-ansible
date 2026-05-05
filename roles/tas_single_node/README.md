@@ -33,7 +33,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_logsigner_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:9a030d26d3328738b1df20eeca44b28ebf0a16e1d7fa4aa34a1fb380fb19cea3`  |
 | tas_single_node_rekor_image | Rekor image | str |  `registry.redhat.io/rhtas/rekor-server-rhel9@sha256:872350f23d5963cec320f5b3dcdd2c0bce38538a6b1f18b789127769f227196f`  |
 | tas_single_node_ct_server_image | ctlog image | str |  `registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:414334f1507b75a4c6e0c4fe4fea17acccab41d3f076163dd65c43c55d60dc7c`  |
-| tas_single_node_redis_image | Redis image | str |  `registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:487eb4f630346e8e35664eadfd0fa3c930e3235c3c2f592c69e8f959ba528eb7`  |
+| tas_single_node_redis_image | Redis image | str |  `registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:d39c0a65e5402ecd748c70e41368ce65447fab524a5c80dd78f1ccf5e7d3fd6e`  |
 | tas_single_node_trillian_db_image | Trillian database image | str |  `registry.redhat.io/rhtas/trillian-database-rhel9@sha256:12f385fd99a7bfd1db23749aa1bac14db709a3845ac2c5779addae40fd69cac1`  |
 | tas_single_node_tuf_image | TUF server image | str |  `registry.redhat.io/rhtas/tuf-server-rhel9@sha256:34f5cdc53a908ae2819d85ab18e35b69dc4efc135d747dd1d2e216a99a2dcd1b`  |
 | tas_single_node_netcat_image | Netcat image | str |  `registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7`  |
