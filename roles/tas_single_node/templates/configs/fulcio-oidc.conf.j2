@@ -8,6 +8,7 @@ oidc-issuers:
     ci-provider: {{ issuer.ci_provider | quote }}
 {% endif %}
 {% endfor %}
+{% if tas_single_node_fulcio.fulcio_config.meta_issuers | length > 0 %}
 meta-issuers:
 {% for meta_issuer in tas_single_node_fulcio.fulcio_config.meta_issuers %}
   {{ meta_issuer.issuer_pattern | quote }}:
@@ -17,6 +18,8 @@ meta-issuers:
     ci-provider: {{ meta_issuer.ci_provider | quote }}
 {% endif %}
 {% endfor %}
+{% endif %}
+{% if tas_single_node_fulcio.fulcio_config.ci_issuer_metadata | length > 0 %}
 ci-issuer-metadata:
 {% for cim in tas_single_node_fulcio.fulcio_config.ci_issuer_metadata %}
   {{ cim.issuer_name | quote }}:
@@ -32,3 +35,4 @@ ci-issuer-metadata:
         {{ k | replace('_', '-') }}: {{ v | quote }}
       {% endfor %}
 {% endfor %}
+{% endif %}
