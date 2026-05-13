@@ -61,8 +61,13 @@ spec:
                 --fileca-key-passwd "${PASSPHRASE}" \
                 --ct-log-url=http://{{ tas_single_node_ctlog_pod }}-pod:{{ tas_single_node_ctlog_port_http }}/{{ tas_single_node_fulcio.ct_log_prefix }}
           env:
+{% if tas_single_node_fulcio.trusted_ca != "" %}
+            - name: SSL_CERT_DIR
+              value: /certs:/etc/oidc-ca
+{% else %}
             - name: SSL_CERT_DIR
               value: /certs
+{% endif %}
             - name: PASSPHRASE
               valueFrom:
                 secretKeyRef:
@@ -79,11 +84,6 @@ spec:
               protocol: TCP
           resources: {}
           volumeMounts:
-{% if tas_single_node_fulcio.trusted_ca != "" %}
-            - mountPath: /certs/fulcio-trusted-ca.pem
-              name: fulcio-oidc-ca
-              subPath: fulcio-trusted-ca.pem
-{% endif %}
             - mountPath: /etc/fulcio-config
               name: fulcio-config
             - mountPath: /var/run/fulcio-secrets
@@ -92,6 +92,11 @@ spec:
             - mountPath: /certs
               name: nginx-certs
               readOnly: true
+{% if tas_single_node_fulcio.trusted_ca != "" %}
+            - mountPath: /etc/oidc-ca
+              name: fulcio-oidc-ca
+              readOnly: true
+{% endif %}
       restartPolicy: Always
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
