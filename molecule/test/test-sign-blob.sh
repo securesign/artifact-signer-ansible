@@ -60,8 +60,8 @@ echo "testing" > "$FILENAME.txt"
 #       --bundle "$FILE.bundle" \
 #       "$FILE"
 
-# Legacy fallback: explicit service URLs for TUF repos without signing config
-cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}" --use-signing-config=false --new-bundle-format=false --timestamp-server-url="${COSIGN_TSA_URL}" --rfc3161-timestamp="$FILENAME.timestamp"
+# Use cosign v3 with signing config from TUF (uses Fulcio v2 API)
+cosign --verbose sign-blob "$FILENAME.txt" --bundle "$FILENAME.bundle" --identity-token="${TOKEN}"
 
 validation_counter=0
 for file in /test/*.txt; do
@@ -71,9 +71,6 @@ for file in /test/*.txt; do
         --certificate-identity="${EMAIL}" \
         --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
         --bundle "${file%.*}.bundle" \
-        --rfc3161-timestamp="${file%.*}.timestamp" \
-        --use-signed-timestamps \
-        --new-bundle-format=false \
         "$file"
 
    validation_counter=$((validation_counter + 1))
