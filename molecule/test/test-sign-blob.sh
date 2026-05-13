@@ -16,10 +16,10 @@ export OIDC_ISSUER_URL=$OIDC_ISSUER_URL
 # export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
 # export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
 # export COSIGN_TSA_URL=https://tsa.$BASE_HOSTNAME/api/v1/timestamp
+# COSIGN_OIDC_ISSUER is also considered a service URL and should not be set
 export COSIGN_MIRROR=$TUF_URL
 export COSIGN_ROOT=$TUF_URL/root.json
 export COSIGN_OIDC_CLIENT_ID=trusted-artifact-signer
-export COSIGN_OIDC_ISSUER=$OIDC_ISSUER_URL
 export COSIGN_YES="true"
 export EMAIL=jdoe@redhat.com
 
@@ -70,7 +70,7 @@ for file in /test/*.txt; do
     echo "Executing cosign verification on file: $file"
     cosign --verbose verify-blob \
         --certificate-identity="${EMAIL}" \
-        --certificate-oidc-issuer="${COSIGN_OIDC_ISSUER}" \
+        --certificate-oidc-issuer="${OIDC_ISSUER_URL}" \
         --bundle "${file%.*}.bundle" \
         "$file"
 
