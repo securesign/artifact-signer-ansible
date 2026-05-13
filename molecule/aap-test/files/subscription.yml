@@ -2,8 +2,8 @@
 
 - name: subscription | Get subscriptions with a filter
   ansible.controller.subscriptions:
-    client_id: "{{ redhat_subscription_username }}"
-    client_secret: "{{ redhat_subscription_password }}"
+    username: "{{ redhat_subscription_username }}"
+    password: "{{ redhat_subscription_password }}"
     filters: "{{ controller_license.filters }}"
     # Role Standard Options
     controller_host: "{{ aap_hostname | default(omit, true) }}"
