@@ -12,9 +12,10 @@ update-ca-trust
 # set up cosign env
 export TUF_URL=https://tuf.$BASE_HOSTNAME
 export OIDC_ISSUER_URL=$OIDC_ISSUER_URL
-export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
-export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
-export COSIGN_TSA_URL=https://tsa.$BASE_HOSTNAME/api/v1/timestamp
+# When using TUF root with signing config, do NOT set individual service URLs
+# export COSIGN_FULCIO_URL=https://fulcio.$BASE_HOSTNAME
+# export COSIGN_REKOR_URL=https://rekor.$BASE_HOSTNAME
+# export COSIGN_TSA_URL=https://tsa.$BASE_HOSTNAME/api/v1/timestamp
 export COSIGN_MIRROR=$TUF_URL
 export COSIGN_ROOT=$TUF_URL/root.json
 export COSIGN_OIDC_CLIENT_ID=trusted-artifact-signer
