@@ -35,10 +35,12 @@ tas_single_node_fulcio:
     {{ lookup('file', molecule_scenario_directory + '/test_creds/fulcio/fulcio.pem') }}
   ca_passphrase: password
   fulcio_config:
+    oidc_issuers: []
     meta_issuers:
       - issuer_pattern: "https://dex-*:5556/dex"
         client_id: trusted-artifact-signer
         type: email
+    ci_issuer_metadata: []
 
 tas_single_node_rekor:
   ca_passphrase: password

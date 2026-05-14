@@ -72,11 +72,26 @@ validation_counter=0
 for file in /test/*.txt; do
   if [ -f "$file" ]; then  # Check if it is a regular file
     echo "Executing cosign verification on file: $file"
-    cosign --verbose verify-blob \
-        --certificate-identity="${EMAIL}" \
-        --certificate-oidc-issuer="${OIDC_ISSUER_URL}" \
-        --bundle "${file%.*}.bundle" \
-        "$file"
+
+    # Check if RFC3161 timestamp file exists (old bundle format)
+    if [ -f "${file%.*}.timestamp" ]; then
+      echo "Verifying with old bundle format (pre-rotation)"
+      cosign --verbose verify-blob \
+          --certificate-identity="${EMAIL}" \
+          --certificate-oidc-issuer="${OIDC_ISSUER_URL}" \
+          --bundle "${file%.*}.bundle" \
+          --rfc3161-timestamp="${file%.*}.timestamp" \
+          --use-signed-timestamps \
+          --new-bundle-format=false \
+          "$file"
+    else
+      echo "Verifying with new bundle format (v2 API)"
+      cosign --verbose verify-blob \
+          --certificate-identity="${EMAIL}" \
+          --certificate-oidc-issuer="${OIDC_ISSUER_URL}" \
+          --bundle "${file%.*}.bundle" \
+          "$file"
+    fi
 
    validation_counter=$((validation_counter + 1))
   fi

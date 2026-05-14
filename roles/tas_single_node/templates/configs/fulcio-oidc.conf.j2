@@ -1,3 +1,4 @@
+{% if tas_single_node_fulcio.fulcio_config.oidc_issuers is defined and tas_single_node_fulcio.fulcio_config.oidc_issuers | length > 0 %}
 oidc-issuers:
 {% for issuer in tas_single_node_fulcio.fulcio_config.oidc_issuers %}
   {{ issuer.issuer | quote }}:
@@ -8,6 +9,7 @@ oidc-issuers:
     ci-provider: {{ issuer.ci_provider | quote }}
 {% endif %}
 {% endfor %}
+{% endif %}
 {% if tas_single_node_fulcio.fulcio_config.meta_issuers | length > 0 %}
 meta-issuers:
 {% for meta_issuer in tas_single_node_fulcio.fulcio_config.meta_issuers %}
