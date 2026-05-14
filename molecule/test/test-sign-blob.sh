@@ -37,10 +37,14 @@ if [ -z "${TOKEN}" ]; then
   exit 1
 fi
 
+checksum=$(curl -s "$COSIGN_MIRROR/root.json" | sha256sum | awk '{print $1}')
+export checksum
+
+
 env
 cd /test
 FILENAME="$(date +%Y%m%d%H%M%S)"
-cosign initialize
+cosign initialize --mirror=$TUF_URL --root=$TUF_URL/root.json --root-checksum $checksum
 
 echo "testing" > "$FILENAME.txt"
 
