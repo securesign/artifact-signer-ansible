@@ -1,6 +1,6 @@
 FROM ghcr.io/sigstore/cosign/cosign:v3.0.5 AS cosign-bin
 
-FROM fedora:44
+FROM fedora:45
 RUN dnf install -y openssl vim && dnf clean all
 
 COPY --from=cosign-bin /ko-app/cosign /usr/local/bin/cosign
