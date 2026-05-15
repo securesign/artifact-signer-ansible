@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ansible-automation-platform-26/ansible-dev-tools-rhel9:latest@sha256:bebb7ba186ff9fe05642c43fa746ee9d5f45cd113f6f02795ef37646e5010cdc AS builder
+FROM registry.redhat.io/ansible-automation-platform-26/ansible-dev-tools-rhel9:latest@sha256:ab51737c0258483311e4ede2b82fdb922c969524eaa7c45dfc48d3fdcaf520d8 AS builder
 
 WORKDIR /tmp/source
 
@@ -13,12 +13,12 @@ USER root
 
 RUN ansible-galaxy collection build --force
 
-FROM registry.redhat.io/ubi10-minimal:latest@sha256:3c674490453d5fb3d655b15874d33fa5e8ba6b33fad9ea2954b143c896f98516
+FROM registry.redhat.io/ubi10-minimal:latest@sha256:01a3f76f9f6734c637e328111b0f48100e8d8ad41ead12fc3ff0b57a952dd7ea
 
 LABEL vendor="Red Hat, Inc."
 LABEL url="https://www.redhat.com"
 LABEL distribution-scope="private"
-LABEL version="1.4.0"
+LABEL version="1.4.1"
 LABEL description="Ansible collection to automate the deployment of the Red Hat Trusted Artifact Signer (RHTAS) service on Red Hat Enterprise Linux (RHEL)."
 LABEL summary="Ansible Collection for Red Hat Trusted Artifact Signer"
 LABEL com.redhat.component="rhtas-ansible-collection"
