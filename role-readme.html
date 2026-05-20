@@ -1,6 +1,6 @@
 
 <h1>Ansible Role: redhat.artifact_signer.tas_single_node</h1>
-<p>Version: 1.4.0</p>
+<p>Version: 1.4.1</p>
 <p>Deploy the <a href="https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer" rel="noopener noreferrer">RHTAS</a> service on a single managed node by using the <code>tas_single_node</code> role.
  Requires RHEL 9.4 or later.</p>
 <h2>Role Arguments</h2>
@@ -122,49 +122,49 @@
 <td>tas_single_node_fulcio_server_image</td>
 <td>Fulcio image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/fulcio-rhel9@sha256:a063b375fbd8cc662712fdcd40b8185c33a73de54bb43b5a2118a0a41ada93ee</code></td>
+<td><code>registry.redhat.io/rhtas/fulcio-rhel9@sha256:15f5484722751d556b379ca44e244d1901456ae09e828cf984c6e68500d39dea</code></td>
 </tr>
 <tr>
 <td>tas_single_node_trillian_log_server_image</td>
 <td>Trillian log server image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:6426ae757e473c7a3a7a43e4c22ddbed86a0912c2517f7e7d6276f006e0413be</code></td>
+<td><code>registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:30c7bee399067e97166e860648e8ef679d20643aaa135a6595ec9cee1f17c362</code></td>
 </tr>
 <tr>
 <td>tas_single_node_logsigner_image</td>
 <td>Trillian logsigner image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:9a030d26d3328738b1df20eeca44b28ebf0a16e1d7fa4aa34a1fb380fb19cea3</code></td>
+<td><code>registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:0f647489aec46d1724883dc318541a567cb5d7db19d4fa71bbb25bdac95cfd17</code></td>
 </tr>
 <tr>
 <td>tas_single_node_rekor_image</td>
 <td>Rekor image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/rekor-server-rhel9@sha256:872350f23d5963cec320f5b3dcdd2c0bce38538a6b1f18b789127769f227196f</code></td>
+<td><code>registry.redhat.io/rhtas/rekor-server-rhel9@sha256:b60f94ac019101a14b11b4f4dc32ff7ac6d5339508f96ca773facfe6333f6ed6</code></td>
 </tr>
 <tr>
 <td>tas_single_node_ct_server_image</td>
 <td>ctlog image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:414334f1507b75a4c6e0c4fe4fea17acccab41d3f076163dd65c43c55d60dc7c</code></td>
+<td><code>registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:fa0187817e653e22770dd423d909daaa6992e71dc1d6f2d454e6cc6f5b9168bc</code></td>
 </tr>
 <tr>
 <td>tas_single_node_redis_image</td>
 <td>Redis image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:487eb4f630346e8e35664eadfd0fa3c930e3235c3c2f592c69e8f959ba528eb7</code></td>
+<td><code>registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:38539a9d4a6860683cd98f37af7509e6cf7867bea547d041ef2d6540bff4ee92</code></td>
 </tr>
 <tr>
 <td>tas_single_node_trillian_db_image</td>
 <td>Trillian database image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/trillian-database-rhel9@sha256:12f385fd99a7bfd1db23749aa1bac14db709a3845ac2c5779addae40fd69cac1</code></td>
+<td><code>registry.redhat.io/rhtas/trillian-database-rhel9@sha256:84e167cbae30f8807a8cf640ba5ad8018a94ef7c0af815dae588932eff495542</code></td>
 </tr>
 <tr>
 <td>tas_single_node_tuf_image</td>
 <td>TUF server image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/tuf-server-rhel9@sha256:34f5cdc53a908ae2819d85ab18e35b69dc4efc135d747dd1d2e216a99a2dcd1b</code></td>
+<td><code>registry.redhat.io/rhtas/tuffer-rhel9@sha256:1ea4b7e13832e0317799c8370c48c1b9d5c48c3752c1b98b227bd14ce013645d</code></td>
 </tr>
 <tr>
 <td>tas_single_node_netcat_image</td>
@@ -182,13 +182,13 @@
 <td>tas_single_node_tsa_image</td>
 <td>Timestamp Authority Image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:b8be0554d55198f65f76bf3a2985697e7f166940c2aec9ef7544e6d81575804c</code></td>
+<td><code>registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:72575fcf0f12cca7b430c102fda97e85b723f15de8ad2a8440f7440e9611b08d</code></td>
 </tr>
 <tr>
 <td>tas_single_node_rekor_search_image</td>
 <td>Rekor search UI image</td>
 <td>str</td>
-<td><code>registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e915731d577d58ac45d9124c18e97529a7a5b4ae1503bc1c78ca8de1c704c968</code></td>
+<td><code>registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:bb16977801728ebec08ab5e10ae4d3ef8380c971b61d36342a581a77538e4ed9</code></td>
 </tr>
 <tr>
 <td>tas_single_node_podman</td>
