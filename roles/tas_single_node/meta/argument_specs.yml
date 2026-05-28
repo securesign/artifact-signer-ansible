@@ -1185,7 +1185,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:38539a9d4a6860683cd98f37af7509e6cf7867bea547d041ef2d6540bff4ee92"
+        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:052018f4efa38633f44410bca75b8d95f403afdce3d5954e08f3dcc2066880ca"
       tas_single_node_trillian_db_image:
         description: "Trillian database image"
         type: "str"
