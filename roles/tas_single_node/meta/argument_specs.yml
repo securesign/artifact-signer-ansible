@@ -1197,7 +1197,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/tuffer-rhel9@sha256:1ea4b7e13832e0317799c8370c48c1b9d5c48c3752c1b98b227bd14ce013645d"
+        default: "registry.redhat.io/rhtas/tuffer-rhel9@sha256:b690512dc86176acbb3c71e898694dbc14f336a4ff04434b5b0eb59f639a248d"
       tas_single_node_netcat_image:
         description: "Netcat image"
         type: "str"
