@@ -50,7 +50,7 @@ tas_single_node_rekor_search_ui_image:
   "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e915731d577d58ac45d9124c18e97529a7a5b4ae1503bc1c78ca8de1c704c968"
 # Create Tree
 tas_single_node_createtree_image:
-  "registry.redhat.io/rhtas/createtree-rhel9@sha256:49ffea5617c003c5637d29a5a5eb6897039327270f46269a62152cabd61d3ce7"
+  "registry.redhat.io/rhtas/createtree-rhel9@sha256:e7ad9663e4a9427989f7e4bbccb6d9b264bf00c229588d78cb920cbadf49ec17"
 # CLI Server
 tas_single_node_client_server_image:
   "registry.redhat.io/rhtas/client-server-rhel9@sha256:b54ee80dcc6b6712ea5ad5ab347fa79c1b142077da31ccca11baaeee539235a5"
