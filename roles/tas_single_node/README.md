@@ -38,7 +38,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_tuf_image | TUF server image | str |  `registry.redhat.io/rhtas/tuffer-rhel9@sha256:1ea4b7e13832e0317799c8370c48c1b9d5c48c3752c1b98b227bd14ce013645d`  |
 | tas_single_node_netcat_image | Netcat image | str |  `registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7`  |
 | tas_single_node_nginx_image | Nginx image | str |  `registry.redhat.io/rhel9/nginx-124@sha256:71fc4492c3a632663c1e17ec9364d87aa7bd459d3c723277b8b94a949b84c9fe`  |
-| tas_single_node_tsa_image | Timestamp Authority Image | str |  `registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:72575fcf0f12cca7b430c102fda97e85b723f15de8ad2a8440f7440e9611b08d`  |
+| tas_single_node_tsa_image | Timestamp Authority Image | str |  `registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:debbbbd4f615d4fc5acad07252f5cff4a953ef3c71034b1740bb966c95c3c63f`  |
 | tas_single_node_rekor_search_image | Rekor search UI image | str |  `registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e915731d577d58ac45d9124c18e97529a7a5b4ae1503bc1c78ca8de1c704c968`  |
 | tas_single_node_podman | Configuration options for Podman. | dict of 'tas_single_node_podman' options |  |
 | tas_single_node_cockpit | Configuration options for Cockpit. | dict of 'tas_single_node_cockpit' options |  `{'enabled': False, 'user': {'create': False, 'username': 'cockpit-user'}}`  |
