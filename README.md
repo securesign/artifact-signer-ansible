@@ -18,7 +18,7 @@ The RHTAS Ansible collection deploys the following RHTAS components:
 
 * [Fulcio](https://docs.sigstore.dev/fulcio/overview)
 * [Certificate Log](https://docs.sigstore.dev/fulcio/certificate-issuing-overview)
-* [Timestamp Authority](https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities)
+* [Timestamp Authority](https://docs.sigstore.dev/cosign/verifying/timestamps/#timestamp-authorities)
 * [The Update Framework (TUF) server](https://theupdateframework.io/)
 
 An [NGINX](https://www.nginx.com) front end places an entrypoint to the various backend components.
@@ -259,7 +259,7 @@ See [Ansible collections usage](https://docs.ansible.com/ansible/devel/user_guid
 **Steps:**
 
 Create a MariaDB instance.
-Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/deployment_guide/configure-an-alternative-database-for-trusted-artifact-signer#configuring-amazon-rds-for-trusted-artifact-signer_deploy).
+Follow the MariaDB setup documentation for RHTAS found [here](https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/deployment_guide/rhtas-ocp-deploy#configuring-amazon-rds-for-trusted-artifact-signer_deploy).
 Ensure the instance uses the Trillian schema.
 Make note the instance's hostname, port, username, password, and root's password.
 
@@ -374,7 +374,7 @@ To achieve this, you can run sanity checks by running the following:
 
 ### Testing Deployment on a virtual machine
 
-The [molecule/README.md](molecule/README.md) file has instructions on testing the deployment on a virtual machine (VM).
+The [molecule/README.md](https://github.com/securesign/artifact-signer-ansible/blob/release-1.4/molecule/README.md) file has instructions on testing the deployment on a virtual machine (VM).
 By default, the VM provider is [Amazon Web Services](https://aws.amazon.com/).
 
 ## Contributing
@@ -400,4 +400,4 @@ Submit an [Issue](https://github.com/securesign/artifact-signer-ansible/issues) 
 
 ## License Information
 
-You can find the license information within the [LICENSE](LICENSE) file.
+You can find the license information within the [LICENSE](https://github.com/securesign/artifact-signer-ansible/blob/release-1.4/LICENSE) file.
