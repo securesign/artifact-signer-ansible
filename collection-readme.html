@@ -18,7 +18,7 @@ A Kubernetes-based manifest creates containers that uses <a href="https://docs.p
 <p><a href="https://docs.sigstore.dev/fulcio/overview" rel="noopener noreferrer">Fulcio</a></p>
 </li>
 <li><a href="https://docs.sigstore.dev/fulcio/certificate-issuing-overview" rel="noopener noreferrer">Certificate Log</a></li>
-<li><a href="https://docs.sigstore.dev/verifying/timestamps/#timestamp-authorities" rel="noopener noreferrer">Timestamp Authority</a></li>
+<li><a href="https://docs.sigstore.dev/cosign/verifying/timestamps/#timestamp-authorities" rel="noopener noreferrer">Timestamp Authority</a></li>
 <li><a href="https://theupdateframework.io/" rel="noopener noreferrer">The Update Framework (TUF) server</a></li>
 </ul>
 <p>An <a href="https://www.nginx.com" rel="noopener noreferrer">NGINX</a> front end places an entrypoint to the various backend components.
@@ -215,7 +215,7 @@ Download the <em>root</em> certificate issued from the Rekor certificate.</p>
 </ul>
 <p><strong>Steps:</strong></p>
 <p>Create a MariaDB instance.
-Follow the MariaDB setup documentation for RHTAS found <a href="https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/deployment_guide/configure-an-alternative-database-for-trusted-artifact-signer#configuring-amazon-rds-for-trusted-artifact-signer_deploy" rel="noopener noreferrer">here</a>.
+Follow the MariaDB setup documentation for RHTAS found <a href="https://docs.redhat.com/en/documentation/red_hat_trusted_artifact_signer/1/html/deployment_guide/rhtas-ocp-deploy#configuring-amazon-rds-for-trusted-artifact-signer_deploy" rel="noopener noreferrer">here</a>.
 Ensure the instance uses the Trillian schema.
 Make note the instance's hostname, port, username, password, and root's password.</p>
 <p>Configure the Ansible collection.
@@ -295,7 +295,7 @@ The <code>collection</code> refers to the current repository <code>artifact-sign
 <pre><code>ansible-test sanity
 </code></pre>
 <h3>Testing Deployment on a virtual machine</h3>
-<p>The <a href="molecule/README.md" rel="noopener noreferrer">molecule/README.md</a> file has instructions on testing the deployment on a virtual machine (VM).
+<p>The <a href="https://github.com/securesign/artifact-signer-ansible/blob/release-1.4/molecule/README.md" rel="noopener noreferrer">molecule/README.md</a> file has instructions on testing the deployment on a virtual machine (VM).
 By default, the VM provider is <a href="https://aws.amazon.com/" rel="noopener noreferrer">Amazon Web Services</a>.</p>
 <h2>Contributing</h2>
 <h2>Support</h2>
@@ -309,4 +309,4 @@ By default, the VM provider is <a href="https://aws.amazon.com/" rel="noopener n
 <p>Any and all feedback is welcome.
 Submit an <a href="https://github.com/securesign/artifact-signer-ansible/issues" rel="noopener noreferrer">Issue</a> or <a href="https://github.com/securesign/artifact-signer-ansible/pulls" rel="noopener noreferrer">Pull Request</a> as needed.</p>
 <h2>License Information</h2>
-<p>You can find the license information within the <a href="LICENSE" rel="noopener noreferrer">LICENSE</a> file.</p>
+<p>You can find the license information within the <a href="https://github.com/securesign/artifact-signer-ansible/blob/release-1.4/LICENSE" rel="noopener noreferrer">LICENSE</a> file.</p>
