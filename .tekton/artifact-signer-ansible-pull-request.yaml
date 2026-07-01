@@ -41,7 +41,7 @@ spec:
     - name: prefetch-input
       value: ''
     - name: image-expires-after
-      value: 6d
+      value: 5d
   pipelineRef:
     params:
       - name: url
