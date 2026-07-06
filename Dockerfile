@@ -4,6 +4,7 @@ WORKDIR /tmp/source
 
 COPY meta/ meta/
 COPY roles/ roles/
+COPY molecule/ molecule/
 COPY galaxy.yml .
 COPY requirements.yml .
 COPY README.md .
