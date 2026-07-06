@@ -47,7 +47,7 @@ spec:
       - name: url
         value: https://github.com/securesign/pipelines.git
       - name: revision
-        value: eli/test-prepare-molecule-refactor
+        value: eli/test-aws-cleanup
       - name: pathInRepo
         value: pipelines/docker-build-oci-ta.yaml
     resolver: git
