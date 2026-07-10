@@ -18,7 +18,7 @@ FROM registry.redhat.io/ubi10-minimal@sha256:b217fa65d8c21058887b18f005f587e47a1
 LABEL vendor="Red Hat, Inc."
 LABEL url="https://www.redhat.com"
 LABEL distribution-scope="private"
-LABEL version="1.3.5"
+LABEL version="1.3.6"
 LABEL description="Ansible collection to automate the deployment of the Red Hat Trusted Artifact Signer (RHTAS) service on Red Hat Enterprise Linux (RHEL)."
 LABEL summary="Ansible Collection for Red Hat Trusted Artifact Signer"
 LABEL com.redhat.component="rhtas-ansible-collection"
