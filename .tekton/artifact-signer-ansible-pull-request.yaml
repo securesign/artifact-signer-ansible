@@ -41,13 +41,13 @@ spec:
     - name: prefetch-input
       value: ''
     - name: image-expires-after
-      value: 5d
+      value: 10d
   pipelineRef:
     params:
       - name: url
         value: https://github.com/securesign/pipelines.git
       - name: revision
-        value: main
+        value: eli/test-prepare-tests
       - name: pathInRepo
         value: pipelines/docker-build-oci-ta.yaml
     resolver: git
