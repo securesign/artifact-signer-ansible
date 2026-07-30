@@ -1155,55 +1155,55 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/fulcio-rhel9@sha256:5395edc0795b38375f8d8480ac77ea26ad41aac60f89e8b68537bc4f1a6e360b"
+        default: "registry.redhat.io/rhtas/fulcio-rhel9@sha256:0996775ede985a6b2b1ada6045c1ab4d60d16977d7087326ee14988e28be87e6"
       tas_single_node_trillian_log_server_image:
         description: "Trillian log server image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:30c7bee399067e97166e860648e8ef679d20643aaa135a6595ec9cee1f17c362"
+        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:e3a8872b1ffd7282ec1133fcc7826682fb77c09e3d44cc2394bf9113dcb1e34c"
       tas_single_node_logsigner_image:
         description: "Trillian logsigner image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:0f647489aec46d1724883dc318541a567cb5d7db19d4fa71bbb25bdac95cfd17"
+        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:e9d5ddcfdebb4c728bbdc5b305216d372d6d880dd7c85fadb6df7bed6b47a8d2"
       tas_single_node_rekor_image:
         description: "Rekor image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:b60f94ac019101a14b11b4f4dc32ff7ac6d5339508f96ca773facfe6333f6ed6"
+        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:b0264e38a58995d26b27042c23c023a410c9632f472c56db85db5a5fef96bb85"
       tas_single_node_ct_server_image:
         description: "ctlog image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:fa0187817e653e22770dd423d909daaa6992e71dc1d6f2d454e6cc6f5b9168bc"
+        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:5a07b75ddd1a925c85b22cba4eac9317370e5fc9ca01d79e7a6414246171bb90"
       tas_single_node_redis_image:
         description: "Redis image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:38539a9d4a6860683cd98f37af7509e6cf7867bea547d041ef2d6540bff4ee92"
+        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:f56e3c3845c4d37ec8b47f6dc00dec4186cba95b66ae88c99b4969eea3eb56e1"
       tas_single_node_trillian_db_image:
         description: "Trillian database image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:84e167cbae30f8807a8cf640ba5ad8018a94ef7c0af815dae588932eff495542"
+        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:fa963e4b0f7c6ee46d84f9a5e5e31445d659db80e08a90e0927646bc24c1e53b"
       tas_single_node_tuf_image:
         description: "TUF server image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/tuffer-rhel9@sha256:1ea4b7e13832e0317799c8370c48c1b9d5c48c3752c1b98b227bd14ce013645d"
+        default: "registry.redhat.io/rhtas/tuffer-rhel9@sha256:7e5f420f6a469525e6a3bff9fff41a1c646aca0bb0429a2c6edc7f398409b757"
       tas_single_node_netcat_image:
         description: "Netcat image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/openshift4/ose-tools-rhel8@sha256:486b4d2dd0d10c5ef0212714c94334e04fe8a3d36cf619881986201a50f123c7"
+        default: "registry.redhat.io/openshift4/ose-tools-rhel9@sha256:a3bdc6574db914ec8c4385b6ff8b2c315930f8de9a27a3a9e0204163c85cd6be"
       tas_single_node_nginx_image:
         description: "Nginx image"
         type: "str"
@@ -1215,13 +1215,13 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:b71b536a4f70e70df2ec9ee03d373a76e5b505de3513c46bcdcb799b1103685b"
+        default: "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:0c392cea88e98bed79228bedd39e5f046945277147c44cec1f15d2f756e84da3"
       tas_single_node_rekor_search_image:
         description: "Rekor search UI image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e915731d577d58ac45d9124c18e97529a7a5b4ae1503bc1c78ca8de1c704c968"
+        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:ac76a66ffeffbccea272181936686f4160f190f5575c8b27357a1b8e4f5640b7"
       tas_single_node_podman:
         description: "Configuration options for Podman."
         type: "dict"
