@@ -1221,7 +1221,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:e915731d577d58ac45d9124c18e97529a7a5b4ae1503bc1c78ca8de1c704c968"
+        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:ac76a66ffeffbccea272181936686f4160f190f5575c8b27357a1b8e4f5640b7"
       tas_single_node_podman:
         description: "Configuration options for Podman."
         type: "dict"
