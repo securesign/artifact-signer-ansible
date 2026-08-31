@@ -13,7 +13,7 @@ USER root
 
 RUN ansible-galaxy collection build --force
 
-FROM registry.redhat.io/ubi10-minimal:latest@sha256:3c674490453d5fb3d655b15874d33fa5e8ba6b33fad9ea2954b143c896f98516
+FROM registry.redhat.io/ubi10-minimal:latest@sha256:6df6c7d3d0ce8a6989e9979f2507401dddeebf60a94afbbeedc5b6e5ec89214b
 
 LABEL vendor="Red Hat, Inc."
 LABEL url="https://www.redhat.com"
