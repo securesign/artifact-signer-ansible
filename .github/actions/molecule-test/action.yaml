@@ -9,13 +9,13 @@ runs:
   using: "composite"
   steps:
     - name: Cache venv test directory
-      uses: actions/cache@v3
+      uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3.5.0
       with:
         path: venv
         key: ${{ runner.os }}-python-venv-${{ hashFiles('testing-requirements.txt') }}
 
     - name: Cache Ansible Galaxy roles and collections
-      uses: actions/cache@v3
+      uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3.5.0
       with:
         path: |
           ~/.ansible/roles
