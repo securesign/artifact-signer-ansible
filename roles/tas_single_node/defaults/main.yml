@@ -47,7 +47,7 @@ tas_single_node_nginx_image:
 tas_single_node_timestamp_authority_image:
   "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:0c392cea88e98bed79228bedd39e5f046945277147c44cec1f15d2f756e84da3"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:ac76a66ffeffbccea272181936686f4160f190f5575c8b27357a1b8e4f5640b7"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:d924c7e941a451026739083e9cce8e69f49f93905677185ddbd98169fd180e14"
 # Create Tree
 tas_single_node_createtree_image:
   "registry.redhat.io/rhtas/createtree-rhel9@sha256:be9734d8982ba67b2ec1b7b69199b5aded23bfc7c9d9f3eda47f3f0ccd110ab8"
