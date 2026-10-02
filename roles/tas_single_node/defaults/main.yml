@@ -23,7 +23,7 @@ tas_single_node_trillian_log_server_image:
 tas_single_node_trillian_log_signer_image:
   "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:e9d5ddcfdebb4c728bbdc5b305216d372d6d880dd7c85fadb6df7bed6b47a8d2"
 tas_single_node_rekor_server_image:
-  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:b0264e38a58995d26b27042c23c023a410c9632f472c56db85db5a5fef96bb85"
+  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:642ad17217654a712f7086fe84ee75856e577938b721a5de5d0d0d068345fb99"
 tas_single_node_rekor_monitor_image:
   "registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:e96b0b3146b63f4710ebfb3ed4a4edd9278b15852aa3130881e8332965bf00a3"
 tas_single_node_ctlog_image:
