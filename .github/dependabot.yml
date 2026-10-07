@@ -9,3 +9,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # not supported on RHEL9, kept in sync with renovate.json's packageRules
+      - dependency-name: "ansible-core"
+      - dependency-name: "ansible-lint"
+      - dependency-name: "boto3"
+      - dependency-name: "botocore"
+      - dependency-name: "awscli"
