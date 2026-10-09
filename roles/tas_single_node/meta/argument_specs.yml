@@ -1155,7 +1155,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/fulcio-rhel9@sha256:0996775ede985a6b2b1ada6045c1ab4d60d16977d7087326ee14988e28be87e6"
+        default: "registry.redhat.io/rhtas/fulcio-rhel9@sha256:5e3bce5d59f0c75a8178ddedcd5c7e8ee07544b5bc9382f8933ccca2b24bb10c"
       tas_single_node_trillian_log_server_image:
         description: "Trillian log server image"
         type: "str"
