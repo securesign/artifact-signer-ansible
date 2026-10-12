@@ -1161,19 +1161,19 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:d458626dcaf975890665047a5c863b9962d1cf7ba0bff788fe06f20e225f320e"
+        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b9c6cb923b8de284f0092ea47c0f40a9d82b51dc648de3d4262dcbecb3fed922"
       tas_single_node_trillian_log_signer_image:
         description: "Trillian logsigner image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:3608259e62e587c9d515338d0e00f6f074abe60fcd93338d4b0ee00446e23e8c"
+        default: "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:cc79f3d28059890afe3f0dc146aad5b957978b15895e507be61520466c274826"
       tas_single_node_rekor_server_image:
         description: "Rekor image"
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:c322460c7b47ec791e8a32ff5844b0414df7b2c172fcaeebe47730dd3e99e44a"
+        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:241c175d604dc28b818454a69863a3a22693fadbd7d7bc9f2560bee20fdf1d0e"
       tas_single_node_rekor_monitor_image:
         description: "Rekor monitor image"
         type: "str"
@@ -1209,7 +1209,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:293274d23cdb63c76bcb7e6b6f70e79a1f96b3f93621fe959dcc63bdafb53fd5"
+        default: "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:a1a7d43a20f1776118fb359b1223307356bac543cda4267af33b7175b0699f04"
       tas_single_node_tuf_image:
         description: "TUF server image"
         type: "str"
@@ -1251,7 +1251,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/createtree-rhel9@sha256:f233fb3a6425a395d7cfe28658d9e0098915052b26d50e188e4b9d7cbbd8f458"
+        default: "registry.redhat.io/rhtas/createtree-rhel9@sha256:ef80ea41bacddc59f4f305b7bf6ab3e710ed0b3908f11a7193d82563f1eb3df7"
       tas_single_node_client_server_image:
         description: "CLI server image"
         type: "str"
