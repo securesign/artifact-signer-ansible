@@ -1215,7 +1215,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/tuffer-rhel9@sha256:c39db5d599011cc925daa90c5dc24857f2b69a06f98bc9848e3a4516894f3521"
+        default: "registry.redhat.io/rhtas/tuffer-rhel9@sha256:6171943a8081a69eafc494b539b51f173e5ee59b2b350cc149ae43c0d96a3c96"
       tas_single_node_http_server_image:
         description: "HTTP server image"
         type: "str"
