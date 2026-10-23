@@ -37,7 +37,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_ctlog_monitor_image | ctlog monitor image | str |  `registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:085ae861d8c3eead4ac3882f69fd65e7c38fdff1731b3bd17ca7e8e89e7d602a`  |
 | tas_single_node_rekor_redis_image | Redis image | str |  `registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:3655b8bdb0de7c348c0fd6bfaa1c75bea535aa8c9ee30413d9f897a0f5385dbe`  |
 | tas_single_node_backfill_redis_image | Rekor backfill Redis image | str |  `registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:8be71af65d0ba1b85901e7b8b156f9255e825cd05ea1428439a1f47723f044cd`  |
-| tas_single_node_trillian_db_image | Trillian database image | str |  `registry.redhat.io/rhtas/trillian-database-rhel9@sha256:a1a7d43a20f1776118fb359b1223307356bac543cda4267af33b7175b0699f04`  |
+| tas_single_node_trillian_db_image | Trillian database image | str |  `registry.redhat.io/rhtas/trillian-database-rhel9@sha256:49074e3144576a4c7276b7d6c36f7f055b5e6ad2f05995c3ffd04549b94e14a3`  |
 | tas_single_node_tuf_image | TUF server image | str |  `registry.redhat.io/rhtas/tuffer-rhel9@sha256:6171943a8081a69eafc494b539b51f173e5ee59b2b350cc149ae43c0d96a3c96`  |
 | tas_single_node_http_server_image | HTTP server image | str |  `registry.redhat.io/ubi9/httpd-24@sha256:cd8e4f2bb54f535f68e48969d03b58581c7c2b47ee17c3e8b7893323a32bee3b`  |
 | tas_single_node_trillian_netcat_image | Netcat image | str |  `registry.redhat.io/openshift4/ose-tools-rhel9@sha256:7c9d49fbb1c4b1bd2d3ea674fab638a68f361bafdc38a0ec3497333b53e42946`  |
