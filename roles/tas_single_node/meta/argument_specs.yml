@@ -1161,7 +1161,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b9c6cb923b8de284f0092ea47c0f40a9d82b51dc648de3d4262dcbecb3fed922"
+        default: "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:2e958d361b007cafb1e1a2631f76ab1ba10f8ebf3775313c52d95f05471d7dcb"
       tas_single_node_trillian_log_signer_image:
         description: "Trillian logsigner image"
         type: "str"
