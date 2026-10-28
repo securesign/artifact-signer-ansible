@@ -19,7 +19,7 @@ tas_single_node_trust_root:
 tas_single_node_fulcio_server_image:
   "registry.redhat.io/rhtas/fulcio-rhel9@sha256:5e3bce5d59f0c75a8178ddedcd5c7e8ee07544b5bc9382f8933ccca2b24bb10c"
 tas_single_node_trillian_log_server_image:
-  "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b9c6cb923b8de284f0092ea47c0f40a9d82b51dc648de3d4262dcbecb3fed922"
+  "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b00f318a3f43dc937ca7fa82ad873638c3161132f353d6d2ab7de1c6b8b38c45"
 tas_single_node_trillian_log_signer_image:
   "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:cc79f3d28059890afe3f0dc146aad5b957978b15895e507be61520466c274826"
 tas_single_node_rekor_server_image:
