@@ -1173,7 +1173,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:241c175d604dc28b818454a69863a3a22693fadbd7d7bc9f2560bee20fdf1d0e"
+        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:c055b3384a1a0d46e899629331fbcdd00984faac23daf946c0ee9e4b680c8398"
       tas_single_node_rekor_monitor_image:
         description: "Rekor monitor image"
         type: "str"
