@@ -31,7 +31,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_fulcio_server_image | Fulcio image | str |  `registry.redhat.io/rhtas/fulcio-rhel9@sha256:5e3bce5d59f0c75a8178ddedcd5c7e8ee07544b5bc9382f8933ccca2b24bb10c`  |
 | tas_single_node_trillian_log_server_image | Trillian log server image | str |  `registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b9c6cb923b8de284f0092ea47c0f40a9d82b51dc648de3d4262dcbecb3fed922`  |
 | tas_single_node_trillian_log_signer_image | Trillian logsigner image | str |  `registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:cc79f3d28059890afe3f0dc146aad5b957978b15895e507be61520466c274826`  |
-| tas_single_node_rekor_server_image | Rekor image | str |  `registry.redhat.io/rhtas/rekor-server-rhel9@sha256:241c175d604dc28b818454a69863a3a22693fadbd7d7bc9f2560bee20fdf1d0e`  |
+| tas_single_node_rekor_server_image | Rekor image | str |  `registry.redhat.io/rhtas/rekor-server-rhel9@sha256:c055b3384a1a0d46e899629331fbcdd00984faac23daf946c0ee9e4b680c8398`  |
 | tas_single_node_rekor_monitor_image | Rekor monitor image | str |  `registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:66356930e442450d05333c799185ca6f241838f57bfe98000a79475614070e72`  |
 | tas_single_node_ctlog_image | ctlog image | str |  `registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:48d79f34792d52f4f92f99327c726baf23ffd69a84335680ab44f159960ab764`  |
 | tas_single_node_ctlog_monitor_image | ctlog monitor image | str |  `registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:085ae861d8c3eead4ac3882f69fd65e7c38fdff1731b3bd17ca7e8e89e7d602a`  |
