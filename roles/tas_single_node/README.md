@@ -34,7 +34,7 @@ Deploy the [RHTAS](https://docs.redhat.com/en/documentation/red_hat_trusted_arti
 | tas_single_node_rekor_server_image | Rekor image | str |  `registry.redhat.io/rhtas/rekor-server-rhel9@sha256:241c175d604dc28b818454a69863a3a22693fadbd7d7bc9f2560bee20fdf1d0e`  |
 | tas_single_node_rekor_monitor_image | Rekor monitor image | str |  `registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:66356930e442450d05333c799185ca6f241838f57bfe98000a79475614070e72`  |
 | tas_single_node_ctlog_image | ctlog image | str |  `registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:48d79f34792d52f4f92f99327c726baf23ffd69a84335680ab44f159960ab764`  |
-| tas_single_node_ctlog_monitor_image | ctlog monitor image | str |  `registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:085ae861d8c3eead4ac3882f69fd65e7c38fdff1731b3bd17ca7e8e89e7d602a`  |
+| tas_single_node_ctlog_monitor_image | ctlog monitor image | str |  `registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:3e4d87905e1cdcdbc769807e95d85e85b795af258476b8b17ec5c1081ae3dd94`  |
 | tas_single_node_rekor_redis_image | Redis image | str |  `registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:3655b8bdb0de7c348c0fd6bfaa1c75bea535aa8c9ee30413d9f897a0f5385dbe`  |
 | tas_single_node_backfill_redis_image | Rekor backfill Redis image | str |  `registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:8be71af65d0ba1b85901e7b8b156f9255e825cd05ea1428439a1f47723f044cd`  |
 | tas_single_node_trillian_db_image | Trillian database image | str |  `registry.redhat.io/rhtas/trillian-database-rhel9@sha256:a1a7d43a20f1776118fb359b1223307356bac543cda4267af33b7175b0699f04`  |
