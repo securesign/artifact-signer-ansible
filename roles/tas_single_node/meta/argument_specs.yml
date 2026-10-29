@@ -1191,7 +1191,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.4.0"
-        default: "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:085ae861d8c3eead4ac3882f69fd65e7c38fdff1731b3bd17ca7e8e89e7d602a"
+        default: "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:3e4d87905e1cdcdbc769807e95d85e85b795af258476b8b17ec5c1081ae3dd94"
       tas_single_node_rekor_redis_image:
         description: "Redis image"
         type: "str"
