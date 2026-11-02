@@ -1173,7 +1173,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:872350f23d5963cec320f5b3dcdd2c0bce38538a6b1f18b789127769f227196f"
+        default: "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:66de1676fc50ece906ec152ee1008cb3c1045e957497472e9457a6bfc15daa2e"
       tas_single_node_ct_server_image:
         description: "ctlog image"
         type: "str"
