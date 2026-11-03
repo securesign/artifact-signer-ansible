@@ -1197,7 +1197,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:3655b8bdb0de7c348c0fd6bfaa1c75bea535aa8c9ee30413d9f897a0f5385dbe"
+        default: "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:fe4707a09e7d9aba4178d8fad2a48e0ba8985607945283eae6386f45f150686e"
       tas_single_node_backfill_redis_image:
         description: "Rekor backfill Redis image"
         type: "str"
