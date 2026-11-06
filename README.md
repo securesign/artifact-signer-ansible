@@ -53,6 +53,31 @@ The ingress host names are as follows, where `<base_hostname>` is your deploymen
 
 ## Installation
 
+Before installing RHTAS, update the default password values with your preferred password.
+In the `main.yml` file update the following lines, replacing the default password values with your new password:
+
+```yaml
+roles/tas_single_node/vars/main.yml; 17; ca_passphrase: rhtas
+roles/tas_single_node/vars/main.yml; 40; password: password
+roles/tas_single_node/vars/main.yml; 50; root_password: rootpassword
+roles/tas_single_node/vars/main.yml; 51; password: password
+roles/tas_single_node/vars/main.yml; 88; ca_passphrase: rhtas
+roles/tas_single_node/vars/main.yml; 111; ca_passphrase: rhtas
+roles/tas_single_node/vars/main.yml; 117; ca_passphrase: rhtas
+roles/tas_single_node/vars/main.yml; 122; password: rhtas
+```
+
+Also, in the `argument_specs.yml` file update the following lines, replacing the default password values with your new password:
+
+```yaml
+roles/tas_single_node/meta/argument_specs.yml; 37; password: password
+roles/tas_single_node/meta/argument_specs.yml; 100; root_password: rootpassword
+roles/tas_single_node/meta/argument_specs.yml; 101; password: password
+roles/tas_single_node/meta/argument_specs.yml; 369; ca_passphrase: rhtas
+roles/tas_single_node/meta/argument_specs.yml; 822; ca_passphrase: rhtas
+roles/tas_single_node/meta/argument_specs.yml; 1028; ca_passphrase: rhtas
+```
+
 Install the collection with the Ansible Galaxy command-line tool:
 
     ansible-galaxy collection install redhat.artifact_signer

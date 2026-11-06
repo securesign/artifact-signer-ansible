@@ -16,4 +16,4 @@
 
     - name: Apply tas_single_node role
       ansible.builtin.include_role:
-        name: tas_single_node
+        name: redhat.artifact_signer.tas_single_node

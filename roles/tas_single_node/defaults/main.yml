@@ -17,43 +17,43 @@ tas_single_node_trust_root:
 # To avoid breaking our structural tests
 
 tas_single_node_fulcio_server_image:
-  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:8ce8d537dbaa701b750ea27b7a6fc350975e8c9edd2e9add1edd4b63c52955d0"
+  "registry.redhat.io/rhtas/fulcio-rhel9@sha256:5e3bce5d59f0c75a8178ddedcd5c7e8ee07544b5bc9382f8933ccca2b24bb10c"
 tas_single_node_trillian_log_server_image:
-  "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b22d0002bcaef345d832db28654fbd7e5075832ce568e1614c53c24a2a874fc4"
+  "registry.redhat.io/rhtas/trillian-logserver-rhel9@sha256:b9c6cb923b8de284f0092ea47c0f40a9d82b51dc648de3d4262dcbecb3fed922"
 tas_single_node_trillian_log_signer_image:
-  "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:2e5280e55fe92838b230f15758fbd281e147b19e93b19a3e88d9ffc0bd7f23ae"
+  "registry.redhat.io/rhtas/trillian-logsigner-rhel9@sha256:cc79f3d28059890afe3f0dc146aad5b957978b15895e507be61520466c274826"
 tas_single_node_rekor_server_image:
-  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:c295648d89e011fa9305ea11e1bca592901dcb04dcdd596177391a1d2fbee561"
+  "registry.redhat.io/rhtas/rekor-server-rhel9@sha256:241c175d604dc28b818454a69863a3a22693fadbd7d7bc9f2560bee20fdf1d0e"
 tas_single_node_rekor_monitor_image:
-  "registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:6a1228030e98725190524934bb5c6314f6266618a11881c60eab45d97a8b22da"
+  "registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:66356930e442450d05333c799185ca6f241838f57bfe98000a79475614070e72"
 tas_single_node_ctlog_image:
-  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:bb115de802a1371cf6fa24540c98373fdbd18e9fd73006c47cd65e6a76063809"
+  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:48d79f34792d52f4f92f99327c726baf23ffd69a84335680ab44f159960ab764"
 tas_single_node_ctlog_monitor_image:
-  "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:7d5d9f538f9fe73230824ef9c755dbe29766aefda1ba2af360d6302003bff8e0"
+  "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:085ae861d8c3eead4ac3882f69fd65e7c38fdff1731b3bd17ca7e8e89e7d602a"
 tas_single_node_rekor_redis_image:
-  "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:d63c77286c617e04128a1b177e1519244f5c687b5c36d334a117cb058466c690"
+  "registry.redhat.io/rhtas/trillian-redis-rhel9@sha256:3655b8bdb0de7c348c0fd6bfaa1c75bea535aa8c9ee30413d9f897a0f5385dbe"
 tas_single_node_backfill_redis_image:
-  "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:a24244f06fb014bf73e15c7925e512ce9827d5341f8206d5ab9092a665c4a076"
+  "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:8be71af65d0ba1b85901e7b8b156f9255e825cd05ea1428439a1f47723f044cd"
 tas_single_node_trillian_db_image:
-  "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:9ea85ef412a8fe9de1bad3cde18d384cf3e63c29eedd3326514024ccd70b5601"
+  "registry.redhat.io/rhtas/trillian-database-rhel9@sha256:a1a7d43a20f1776118fb359b1223307356bac543cda4267af33b7175b0699f04"
 tas_single_node_tuf_image:
-  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:fb433b8cdac8843886c7e206e23e46e1770c75c9320f1ed780d1bb625ee11ad0"
+  "registry.redhat.io/rhtas/tuffer-rhel9@sha256:6171943a8081a69eafc494b539b51f173e5ee59b2b350cc149ae43c0d96a3c96"
 tas_single_node_http_server_image:
-  "registry.redhat.io/ubi9/httpd-24@sha256:b660a5ca52c587e459969d34c7dafaa989159da3c7dd1828d9c7159915974163"
+  "registry.redhat.io/ubi9/httpd-24@sha256:368ffd2362306a7d07ecd169dc52e2abba0f0ea120d47c52b3c0783eba659084"
 tas_single_node_trillian_netcat_image:
-  "registry.redhat.io/openshift4/ose-tools-rhel9@sha256:17d4647d21d7571c11d6f983400da6544376fe8bde8372776e4779ebd8c6fd53"
+  "registry.redhat.io/openshift4/ose-tools-rhel9@sha256:d76b7ec587ba8d8b29cf709d9db0eb1fa3117e20650989c3b35095f395db0313"
 tas_single_node_nginx_image:
-  "registry.redhat.io/rhel9/nginx-124@sha256:fc163d9e8d58caad8efa88c43272c95486194cfa6356dd0bdb44ba60f51d96a5"
+  "registry.redhat.io/rhel9/nginx-124@sha256:d5cec86a9adf972dbfa0d87b134e7c404706cc1920fc2e6a2b146e290276f219"
 tas_single_node_timestamp_authority_image:
-  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:320eff29441452a82b68afdbdae70dfd27abbd0620a19ebbdff7a3cbfda4f052"
+  "registry.redhat.io/rhtas/timestamp-authority-rhel9@sha256:26b9b9c1534af8231baedc1e19abd5f7fcb1ba5608700461d9edb173ad5e8713"
 tas_single_node_rekor_search_ui_image:
-  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:c487c6616132ba70b1b1c0e38cc18f9ac9d2165870e5e824259016ec816b4195"
+  "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:1b3c17dafcecb373afc6bf385da4a8547f0ed5a6488b383d8487fa5e0e639ca5"
 # Create Tree
 tas_single_node_createtree_image:
-  "registry.redhat.io/rhtas/createtree-rhel9@sha256:ad10daddbf2508fc32698ce785d71955db4c723a8f438d73c7c9926d5744f056"
+  "registry.redhat.io/rhtas/createtree-rhel9@sha256:ef80ea41bacddc59f4f305b7bf6ab3e710ed0b3908f11a7193d82563f1eb3df7"
 # CLI Server
 tas_single_node_client_server_image:
-  "registry.redhat.io/rhtas/client-server-rhel9@sha256:ab78905b3577eeaf92ff4ba93cd4b387bfad9970fd5c26da87fa3c409284548d"
+  "registry.redhat.io/rhtas/client-server-rhel9@sha256:7b26065b548c9cb3cd4dda6c298d65aa655b04fc6ba2504b4e5f6a77cd9197fc"
 
 tas_single_node_signing_config_url_mode: external
 
