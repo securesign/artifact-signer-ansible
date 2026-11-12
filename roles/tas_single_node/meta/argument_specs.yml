@@ -1257,7 +1257,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/client-server-rhel9@sha256:7b26065b548c9cb3cd4dda6c298d65aa655b04fc6ba2504b4e5f6a77cd9197fc"
+        default: "registry.redhat.io/rhtas/client-server-rhel9@sha256:01176f37503950e46b027d5efa75b69b875ff6e8739ef90ad4190e95fffe3baa"
       tas_single_node_podman:
         description: "Configuration options for Podman."
         type: "dict"
