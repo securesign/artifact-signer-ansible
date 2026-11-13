@@ -1245,7 +1245,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:1b3c17dafcecb373afc6bf385da4a8547f0ed5a6488b383d8487fa5e0e639ca5"
+        default: "registry.redhat.io/rhtas/rekor-search-ui-rhel9@sha256:185f14ae66bef9fb9cb2abe4cf2576e289f1757e901c46b3d25e92783b0d762c"
       tas_single_node_createtree_image:
         description: "Trillian create-tree image"
         type: "str"
