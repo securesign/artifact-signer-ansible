@@ -1251,7 +1251,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/createtree-rhel9@sha256:ef80ea41bacddc59f4f305b7bf6ab3e710ed0b3908f11a7193d82563f1eb3df7"
+        default: "registry.redhat.io/rhtas/createtree-rhel9@sha256:3f8fe8a443db79fae07c5850a1ac359316bda4b6d06e1ff8b09d1c85b7400bc4"
       tas_single_node_client_server_image:
         description: "CLI server image"
         type: "str"
