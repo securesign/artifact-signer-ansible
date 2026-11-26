@@ -27,7 +27,7 @@ tas_single_node_rekor_server_image:
 tas_single_node_rekor_monitor_image:
   "registry.redhat.io/rhtas/rekor-monitor-rhel9@sha256:7005fa66e7793fc865052dc466fbe836c96c34cc0c19c08703cbb588a4d429cf"
 tas_single_node_ctlog_image:
-  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:01a81599f6b18540c840fce3ab54509a515a5a5fbd2ad069e27a8774937927d9"
+  "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:3390cbe88b52324c2df128822ac0fc38694e546015428d5b2e783ee84037191b"
 tas_single_node_ctlog_monitor_image:
   "registry.redhat.io/rhtas/ctlog-monitor-rhel9@sha256:469ff13cac039004bf46f3cbb634d5e9174e2f6da9800e85b580afeafb31924e"
 tas_single_node_rekor_redis_image:

@@ -1185,7 +1185,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.0"
-        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:48d79f34792d52f4f92f99327c726baf23ffd69a84335680ab44f159960ab764"
+        default: "registry.redhat.io/rhtas/certificate-transparency-rhel9@sha256:3390cbe88b52324c2df128822ac0fc38694e546015428d5b2e783ee84037191b"
       tas_single_node_ctlog_monitor_image:
         description: "ctlog monitor image"
         type: "str"
