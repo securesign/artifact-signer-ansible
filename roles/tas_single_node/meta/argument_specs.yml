@@ -1203,7 +1203,7 @@ argument_specs:
         type: "str"
         required: false
         version_added: "1.1.1"
-        default: "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:8be71af65d0ba1b85901e7b8b156f9255e825cd05ea1428439a1f47723f044cd"
+        default: "registry.redhat.io/rhtas/rekor-backfill-redis-rhel9@sha256:2ea3bb436e7e7d7fbf01108b1843f48aa86e875d9c8a7aa9b9ec91f6d80bf692"
       tas_single_node_trillian_db_image:
         description: "Trillian database image"
         type: "str"
